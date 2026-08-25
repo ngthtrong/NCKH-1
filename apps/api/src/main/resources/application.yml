@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: multi-tenant-task-api
+  datasource:
+    url: ${CONTROL_DB_URL:jdbc:postgresql://localhost:5432/control_db}
+    username: ${CONTROL_DB_USER:control_app}
+    password: ${CONTROL_DB_PASSWORD:local-control-change-me}
+    hikari:
+      maximum-pool-size: ${CONTROL_DB_POOL_SIZE:5}
+      minimum-idle: 1
+      connection-timeout: 5000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    locations: classpath:db/migration/control
+    validate-migration-naming: true
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:20MB}
+      max-request-size: ${MAX_REQUEST_SIZE:21MB}
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+app:
+  base-domain: ${BASE_DOMAIN:localhost}
+  accounts-subdomain: ${ACCOUNTS_SUBDOMAIN:accounts}
+  jwt:
+    secret: ${JWT_SECRET:local-only-jwt-secret-change-me-32-bytes-minimum}
+    issuer: ${JWT_ISSUER:nckh1-local}
+    access-ttl: ${ACCESS_TOKEN_TTL:PT15M}
+    global-ttl: ${GLOBAL_TOKEN_TTL:PT15M}
+    refresh-ttl: ${REFRESH_TOKEN_TTL:P7D}
+  datasource:
+    pool:
+      jdbc-url: ${POOL_DB_URL:jdbc:postgresql://localhost:5432/pool_db}
+      username: ${POOL_DB_USER:pool_app}
+      password: ${POOL_DB_PASSWORD:local-pool-change-me}
+      maximum-pool-size: ${POOL_DB_POOL_SIZE:10}
+    silo:
+      maximum-pool-size: ${SILO_DB_POOL_SIZE:2}
+      idle-timeout: ${SILO_DB_IDLE_TIMEOUT:PT10M}
+      global-connection-cap: ${SILO_GLOBAL_CONNECTION_CAP:10}
+  provisioning:
+    admin-url: ${PROVISIONER_DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    admin-username: ${PROVISIONER_DB_USER:provisioner}
+    admin-password: ${PROVISIONER_DB_PASSWORD:local-provisioner-change-me}
+    encryption-key: ${PLACEMENT_ENCRYPTION_KEY:local-only-placement-key-change-me}
+    max-attempts: ${PROVISIONING_MAX_ATTEMPTS:3}
+  payment:
+    provider: ${PAYMENT_PROVIDER:fake}
+    webhook-secret: ${PAYMENT_WEBHOOK_SECRET:local-only-payment-secret}
+  storage:
+    type: ${RESOURCE_STORAGE_TYPE:minio}
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    public-endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:local-minio-change-me}
+    bucket: ${MINIO_BUCKET:tenant-resources}
+    filesystem-root: ${RESOURCE_FILESYSTEM_ROOT:.data/resources}
+    signing-secret: ${RESOURCE_SIGNING_SECRET:local-only-resource-signing-secret}
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE:120}
+  seed:
+    enabled: ${DEMO_DATA_ENABLED:false}
+    owner-email: ${DEMO_OWNER_EMAIL:owner@example.test}
+    owner-password: ${DEMO_OWNER_PASSWORD:ChangeMe123!}
+
+logging:
+  level:
+    root: INFO
+    vn.edu.ctu.saas: INFO

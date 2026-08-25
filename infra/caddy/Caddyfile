@@ -1,0 +1,29 @@
+{
+    auto_https off
+    admin off
+}
+
+http://accounts.localhost, http://*.localhost {
+    encode zstd gzip
+
+    @api path /api/* /actuator/health /actuator/health/*
+    handle @api {
+        reverse_proxy api:8080
+    }
+
+    handle {
+        reverse_proxy web:8080
+    }
+
+    header {
+        -Server
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+    }
+
+    log {
+        output stdout
+        format json
+    }
+}

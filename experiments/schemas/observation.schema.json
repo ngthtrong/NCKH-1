@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/saas-research/observation.schema.json",
+  "title": "Normalized k6 observation row",
+  "description": "Each row in observations.csv follows this record shape.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "scenario",
+    "rate_limit_variant",
+    "metric",
+    "statistic",
+    "value",
+    "unit",
+    "tags"
+  ],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "scenario": { "type": "string", "minLength": 1 },
+    "rate_limit_variant": { "type": "string", "minLength": 1 },
+    "metric": { "type": "string", "minLength": 1 },
+    "statistic": { "type": "string", "minLength": 1 },
+    "value": { "type": "number" },
+    "unit": { "enum": ["milliseconds", "bytes", "ratio", "count", "per_second", "value"] },
+    "tags": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

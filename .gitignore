@@ -1,0 +1,45 @@
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# Java
+apps/api/target/
+*.log
+
+# Node
+apps/web/node_modules/
+apps/web/dist/
+apps/web/coverage/
+apps/web/playwright-report/
+apps/web/test-results/
+
+# Research outputs and private participant data
+experiments/results/*
+!experiments/results/.gitkeep
+experiments/derived/*
+!experiments/derived/.gitkeep
+experiments/results/raw/*
+!experiments/results/raw/.gitkeep
+experiments/results/processed/*
+!experiments/results/processed/.gitkeep
+research-private/
+*.ipynb_checkpoints/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Runtime data
+.data/
+data/
+backups/

@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: local
+    application: saas-research
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: saas-api
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api:8080"]
+        labels:
+          process_role: api

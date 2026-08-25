@@ -1,0 +1,1109 @@
+openapi: 3.1.0
+info:
+  title: NCKH SaaS Multi-tenancy API
+  version: 0.1.0
+  description: >-
+    Hợp đồng REST cho control plane và application plane. Các API nghiệp vụ lấy
+    tenant từ host và JWT; không nhận tenant_id từ payload để phân quyền.
+servers:
+  - url: http://accounts.localhost:8080/api/v1
+    description: Control host local
+  - url: http://{tenant}.localhost:8080/api/v1
+    description: Tenant host local
+    variables:
+      tenant:
+        default: pool-demo
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Tenants
+  - name: Projects
+  - name: Resources
+  - name: Notifications
+  - name: Payments
+  - name: Administration
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/LoginRequest'}
+      responses:
+        '200':
+          description: Global session and available tenants
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LoginResponse'}
+        default: {$ref: '#/components/responses/Error'}
+  /auth/tenant-transfer:
+    post:
+      tags: [Auth]
+      operationId: createTenantTransfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TenantTransferRequest'}
+      responses:
+        '200':
+          description: One-time transfer code
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantTransferResponse'}
+        default: {$ref: '#/components/responses/Error'}
+  /auth/exchange:
+    post:
+      tags: [Auth]
+      operationId: exchangeTenantTransfer
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ExchangeRequest'}
+      responses:
+        '200':
+          description: Tenant-bound access token; refresh and CSRF cookies are set
+          headers:
+            Set-Cookie:
+              schema: {type: string}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantSessionResponse'}
+        default: {$ref: '#/components/responses/Error'}
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshTenantSession
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Rotated tenant session
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantSessionResponse'}
+        default: {$ref: '#/components/responses/Error'}
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/OptionalCsrfHeader'
+      responses:
+        '200': {description: Refresh session revoked}
+        default: {$ref: '#/components/responses/Error'}
+  /auth/me:
+    get:
+      tags: [Auth]
+      operationId: currentUser
+      responses:
+        '200':
+          description: Current user and optional tenant context
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MeResponse'}
+        default: {$ref: '#/components/responses/Error'}
+  /tenants:
+    get:
+      tags: [Tenants]
+      operationId: listMyTenants
+      responses:
+        '200':
+          description: Active memberships of current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/TenantView'}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Tenants]
+      operationId: createTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateTenantRequest'}
+      responses:
+        '200':
+          description: Tenant in PENDING_PAYMENT state
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantView'}
+        default: {$ref: '#/components/responses/Error'}
+  /members:
+    get:
+      tags: [Tenants]
+      operationId: listTenantMembers
+      responses:
+        '200':
+          description: Active tenant members
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /members/invitations:
+    post:
+      tags: [Tenants]
+      operationId: inviteExistingTenantMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/InviteMemberRequest'}
+      responses:
+        '200':
+          description: Membership created or reactivated
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /members/{membershipId}:
+    parameters:
+      - $ref: '#/components/parameters/MembershipId'
+    patch:
+      tags: [Tenants]
+      operationId: updateTenantMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateMemberRequest'}
+      responses:
+        '200':
+          description: Updated membership and incremented security version when changed
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Tenants]
+      operationId: revokeTenantMember
+      responses:
+        '200': {description: Membership revoked}
+        default: {$ref: '#/components/responses/Error'}
+  /members/{membershipId}/role:
+    patch:
+      tags: [Tenants]
+      operationId: changeTenantMemberRole
+      parameters:
+        - $ref: '#/components/parameters/MembershipId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ChangeRoleRequest'}
+      responses:
+        '200':
+          description: Updated membership
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /dashboard:
+    get:
+      tags: [Projects]
+      operationId: dashboard
+      responses:
+        '200':
+          description: Metrics restricted to projects visible to current user
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/DashboardView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects:
+    get:
+      tags: [Projects]
+      operationId: listProjects
+      responses:
+        '200':
+          description: Projects with current user's project membership
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ProjectView'}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Projects]
+      operationId: createProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateProjectRequest'}
+      responses:
+        '201':
+          description: Project, manager membership and default Kanban board created atomically
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProjectView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    put:
+      tags: [Projects]
+      operationId: updateProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateProjectRequest'}
+      responses:
+        '200':
+          description: Updated project
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProjectView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Projects]
+      operationId: deleteProject
+      responses:
+        '204': {description: Project deleted}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/members:
+    get:
+      tags: [Projects]
+      operationId: listProjectMembers
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project memberships
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ProjectMemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/members/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/UserId'
+    put:
+      tags: [Projects]
+      operationId: setProjectMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SetProjectMemberRequest'}
+      responses:
+        '200':
+          description: Project membership created or updated
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProjectMemberView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Projects]
+      operationId: removeProjectMember
+      responses:
+        '204': {description: Project membership removed}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/boards:
+    post:
+      tags: [Projects]
+      operationId: createBoard
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateBoardRequest'}
+      responses:
+        '201':
+          description: Board with default columns
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BoardView'}
+        default: {$ref: '#/components/responses/Error'}
+  /boards/{boardId}:
+    get:
+      tags: [Projects]
+      operationId: getBoard
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      responses:
+        '200':
+          description: Board, columns and tasks
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BoardView'}
+        default: {$ref: '#/components/responses/Error'}
+  /boards/{boardId}/tasks:
+    post:
+      tags: [Projects]
+      operationId: createTask
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateTaskRequest'}
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskView'}
+        default: {$ref: '#/components/responses/Error'}
+  /boards/{boardId}/tasks/{taskId}/position:
+    patch:
+      tags: [Projects]
+      operationId: moveTask
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/MoveTaskRequest'}
+      responses:
+        '200':
+          description: Task moved; 409 is returned for stale version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/TaskId'
+    patch:
+      tags: [Projects]
+      operationId: updateTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateTaskRequest'}
+      responses:
+        '200':
+          description: Task updated; 409 is returned for stale version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Projects]
+      operationId: deleteTask
+      responses:
+        '204': {description: Task deleted}
+        default: {$ref: '#/components/responses/Error'}
+  /tasks/{taskId}/comments:
+    parameters:
+      - $ref: '#/components/parameters/TaskId'
+    get:
+      tags: [Projects]
+      operationId: listComments
+      responses:
+        '200':
+          description: Task comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/CommentView'}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Projects]
+      operationId: createComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCommentRequest'}
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CommentView'}
+        default: {$ref: '#/components/responses/Error'}
+  /resources:
+    get:
+      tags: [Resources]
+      operationId: listResources
+      responses:
+        '200':
+          description: Resources uploaded by or project-visible to current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ResourceView'}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Resources]
+      operationId: uploadResource
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: {type: string, format: binary}
+      responses:
+        '200':
+          description: Resource stored in tenant namespace
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ResourceView'}
+        default: {$ref: '#/components/responses/Error'}
+  /resources/quota:
+    get:
+      tags: [Resources]
+      operationId: resourceQuota
+      responses:
+        '200':
+          description: Aggregate quota for tenant administrators
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuotaView'}
+        default: {$ref: '#/components/responses/Error'}
+  /resources/{resourceId}/download-url:
+    get:
+      tags: [Resources]
+      operationId: createResourceDownloadUrl
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Short-lived authorized URL
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/DownloadUrl'}
+        default: {$ref: '#/components/responses/Error'}
+  /resources/{resourceId}/tasks/{taskId}:
+    post:
+      tags: [Resources]
+      operationId: attachResourceToTask
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200': {description: Resource attached idempotently}
+        default: {$ref: '#/components/responses/Error'}
+  /resources/{resourceId}:
+    delete:
+      tags: [Resources]
+      operationId: deleteResource
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200': {description: Resource deleted}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications:
+    get:
+      tags: [Notifications]
+      operationId: listNotifications
+      responses:
+        '200':
+          description: Current user's notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/NotificationView'}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications/{notificationId}/read:
+    patch:
+      tags: [Notifications]
+      operationId: markNotificationRead
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema: {$ref: '#/components/schemas/UUID'}
+      responses:
+        '200':
+          description: Updated notification
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NotificationView'}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications/read-all:
+    post:
+      tags: [Notifications]
+      operationId: markAllNotificationsRead
+      responses:
+        '200': {description: All current user's notifications marked read}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications/preferences:
+    get:
+      tags: [Notifications]
+      operationId: getNotificationPreferences
+      responses:
+        '200':
+          description: Notification preferences
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NotificationPreferences'}
+        default: {$ref: '#/components/responses/Error'}
+    put:
+      tags: [Notifications]
+      operationId: updateNotificationPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/NotificationPreferences'}
+      responses:
+        '200':
+          description: Updated notification preferences
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NotificationPreferences'}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications/push-subscriptions:
+    post:
+      tags: [Notifications]
+      operationId: addPushSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PushSubscriptionRequest'}
+      responses:
+        '200':
+          description: Push subscription stored
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PushSubscriptionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /notifications/push-subscriptions/{subscriptionId}:
+    delete:
+      tags: [Notifications]
+      operationId: removePushSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema: {$ref: '#/components/schemas/UUID'}
+      responses:
+        '200': {description: Push subscription removed}
+        default: {$ref: '#/components/responses/Error'}
+  /audit:
+    get:
+      tags: [Administration]
+      operationId: listAuditEvents
+      parameters:
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 200, default: 50}
+      responses:
+        '200':
+          description: Tenant audit events for tenant administrators
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/AuditView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tenants/{tenantId}/payment-session:
+    post:
+      tags: [Payments]
+      operationId: createPaymentSession
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: {type: string, minLength: 8, maxLength: 120}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreatePaymentRequest'}
+      responses:
+        '200':
+          description: Idempotent provider checkout session
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PaymentSessionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /payments/webhooks/fake:
+    post:
+      tags: [Payments]
+      operationId: handleFakePaymentWebhook
+      security: []
+      parameters:
+        - name: X-Payment-Signature
+          in: header
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: true}
+      responses:
+        '200':
+          description: Verified and idempotently processed callback
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PaymentResultView'}
+        default: {$ref: '#/components/responses/Error'}
+  /admin/tenants:
+    get:
+      tags: [Administration]
+      operationId: listAdminTenants
+      parameters:
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 0, default: 0}
+        - name: size
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+        - name: search
+          in: query
+          schema: {type: string, default: ''}
+      responses:
+        '200':
+          description: Control-plane tenant page for system administrators
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminTenantPage'}
+        default: {$ref: '#/components/responses/Error'}
+  /admin/tenants/{tenantId}/provisioning/retry:
+    post:
+      tags: [Administration]
+      operationId: retryProvisioning
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200': {description: Failed job queued again and transition audited}
+        default: {$ref: '#/components/responses/Error'}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    CsrfHeader:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      schema: {type: string}
+    OptionalCsrfHeader:
+      name: X-CSRF-Token
+      in: header
+      required: false
+      schema: {type: string}
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    MembershipId:
+      name: membershipId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    BoardId:
+      name: boardId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    ResourceId:
+      name: resourceId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+  responses:
+    Error:
+      description: Structured API error
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+  schemas:
+    UUID: {type: string, format: uuid}
+    Instant: {type: string, format: date-time}
+    TenantRole: {type: string, enum: [OWNER, ADMIN, MEMBER]}
+    ProjectRole: {type: string, enum: [MANAGER, MEMBER, VIEWER]}
+    TenantTier: {type: string, enum: [STARTER, PROFESSIONAL, ENTERPRISE]}
+    TenantPlacement: {type: string, enum: [POOL, SILO_DATABASE]}
+    TenantStatus: {type: string, enum: [PENDING_PAYMENT, PROVISIONING, ACTIVE, FAILED, SUSPENDED]}
+    PaymentStatus: {type: string, enum: [CREATED, PENDING, SUCCEEDED, FAILED, EXPIRED]}
+    ProvisioningStatus: {type: string, enum: [QUEUED, RUNNING, SUCCEEDED, RETRYABLE_FAILED, FAILED_ROLLED_BACK]}
+    ApiError:
+      type: object
+      required: [timestamp, status, code, message, path, fieldErrors]
+      properties:
+        timestamp: {$ref: '#/components/schemas/Instant'}
+        status: {type: integer}
+        code: {type: string}
+        message: {type: string}
+        path: {type: string}
+        fieldErrors: {type: object, additionalProperties: {type: string}}
+        requestId: {type: [string, 'null']}
+    UserView:
+      type: object
+      required: [id, email, displayName]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        email: {type: string, format: email}
+        displayName: {type: string}
+    TenantView:
+      type: object
+      required: [id, slug, name, tier, status, placement, role]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        slug: {type: string}
+        name: {type: string}
+        tier: {$ref: '#/components/schemas/TenantTier'}
+        status: {$ref: '#/components/schemas/TenantStatus'}
+        placement: {$ref: '#/components/schemas/TenantPlacement'}
+        role: {$ref: '#/components/schemas/TenantRole'}
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+    LoginResponse:
+      type: object
+      required: [accessToken, expiresInSeconds, user, tenants]
+      properties:
+        accessToken: {type: string}
+        expiresInSeconds: {type: integer, format: int64}
+        user: {$ref: '#/components/schemas/UserView'}
+        tenants:
+          type: array
+          items: {$ref: '#/components/schemas/TenantView'}
+    TenantTransferRequest:
+      type: object
+      required: [tenantSlug]
+      properties: {tenantSlug: {type: string}}
+    TenantTransferResponse:
+      type: object
+      required: [code, redirectUrl, expiresInSeconds]
+      properties:
+        code: {type: string}
+        redirectUrl: {type: string, format: uri}
+        expiresInSeconds: {type: integer, format: int64}
+    ExchangeRequest:
+      type: object
+      required: [code]
+      properties: {code: {type: string}}
+    TenantSessionResponse:
+      type: object
+      required: [accessToken, expiresInSeconds, user, activeTenant]
+      properties:
+        accessToken: {type: string}
+        expiresInSeconds: {type: integer, format: int64}
+        user: {$ref: '#/components/schemas/UserView'}
+        activeTenant: {$ref: '#/components/schemas/TenantView'}
+    MeResponse:
+      type: object
+      required: [user, tenantScoped]
+      properties:
+        user: {$ref: '#/components/schemas/UserView'}
+        tenant: {anyOf: [{$ref: '#/components/schemas/TenantView'}, {type: 'null'}]}
+        tenantScoped: {type: boolean}
+    CreateTenantRequest:
+      type: object
+      required: [slug, name, tier, placement]
+      properties:
+        slug: {type: string, pattern: '^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$'}
+        name: {type: string}
+        tier: {$ref: '#/components/schemas/TenantTier'}
+        placement: {$ref: '#/components/schemas/TenantPlacement'}
+    MemberView:
+      type: object
+      required: [membershipId, userId, email, displayName, role, active, securityVersion]
+      properties:
+        membershipId: {$ref: '#/components/schemas/UUID'}
+        userId: {$ref: '#/components/schemas/UUID'}
+        email: {type: string, format: email}
+        displayName: {type: string}
+        role: {$ref: '#/components/schemas/TenantRole'}
+        active: {type: boolean}
+        securityVersion: {type: integer, format: int64}
+    InviteMemberRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email: {type: string, format: email}
+        role: {$ref: '#/components/schemas/TenantRole'}
+    UpdateMemberRequest:
+      type: object
+      required: [role, active]
+      properties:
+        role: {$ref: '#/components/schemas/TenantRole'}
+        active: {type: boolean}
+    ChangeRoleRequest:
+      type: object
+      required: [role]
+      properties: {role: {$ref: '#/components/schemas/TenantRole'}}
+    DashboardView:
+      type: object
+      required: [projects, boards, openTasks, overdueTasks, unreadNotifications]
+      properties:
+        projects: {type: integer, format: int64}
+        boards: {type: integer, format: int64}
+        openTasks: {type: integer, format: int64}
+        overdueTasks: {type: integer, format: int64}
+        unreadNotifications: {type: integer, format: int64}
+    ProjectView:
+      type: object
+      required: [id, name, createdBy, createdAt, updatedAt, role, memberCount, taskCount, completedTaskCount]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        description: {type: [string, 'null']}
+        createdBy: {$ref: '#/components/schemas/UUID'}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        updatedAt: {$ref: '#/components/schemas/Instant'}
+        role: {$ref: '#/components/schemas/ProjectRole'}
+        boardId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        memberCount: {type: integer, format: int64}
+        taskCount: {type: integer, format: int64}
+        completedTaskCount: {type: integer, format: int64}
+    CreateProjectRequest:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, maxLength: 160}
+        description: {type: [string, 'null'], maxLength: 5000}
+    UpdateProjectRequest:
+      $ref: '#/components/schemas/CreateProjectRequest'
+    ProjectMemberView:
+      type: object
+      required: [projectId, userId, role]
+      properties:
+        projectId: {$ref: '#/components/schemas/UUID'}
+        userId: {$ref: '#/components/schemas/UUID'}
+        role: {$ref: '#/components/schemas/ProjectRole'}
+    SetProjectMemberRequest:
+      type: object
+      required: [role]
+      properties: {role: {$ref: '#/components/schemas/ProjectRole'}}
+    ColumnView:
+      type: object
+      required: [id, name, position]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        position: {type: number}
+    TaskView:
+      type: object
+      required: [id, projectId, boardId, columnId, title, position, version, createdAt, updatedAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        boardId: {$ref: '#/components/schemas/UUID'}
+        columnId: {$ref: '#/components/schemas/UUID'}
+        parentTaskId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        title: {type: string}
+        description: {type: [string, 'null']}
+        assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        position: {type: number}
+        version: {type: integer, format: int64}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        updatedAt: {$ref: '#/components/schemas/Instant'}
+    BoardView:
+      type: object
+      required: [id, projectId, name, columns, tasks]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        columns: {type: array, items: {$ref: '#/components/schemas/ColumnView'}}
+        tasks: {type: array, items: {$ref: '#/components/schemas/TaskView'}}
+    CreateBoardRequest:
+      type: object
+      required: [name]
+      properties: {name: {type: string, maxLength: 160}}
+    CreateTaskRequest:
+      type: object
+      required: [columnId, title]
+      properties:
+        columnId: {$ref: '#/components/schemas/UUID'}
+        parentTaskId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        title: {type: string, maxLength: 240}
+        description: {type: [string, 'null'], maxLength: 10000}
+        assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        position: {type: [number, 'null']}
+    UpdateTaskRequest:
+      type: object
+      required: [columnId, title, version]
+      properties:
+        columnId: {$ref: '#/components/schemas/UUID'}
+        title: {type: string, maxLength: 240}
+        description: {type: [string, 'null'], maxLength: 10000}
+        assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        position: {type: [number, 'null']}
+        version: {type: integer, format: int64}
+    MoveTaskRequest:
+      type: object
+      required: [targetColumnId, targetPosition, version]
+      properties:
+        targetColumnId: {$ref: '#/components/schemas/UUID'}
+        targetPosition: {type: number}
+        version: {type: integer, format: int64}
+    CommentView:
+      type: object
+      required: [id, taskId, authorUserId, body, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        taskId: {$ref: '#/components/schemas/UUID'}
+        authorUserId: {$ref: '#/components/schemas/UUID'}
+        body: {type: string}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    CreateCommentRequest:
+      type: object
+      required: [body]
+      properties: {body: {type: string, maxLength: 10000}}
+    ResourceView:
+      type: object
+      required: [id, originalName, storageKey, contentType, sizeBytes, uploadedBy, createdAt, taskCount]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        originalName: {type: string}
+        storageKey: {type: string, description: Server-generated key; clients must not use it for authorization}
+        contentType: {type: string}
+        sizeBytes: {type: integer, format: int64}
+        uploadedBy: {$ref: '#/components/schemas/UUID'}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        taskCount: {type: integer, format: int64}
+    QuotaView:
+      type: object
+      required: [usedBytes, limitBytes]
+      properties:
+        usedBytes: {type: integer, format: int64}
+        limitBytes: {type: integer, format: int64}
+    DownloadUrl:
+      type: object
+      required: [url, expiresAt]
+      properties:
+        url: {type: string, format: uri-reference}
+        expiresAt: {$ref: '#/components/schemas/Instant'}
+    NotificationView:
+      type: object
+      required: [id, eventType, title, body, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        eventType: {type: string}
+        title: {type: string}
+        body: {type: string}
+        readAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    NotificationPreferences:
+      type: object
+      required: [inAppEnabled, emailEnabled, webPushEnabled]
+      properties:
+        inAppEnabled: {type: boolean}
+        emailEnabled: {type: boolean}
+        webPushEnabled: {type: boolean}
+    PushSubscriptionRequest:
+      type: object
+      required: [endpoint, p256dh, auth]
+      properties:
+        endpoint: {type: string, format: uri}
+        p256dh: {type: string}
+        auth: {type: string}
+    PushSubscriptionView:
+      type: object
+      required: [id, endpoint, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        endpoint: {type: string, format: uri}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    AuditView:
+      type: object
+      required: [id, actorName, action, aggregateType, detailsJson, occurredAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        actorUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        actorName: {type: string}
+        action: {type: string}
+        aggregateType: {type: string}
+        aggregateId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        correlationId: {type: [string, 'null']}
+        detailsJson: {type: string}
+        occurredAt: {$ref: '#/components/schemas/Instant'}
+    CreatePaymentRequest:
+      type: object
+      required: [amountMinor, currency, returnUrl]
+      properties:
+        amountMinor: {type: integer, format: int64, minimum: 1}
+        currency: {type: string, pattern: '^[A-Za-z]{3}$'}
+        returnUrl: {type: string, format: uri}
+    PaymentSessionView:
+      type: object
+      required: [paymentId, provider, reference, checkoutUrl, status]
+      properties:
+        paymentId: {$ref: '#/components/schemas/UUID'}
+        provider: {type: string}
+        reference: {type: string}
+        checkoutUrl: {type: string, format: uri}
+        status: {$ref: '#/components/schemas/PaymentStatus'}
+    PaymentResultView:
+      type: object
+      required: [paymentId, tenantId, status, duplicate]
+      properties:
+        paymentId: {$ref: '#/components/schemas/UUID'}
+        tenantId: {$ref: '#/components/schemas/UUID'}
+        status: {$ref: '#/components/schemas/PaymentStatus'}
+        duplicate: {type: boolean}
+    AdminTenantView:
+      type: object
+      required: [id, name, slug, tier, status, memberCount, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        slug: {type: string}
+        tier: {$ref: '#/components/schemas/TenantTier'}
+        placement: {anyOf: [{$ref: '#/components/schemas/TenantPlacement'}, {type: 'null'}]}
+        status: {$ref: '#/components/schemas/TenantStatus'}
+        provisioningStatus: {anyOf: [{$ref: '#/components/schemas/ProvisioningStatus'}, {type: 'null'}]}
+        memberCount: {type: integer, format: int64}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        lastError: {type: [string, 'null']}
+    AdminTenantPage:
+      type: object
+      required: [items, page, size, totalItems, totalPages]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/AdminTenantView'}}
+        page: {type: integer}
+        size: {type: integer}
+        totalItems: {type: integer, format: int64}
+        totalPages: {type: integer}

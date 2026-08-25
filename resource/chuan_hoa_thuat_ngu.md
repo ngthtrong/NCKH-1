@@ -1,7 +1,7 @@
 # TIÊU CHUẨN HÓA THUẬT NGỮ TIẾNG ANH - TIẾNG VIỆT
 ## Đề tài: Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao (Multi-Tenant)
 
-Tài liệu này chuẩn hóa việc dịch thuật và sử dụng các thuật ngữ chuyên ngành Anh - Việt trong hồ sơ thuyết minh đề tài nghiên cứu khoa học [thuyet_minh_SaaS.md](file:///home/ngthtrong/NCKH-1/thuyet_minh_SaaS.md) và các tài liệu kỹ thuật liên quan (báo cáo, đặc tả, slide, nhật ký thực nghiệm).
+Tài liệu này chuẩn hóa việc dịch thuật và sử dụng các thuật ngữ chuyên ngành Anh - Việt trong hồ sơ thuyết minh đề tài nghiên cứu khoa học [thuyetMinhSaasMultiTenancy.md](./thuyetMinhSaasMultiTenancy.md) và các tài liệu kỹ thuật liên quan (báo cáo, đặc tả, slide, nhật ký thực nghiệm).
 
 ---
 

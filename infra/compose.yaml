@@ -1,0 +1,255 @@
+name: ${COMPOSE_PROJECT_NAME:-saas-research}
+
+x-api-environment: &api-environment
+  CONTROL_DB_URL: ${CONTROL_DB_URL:-jdbc:postgresql://postgres:5432/control_db}
+  CONTROL_DB_USER: ${CONTROL_DB_USER:?Set CONTROL_DB_USER in infra/.env}
+  CONTROL_DB_PASSWORD: ${CONTROL_DB_PASSWORD:?Set CONTROL_DB_PASSWORD in infra/.env}
+  SPRING_FLYWAY_USER: ${MIGRATION_DB_USER:?Set MIGRATION_DB_USER in infra/.env}
+  SPRING_FLYWAY_PASSWORD: ${MIGRATION_DB_PASSWORD:?Set MIGRATION_DB_PASSWORD in infra/.env}
+  POOL_DB_URL: ${POOL_DB_URL:-jdbc:postgresql://postgres:5432/pool_db}
+  POOL_DB_USER: ${POOL_DB_USER:?Set POOL_DB_USER in infra/.env}
+  POOL_DB_PASSWORD: ${POOL_DB_PASSWORD:?Set POOL_DB_PASSWORD in infra/.env}
+  JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in infra/.env}
+  ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-PT10M}
+  REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL:-P7D}
+  PLACEMENT_ENCRYPTION_KEY: ${PLACEMENT_ENCRYPTION_KEY:?Set PLACEMENT_ENCRYPTION_KEY in infra/.env}
+  PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:?Set PAYMENT_WEBHOOK_SECRET in infra/.env}
+  RESOURCE_SIGNING_SECRET: ${RESOURCE_SIGNING_SECRET:?Set RESOURCE_SIGNING_SECRET in infra/.env}
+  MINIO_ENDPOINT: http://minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_APP_ACCESS_KEY:?Set MINIO_APP_ACCESS_KEY in infra/.env}
+  MINIO_SECRET_KEY: ${MINIO_APP_SECRET_KEY:?Set MINIO_APP_SECRET_KEY in infra/.env}
+  MINIO_BUCKET: ${MINIO_BUCKET:-tenant-resources}
+  SMTP_HOST: mailpit
+  SMTP_PORT: 1025
+  PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-fake}
+  PUBLIC_ACCOUNTS_URL: ${PUBLIC_ACCOUNTS_URL:-http://accounts.localhost:8080}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  DEMO_DATA_ENABLED: ${DEMO_DATA_ENABLED:-true}
+  DEMO_OWNER_EMAIL: ${DEMO_OWNER_EMAIL:-owner@example.test}
+  DEMO_OWNER_PASSWORD: ${DEMO_OWNER_PASSWORD:?Set DEMO_OWNER_PASSWORD in infra/.env}
+
+x-app-runtime: &app-runtime
+  build:
+    context: ..
+    dockerfile: infra/docker/api.Dockerfile
+  image: saas-research-api:local
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp:size=128m,mode=1777
+  networks:
+    - saas
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:18-alpine}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:?Set POSTGRES_ADMIN_USER in infra/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD in infra/.env}
+      CONTROL_DB_NAME: ${CONTROL_DB_NAME:-control_db}
+      CONTROL_DB_USER: ${CONTROL_DB_USER:?Set CONTROL_DB_USER in infra/.env}
+      CONTROL_DB_PASSWORD: ${CONTROL_DB_PASSWORD:?Set CONTROL_DB_PASSWORD in infra/.env}
+      POOL_DB_NAME: ${POOL_DB_NAME:-pool_db}
+      POOL_DB_USER: ${POOL_DB_USER:?Set POOL_DB_USER in infra/.env}
+      POOL_DB_PASSWORD: ${POOL_DB_PASSWORD:?Set POOL_DB_PASSWORD in infra/.env}
+      PROVISIONER_DB_USER: ${PROVISIONER_DB_USER:?Set PROVISIONER_DB_USER in infra/.env}
+      PROVISIONER_DB_PASSWORD: ${PROVISIONER_DB_PASSWORD:?Set PROVISIONER_DB_PASSWORD in infra/.env}
+      MIGRATION_DB_USER: ${MIGRATION_DB_USER:?Set MIGRATION_DB_USER in infra/.env}
+      MIGRATION_DB_PASSWORD: ${MIGRATION_DB_PASSWORD:?Set MIGRATION_DB_PASSWORD in infra/.env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - saas
+
+  minio:
+    image: ${MINIO_IMAGE:-quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z}
+    restart: unless-stopped
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in infra/.env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in infra/.env}
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - saas
+
+  minio-init:
+    image: ${MINIO_MC_IMAGE:-quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z}
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_started
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in infra/.env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in infra/.env}
+      MINIO_APP_ACCESS_KEY: ${MINIO_APP_ACCESS_KEY:?Set MINIO_APP_ACCESS_KEY in infra/.env}
+      MINIO_APP_SECRET_KEY: ${MINIO_APP_SECRET_KEY:?Set MINIO_APP_SECRET_KEY in infra/.env}
+      MINIO_BUCKET: ${MINIO_BUCKET:-tenant-resources}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        until mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do sleep 2; done
+        mc mb --ignore-existing "local/$${MINIO_BUCKET}"
+        mc admin user add local "$${MINIO_APP_ACCESS_KEY}" "$${MINIO_APP_SECRET_KEY}" || true
+        mc admin policy attach local readwrite --user "$${MINIO_APP_ACCESS_KEY}"
+    networks:
+      - saas
+
+  mailpit:
+    image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.30.0}
+    restart: unless-stopped
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: 1000
+    ports:
+      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
+    volumes:
+      - mailpit-data:/data
+    networks:
+      - saas
+
+  api:
+    <<: *app-runtime
+    environment:
+      <<: *api-environment
+      SPRING_PROFILES_ACTIVE: api
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  worker:
+    <<: *app-runtime
+    environment:
+      <<: *api-environment
+      SPRING_PROFILES_ACTIVE: worker
+      SPRING_MAIN_WEB_APPLICATION_TYPE: none
+      PROVISIONER_DB_URL: jdbc:postgresql://${SILO_DB_HOST:-postgres}:${SILO_DB_PORT:-5432}/postgres
+      PROVISIONER_DB_USER: ${PROVISIONER_DB_USER:?Set PROVISIONER_DB_USER in infra/.env}
+      PROVISIONER_DB_PASSWORD: ${PROVISIONER_DB_PASSWORD:?Set PROVISIONER_DB_PASSWORD in infra/.env}
+      SILO_DB_HOST: ${SILO_DB_HOST:-postgres}
+      SILO_DB_PORT: ${SILO_DB_PORT:-5432}
+      SILO_DB_PREFIX: ${SILO_DB_PREFIX:-tenant_}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+      args:
+        VITE_API_BASE_URL: /api/v1
+    image: saas-research-web:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - saas
+
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2.11.4-alpine}
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    networks:
+      - saas
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE:-prom/prometheus:v3.5.5}
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - saas
+
+  grafana:
+    image: ${GRAFANA_IMAGE:-grafana/grafana:13.1.0}
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in infra/.env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - saas
+
+networks:
+  saas:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  minio-data:
+  mailpit-data:
+  prometheus-data:
+  grafana-data:
+  caddy-data:
+  caddy-config:

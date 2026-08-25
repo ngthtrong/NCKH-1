@@ -1,0 +1,37 @@
+groups:
+  - name: saas-api
+    rules:
+      - alert: SaasApiUnavailable
+        expr: up{job="saas-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: SaaS API is not scrapeable
+          description: Prometheus has been unable to scrape the API for two minutes.
+
+      - alert: SaasApiHighServerErrorRatio
+        expr: |
+          sum(rate(http_server_requests_seconds_count{job="saas-api",status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(http_server_requests_seconds_count{job="saas-api"}[5m])), 1)
+          > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: SaaS API server error ratio is above 5%
+          description: The aggregate five-minute HTTP 5xx ratio has remained above 5% for ten minutes.
+
+      - alert: SaasApiDatabasePoolNearCapacity
+        expr: |
+          max by (pool) (hikaricp_connections_active{job="saas-api"})
+          /
+          clamp_min(max by (pool) (hikaricp_connections_max{job="saas-api"}), 1)
+          > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Database connection pool is near capacity
+          description: Hikari pool {{ $labels.pool }} has used more than 90% of its configured connections for five minutes.

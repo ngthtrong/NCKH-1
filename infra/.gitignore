@@ -1,0 +1,8 @@
+.env
+backups/
+caddy/data/
+caddy/config/
+grafana/data/
+postgres/data/
+prometheus/data/
+!**/.gitkeep

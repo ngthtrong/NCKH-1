@@ -1,0 +1,158 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "API scrape status. A value of 1 means Prometheus can reach the application metrics endpoint.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        { "expr": "up{job=\"saas-api\"}", "legendFormat": "API", "refId": "A" }
+      ],
+      "title": "API availability",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Total API requests per second, optionally filtered by tenant_id when that label is emitted by the application.",
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "reqps" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 9, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (tenant_id) (rate(http_server_requests_seconds_count{job=\"saas-api\",tenant_id=~\"$tenant\"}[1m]))",
+          "legendFormat": "{{tenant_id}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request rate by tenant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "95th percentile server-side duration. This panel shows observations only; an SLO is set after the pilot experiment.",
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "s" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 9, "x": 15, "y": 0 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, tenant_id) (rate(http_server_requests_seconds_bucket{job=\"saas-api\",tenant_id=~\"$tenant\"}[5m])))",
+          "legendFormat": "{{tenant_id}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP p95 by tenant",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Active, idle and maximum connections grouped by Hikari pool.",
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 4,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "expr": "hikaricp_connections_active{job=\"saas-api\"}", "legendFormat": "{{pool}} active", "refId": "A" },
+        { "expr": "hikaricp_connections_idle{job=\"saas-api\"}", "legendFormat": "{{pool}} idle", "refId": "B" },
+        { "expr": "hikaricp_connections_max{job=\"saas-api\"}", "legendFormat": "{{pool}} max", "refId": "C" }
+      ],
+      "title": "Database connections",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "JVM heap usage and process resident memory for resource comparison runs.",
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "bytes" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 5,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "expr": "sum(jvm_memory_used_bytes{job=\"saas-api\",area=\"heap\"})", "legendFormat": "JVM heap", "refId": "A" },
+        { "expr": "process_resident_memory_bytes{job=\"saas-api\"}", "legendFormat": "Process RSS", "refId": "B" }
+      ],
+      "title": "Application memory",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 41,
+  "tags": ["saas", "multi-tenancy", "research"],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(http_server_requests_seconds_count{job=\"saas-api\"}, tenant_id)",
+        "includeAll": true,
+        "label": "Tenant",
+        "name": "tenant",
+        "query": { "query": "label_values(http_server_requests_seconds_count{job=\"saas-api\"}, tenant_id)", "refId": "PrometheusVariableQueryEditor-VariableQuery" },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SaaS multi-tenancy overview",
+  "uid": "saas-multitenancy-overview",
+  "version": 1
+}

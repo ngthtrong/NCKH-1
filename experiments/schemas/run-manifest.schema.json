@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/saas-research/run-manifest.schema.json",
+  "title": "SaaS multi-tenancy experiment run manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "data_kind",
+    "run_id",
+    "status",
+    "started_at_utc",
+    "scenario",
+    "rate_limit_variant",
+    "source",
+    "target",
+    "system",
+    "tools",
+    "images",
+    "workload",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "data_kind": {
+      "const": "measured",
+      "description": "The manifest is created only when a real k6 invocation starts. Test fixtures use a separate temporary directory and are never research results."
+    },
+    "run_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
+    "status": { "enum": ["running", "succeeded", "failed", "aborted"] },
+    "started_at_utc": { "type": "string", "format": "date-time" },
+    "finished_at_utc": { "type": ["string", "null"], "format": "date-time" },
+    "scenario": { "enum": ["smoke", "baseline", "load", "stress", "noisy-neighbor"] },
+    "rate_limit_variant": { "enum": ["not-applicable", "before", "after"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_commit", "git_dirty"],
+      "properties": {
+        "git_commit": { "type": "string" },
+        "git_dirty": { "type": ["boolean", "null"] }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_label", "base_url", "tenant_hosts"],
+      "properties": {
+        "environment_label": { "type": "string", "minLength": 1 },
+        "base_url": { "type": "string", "minLength": 1 },
+        "tenant_hosts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "architecture", "logical_cpu_count", "memory_bytes", "cpu_model"],
+      "properties": {
+        "os": { "type": "string" },
+        "architecture": { "type": "string" },
+        "logical_cpu_count": { "type": ["integer", "null"], "minimum": 1 },
+        "memory_bytes": { "type": ["integer", "null"], "minimum": 1 },
+        "cpu_model": { "type": ["string", "null"] }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "images": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["script", "summary", "raw_metrics", "resource_metrics"],
+      "properties": {
+        "script": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "raw_metrics": { "type": "string", "minLength": 1 },
+        "resource_metrics": { "type": "string", "minLength": 1 }
+      }
+    },
+    "notes": { "type": "string" }
+  }
+}

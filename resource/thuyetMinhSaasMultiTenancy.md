@@ -44,7 +44,7 @@ THS2026-
 
 ## 5. Thời gian thực hiện
 
-06 tháng — Từ tháng 3 năm 2026 đến tháng 8 năm 2026
+06 tháng — Từ tháng 5 năm 2026 đến tháng 10 năm 2026
 
 ## 6. Đơn vị của chủ nhiệm đề tài
 
@@ -77,26 +77,27 @@ Khóa: 49
 ## 8. Những thành viên tham gia nghiên cứu đề tài
 
 1. Ngô Hưng Thịnh — B2303904 (DI2396F2) — Khóa 49
+
    - Phân tích yêu cầu cho ứng dụng và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao phù hợp
    - Thiết kế kiến trúc phần mềm cho ứng dụng quản lý công việc đa thuê bao
    - Xây dựng và triển khai ứng dụng dưới dạng dịch vụ phần mềm
-
 2. Nguyễn Thanh Trọng — B2305615 (DI2396F1) — Khóa 49
+
    - Phân tích yêu cầu cho ứng dụng và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao phù hợp
    - Thiết kế kiến trúc phần mềm cho ứng dụng quản lý công việc đa thuê bao
    - Xây dựng và triển khai ứng dụng dưới dạng dịch vụ phần mềm
-
 3. Trang Minh Chánh — B2303864 (DI2396F1) — Khóa 49
+
    - Nghiên cứu tổng quan kiến trúc đa thuê bao và quản lý công việc theo mô hình Kanban
    - Phân tích yêu cầu cho ứng dụng và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao phù hợp
    - Thực hiện kiểm thử và đánh giá
-
 4. Huỳnh Hồng Ân — B2306657 (DI23V7F1) — Khóa 49
+
    - Nghiên cứu tổng quan kiến trúc đa thuê bao và quản lý công việc theo mô hình Kanban
    - Thực hiện kiểm thử và đánh giá
    - Viết báo cáo nghiên cứu
-
 5. Cao Tường Hưng — B2303873 (DI2396F1) — Khóa 49
+
    - Phân tích yêu cầu cho ứng dụng và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao phù hợp
    - Thiết kế kiến trúc phần mềm cho ứng dụng quản lý công việc đa thuê bao
    - Xây dựng và triển khai ứng dụng web dưới dạng dịch vụ phần mềm
@@ -123,7 +124,6 @@ Tại Việt Nam, các hệ thống phần mềm cung cấp dưới dạng dịc
 Thứ nhất, nhóm nghiên cứu tập trung triển khai ứng dụng đa thuê bao theo hướng nghiệp vụ cụ thể. Nhiều khóa luận và công trình tại các trường đại học trong nước đã xây dựng thành công các hệ thống đa người dùng theo hướng đa thuê bao. Các công trình này mặc dù đảm bảo đặc điểm của ứng dụng đa thuê bao nhưng thường xây dựng tính năng đa thuê bao mang tính đặc thù cho bài toán cụ thể [1][2].
 Thứ hai, nhóm các nghiên cứu chuyên sâu về tối ưu hóa hạ tầng và nền tảng điện toán đám mây hỗ trợ triển khai SaaS đa thuê bao. Song song với việc triển khai ứng dụng, các nhà nghiên cứu trong nước đã tập trung giải quyết các bài toán cốt lõi của vận hành đám mây như cân bằng tải, phân bổ tài nguyên và đảm bảo chất lượng dịch vụ (Quality of Service – QoS) [3][4].
 Ngoài ra, các doanh nghiệp trong nước (VNG, Base.vn, KiotViet,...) cũng đã triển khai thành công SaaS dạng đa thuê bao trong sản phẩm của họ, tuy nhiên, các kỹ thuật của họ được giữ kín như bí mật thương mại và tài sản trí tuệ độc quyền.
-
 
 ### 10.2. Ngoài nước
 
@@ -172,7 +172,6 @@ Trên thực tế, nhiều nền tảng quản lý công việc thương mại �
 Về mặt học thuật, các nghiên cứu hiện nay chủ yếu tập trung vào từng cơ chế riêng lẻ của kiến trúc đa thuê bao hoặc các mô hình tổng quát ở mức trừu tượng cao, trong khi còn thiếu các nghiên cứu gắn kết các cơ chế này trong một ứng dụng nghiệp vụ cụ thể. Điều này cho thấy sự cần thiết của việc nghiên cứu và minh họa kiến trúc đa thuê bao thông qua một bài toán đủ phức tạp và có tính thực tiễn cao như ứng dụng quản lý công việc theo mô hình Kanban.
 Xuất phát từ thực trạng đó, đề tài lựa chọn xây dựng ứng dụng quản lý công việc đa thuê bao làm đối tượng nghiên cứu và triển khai. Thông qua ứng dụng này, đề tài tập trung phân tích và hiện thực các cơ chế đa thuê bao cốt lõi ở tầng ứng dụng, đồng thời triển khai hệ thống dưới dạng dịch vụ phần mềm có thể truy cập qua Internet. Kết quả nghiên cứu vừa có ý nghĩa lý luận trong việc hệ thống hóa các cơ chế kiến trúc đa thuê bao cho một bài toán cụ thể, vừa có ý nghĩa thực tiễn khi cung cấp một mô hình tham khảo khả thi cho việc phát triển và triển khai các ứng dụng quản lý công việc đa thuê bao trong môi trường đại học.
 
-
 ## 12. Mục tiêu đề tài
 
 ### 12.1 Mục tiêu tổng quát
@@ -191,46 +190,49 @@ Nghiên cứu và xây dựng kiến trúc đa thuê bao cho ứng dụng quản
 
 Đối tượng nghiên cứu của đề tài tập trung vào hai thành phần chính: kiến trúc đa thuê bao và ứng dụng quản lý công việc, trong đó không gian làm việc (workspace) do một khách hàng tạo và quản lý được xác định là thuê bao. Mỗi  không gian làm việc có thể chứa nhiều dự án và được vận hành trên cùng một hạ tầng hệ thống. Cụ thể đối tượng nghiên cứu bao gồm:
 Các cơ chế kỹ thuật cốt lõi trong kiến trúc đa thuê bao để đảm bảo các tính năng đa thuê bao:
+
 - Cơ chế cô lập dữ liệu: Các mô hình và kỹ thuật để phân tách dữ liệu an toàn giữa các đơn vị thuê bao trên cùng một hệ thống cơ sở dữ liệu.
 - Định danh và Điều hướng Tenant: Các giải pháp kỹ thuật để nhận diện chính xác nguồn gốc yêu cầu của người dùng và điều hướng vào đúng không gian làm việc.
 - Bảo mật và Phân quyền: Hệ thống kiểm soát quyền truy cập đa cấp độ, đảm bảo tính riêng tư và ngăn chặn truy cập trái phép giữa các tenant.
 - Tối ưu hóa tài nguyên: Các chiến lược quản lý kết nối và truy vấn để duy trì hiệu năng hệ thống khi quy mô mở rộng.
-Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ quản lý không gian làm việc:
+  Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ quản lý không gian làm việc:
 - Nghiên cứu các quy tắc nghiệp vụ như: người dùng được mời bởi thuê bao chỉ có thể truy cập board thuộc phạm vi của mình, thuê bao có thể xóa board nhưng người dùng không thể và cơ chế phân quyền cho người dùng cụ thể.
-- Các thành phần chính của hệ thống: quản lý người dùng và phân quyền, quản lý dự án và công việc theo thứ bậc dựa, quản lý và chia sẻ tài nguyên phục vụ cho công việc 
+- Các thành phần chính của hệ thống: quản lý người dùng và phân quyền, quản lý dự án và công việc theo thứ bậc dựa, quản lý và chia sẻ tài nguyên phục vụ cho công việc
 - Cơ chế theo dõi tiến độ và nhắc nhở thời hạn thực hiện công việc đa kênh.
-
 
 ### 13.2 Phạm vi nghiên cứu
 
 Không gian nghiên cứu:
+
 - Kiến trúc đa thuê bao: Tập trung nghiên cứu và thiết kế kiến trúc phần mềm hướng dịch vụ đa thuê bao. Trọng tâm là xây dựng các cơ chế nền tảng: Định danh thuê bao, Cô lập dữ liệu và Đồng bộ trạng thái cơ bản.
-- Các nhóm dịch vụ chính mà ứng dụng cung cấp qua Internet bao gồm: 
-    - Dịch vụ quản lý không gian làm việc.
-    - Dịch vụ quản lý dự án và công việc theo mô hình Kanban.
-    - Dịch vụ thông báo công việc.
+- Các nhóm dịch vụ chính mà ứng dụng cung cấp qua Internet bao gồm:
+  - Dịch vụ quản lý không gian làm việc.
+  - Dịch vụ quản lý dự án và công việc theo mô hình Kanban.
+  - Dịch vụ thông báo công việc.
 - Không gian triển khai ứng dụng bao gồm môi trường phát triển là Localhost và môi trường thử nghiệm thông qua việc triển khai ứng dụng lên một máy chủ ảo có cấu hình giới hạn để mô phỏng môi trường thực tế trên Internet.
 
 Giới hạn nội dung nghiên cứu:
+
 - Đề tài tập trung giải quyết các vấn đề cốt lõi về mặt kiến trúc hệ thống, không tập trung vào phát triển một sản phẩm thương mại hoàn chỉnh. Cụ thể:
 - Về mặt chức năng:
-    - Xây dựng module Quản trị hệ thống để khởi tạo thuê bao.
-    - Xây dựng module Quản trị Tenant để quản lý công việc và thành viên.
-    - Xây dựng module Thành viên để xem và tương tác cơ bản với công việc được giao.
+  - Xây dựng module Quản trị hệ thống để khởi tạo thuê bao.
+  - Xây dựng module Quản trị Tenant để quản lý công việc và thành viên.
+  - Xây dựng module Thành viên để xem và tương tác cơ bản với công việc được giao.
 - Về mặt kỹ thuật:
-    - Tập trung nghiên cứu và triển khai mô hình phù hợp như Shared Database, Separate Schema và Shared Schema trên các hệ quản trị cơ sở dữ liệu.
-    - Nghiên cứu cơ chế định tuyến dựa trên Subdomain hoặc Header để phân loại yêu cầu người dùng.
+  - Tập trung nghiên cứu và triển khai mô hình phù hợp như Shared Database, Separate Schema và Shared Schema trên các hệ quản trị cơ sở dữ liệu.
+  - Nghiên cứu cơ chế định tuyến dựa trên Subdomain hoặc Header để phân loại yêu cầu người dùng.
 - Đề tài không tập trung vào các cơ chế đồng bộ thời gian thực phức tạp hay xử lý xung đột nâng cao giữa nhiều người dùng. Không đi sâu vào các bài toán tối ưu hạ tầng quy mô lớn, cân bằng tải phức tạp, tự động mở rộng, bảo mật hạ tầng mạng chuyên sâu. Không phát triển ứng dụng cho di động.
 
 Thời gian nghiên cứu: 6 tháng (từ 3/2026 đến 8/2026)
 
 Quy mô triển khai thực nghiệm:
+
 - Nhóm nghiên cứu sẽ thiết lập từ 3 đến 5 thuê bao giả lập trên hệ thống.
 - Mỗi thuê bao sẽ có khoảng 10 đến 20 tài khoản người dùng hoạt động đồng thời.
 
-Lý giải sự chọn mẫu: 
-- Nhóm quyết định giới hạn phạm vi nghiệp vụ ở mô hình Kanban thay vì các công cụ lập lịch phức tạp để phù hợp với nguồn lực và quỹ thời gian 6 tháng. Chiến lược này ưu tiên chiều sâu kiến trúc hơn độ rộng tính năng, tập trung giải quyết triệt để bài toán cô lập dữ liệu trong môi trường đa thuê bao cũng như giải quyết các bài toán gặp phải trong quá trình phát triển ứng dụng. Việc lựa chọn môi trường đại học làm ngữ cảnh thực nghiệm cho phép nhóm tận dụng cơ cấu tổ chức sẵn có (bài tập lớn, niên luận, luận văn,...) để mô phỏng môi trường sản phẩm, tạo điều kiện thuận lợi nhất để kiểm chứng sản phẩm trên đối tượng người dùng thực tế.
+Lý giải sự chọn mẫu:
 
+- Nhóm quyết định giới hạn phạm vi nghiệp vụ ở mô hình Kanban thay vì các công cụ lập lịch phức tạp để phù hợp với nguồn lực và quỹ thời gian 6 tháng. Chiến lược này ưu tiên chiều sâu kiến trúc hơn độ rộng tính năng, tập trung giải quyết triệt để bài toán cô lập dữ liệu trong môi trường đa thuê bao cũng như giải quyết các bài toán gặp phải trong quá trình phát triển ứng dụng. Việc lựa chọn môi trường đại học làm ngữ cảnh thực nghiệm cho phép nhóm tận dụng cơ cấu tổ chức sẵn có (bài tập lớn, niên luận, luận văn,...) để mô phỏng môi trường sản phẩm, tạo điều kiện thuận lợi nhất để kiểm chứng sản phẩm trên đối tượng người dùng thực tế.
 
 ## 14. Cách tiếp cận, phương pháp nghiên cứu
 
@@ -240,30 +242,33 @@ Nghiên cứu nghiệp vụ cốt lõi và giải quyết các bài toán kỹ t
 Xây dựng ứng dụng quản lý công việc dựa trên kiến trúc đa thuê bao và triển khai như một dịch vụ phần mềm truy cập trên Internet, tìm ra hướng giải quyết các bài toán cụ thể khi phát triển ứng dụng.
 Đánh giá bằng các phương pháp kiểm thử phần mềm để đo lường hiệu quả của kiến trúc trong việc đảm bảo tính cô lập dữ liệu và hiệu năng hệ thống.
 
-
 ### 14.2 Phương pháp nghiên cứu
 
 Phương pháp nghiên cứu của đề tài được triển khai theo hướng kết hợp giữa phân tích, xây dựng ứng dụng cài đặt và thực nghiệm kiểm chứng.
 
 Phân tích và tổng hợp lý thuyết:
-  - Nghiên cứu các nền tảng quản lý công việc hiện nay để xác định các yêu cầu nghiệp vụ cốt lõi.
-  - Nghiên cứu, phân tích và đề xuất giải pháp cho các bài toán kỹ thuật đa thuê bao như cô lập dữ liệu và các cơ chế, công nghệ hỗ trợ cho kiến trúc đa thuê bao phù hợp với ứng dụng.
 
-Xây dựng kiến trúc hệ thống: 
+- Nghiên cứu các nền tảng quản lý công việc hiện nay để xác định các yêu cầu nghiệp vụ cốt lõi.
+- Nghiên cứu, phân tích và đề xuất giải pháp cho các bài toán kỹ thuật đa thuê bao như cô lập dữ liệu và các cơ chế, công nghệ hỗ trợ cho kiến trúc đa thuê bao phù hợp với ứng dụng.
+
+Xây dựng kiến trúc hệ thống:
+
 - Xây dựng mô hình kiến trúc phần mềm nhằm tích hợp cơ chế đa thuê bao vào trong ứng dụng quản lý công việc, đảm bảo kiến trúc có khả năng tách biệt logic xử lý dữ liệu của từng khách hàng.
 - Xây dựng luồng xử lý yêu cầu của thuê bao xuyên suốt hệ thống, đảm bảo khả năng nhận diện định danh thuê bao trên mỗi tầng.
-Đặc tả cơ chế phân quyền truy cập cho nhiều loại thuê bao.
+  Đặc tả cơ chế phân quyền truy cập cho nhiều loại thuê bao.
 
 Xây dựng ứng dụng:
+
 - Xây dựng quy trình cho phép một giáo viên đăng ký tài khoản, thanh toán và được hệ thống tự động cấp phát không gian lưu trữ, cơ sở dữ liệu và tên miền riêng. Tổ chức dự án theo cấu trúc phân cấp thứ bậc giúp quản lý chặt chẽ quy mô dự án lớn.
 - Xây dựng cơ chế chia sẻ và tái sử dụng tài nguyên giữa các đầu việc khác nhau trong cùng dự án. Tích hợp hệ thống nhắc nhở thời hạn công việc qua đa kênh để tối ưu hiệu suất làm việc nhóm.
 
 Thực nghiệm và kiểm định:
+
 - Thực hiện và quan sát hiệu năng của hệ thống khi có một lượng người dùng ở quy mô vừa phải cùng hoạt động qua các kịch bản kiểm thử, đảm bảo việc truy vấn dữ liệu của tenant này không nhìn thấy dữ liệu tenant khác trên cùng cơ sở dữ liệu, hạ tầng.
 
 Đánh giá:
-- Dựa trên sản phẩm thực tế, đề tài đánh giá mức độ đáp ứng của các giải pháp đối với các bài toán kỹ thuật về: tốc độ triển khai cho khách hàng mới, độ tin cậy của cô lập dữ liệu, phân quyền, khả năng chịu tải và mở rộng khi số lượng người dùng tăng lên.
 
+- Dựa trên sản phẩm thực tế, đề tài đánh giá mức độ đáp ứng của các giải pháp đối với các bài toán kỹ thuật về: tốc độ triển khai cho khách hàng mới, độ tin cậy của cô lập dữ liệu, phân quyền, khả năng chịu tải và mở rộng khi số lượng người dùng tăng lên.
 
 ## 15. Nội dung nghiên cứu và tiến độ thực hiện
 
@@ -276,17 +281,16 @@ Thực nghiệm và kiểm định:
 - Thực hiện kiểm thử và đánh giá
 - Viết báo cáo nghiên cứu
 
-
 ### 15.2 Tiến độ thực hiện
 
-| STT | Nội dung công việc | Sản phẩm | Thời gian (bắt đầu-kết thúc) | Người thực hiện (số tháng) |
-| --- | --- | --- | --- | --- |
-| 1 | Nghiên cứu tổng quan kiến trúc đa thuê bao và quản lý công việc theo Kanban | Báo cáo tổng quan lý thuyết | 3/2026 - 4/2026 | Trang Minh Chánh (0,7); Nguyễn Thanh Trọng (0,7); Huỳnh Hồng Ân (0,6) |
-| 2 | Phân tích yêu cầu và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao | Tài liệu đề xuất giải pháp kỹ thuật | 3/2026 - 4/2026 | Trang Minh Chánh (0,7); Ngô Hưng Thịnh (0,7); Nguyễn Thanh Trọng (0,6) |
-| 3 | Thiết kế kiến trúc phần mềm cho ứng dụng | Tài liệu đặc tả kiến trúc | 4/2026 - 5/2026 | Ngô Hưng Thịnh (0,7); Nguyễn Thanh Trọng (0,7); Cao Tường Hưng (0,6) |
-| 4 | Xây dựng và triển khai ứng dụng | Ứng dụng web quản lý công việc đa thuê bao | 5/2026 - 7/2026 | Nguyễn Thanh Trọng (1); Cao Tường Hưng (1); Ngô Hưng Thịnh (1) |
-| 5 | Thực hiện kiểm thử và đánh giá | Báo cáo kết quả kiểm thử | 7/2026 | Huỳnh Hồng Ân (0,5); Cao Tường Hưng (0,5) |
-| 6 | Viết báo cáo nghiên cứu | Báo cáo nghiên cứu khoa học | 8/2026 | Trang Minh Chánh (0,5); Huỳnh Hồng Ân (0,5) |
+| STT | Nội dung công việc                                                                   | Sản phẩm                                         | Thời gian (bắt đầu-kết thúc) | Người thực hiện (số tháng)                                             |
+| --- | --------------------------------------------------------------------------------------- | -------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------- |
+| 1   | Nghiên cứu tổng quan kiến trúc đa thuê bao và quản lý công việc theo Kanban | Báo cáo tổng quan lý thuyết                   | 3/2026 - 4/2026                    | Trang Minh Chánh (0,7); Nguyễn Thanh Trọng (0,7); Huỳnh Hồng Ân (0,6)  |
+| 2   | Phân tích yêu cầu và thiết kế giải pháp kỹ thuật cho cơ chế đa thuê bao  | Tài liệu đề xuất giải pháp kỹ thuật       | 3/2026 - 4/2026                    | Trang Minh Chánh (0,7); Ngô Hưng Thịnh (0,7); Nguyễn Thanh Trọng (0,6) |
+| 3   | Thiết kế kiến trúc phần mềm cho ứng dụng                                        | Tài liệu đặc tả kiến trúc                   | 4/2026 - 5/2026                    | Ngô Hưng Thịnh (0,7); Nguyễn Thanh Trọng (0,7); Cao Tường Hưng (0,6) |
+| 4   | Xây dựng và triển khai ứng dụng                                                   | Ứng dụng web quản lý công việc đa thuê bao | 5/2026 - 7/2026                    | Nguyễn Thanh Trọng (1); Cao Tường Hưng (1); Ngô Hưng Thịnh (1)       |
+| 5   | Thực hiện kiểm thử và đánh giá                                                  | Báo cáo kết quả kiểm thử                     | 7/2026                             | Huỳnh Hồng Ân (0,5); Cao Tường Hưng (0,5)                              |
+| 6   | Viết báo cáo nghiên cứu                                                            | Báo cáo nghiên cứu khoa học                   | 8/2026                             | Trang Minh Chánh (0,5); Huỳnh Hồng Ân (0,5)                              |
 
 ## 16. Sản phẩm
 
@@ -313,7 +317,7 @@ Trường Công nghệ Thông tin và Truyền thông, Đại học Cần Thơ
 
 ### 18.1 Đối với lĩnh vực giáo dục và đào tạo
 
-Cung cấp một công cụ trực quan hỗ trợ các nhóm sinh viên và giảng viên quản lý công việc, tiến độ đồ án, bài tập lớn. Việc sử dụng ứng dụng giúp hiện đại hóa phương pháp làm việc nhóm trong môi trường giáo dục, rèn luyện tư duy quản lý dự án chuyên nghiệp cho người học, thay thế các phương thức quản lý thủ công rời rạc qua tin nhắn hay bảng tính truyền thống.   
+Cung cấp một công cụ trực quan hỗ trợ các nhóm sinh viên và giảng viên quản lý công việc, tiến độ đồ án, bài tập lớn. Việc sử dụng ứng dụng giúp hiện đại hóa phương pháp làm việc nhóm trong môi trường giáo dục, rèn luyện tư duy quản lý dự án chuyên nghiệp cho người học, thay thế các phương thức quản lý thủ công rời rạc qua tin nhắn hay bảng tính truyền thống.
 
 ### 18.2 Đối với lĩnh vực khoa học và công nghệ
 
@@ -334,19 +338,17 @@ Các sản phẩm của đề tài được bàn giao cho Trường Công nghệ
 - Kinh phí ĐHCT cấp: 15.000.000 đồng
 - Các nguồn khác: 0 đồng
 
-| Stt | Khoản chi, nội dung chi | Tổng kinh phí | Kinh phí ĐHCT cấp | Các nguồn khác |
-| --- | --- | ---: | ---: | ---: |
-| 1 | Chi tiền thù lao tham gia thực hiện đề tài | 12.125.000 | 12.125.000 | 0 |
-| 2 | Chi mua vật tư, nguyên, nhiên vật liệu | 0 | 0 | 0 |
-| 3 | Chi văn phòng phẩm, in ấn | 150.000 | 150.000 | 0 |
-| 4 | Chi họp hội đồng đánh giá, nghiệm thu | 2.725.000 | 2.725.000 | 0 |
-|   | **Tổng cộng** | **15.000.000** | **15.000.000** | **0** |
+| Stt | Khoản chi, nội dung chi                         |      Tổng kinh phí | Kinh phí ĐHCT cấp | Các nguồn khác |
+| --- | ------------------------------------------------- | -------------------: | -------------------: | ----------------: |
+| 1   | Chi tiền thù lao tham gia thực hiện đề tài |           12.125.000 |           12.125.000 |                 0 |
+| 2   | Chi mua vật tư, nguyên, nhiên vật liệu      |                    0 |                    0 |                 0 |
+| 3   | Chi văn phòng phẩm, in ấn                     |              150.000 |              150.000 |                 0 |
+| 4   | Chi họp hội đồng đánh giá, nghiệm thu     |            2.725.000 |            2.725.000 |                 0 |
+|     | **Tổng cộng**                             | **15.000.000** | **15.000.000** |       **0** |
 
 ---
 
 TRƯỜNG CNTT-TT | CÁN BỘ HƯỚNG DẪN | CHỦ NHIỆM ĐỀ TÀI
-
-
 
 TL. HIỆU TRƯỞNG
 

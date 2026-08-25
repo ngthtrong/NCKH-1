@@ -40,7 +40,7 @@ Khung kiến trúc phải thống nhất được:
 
 ### 2.1. Chuẩn hóa đề cương và giao thức nghiên cứu
 
-- Đối chiếu mục tiêu, phạm vi, phương pháp và sản phẩm tại [thuyet_minh_SaaS.md](/home/ngthtrong/NCKH-1/resource/thuyet_minh_SaaS.md:176).
+- Đối chiếu mục tiêu, phạm vi, phương pháp và sản phẩm tại [thuyetMinhSaasMultiTenancy.md](./thuyetMinhSaasMultiTenancy.md).
 - Lập bảng ánh xạ: câu hỏi nghiên cứu → phương pháp → dữ liệu cần thu → tiêu chí đánh giá → đầu ra.
 - Thiết lập nhật ký nghiên cứu, sổ quyết định kiến trúc (ADR), danh mục rủi ro và quy tắc quản lý phiên bản tài liệu.
 - Áp dụng thống nhất thuật ngữ theo [chuan_hoa_thuat_ngu.md](/home/ngthtrong/NCKH-1/resource/chuan_hoa_thuat_ngu.md:1).

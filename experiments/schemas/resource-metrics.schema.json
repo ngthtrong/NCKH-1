@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/saas-research/resource-metrics.schema.json",
+  "title": "Prometheus resource metric export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "data_kind",
+    "run_id",
+    "source",
+    "started_at_utc",
+    "finished_at_utc",
+    "step_seconds",
+    "queries",
+    "errors"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "data_kind": { "const": "measured" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "started_at_utc": { "type": "string", "format": "date-time" },
+    "finished_at_utc": { "type": "string", "format": "date-time" },
+    "step_seconds": { "type": "integer", "minimum": 1 },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "query", "unit", "series"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "query": { "type": "string", "minLength": 1 },
+          "unit": { "enum": ["ratio", "bytes", "count"] },
+          "series": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["metric", "values"],
+              "properties": {
+                "metric": { "type": "object", "additionalProperties": { "type": "string" } },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [{ "type": "number" }, { "type": "string" }],
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "errors": { "type": "array", "items": { "type": "string" } }
+  }
+}
