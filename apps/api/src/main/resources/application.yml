@@ -72,6 +72,7 @@ app:
     admin-password: ${PROVISIONER_DB_PASSWORD:local-provisioner-change-me}
     encryption-key: ${PLACEMENT_ENCRYPTION_KEY:local-only-placement-key-change-me}
     max-attempts: ${PROVISIONING_MAX_ATTEMPTS:3}
+    lease-duration: ${PROVISIONING_LEASE_DURATION:PT10M}
   payment:
     provider: ${PAYMENT_PROVIDER:fake}
     webhook-secret: ${PAYMENT_WEBHOOK_SECRET:local-only-payment-secret}

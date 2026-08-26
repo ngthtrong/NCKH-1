@@ -27,7 +27,8 @@ public record AppProperties(
             String adminUsername,
             String adminPassword,
             String encryptionKey,
-            int maxAttempts) {}
+            int maxAttempts,
+            Duration leaseDuration) {}
 
     public record Payment(String provider, String webhookSecret) {}
 

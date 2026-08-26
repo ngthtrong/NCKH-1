@@ -1,9 +1,9 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-08-25 (UTC)  
-**Nhánh đang làm:** `main`  
-**Commit nền trước checkpoint này:** `bdb92ed` (`implement plan phase 1`)  
-**Trạng thái:** baseline ứng dụng và tài liệu đã được dựng; chưa nghiệm thu toàn bộ đề tài.
+**Cập nhật:** 2026-08-26 (UTC)
+**Nhánh đang làm:** `main`
+**Commit nền trước các sửa lỗi P0/P1:** `7007b9f` (`implement plan project status`)
+**Trạng thái:** P0 hoàn tất local; phần hardening lõi P1 đã được xác minh, nhưng P1 và toàn bộ đề tài chưa nghiệm thu.
 
 Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. Nó phân biệt rõ mã đã hiện thực, kiểm tra đã chạy, phần mới chỉ là khung và phần bắt buộc phải chờ dữ liệu/hạ tầng thật.
 
@@ -13,7 +13,7 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 - Kế hoạch thực hiện: [`resource/plan.md`](../resource/plan.md).
 - Không khôi phục hai file người dùng đang chủ động xóa: `resource/important.md` và `resource/thuyet_minh_SaaS.md`.
 - `draft.md` không còn tồn tại tại checkpoint; nếu người dùng tạo lại file này thì không được ghi đè khi chưa kiểm tra nội dung.
-- Tại thời điểm chốt, `main` và `origin/main` cùng trỏ tới `bdb92ed`; chỉ README và tài liệu checkpoint này đang thay đổi/chưa commit. Phiên sau vẫn phải đọc `git status --short` vì trạng thái có thể đã thay đổi.
+- Tại thời điểm chốt, `main` và `origin/main` cùng trỏ tới `7007b9f`. Các sửa lỗi P0/P1, test, `.dockerignore` và tài liệu xác minh đang thay đổi/chưa commit. Phiên sau vẫn phải đọc `git status --short` vì trạng thái có thể đã thay đổi.
 - Không tạo số đo, DOI, kết quả khảo sát, SUS hoặc kết quả thực nghiệm giả. Mục có nhãn `UNVERIFIED` phải tiếp tục giữ nhãn đến khi kiểm chứng nguồn thật.
 - Không tuyên bố Cổng B/E đạt chỉ từ compile, unit test hoặc test dùng fixture.
 
@@ -24,11 +24,11 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 | A — Repo và giao thức nghiên cứu | **Đang thực hiện, khung chính đã có** | Kiểm chứng trực tuyến toàn bộ nguồn/DOI, hoàn tất sàng lọc và bảo đảm mọi yêu cầu đều truy vết được |
 | B — Spike và ADR | **Một phần** | Chạy đủ ba phương án cô lập trên Pool/Silo bằng PostgreSQL thật; đo latency/RAM/connection; chạy spike storage/payment; chấm điểm và chốt ADR 0003–0005 |
 | C — Kiến trúc và hợp đồng | **Khung chính đã có** | Review tính nhất quán sau khi ADR B được chốt; bổ sung chi tiết nếu spike làm thay đổi quyết định |
-| D — Lát cắt dọc | **Baseline chức năng, chưa đủ ma trận nghiệm thu** | Hoàn thiện column management, Web Push thật, test role/IDOR/E2E, xử lý crash/retry và các trạng thái UI còn thiếu |
-| E — Triển khai và thực nghiệm | **Có Compose/test/k6 harness; chưa có số đo chính** | Chạy Docker/PostgreSQL thật, pilot VPS, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
+| D — Lát cắt dọc | **Baseline chức năng + hardening P1 một phần** | Hoàn thiện column management, Web Push thật, phần còn lại của role/IDOR/E2E, fault injection và các trạng thái UI còn thiếu |
+| E — Triển khai và thực nghiệm | **Local Compose/Testcontainers/k6 smoke đã xác minh; chưa có số đo chính** | Pilot VPS, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
 | F — Tổng hợp | **Chưa thực hiện** | Chỉ bắt đầu sau khi có bằng chứng A–E; hoàn thiện báo cáo, bản tin, demo và video |
 
-**Kết luận cổng:** chưa đánh dấu Cổng A, B hoặc E là đạt. Cổng E đặc biệt chưa đạt vì chưa có lần chạy Docker/VPS và dữ liệu đo thật tại checkpoint này.
+**Kết luận cổng:** chưa đánh dấu Cổng A, B hoặc E là đạt. P0 và các kiểm tra P1 là bằng chứng kỹ thuật local; Cổng E vẫn chưa đạt vì chưa có pilot trên VPS, SLO khóa trước và dữ liệu thực nghiệm chính.
 
 ## 3. Phần đã hiện thực
 
@@ -48,13 +48,15 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 - Application plane dùng chung schema cho Pool và Silo; mọi bảng nghiệp vụ có `tenant_id` và Pool bật `FORCE ROW LEVEL SECURITY`.
 - Có `TenantContext`, host–token validation, membership-version invalidation, tenant-bound JWT/refresh flow và đối chiếu trạng thái tenant.
 - Có resolver Pool/Silo, Hikari pool cho Silo, giới hạn connection ban đầu và mã hóa placement secret.
-- Fake payment provider, kiểm tra amount/currency/return URL, idempotency và webhook signature/replay/payload hash.
-- Provisioning state machine có idempotency, retry, rollback và bảng sự kiện audit. Retry Silo cập nhật lại mật khẩu role để secret lưu trong control plane luôn khớp PostgreSQL.
+- Fake payment provider, kiểm tra amount/currency/return URL, webhook signature/replay/payload hash và khóa advisory theo transaction để idempotency vẫn đúng khi tạo payment đồng thời.
+- Provisioning state machine có idempotency, retry, rollback và bảng sự kiện audit. Control migration V3 bổ sung claim lease; worker dùng `SKIP LOCKED`, heartbeat và các transaction ngắn quanh claim/prepare/finalize thay vì giữ control transaction qua external DDL.
+- Placement Silo được chuẩn bị với database/role/credential ổn định trước external DDL; retry dùng lại cùng metadata và credential đã mã hóa.
 - Project, project role, board, task, subtask một cấp, comment, assignee, due date và optimistic locking.
-- Resource namespace theo tenant, signed URL, quota, liên kết task và kiểm tra quyền project; upload có khóa theo tenant trong một API instance.
+- Resource namespace theo tenant, signed URL, quota, liên kết task và kiểm tra quyền project; upload có khóa theo tenant trong một API instance. Xóa metadata ghi audit và outbox trong cùng transaction, còn object storage được xóa idempotent bởi worker.
 - In-app notification, SMTP/Mailpit adapter, lưu Web Push subscription; VAPID delivery thật chưa được hiện thực.
 - Audit, admin APIs, rate limiting theo tenant/tier và nhãn quan sát `tenant_id`, `tenant_tier`, `tenant_placement`.
-- Hai migration control (`V1`, `V2`) và một migration application dùng chung cho Pool/Silo.
+- Ba migration control (`V1`–`V3`) và một migration application dùng chung cho Pool/Silo.
+- Integration test đã bổ sung cho project role/IDOR, membership revoke/version/tenant status, payment concurrency, resource deletion và provisioning claim/lease/state.
 
 ### 3.3 Frontend React
 
@@ -63,10 +65,12 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 - Access token giữ trong memory; API client có refresh flow và xử lý lỗi HTTP có cấu trúc.
 - Kiểu DTO lõi được dẫn xuất từ OpenAPI; script `api:generate` và `api:check` ngăn contract bị lệch.
 - Có trạng thái loading/empty/error ở các màn hình chính và kiểm tra conflict cho cập nhật task; vẫn cần audit UI theo toàn bộ ma trận vai trò.
+- Playwright đã có hai luồng trình duyệt cho login/chọn tenant Pool/Silo và xác minh token mỗi tenant bị chặn `403` trên host tenant còn lại.
 
 ### 3.4 Hạ tầng, CI và thực nghiệm
 
 - Compose gồm PostgreSQL 18, API, worker, web/Caddy, MinIO, Mailpit, Prometheus và Grafana.
+- Compose đã được sửa theo layout volume PostgreSQL 18, root filesystem web read-only có tmpfs riêng và healthcheck IPv4 ổn định.
 - Role API không nhận `CREATEDB`/`BYPASSRLS`; provisioner credential chỉ cấp cho worker.
 - Có runbook local, deployment, backup/restore; secrets thật bị loại khỏi Git.
 - GitHub Actions có backend/frontend test, lint/build, OpenAPI drift check, migration validation tĩnh, dependency review và container build.
@@ -76,49 +80,62 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 
 ## 4. Bằng chứng kiểm tra đã có
 
-Các kết quả dưới đây là kiểm tra kỹ thuật, không phải kết quả thực nghiệm nghiên cứu.
+Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại [P0 verification 2026-08-26](testing/p0-verification-2026-08-26.md) và [P1 verification 2026-08-26](testing/p1-verification-2026-08-26.md). Các kết quả dưới đây là kiểm tra kỹ thuật, không phải kết quả thực nghiệm nghiên cứu.
 
 | Kiểm tra | Kết quả tại checkpoint |
 |---|---|
-| Backend compile offline | Thành công; biên dịch 82 file Java |
-| Backend test | 20 test: 16 pass, 4 test RLS skip do không kết nối được Docker daemon |
-| Frontend TypeScript | `tsc -b --pretty false` thành công sau thay đổi gần nhất |
-| Frontend unit test | 3 file, 5 test pass ở lần chạy gần nhất |
-| Frontend production build | Đã pass trước thay đổi contract gần nhất; cần chạy lại toàn bộ ở phiên sau |
-| OpenAPI generated-type drift | `npm run api:check` đã pass ở lần chạy gần nhất |
+| Backend clean test | 16 suite, 53/53 test pass; 0 failure, 0 error, 0 skip; exit code 0 |
+| RLS Testcontainers | 4/4 pass trên PostgreSQL 18.6 thật |
+| Security/IDOR | 8 project authorization, 6 tenant membership và 10 tenant context/host test pass |
+| Payment concurrency | Hai create đồng thời tạo đúng 1 payment; hai webhook trùng enqueue đúng 1 provisioning |
+| Provisioning durability | 10 test P1 cho claim/lease/retry/rollback/credential pass; 2 test baseline provisioning tiếp tục pass |
+| Resource deletion | 4 test transaction outbox/tenant namespace pass; không gọi storage inline |
+| Frontend TypeScript/OpenAPI | `lint` và `api:check` pass, không drift |
+| Frontend unit test | 3 file, 5/5 test pass |
+| Frontend production build | Pass với Vite 7.3.6 |
+| Playwright E2E | 2/2 pass: Pool → Silo và Silo → Pool token/host mismatch đều trả `403` |
+| npm install/audit | 263 package cài, audit 264 package, 0 vulnerability |
 | k6 JavaScript syntax | Tất cả file `experiments/k6/*.js` và `lib/*.js` qua `node --check` |
-| Infra/analyzer validation | 3 Python test pass; JSON/Python/static checks pass |
-| Docker Compose runtime | Chưa chạy; Docker WSL integration/daemon không khả dụng |
+| Infra/analyzer validation | Compose interpolation pass; 3 Python test và JSON/Python/static checks pass |
+| Docker Compose runtime | `scripts/dev-up.sh` exit 0 và chạy lại idempotent; 10 service được tạo/chạy đúng trạng thái |
+| Flyway/seed | Control V1–V3, Pool V1 và Silo V1 pass; hai tenant `ACTIVE`, cùng seed 1 project/3 task |
+| Role/RLS | 14/14 bảng Pool bật RLS + FORCE RLS; application roles không có `BYPASSRLS` |
+| API smoke | Login/transfer/exchange/me/projects/refresh pass trên Pool và Silo; token sai host bị chặn 403 |
+| k6 smoke | 1 iteration, 2/2 check pass, không có request lỗi; không dùng timing này làm số liệu hiệu năng |
 
-Lệnh kiểm tra compile cuối cùng đã dùng cache Maven cục bộ:
+Lệnh backend cuối cùng (host kiểm tra dùng cache Maven tạm vì home read-only):
 
 ```bash
-/tmp/apache-maven-3.9.11/bin/mvn -o \
-  -Dmaven.repo.local=/tmp/nckh-m2 \
-  -DskipTests compile
+cd apps/api
+MAVEN_USER_HOME=/tmp/nckh-maven-home ./mvnw -q \
+  -Dmaven.repo.local=/tmp/nckh-m2 clean test
 ```
 
-Lệnh TypeScript cuối cùng:
+Chuỗi frontend cuối cùng:
 
 ```bash
 cd apps/web
-/tmp/node-v22.12.0-linux-x64/bin/node node_modules/typescript/bin/tsc -b --pretty false
+npm ci
+npm run api:check
+npm run lint
+npm test
+npm run build
+E2E_ENV_FILE=../../infra/.env npm run test:e2e
 ```
 
 ## 5. Giới hạn và nợ kỹ thuật đã biết
 
 ### Bắt buộc trước khi nghiệm thu an toàn
 
-- Docker daemon chưa khả dụng, nên bốn test PostgreSQL RLS (native select, bulk update, cross-tenant insert, owner/superuser behavior) đang bị skip.
-- Chưa xác nhận Compose startup, Flyway `control V1→V2`, Pool migration và nhiều phiên bản Silo trên PostgreSQL 18 thật.
-- Chưa có Playwright E2E hoặc ma trận tích hợp đầy đủ cho role tenant/project, host/token/payload tampering, file key, membership revoked, webhook giả/trùng và job sai tenant.
-- `ResourceService.delete` xóa hàng DB trước khi xóa object storage; lỗi storage có thể để object mồ côi. Nên chuyển physical deletion sang outbox/retry.
-- Worker đang giữ transaction control plane trong lúc provisioning/migration bên ngoài; nên tách claim → process → finalize, thêm lock/`SKIP LOCKED`, lease/timeout và test crash recovery.
-- Tạo payment session đồng thời với cùng idempotency key có thể đụng unique constraint trước khi đọc lại; cần khóa/advisory lock hoặc bắt `DataIntegrityViolationException` rồi trả bản ghi thắng.
+- Local Compose, Flyway và schema V1 của Pool/Silo đã xác minh; vẫn chưa có nhiều phiên bản application migration để kiểm thử đường nâng cấp Silo `V1→Vn`.
+- Playwright và ma trận integration đã bao phủ lát cắt quan trọng, nhưng chưa đủ mọi ô role/action: column CRUD, optimistic conflict qua HTTP/UI, file-key tampering, resource download và background job sai tenant vẫn cần test bổ sung.
+- Physical resource deletion đã chuyển sang outbox/retry; chưa fault-inject MinIO để kiểm chứng backoff và eventual cleanup end-to-end. Outbox hiện dừng sau 5 attempt nhưng chưa có dead-letter/requeue workflow quản trị.
+- Provisioning đã tách claim → external work → finalize và có lease recovery; vẫn cần force-kill worker ở các điểm giữa DDL/migration/finalize, kiểm tra rollback lỗi thật và chứng minh retry không tạo tài nguyên trùng trên các failure point đó.
+- Payment creation/webhook concurrency đã pass trên PostgreSQL thật; adapter VNPay/Stripe thật vẫn phải kiểm thử signature/callback bằng credential sandbox khi nhóm cung cấp.
 
 ### Chức năng còn thiếu hoặc mới là adapter
 
-- Chưa có CRUD/sắp xếp column đầy đủ; board hiện chủ yếu hỗ trợ tạo/default và Kanban task movement.
+- Chưa có CRUD/sắp xếp column đầy đủ; board hiện chủ yếu hỗ trợ tạo/default và Kanban task movement. Đây là chức năng P1 ưu tiên tiếp theo.
 - Web Push mới lưu subscription và trả trạng thái `VAPID_NOT_CONFIGURED`; chưa gửi thật.
 - VNPay/Stripe adapter thật chưa có do chưa có credential; FakePaymentProvider là mặc định hợp lệ cho local/test.
 - ADR isolation/payment/storage vẫn ở trạng thái Proposed vì spike và số đo chưa hoàn tất.
@@ -138,19 +155,17 @@ cd apps/web
 
 ### P0 — Tạo baseline chạy được hoàn toàn
 
-1. Đọc tài liệu này, `git status --short`, thuyết minh và kế hoạch; bảo toàn các file người dùng nêu ở mục 1.
-2. Bật Docker Desktop WSL integration hoặc Docker Engine tương đương.
-3. Chạy toàn bộ backend/frontend/static tests theo mục 7; sửa mọi lỗi trước khi thêm chức năng.
-4. Chạy `scripts/dev-up.sh`, kiểm tra health, seed cả `pool-demo` và `silo-demo`, sau đó kiểm tra migration/role/RLS bằng database thật.
-5. Chạy lại bốn RLS Testcontainers test và lưu log kiểm tra, nhưng không coi đó là dữ liệu hiệu năng.
+**Hoàn tất local ngày 2026-08-26.** Backend/frontend/static tests, Compose bootstrap, Flyway, seed Pool/Silo, role/RLS, API smoke và k6 smoke đều có bằng chứng trong biên bản P0. Stack được để ở trạng thái đang chạy tại cuối phiên; trạng thái này không được giả định còn nguyên ở phiên sau.
 
 ### P1 — Đóng các lỗ hổng nghiệm thu chức năng
 
-1. Thêm integration test cho toàn bộ permission/IDOR/host-token/membership-revocation matrix.
-2. Tách transaction provisioning, thêm claim locking/lease/crash recovery và test retry không tạo tài nguyên trùng.
-3. Đưa physical resource deletion vào outbox/retry và test failure path.
-4. Hoàn thiện column management, optimistic-lock UI và Playwright cho hai tenant Pool/Silo.
-5. Cứng hóa payment idempotency khi hai request đồng thời.
+**Đang thực hiện.** Bằng chứng chi tiết nằm trong biên bản P1; không suy rộng các test đã pass thành toàn bộ ma trận.
+
+1. **Đã làm phần lõi:** integration test cho project role/IDOR, tenant membership, host-token, membership revoke/version và suspended tenant. **Còn:** các mutation chưa phủ đủ, file key/download, job sai tenant và HTTP/UI matrix.
+2. **Đã làm phần lõi:** provisioning dùng atomic claim, `SKIP LOCKED`, lease/heartbeat, short transaction, metadata/credential ổn định và state transition test. **Còn:** force-kill/failure injection qua DDL, Flyway và rollback thật.
+3. **Đã làm phần lõi:** physical resource deletion qua outbox, tenant-prefix guard và transaction test. **Còn:** MinIO failure/backoff/eventual cleanup và dead-letter/requeue.
+4. **Đã làm một phần:** optimistic-lock UI baseline và 2 Playwright test Pool/Silo host binding. **Còn ưu tiên cao nhất:** column CRUD/reorder và Playwright cho Kanban/conflict/role states.
+5. **Đã xác minh:** payment advisory lock và duplicate webhook concurrency trên PostgreSQL 18.6; mỗi race chỉ tạo/enqueue một lần.
 
 ### P2 — Hoàn tất spike và chốt Cổng B
 
@@ -181,7 +196,7 @@ Backend (Docker phải hoạt động để test RLS không bị skip):
 
 ```bash
 cd apps/api
-./mvnw -B -ntp test
+./mvnw -B -ntp clean test
 ```
 
 Frontend:
@@ -193,6 +208,8 @@ npm run api:check
 npm run lint
 npm test
 npm run build
+npm run test:e2e:install
+E2E_ENV_FILE=../../infra/.env npm run test:e2e
 ```
 
 Hạ tầng:
@@ -214,6 +231,6 @@ Các workload nghiệp vụ cần token tenant thật trong environment; xem `ex
 
 Có thể dùng nguyên văn:
 
-> Đọc `docs/PROJECT_STATUS.md`, `resource/plan.md` và `resource/thuyetMinhSaasMultiTenancy.md`; kiểm tra working tree và tiếp tục từ P0. Không khôi phục hai file resource đang bị xóa, không ghi đè `draft.md`, không tạo dữ liệu nghiên cứu giả. Trước tiên hãy chạy full verification khi Docker khả dụng, rồi cập nhật lại checkpoint bằng bằng chứng thực tế.
+> Đọc `docs/PROJECT_STATUS.md`, hai biên bản `docs/testing/p0-verification-2026-08-26.md` và `docs/testing/p1-verification-2026-08-26.md`, rồi đọc `resource/plan.md` và `resource/thuyetMinhSaasMultiTenancy.md`; kiểm tra working tree và tiếp tục phần P1 còn lại. Không khôi phục hai file resource đang bị xóa, không ghi đè `draft.md`, không tạo dữ liệu nghiên cứu giả. Giữ 53 backend test, 5 frontend unit test, 2 Playwright E2E và Compose/Flyway xanh; ưu tiên column CRUD/reorder, sau đó failure injection provisioning/resource.
 
 Sau mỗi mốc đáng kể, cập nhật ngày, bảng tiến độ, kết quả test và danh sách nợ kỹ thuật trong chính tài liệu này.

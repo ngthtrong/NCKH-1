@@ -60,7 +60,10 @@ services:
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      # PostgreSQL 18+ stores clusters below a major-version-specific
+      # directory. Mount the parent so upgrades can use pg_upgrade --link and
+      # the official image does not reject the legacy PGDATA mount layout.
+      - postgres-data:/var/lib/postgresql
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
@@ -154,6 +157,7 @@ services:
       PROVISIONER_DB_URL: jdbc:postgresql://${SILO_DB_HOST:-postgres}:${SILO_DB_PORT:-5432}/postgres
       PROVISIONER_DB_USER: ${PROVISIONER_DB_USER:?Set PROVISIONER_DB_USER in infra/.env}
       PROVISIONER_DB_PASSWORD: ${PROVISIONER_DB_PASSWORD:?Set PROVISIONER_DB_PASSWORD in infra/.env}
+      PROVISIONING_LEASE_DURATION: ${PROVISIONING_LEASE_DURATION:-PT10M}
       SILO_DB_HOST: ${SILO_DB_HOST:-postgres}
       SILO_DB_PORT: ${SILO_DB_PORT:-5432}
       SILO_DB_PREFIX: ${SILO_DB_PREFIX:-tenant_}
@@ -174,10 +178,14 @@ services:
     read_only: true
     tmpfs:
       - /tmp:size=32m,mode=1777
+      - /var/cache/nginx:size=32m,mode=1777
     expose:
       - "8080"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      # BusyBox may resolve localhost to ::1 while this nginx configuration
+      # listens on IPv4 only, which would keep an otherwise healthy container
+      # in the starting state.
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080/healthz"]
       interval: 10s
       timeout: 3s
       retries: 10

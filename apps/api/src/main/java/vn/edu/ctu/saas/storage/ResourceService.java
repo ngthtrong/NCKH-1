@@ -119,14 +119,25 @@ public class ResourceService {
 
     public void delete(UUID resourceId) {
         TenantContext context = TenantContextHolder.getRequired();
-        ResourceView resource = executor.write(jdbc -> {
+        executor.writeWithoutResult(jdbc -> {
             ResourceView found = find(jdbc, context, resourceId);
             requireDeletable(jdbc, context, found);
+            jdbc.update("""
+                    INSERT INTO audit_events(
+                        id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
+                    VALUES (?,?,?,?,?,?,?,jsonb_build_object('storageKey',?,'originalName',?))
+                    """, UUID.randomUUID(), context.tenantId(), context.userId(), "RESOURCE_DELETED",
+                    "RESOURCE", resourceId, context.correlationId(), found.storageKey(), found.originalName());
+            jdbc.update("""
+                    INSERT INTO outbox_events(
+                        id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,payload_json)
+                    VALUES (?,?,?,?,?,?,?,jsonb_build_object('storageKey',?))
+                    """, UUID.randomUUID(), context.tenantId(), context.userId(),
+                    ResourceDeletionHandler.EVENT_TYPE, "RESOURCE", resourceId,
+                    context.correlationId(), found.storageKey());
             int deleted = jdbc.update("DELETE FROM resources WHERE tenant_id=? AND id=?", context.tenantId(), resourceId);
             if (deleted == 0) throw new NotFoundException("Resource not found");
-            return found;
         });
-        storage.delete(resource.storageKey());
     }
 
     public boolean storageKeyBelongsToCurrentTenant(String key) {

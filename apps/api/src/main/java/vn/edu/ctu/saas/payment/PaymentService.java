@@ -33,6 +33,7 @@ public class PaymentService {
     private final TenantRepository tenantRepository;
     private final TenantMembershipRepository membershipRepository;
     private final ProvisioningService provisioningService;
+    private final PaymentIdempotencyLock idempotencyLock;
     private final TokenHasher tokenHasher;
     private final AppProperties properties;
 
@@ -43,6 +44,7 @@ public class PaymentService {
             TenantRepository tenantRepository,
             TenantMembershipRepository membershipRepository,
             ProvisioningService provisioningService,
+            PaymentIdempotencyLock idempotencyLock,
             TokenHasher tokenHasher,
             AppProperties properties) {
         this.provider = provider;
@@ -51,6 +53,7 @@ public class PaymentService {
         this.tenantRepository = tenantRepository;
         this.membershipRepository = membershipRepository;
         this.provisioningService = provisioningService;
+        this.idempotencyLock = idempotencyLock;
         this.tokenHasher = tokenHasher;
         this.properties = properties;
     }
@@ -68,6 +71,7 @@ public class PaymentService {
         if (membership.getRole() != TenantRole.OWNER) {
             throw new IllegalArgumentException("Only the tenant owner can create a payment session");
         }
+        idempotencyLock.acquire(normalizedKey);
         PaymentTransactionEntity payment = paymentRepository.findByIdempotencyKey(normalizedKey).orElse(null);
         if (payment != null) {
             assertSameIdempotentRequest(payment, tenantId, amountMinor, normalizedCurrency, validatedReturnUrl);

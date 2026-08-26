@@ -38,6 +38,7 @@ class PaymentServiceTest {
     private TenantRepository tenants;
     private TenantMembershipRepository memberships;
     private ProvisioningService provisioning;
+    private PaymentIdempotencyLock idempotencyLock;
     private TokenHasher hasher;
     private PaymentService service;
 
@@ -49,10 +50,11 @@ class PaymentServiceTest {
         tenants = mock(TenantRepository.class);
         memberships = mock(TenantMembershipRepository.class);
         provisioning = mock(ProvisioningService.class);
+        idempotencyLock = mock(PaymentIdempotencyLock.class);
         hasher = new TokenHasher();
         service = new PaymentService(
                 provider, payments, events, tenants, memberships, provisioning,
-                hasher, TestAppProperties.create());
+                idempotencyLock, hasher, TestAppProperties.create());
     }
 
     @Test

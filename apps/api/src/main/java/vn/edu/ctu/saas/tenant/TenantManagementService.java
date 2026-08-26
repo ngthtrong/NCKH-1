@@ -95,14 +95,21 @@ public class TenantManagementService {
 
     @Transactional
     public MemberView updateMember(TenantContext context, UUID memberId, TenantRole role, boolean active) {
-        if (!context.hasAnyRole(TenantRole.OWNER, TenantRole.ADMIN)) {
-            throw new TenantAccessDeniedException("Tenant administrator role is required");
-        }
+        requireAdmin(context);
         TenantMembershipEntity membership = membershipRepository.findById(memberId)
                 .filter(item -> item.getTenantId().equals(context.tenantId()))
                 .orElseThrow(() -> new NotFoundException("Membership not found"));
+        if (role == TenantRole.OWNER && membership.getRole() != TenantRole.OWNER) {
+            throw new ConflictException("Ownership transfer requires the dedicated ownership workflow");
+        }
         if (membership.getRole() == TenantRole.OWNER && (!active || role != TenantRole.OWNER)) {
             throw new ConflictException("The tenant owner cannot be demoted or revoked");
+        }
+        if (!context.hasAnyRole(TenantRole.OWNER)
+                && context.hasAnyRole(TenantRole.ADMIN)
+                && membership.getRole() == TenantRole.ADMIN
+                && (membership.getRole() != role || membership.isActive() != active)) {
+            throw new TenantAccessDeniedException("Only the tenant owner can modify an administrator");
         }
         if (membership.getRole() != role || membership.isActive() != active) {
             membership.setRole(role);
@@ -149,6 +156,7 @@ public class TenantManagementService {
 
     @Transactional
     public void revoke(TenantContext context, UUID membershipId) {
+        requireAdmin(context);
         TenantMembershipEntity membership = membershipRepository.findById(membershipId)
                 .filter(item -> item.getTenantId().equals(context.tenantId()))
                 .orElseThrow(() -> new NotFoundException("Membership not found"));

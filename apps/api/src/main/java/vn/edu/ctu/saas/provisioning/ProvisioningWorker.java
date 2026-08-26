@@ -1,113 +1,196 @@
 package vn.edu.ctu.saas.provisioning;
 
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import vn.edu.ctu.saas.config.AppProperties;
-import vn.edu.ctu.saas.control.ProvisioningJobEntity;
-import vn.edu.ctu.saas.control.ProvisioningJobRepository;
-import vn.edu.ctu.saas.control.ProvisioningStatus;
-import vn.edu.ctu.saas.control.TenantEntity;
-import vn.edu.ctu.saas.control.TenantPlacementEntity;
-import vn.edu.ctu.saas.control.TenantPlacementRepository;
-import vn.edu.ctu.saas.control.TenantRepository;
+import vn.edu.ctu.saas.provisioning.ProvisioningJobCoordinator.FailureOutcome;
+import vn.edu.ctu.saas.provisioning.ProvisioningJobCoordinator.LeaseOwnershipLostException;
+import vn.edu.ctu.saas.provisioning.ProvisioningJobCoordinator.ProvisioningClaim;
+import vn.edu.ctu.saas.provisioning.ProvisioningJobCoordinator.ProvisioningWorkItem;
 import vn.edu.ctu.saas.tenant.TenantDataSourceResolver;
-import vn.edu.ctu.saas.tenant.TenantStatus;
 
 @Component
 @Profile("worker")
 public class ProvisioningWorker {
     private static final Logger log = LoggerFactory.getLogger(ProvisioningWorker.class);
-    private final ProvisioningJobRepository jobRepository;
-    private final TenantRepository tenantRepository;
-    private final TenantPlacementRepository placementRepository;
+    private static final int MAX_JOBS_PER_POLL = 10;
+
+    private final ProvisioningJobCoordinator coordinator;
     private final TenantDatabaseProvisioner databaseProvisioner;
     private final TenantDataSourceResolver dataSourceResolver;
     private final AppProperties properties;
-    private final ProvisioningEventRecorder eventRecorder;
+    private final String workerId = "worker-" + UUID.randomUUID();
+    private final ScheduledExecutorService heartbeatExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "provisioning-lease-heartbeat");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public ProvisioningWorker(
-            ProvisioningJobRepository jobRepository,
-            TenantRepository tenantRepository,
-            TenantPlacementRepository placementRepository,
+            ProvisioningJobCoordinator coordinator,
             TenantDatabaseProvisioner databaseProvisioner,
             TenantDataSourceResolver dataSourceResolver,
-            AppProperties properties,
-            ProvisioningEventRecorder eventRecorder) {
-        this.jobRepository = jobRepository;
-        this.tenantRepository = tenantRepository;
-        this.placementRepository = placementRepository;
+            AppProperties properties) {
+        this.coordinator = coordinator;
         this.databaseProvisioner = databaseProvisioner;
         this.dataSourceResolver = dataSourceResolver;
         this.properties = properties;
-        this.eventRecorder = eventRecorder;
     }
 
     @Scheduled(fixedDelayString = "${PROVISIONING_POLL_INTERVAL:PT5S}")
-    @Transactional
     public void poll() {
-        List<ProvisioningJobEntity> jobs = jobRepository.findTop10ByStatusInAndNextAttemptAtBeforeOrderByCreatedAt(
-                List.of(ProvisioningStatus.QUEUED, ProvisioningStatus.RETRYABLE_FAILED), Instant.now().plusMillis(1));
-        jobs.forEach(this::process);
+        for (int processed = 0; processed < MAX_JOBS_PER_POLL; processed++) {
+            Optional<ProvisioningClaim> claim = coordinator.claimNext(workerId, Instant.now());
+            if (claim.isEmpty()) return;
+            process(claim.orElseThrow());
+        }
     }
 
-    private void process(ProvisioningJobEntity job) {
-        TenantEntity tenant = tenantRepository.findById(job.getTenantId()).orElseThrow();
-        TenantPlacementEntity placement = placementRepository.findByTenantId(tenant.getId()).orElseThrow();
-        ProvisioningStatus previousStatus = job.getStatus();
-        job.setStatus(ProvisioningStatus.RUNNING);
-        job.setAttempts(job.getAttempts() + 1);
-        jobRepository.saveAndFlush(job);
-        eventRecorder.record(job, previousStatus, ProvisioningStatus.RUNNING, null, "Provisioning attempt started");
+    private void process(ProvisioningClaim claim) {
+        AtomicBoolean leaseLost = new AtomicBoolean(false);
+        ScheduledFuture<?> heartbeat = startHeartbeat(claim, leaseLost);
+        ProvisioningWorkItem work = null;
         try {
-            databaseProvisioner.provision(tenant, placement);
-            placementRepository.save(placement);
-            tenant.setStatus(TenantStatus.ACTIVE);
-            tenantRepository.save(tenant);
-            job.setStatus(ProvisioningStatus.SUCCEEDED);
-            job.setNextAttemptAt(null);
-            job.setLastErrorCode(null);
-            job.setLastErrorMessage(null);
-            eventRecorder.record(job, ProvisioningStatus.RUNNING, ProvisioningStatus.SUCCEEDED, null, "Provisioning completed");
-            dataSourceResolver.evict(tenant.getId());
-            log.info("Tenant provisioning succeeded for tenant {}", tenant.getId());
-        } catch (RuntimeException exception) {
-            job.setLastErrorCode(exception.getClass().getSimpleName());
-            job.setLastErrorMessage(safeMessage(exception));
-            if (job.getAttempts() < properties.provisioning().maxAttempts()) {
-                job.setStatus(ProvisioningStatus.RETRYABLE_FAILED);
-                job.setNextAttemptAt(Instant.now().plus(job.getAttempts() * 15L, ChronoUnit.SECONDS));
-                eventRecorder.record(
-                        job, ProvisioningStatus.RUNNING, ProvisioningStatus.RETRYABLE_FAILED,
-                        job.getLastErrorCode(), job.getLastErrorMessage());
-            } else {
-                try {
-                    databaseProvisioner.rollback(tenant, placement);
-                    job.setStatus(ProvisioningStatus.FAILED_ROLLED_BACK);
-                } catch (RuntimeException rollbackFailure) {
-                    job.setStatus(ProvisioningStatus.FAILED_ROLLED_BACK);
-                    job.setLastErrorMessage(safeMessage(exception) + "; rollback: " + safeMessage(rollbackFailure));
-                }
-                tenant.setStatus(TenantStatus.FAILED);
-                tenantRepository.save(tenant);
-                eventRecorder.record(
-                        job, ProvisioningStatus.RUNNING, ProvisioningStatus.FAILED_ROLLED_BACK,
-                        job.getLastErrorCode(), job.getLastErrorMessage());
+            work = coordinator.loadWork(claim, Instant.now());
+            if (claim.rollbackOnly()) {
+                String errorCode = work.lastErrorCode() == null ? "LEASE_EXPIRED" : work.lastErrorCode();
+                String errorMessage = work.lastErrorMessage() == null
+                        ? "Provisioning lease expired after the maximum number of attempts"
+                        : work.lastErrorMessage();
+                rollbackAndFinalize(claim, work, errorCode, errorMessage, null);
+                return;
             }
-            log.warn("Tenant provisioning failed for tenant {} with code {}", tenant.getId(), job.getLastErrorCode());
+
+            databaseProvisioner.prepare(work.tenant(), work.placement());
+            if (!coordinator.persistPreparedPlacement(claim, work.placement(), Instant.now())) {
+                leaseLost.set(true);
+                log.warn("Provisioning lease lost before external work for job {}", claim.jobId());
+                return;
+            }
+
+            databaseProvisioner.provision(work.tenant(), work.placement());
+            if (leaseLost.get()) {
+                log.warn("Ignoring provisioning result after lease loss for job {}", claim.jobId());
+                return;
+            }
+            if (!coordinator.completeSuccessfully(claim, work.placement(), Instant.now())) {
+                leaseLost.set(true);
+                log.warn("Ignoring provisioning result because claim {} is no longer current", claim.jobId());
+                return;
+            }
+            try {
+                dataSourceResolver.evict(claim.tenantId());
+            } catch (RuntimeException evictionFailure) {
+                log.warn("Tenant data source eviction failed after provisioning job {} completed", claim.jobId(), evictionFailure);
+            }
+            log.info("Tenant provisioning succeeded for tenant {} on attempt {}", claim.tenantId(), claim.attempt());
+        } catch (LeaseOwnershipLostException ownershipLost) {
+            leaseLost.set(true);
+            log.warn("Provisioning claim {} was superseded: {}", claim.jobId(), ownershipLost.getMessage());
+        } catch (RuntimeException failure) {
+            if (leaseLost.get()) {
+                log.warn("Provisioning failed after lease loss for job {}; another worker will recover it", claim.jobId(), failure);
+                return;
+            }
+            handleFailure(claim, work, failure);
+        } finally {
+            heartbeat.cancel(false);
         }
-        jobRepository.save(job);
+    }
+
+    private void handleFailure(ProvisioningClaim claim, ProvisioningWorkItem work, RuntimeException failure) {
+        FailureOutcome outcome = coordinator.recordFailure(claim, failure, Instant.now());
+        if (outcome == FailureOutcome.OWNERSHIP_LOST) {
+            log.warn("Provisioning failure ignored because claim {} is no longer current", claim.jobId());
+            return;
+        }
+        if (outcome == FailureOutcome.RETRY_SCHEDULED) {
+            log.warn("Provisioning attempt {} failed for tenant {}; retry scheduled", claim.attempt(), claim.tenantId());
+            return;
+        }
+        rollbackAndFinalize(
+                claim,
+                work,
+                failure.getClass().getSimpleName(),
+                safeMessage(failure),
+                failure);
+    }
+
+    private void rollbackAndFinalize(
+            ProvisioningClaim claim,
+            ProvisioningWorkItem work,
+            String errorCode,
+            String errorMessage,
+            Throwable originalFailure) {
+        Throwable rollbackFailure = null;
+        if (work == null) {
+            rollbackFailure = new IllegalStateException("Rollback skipped because tenant placement metadata is unavailable");
+        } else {
+            try {
+                databaseProvisioner.rollback(work.tenant(), work.placement());
+            } catch (RuntimeException failure) {
+                rollbackFailure = failure;
+            }
+        }
+        boolean completed = coordinator.completeRollback(
+                claim, errorCode, errorMessage, rollbackFailure, Instant.now());
+        if (!completed) {
+            log.warn("Rollback result ignored because claim {} is no longer current", claim.jobId());
+            return;
+        }
+        if (rollbackFailure == null) {
+            log.warn("Tenant provisioning reached its retry limit and was rolled back for tenant {}", claim.tenantId());
+        } else {
+            log.error("Tenant provisioning failed and rollback was incomplete for tenant {}", claim.tenantId(), rollbackFailure);
+        }
+        if (originalFailure != null) {
+            log.debug("Original provisioning failure for job {}", claim.jobId(), originalFailure);
+        }
+    }
+
+    private ScheduledFuture<?> startHeartbeat(ProvisioningClaim claim, AtomicBoolean leaseLost) {
+        long intervalMillis = heartbeatInterval(properties.provisioning().leaseDuration());
+        return heartbeatExecutor.scheduleAtFixedRate(() -> {
+            if (leaseLost.get()) return;
+            try {
+                if (!coordinator.renewLease(claim, Instant.now())) {
+                    leaseLost.set(true);
+                    log.warn("Provisioning lease heartbeat rejected for job {}", claim.jobId());
+                }
+            } catch (RuntimeException heartbeatFailure) {
+                log.warn("Provisioning lease heartbeat failed for job {}", claim.jobId(), heartbeatFailure);
+            }
+        }, intervalMillis, intervalMillis, TimeUnit.MILLISECONDS);
+    }
+
+    private long heartbeatInterval(Duration leaseDuration) {
+        if (leaseDuration == null || leaseDuration.isNegative() || leaseDuration.isZero()) {
+            throw new IllegalStateException("Provisioning lease duration must be positive");
+        }
+        return Math.max(100L, leaseDuration.toMillis() / 3L);
     }
 
     private String safeMessage(Throwable throwable) {
         String message = throwable.getMessage();
         if (message == null) return "No error message";
-        return message.length() > 480 ? message.substring(0, 480) : message;
+        return message.length() <= 500 ? message : message.substring(0, 500);
+    }
+
+    @PreDestroy
+    void stopHeartbeatExecutor() {
+        heartbeatExecutor.shutdownNow();
     }
 }

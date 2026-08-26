@@ -2,6 +2,8 @@ package vn.edu.ctu.saas.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -81,6 +83,54 @@ class TenantContextFilterTest {
     }
 
     @Test
+    void rejectsOldTokenAfterMembershipIsRevokedWithoutCallingApplication() throws Exception {
+        stubTenant(TenantStatus.ACTIVE, false, 2);
+        authenticate(jwt("alpha", 1));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        AtomicBoolean applicationCalled = new AtomicBoolean();
+
+        filter.doFilter(request("alpha.localhost"), response,
+                (ignoredRequest, ignoredResponse) -> applicationCalled.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getContentAsString()).contains("membership is no longer active");
+        assertThat(applicationCalled).isFalse();
+        verify(placements, never()).findByTenantId(tenantId);
+    }
+
+    @Test
+    void rejectsSuspendedTenantBeforeLookingUpMembership() throws Exception {
+        stubTenant(TenantStatus.SUSPENDED, true, 1);
+        authenticate(jwt("alpha", 1));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        AtomicBoolean applicationCalled = new AtomicBoolean();
+
+        filter.doFilter(request("alpha.localhost"), response,
+                (ignoredRequest, ignoredResponse) -> applicationCalled.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getContentAsString()).contains("Tenant is not active for this host");
+        assertThat(applicationCalled).isFalse();
+        verify(memberships, never()).findByTenantIdAndUserId(tenantId, userId);
+    }
+
+    @Test
+    void rejectsTamperedSlugClaimEvenWhenItMatchesTheRequestHost() throws Exception {
+        stubActiveTenant(1);
+        authenticate(jwt("beta", 1));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        AtomicBoolean applicationCalled = new AtomicBoolean();
+
+        filter.doFilter(request("beta.localhost"), response,
+                (ignoredRequest, ignoredResponse) -> applicationCalled.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getContentAsString()).contains("Tenant is not active for this host");
+        assertThat(applicationCalled).isFalse();
+        verify(memberships, never()).findByTenantIdAndUserId(tenantId, userId);
+    }
+
+    @Test
     void establishesContextForValidRequestAndAlwaysClearsThreadLocal() throws Exception {
         stubActiveTenant(3);
         authenticate(jwt("alpha", 3));
@@ -97,16 +147,20 @@ class TenantContextFilterTest {
     }
 
     private void stubActiveTenant(long membershipVersion) {
+        stubTenant(TenantStatus.ACTIVE, true, membershipVersion);
+    }
+
+    private void stubTenant(TenantStatus status, boolean membershipActive, long membershipVersion) {
         TenantEntity tenant = new TenantEntity();
         tenant.setId(tenantId);
         tenant.setSlug("alpha");
         tenant.setTier("STARTER");
-        tenant.setStatus(TenantStatus.ACTIVE);
+        tenant.setStatus(status);
         TenantMembershipEntity membership = new TenantMembershipEntity();
         membership.setTenantId(tenantId);
         membership.setUserId(userId);
         membership.setRole(TenantRole.MEMBER);
-        membership.setActive(true);
+        membership.setActive(membershipActive);
         membership.setSecurityVersion(membershipVersion);
         TenantPlacementEntity placement = new TenantPlacementEntity();
         placement.setTenantId(tenantId);

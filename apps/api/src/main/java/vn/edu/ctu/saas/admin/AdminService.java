@@ -73,6 +73,9 @@ public class AdminService {
         job.setNextAttemptAt(Instant.now());
         job.setLastErrorCode(null);
         job.setLastErrorMessage(null);
+        job.setLeaseOwner(null);
+        job.setLeaseToken(null);
+        job.setLeaseExpiresAt(null);
         tenant.setStatus(TenantStatus.PROVISIONING);
         tenantRepository.save(tenant);
         jobRepository.save(job);

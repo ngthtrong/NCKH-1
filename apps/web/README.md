@@ -21,10 +21,29 @@ SPA trên port 80 và chuyển `/api/` tới service `api:8080`.
 ## Kiểm tra
 
 ```bash
+npm run api:check
 npm run lint
 npm test
 npm run build
 ```
+
+### Playwright E2E trên stack local
+
+Hai ca E2E đăng nhập và chọn riêng tenant Pool/Silo, sau đó cố ý gửi access token vừa phát sang
+host tenant còn lại và yêu cầu backend trả `403`. Test chỉ đọc credential từ environment; không có
+password seed trong mã kiểm thử hoặc file được commit.
+
+```bash
+npm run test:e2e:install
+# Dùng trực tiếp credential seed local, không sao chép hoặc commit password.
+E2E_ENV_FILE=../../infra/.env npm run test:e2e
+```
+
+Nếu cần chạy trên môi trường khác, sao chép `e2e/e2e.env.example` thành `e2e/.env.local`, điền
+credential cục bộ và dùng `E2E_ENV_FILE=e2e/.env.local`. File local, trace, video, screenshot và HTML
+report đều bị Git bỏ qua. Có thể đổi URL, hai tenant slug/URL trong file local; stack phải được seed
+sẵn một tenant `POOL` và một tenant `SILO_DATABASE`, đều ở trạng thái `ACTIVE`. `E2E_GATEWAY_URL`
+là địa chỉ loopback mà Node phân giải được; kiểm thử vẫn gửi đúng tenant hostname qua HTTP `Host`.
 
 Các route chính: `/login`, `/select-tenant`, `/auth/exchange`, `/dashboard`, `/kanban/:boardId`,
 `/members`, `/resources`, `/notifications` và `/admin`.

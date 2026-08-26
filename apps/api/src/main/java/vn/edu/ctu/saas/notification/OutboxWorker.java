@@ -20,6 +20,7 @@ import vn.edu.ctu.saas.control.TenantPlacementRepository;
 import vn.edu.ctu.saas.control.TenantRepository;
 import vn.edu.ctu.saas.control.UserAccountEntity;
 import vn.edu.ctu.saas.control.UserAccountRepository;
+import vn.edu.ctu.saas.storage.ResourceDeletionHandler;
 import vn.edu.ctu.saas.tenant.TenantContext;
 import vn.edu.ctu.saas.tenant.TenantContextHolder;
 import vn.edu.ctu.saas.tenant.TenantJdbcExecutor;
@@ -35,6 +36,7 @@ public class OutboxWorker {
     private final UserAccountRepository userRepository;
     private final TenantJdbcExecutor executor;
     private final NotificationDispatcher dispatcher;
+    private final ResourceDeletionHandler resourceDeletionHandler;
 
     public OutboxWorker(
             TenantRepository tenantRepository,
@@ -42,13 +44,15 @@ public class OutboxWorker {
             TenantMembershipRepository membershipRepository,
             UserAccountRepository userRepository,
             TenantJdbcExecutor executor,
-            NotificationDispatcher dispatcher) {
+            NotificationDispatcher dispatcher,
+            ResourceDeletionHandler resourceDeletionHandler) {
         this.tenantRepository = tenantRepository;
         this.placementRepository = placementRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.executor = executor;
         this.dispatcher = dispatcher;
+        this.resourceDeletionHandler = resourceDeletionHandler;
     }
 
     @Scheduled(fixedDelayString = "${OUTBOX_POLL_INTERVAL:PT3S}")
@@ -104,10 +108,14 @@ public class OutboxWorker {
 
     private void processEvent(TenantEvent event, List<TenantMembershipEntity> memberships) {
         try {
-            for (TenantMembershipEntity membership : memberships) {
-                if (membership.getUserId().equals(event.actorUserId())) continue;
-                UserAccountEntity recipient = userRepository.findById(membership.getUserId()).orElse(null);
-                if (recipient != null && recipient.isEnabled()) dispatcher.dispatch(event, recipient);
+            if (resourceDeletionHandler.supports(event)) {
+                resourceDeletionHandler.handle(event);
+            } else {
+                for (TenantMembershipEntity membership : memberships) {
+                    if (membership.getUserId().equals(event.actorUserId())) continue;
+                    UserAccountEntity recipient = userRepository.findById(membership.getUserId()).orElse(null);
+                    if (recipient != null && recipient.isEnabled()) dispatcher.dispatch(event, recipient);
+                }
             }
             executor.writeWithoutResult(jdbc -> jdbc.update("""
                     UPDATE outbox_events SET processed_at=now(),updated_at=now(),last_error=NULL

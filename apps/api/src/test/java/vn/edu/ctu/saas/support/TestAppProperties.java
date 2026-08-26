@@ -16,7 +16,7 @@ public final class TestAppProperties {
                         new AppProperties.Datasource.Silo(2, Duration.ofMinutes(10), 10)),
                 new AppProperties.Provisioning(
                         "jdbc:postgresql://localhost/postgres", "provisioner", "provisioner-secret",
-                        "test-placement-encryption-key", 3),
+                        "test-placement-encryption-key", 3, Duration.ofMinutes(10)),
                 new AppProperties.Payment("fake", "test-payment-webhook-secret"),
                 new AppProperties.Storage(
                         "filesystem", "http://localhost:9000", "http://localhost:9000",

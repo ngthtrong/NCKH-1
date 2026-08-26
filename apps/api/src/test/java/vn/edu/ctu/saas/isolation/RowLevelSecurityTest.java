@@ -9,7 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -173,12 +174,13 @@ class RowLevelSecurityTest {
         try (PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO projects(id, tenant_id, name, description, created_by, created_at, updated_at) "
                         + "VALUES (?, ?, ?, NULL, ?, ?, ?)")) {
+            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
             statement.setObject(1, UUID.randomUUID());
             statement.setObject(2, tenantId);
             statement.setString(3, name);
             statement.setObject(4, UUID.randomUUID());
-            statement.setObject(5, Instant.now());
-            statement.setObject(6, Instant.now());
+            statement.setObject(5, now);
+            statement.setObject(6, now);
             statement.executeUpdate();
         }
     }

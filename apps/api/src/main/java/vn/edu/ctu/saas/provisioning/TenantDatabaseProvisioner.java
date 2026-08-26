@@ -27,27 +27,51 @@ public class TenantDatabaseProvisioner {
         this.cipher = cipher;
     }
 
-    public void provision(TenantEntity tenant, TenantPlacementEntity placement) {
+    /**
+     * Allocates deterministic placement metadata and a stable encrypted runtime
+     * credential. The worker persists this metadata before external DDL starts,
+     * so a retry never rotates a password whose successful result was not yet
+     * finalized in the control database.
+     */
+    public void prepare(TenantEntity tenant, TenantPlacementEntity placement) {
         if (placement.getPlacementType() == TenantPlacement.POOL) {
-            migratePool();
-            placement.setDatabaseName(databaseName(properties.datasource().pool().jdbcUrl()));
-            placement.setSchemaVersion("1");
+            setOrVerifyDatabaseName(placement, databaseName(properties.datasource().pool().jdbcUrl()));
             return;
         }
+
         String suffix = tenant.getId().toString().replace("-", "");
         String database = identifier("tenant_" + suffix);
         String runtimeRole = identifier("tenant_" + suffix.substring(0, 20) + "_app");
-        String runtimePassword = randomPassword();
-        createRoleAndDatabase(database, runtimeRole, runtimePassword);
-        String tenantUrl = withDatabase(properties.provisioning().adminUrl(), database);
-        migrate(tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
-        grantRuntime(tenantUrl, runtimeRole);
         JdbcEndpoint endpoint = endpoint(properties.provisioning().adminUrl());
+        setOrVerify(placement.getDatabaseHost(), endpoint.host(), "database host");
+        setOrVerify(placement.getDatabasePort(), endpoint.port(), "database port");
+        setOrVerify(placement.getDatabaseName(), database, "database name");
+        setOrVerify(placement.getDatabaseUsername(), runtimeRole, "database username");
         placement.setDatabaseHost(endpoint.host());
         placement.setDatabasePort(endpoint.port());
         placement.setDatabaseName(database);
         placement.setDatabaseUsername(runtimeRole);
-        placement.setEncryptedPassword(cipher.encrypt(runtimePassword));
+        if (placement.getEncryptedPassword() == null) {
+            placement.setEncryptedPassword(cipher.encrypt(randomPassword()));
+        } else {
+            runtimePassword(placement);
+        }
+    }
+
+    public void provision(TenantEntity tenant, TenantPlacementEntity placement) {
+        prepare(tenant, placement);
+        if (placement.getPlacementType() == TenantPlacement.POOL) {
+            migratePool();
+            placement.setSchemaVersion("1");
+            return;
+        }
+        String database = identifier(placement.getDatabaseName());
+        String runtimeRole = identifier(placement.getDatabaseUsername());
+        String runtimePassword = runtimePassword(placement);
+        createRoleAndDatabase(database, runtimeRole, runtimePassword);
+        String tenantUrl = withDatabase(properties.provisioning().adminUrl(), database);
+        migrate(tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+        grantRuntime(tenantUrl, runtimeRole);
         placement.setSchemaVersion("1");
     }
 
@@ -89,9 +113,8 @@ public class TenantDatabaseProvisioner {
                     statement.execute("CREATE ROLE " + runtimeRole + " LOGIN PASSWORD '" + password + "' NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS");
                 }
             } else {
-                // A retry creates a fresh placement secret. Keep PostgreSQL and the
-                // encrypted control-plane value in sync instead of persisting a
-                // password that the existing runtime role does not know.
+                // Reapply the stable prepared credential so a partial prior
+                // attempt and the control-plane placement cannot drift apart.
                 try (Statement statement = connection.createStatement()) {
                     statement.execute("ALTER ROLE " + runtimeRole + " PASSWORD '" + password + "'");
                 }
@@ -147,6 +170,25 @@ public class TenantDatabaseProvisioner {
         byte[] bytes = new byte[32];
         random.nextBytes(bytes);
         return HexFormat.of().formatHex(bytes);
+    }
+
+    private String runtimePassword(TenantPlacementEntity placement) {
+        String password = cipher.decrypt(placement.getEncryptedPassword());
+        if (!password.matches("[0-9a-f]{64}")) {
+            throw new IllegalStateException("Invalid generated tenant runtime credential");
+        }
+        return password;
+    }
+
+    private void setOrVerifyDatabaseName(TenantPlacementEntity placement, String expected) {
+        setOrVerify(placement.getDatabaseName(), expected, "database name");
+        placement.setDatabaseName(expected);
+    }
+
+    private void setOrVerify(Object current, Object expected, String field) {
+        if (current != null && !current.equals(expected)) {
+            throw new IllegalStateException("Tenant placement " + field + " does not match its deterministic value");
+        }
     }
 
     private String identifier(String value) {

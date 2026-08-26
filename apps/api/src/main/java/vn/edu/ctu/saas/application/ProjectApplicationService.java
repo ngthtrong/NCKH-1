@@ -148,9 +148,9 @@ public class ProjectApplicationService {
 
     public ProjectMemberView setProjectMember(UUID projectId, UUID userId, SetProjectMemberRequest request) {
         TenantContext context = TenantContextHolder.getRequired();
-        requireActiveTenantMember(context.tenantId(), userId);
         return executor.write(jdbc -> {
             requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
+            requireActiveTenantMember(context.tenantId(), userId);
             ProjectRole existingRole = projectRole(jdbc, context, projectId, userId);
             if (existingRole == ProjectRole.MANAGER && request.role() != ProjectRole.MANAGER) {
                 requireAnotherManager(jdbc, context, projectId, userId);
