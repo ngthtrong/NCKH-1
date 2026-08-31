@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "data_kind": "spike_protocol",
+  "spike_id": "p2-resource-storage",
+  "adr": "docs/architecture/adrs/0005-resource-storage.md",
+  "decision": "PENDING_DATA",
+  "candidates": ["filesystem", "minio-s3-compatible"],
+  "placements": ["POOL", "SILO_DATABASE"],
+  "minimum_replicates": 3,
+  "required_cases": [
+    "canonical-tenant-resource-key",
+    "path-or-key-traversal",
+    "cross-tenant-prefix",
+    "expired-download-url",
+    "unauthorized-project-download",
+    "concurrent-quota",
+    "incomplete-upload",
+    "idempotent-delete-retry",
+    "metadata-and-object-backup-restore"
+  ],
+  "mandatory_pass_cases": [
+    "canonical-tenant-resource-key",
+    "path-or-key-traversal",
+    "cross-tenant-prefix",
+    "expired-download-url",
+    "unauthorized-project-download",
+    "concurrent-quota",
+    "incomplete-upload",
+    "idempotent-delete-retry",
+    "metadata-and-object-backup-restore"
+  ],
+  "required_artifact_kinds": [
+    "contract-report",
+    "raw-metrics",
+    "resource-metrics",
+    "backup-restore-report",
+    "environment-manifest"
+  ],
+  "measurements": [
+    "operation-latency-median-ms",
+    "operation-latency-p95-ms",
+    "cpu-ratio",
+    "process-rss-bytes",
+    "disk-bytes"
+  ],
+  "eliminate_if": [
+    "tenant-namespace-bypass-succeeds",
+    "quota-can-be-exceeded-by-concurrent-upload",
+    "safe-expiring-download-cannot-be-provided"
+  ],
+  "rubric": [
+    {"id": "security-and-testability", "weight_percent": 35},
+    {"id": "backup-and-operations", "weight_percent": 25},
+    {"id": "resource-footprint", "weight_percent": 20},
+    {"id": "portability", "weight_percent": 10},
+    {"id": "implementation-effort", "weight_percent": 10}
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/saas-research/spike-evidence.schema.json",
+  "title": "Checksum-backed measured P2 spike run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "data_kind",
+    "spike_id",
+    "run_id",
+    "replicate",
+    "candidate",
+    "placement",
+    "comparison_group",
+    "workload_fingerprint",
+    "environment_fingerprint",
+    "status",
+    "started_at_utc",
+    "finished_at_utc",
+    "source",
+    "environment",
+    "case_results",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "data_kind": {"const": "measured_spike"},
+    "spike_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "replicate": {"type": "integer", "minimum": 1},
+    "candidate": {"type": "string", "minLength": 1},
+    "placement": {"type": "string", "minLength": 1},
+    "comparison_group": {"type": "string", "minLength": 1},
+    "workload_fingerprint": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "environment_fingerprint": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "status": {"const": "succeeded"},
+    "started_at_utc": {"type": "string", "format": "date-time"},
+    "finished_at_utc": {"type": "string", "format": "date-time"},
+    "credential_backed": {"type": "boolean"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_commit", "git_dirty"],
+      "properties": {
+        "git_commit": {"type": "string", "minLength": 1},
+        "git_dirty": {"const": false}
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "postgresql_version", "cpu", "memory_bytes"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "postgresql_version": {"type": "string", "minLength": 1},
+        "cpu": {"type": "string", "minLength": 1},
+        "memory_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "case_results": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"enum": ["PASS", "FAIL", "NOT_APPLICABLE"]}
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "path", "sha256"],
+        "properties": {
+          "kind": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"}
+        }
+      }
+    }
+  }
+}

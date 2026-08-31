@@ -49,3 +49,15 @@ scripts/analyze-experiments.sh
 Công cụ dùng Python standard library, chuẩn hóa toàn bộ metric vào `observations.csv`, tạo `comparison.csv`, `qa.json`, `report.md` và biểu đồ SVG từ số đo thật. QA kiểm tra run thiếu, timestamp, trùng ID, số lần lặp, target/workload không đồng nhất và gắn cờ ngoại lệ bằng Tukey IQR; ngoại lệ không bị tự động xóa.
 
 Nếu không có run hợp lệ, lệnh dừng thay vì sinh bảng/biểu đồ trống hoặc dữ liệu mẫu. Unit test tạo fixture tổng hợp trong thư mục tạm, gắn nhãn rõ ràng và không lưu như kết quả nghiên cứu.
+
+## Chuẩn bị spike P2
+
+Các giao thức so sánh isolation, storage và payment được đăng ký trước tại `experiments/spikes/`.
+`scripts/validate-p2-spikes.sh` kiểm tra protocol mà không tạo kết quả; chế độ `--require-complete` chỉ
+pass khi có đủ measured artifact được khóa checksum. Payment tiếp tục bị chặn ở credential và trọng số
+chưa được nhóm phê duyệt. Xem `experiments/spikes/README.md`; không dùng validator này để tự động tuyên
+bố Cổng B đạt.
+
+Guarded Project CRUD security harness cho ba isolation candidate × Pool/Silo chạy riêng bằng
+`scripts/run-p2-isolation-security.sh`. Surefire output của harness là kiểm tra kỹ thuật local, không phải
+latency/resource measurement và không làm thay đổi tổng test của `apps/api`.

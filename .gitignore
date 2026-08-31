@@ -14,6 +14,7 @@ secrets/
 
 # Java
 apps/api/target/
+experiments/spikes/isolation-harness/target/
 *.log
 
 # Node

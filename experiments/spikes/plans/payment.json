@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "data_kind": "spike_protocol",
+  "spike_id": "p2-payment-provider",
+  "adr": "docs/architecture/adrs/0004-payment-provider.md",
+  "decision": "PENDING_DATA",
+  "candidates": ["vnpay-sandbox", "stripe-test-mode"],
+  "placements": ["NOT_APPLICABLE"],
+  "minimum_replicates": 1,
+  "required_cases": [
+    "create-session",
+    "verified-success-callback",
+    "verified-failure-callback",
+    "cancel-or-expire",
+    "invalid-signature",
+    "amount-mismatch",
+    "reference-mismatch",
+    "duplicate-callback",
+    "out-of-order-callback",
+    "provider-timeout",
+    "duplicate-provisioning-prevented",
+    "secret-redaction"
+  ],
+  "mandatory_pass_cases": [
+    "create-session",
+    "verified-success-callback",
+    "verified-failure-callback",
+    "cancel-or-expire",
+    "invalid-signature",
+    "amount-mismatch",
+    "reference-mismatch",
+    "duplicate-callback",
+    "out-of-order-callback",
+    "provider-timeout",
+    "duplicate-provisioning-prevented",
+    "secret-redaction"
+  ],
+  "required_artifact_kinds": [
+    "contract-report",
+    "sanitized-provider-log",
+    "environment-manifest"
+  ],
+  "measurements": [
+    "contract-case-result",
+    "adapter-process-rss-bytes"
+  ],
+  "eliminate_if": [
+    "sandbox-credential-unavailable",
+    "official-signature-verification-cannot-be-tested",
+    "fake-or-duplicate-callback-mutates-state",
+    "secret-appears-in-source-log-or-fixture"
+  ],
+  "credential_gate": {
+    "status": "PENDING_DATA",
+    "required": [
+      "provider-sandbox-account",
+      "server-side-signing-secret-or-key",
+      "registered-callback-or-webhook-endpoint"
+    ]
+  },
+  "rubric": [
+    {"id": "sandbox-access-and-vietnam-fit", "weight_percent": null},
+    {"id": "signature-and-webhook-security-clarity", "weight_percent": null},
+    {"id": "test-tooling", "weight_percent": null},
+    {"id": "official-documentation", "weight_percent": null},
+    {"id": "runtime-footprint-and-maintenance", "weight_percent": null}
+  ]
+}

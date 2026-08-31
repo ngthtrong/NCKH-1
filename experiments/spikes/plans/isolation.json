@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "data_kind": "spike_protocol",
+  "spike_id": "p2-pool-isolation",
+  "adr": "docs/architecture/adrs/0003-pool-isolation-selection.md",
+  "decision": "PENDING_DATA",
+  "candidates": [
+    "explicit-tenant-predicate",
+    "hibernate-global-tenant-mechanism",
+    "postgresql-rls-with-application-guard"
+  ],
+  "placements": ["POOL", "SILO_DATABASE"],
+  "minimum_replicates": 3,
+  "required_cases": [
+    "project-create",
+    "project-list",
+    "project-read-known-foreign-id",
+    "project-update-known-foreign-id",
+    "project-delete-known-foreign-id",
+    "native-query-cross-tenant",
+    "bulk-update-cross-tenant",
+    "background-job-cross-tenant",
+    "connection-reuse-context-reset",
+    "runtime-role-no-bypassrls",
+    "table-owner-negative-control",
+    "superuser-negative-control"
+  ],
+  "mandatory_pass_cases": [
+    "project-create",
+    "project-list",
+    "project-read-known-foreign-id",
+    "project-update-known-foreign-id",
+    "project-delete-known-foreign-id",
+    "native-query-cross-tenant",
+    "bulk-update-cross-tenant",
+    "background-job-cross-tenant",
+    "connection-reuse-context-reset",
+    "runtime-role-no-bypassrls"
+  ],
+  "required_artifact_kinds": [
+    "security-report",
+    "raw-metrics",
+    "resource-metrics",
+    "environment-manifest"
+  ],
+  "measurements": [
+    "latency-median-ms",
+    "latency-p95-ms",
+    "throughput-rps",
+    "error-rate",
+    "process-rss-bytes",
+    "database-connection-count"
+  ],
+  "eliminate_if": [
+    "any-cross-tenant-read-write-delete-succeeds",
+    "any-required-escape-hatch-cannot-be-tested"
+  ],
+  "rubric": [
+    {"id": "isolation", "weight_percent": 30},
+    {"id": "testability", "weight_percent": 20},
+    {"id": "performance-and-resource", "weight_percent": 20},
+    {"id": "migration-and-operations", "weight_percent": 15},
+    {"id": "complexity-and-maintainability", "weight_percent": 15}
+  ]
+}
