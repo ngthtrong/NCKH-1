@@ -53,13 +53,17 @@ public class ResourceService {
         uploadLock.lock();
         try {
             long quota = quotaBytes(context.tier());
-            long current = executor.read(jdbc -> value(jdbc,
-                    "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=?", context.tenantId()));
+            long current = executor.read(jdbc -> {
+                requireAnyProjectRole(jdbc, context, ProjectRole.MEMBER);
+                return value(jdbc,
+                        "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=?", context.tenantId());
+            });
             if (size < 0 || size > quota - current) throw new ConflictException("Tenant resource quota exceeded");
             UUID id = UUID.randomUUID();
             ResourceStorage.StoredObject stored = storage.store(
                     context.tenantId(), id, filename,
                     contentType == null ? "application/octet-stream" : contentType, size, input);
+            requireResourceStorageKey(context, id, stored.storageKey());
             try {
                 return executor.write(jdbc -> {
                     jdbc.update("""
@@ -83,6 +87,7 @@ public class ResourceService {
         ResourceView resource = executor.read(jdbc -> {
             ResourceView found = find(jdbc, context, resourceId);
             requireReadable(jdbc, context, resourceId);
+            requireResourceStorageKey(context, found.id(), found.storageKey());
             return found;
         });
         Duration expiresIn = Duration.ofMinutes(10);
@@ -122,6 +127,7 @@ public class ResourceService {
         executor.writeWithoutResult(jdbc -> {
             ResourceView found = find(jdbc, context, resourceId);
             requireDeletable(jdbc, context, found);
+            requireResourceStorageKey(context, found.id(), found.storageKey());
             jdbc.update("""
                     INSERT INTO audit_events(
                         id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
@@ -142,9 +148,28 @@ public class ResourceService {
 
     public boolean storageKeyBelongsToCurrentTenant(String key) {
         TenantContext context = TenantContextHolder.getRequired();
-        if (!key.startsWith(context.tenantId() + "/")) return false;
+        ResourceStorageKey.Parsed parsed = ResourceStorageKey.parse(key);
+        if (parsed == null || !parsed.tenantId().equals(context.tenantId())) return false;
         return executor.read(jdbc -> value(jdbc,
-                "SELECT count(*) FROM resources WHERE tenant_id=? AND storage_key=?", context.tenantId(), key) > 0);
+                "SELECT count(*) FROM resources WHERE tenant_id=? AND id=? AND storage_key=?",
+                context.tenantId(), parsed.resourceId(), key) > 0);
+    }
+
+    private void requireAnyProjectRole(
+            JdbcTemplate jdbc, TenantContext context, ProjectRole minimum) {
+        List<String> roles = jdbc.query(
+                "SELECT role FROM project_memberships WHERE tenant_id=? AND user_id=?",
+                (rs, rowNum) -> rs.getString(1), context.tenantId(), context.userId());
+        boolean allowed = roles.stream()
+                .map(ProjectRole::valueOf)
+                .anyMatch(role -> roleRank(role) >= roleRank(minimum));
+        if (!allowed) throw new TenantAccessDeniedException("Project member role is required to upload resources");
+    }
+
+    private void requireResourceStorageKey(TenantContext context, UUID resourceId, String storageKey) {
+        if (!ResourceStorageKey.belongsTo(storageKey, context.tenantId(), resourceId)) {
+            throw new IllegalArgumentException("Resource storage key does not belong to the current tenant");
+        }
     }
 
     private ResourceView find(JdbcTemplate jdbc, TenantContext context, UUID resourceId) {

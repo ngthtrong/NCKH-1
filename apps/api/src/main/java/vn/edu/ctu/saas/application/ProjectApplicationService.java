@@ -6,6 +6,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -213,6 +214,103 @@ public class ProjectApplicationService {
         });
     }
 
+    public BoardView createColumn(UUID boardId, CreateColumnRequest request) {
+        TenantContext context = TenantContextHolder.getRequired();
+        return executor.write(jdbc -> {
+            UUID projectId = boardProject(jdbc, context, boardId);
+            requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
+            advanceBoardVersion(jdbc, context, boardId, request.version());
+            UUID columnId = UUID.randomUUID();
+            try {
+                jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,?)",
+                        columnId, context.tenantId(), boardId, request.name().trim(),
+                        nextColumnPosition(jdbc, context, boardId));
+            } catch (DataIntegrityViolationException exception) {
+                throw new ConflictException("Board column name already exists");
+            }
+            auditAndOutbox(jdbc, context, "BOARD_COLUMN_CREATED", "BoardColumn", columnId,
+                    Map.of("boardId", boardId, "name", request.name().trim()));
+            return findBoard(jdbc, context, boardId);
+        });
+    }
+
+    public BoardView updateColumn(UUID boardId, UUID columnId, UpdateColumnRequest request) {
+        TenantContext context = TenantContextHolder.getRequired();
+        return executor.write(jdbc -> {
+            UUID projectId = boardProject(jdbc, context, boardId);
+            requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
+            requireColumn(jdbc, context, boardId, columnId);
+            advanceBoardVersion(jdbc, context, boardId, request.version());
+            try {
+                jdbc.update("""
+                        UPDATE board_columns SET name=?,updated_at=now()
+                        WHERE tenant_id=? AND board_id=? AND id=?
+                        """, request.name().trim(), context.tenantId(), boardId, columnId);
+            } catch (DataIntegrityViolationException exception) {
+                throw new ConflictException("Board column name already exists");
+            }
+            auditAndOutbox(jdbc, context, "BOARD_COLUMN_UPDATED", "BoardColumn", columnId,
+                    Map.of("boardId", boardId, "name", request.name().trim()));
+            return findBoard(jdbc, context, boardId);
+        });
+    }
+
+    public BoardView reorderColumns(UUID boardId, ReorderColumnsRequest request) {
+        TenantContext context = TenantContextHolder.getRequired();
+        return executor.write(jdbc -> {
+            UUID projectId = boardProject(jdbc, context, boardId);
+            requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
+            advanceBoardVersion(jdbc, context, boardId, request.version());
+            List<UUID> existingIds = jdbc.query(
+                    "SELECT id FROM board_columns WHERE tenant_id=? AND board_id=? ORDER BY position,id",
+                    (rs, rowNum) -> rs.getObject(1, UUID.class), context.tenantId(), boardId);
+            if (request.columnIds().size() != existingIds.size()
+                    || new HashSet<>(request.columnIds()).size() != request.columnIds().size()
+                    || !new HashSet<>(request.columnIds()).equals(new HashSet<>(existingIds))) {
+                throw new ConflictException("Column order must contain every board column exactly once");
+            }
+            for (int index = 0; index < request.columnIds().size(); index++) {
+                jdbc.update("""
+                        UPDATE board_columns SET position=?,updated_at=now()
+                        WHERE tenant_id=? AND board_id=? AND id=?
+                        """, BigDecimal.valueOf((index + 1) * 1000L), context.tenantId(), boardId,
+                        request.columnIds().get(index));
+            }
+            auditAndOutbox(jdbc, context, "BOARD_COLUMNS_REORDERED", "Board", boardId,
+                    Map.of("columnIds", request.columnIds()));
+            return findBoard(jdbc, context, boardId);
+        });
+    }
+
+    public BoardView deleteColumn(UUID boardId, UUID columnId, long version) {
+        TenantContext context = TenantContextHolder.getRequired();
+        return executor.write(jdbc -> {
+            UUID projectId = boardProject(jdbc, context, boardId);
+            requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
+            requireColumn(jdbc, context, boardId, columnId);
+            if (count(jdbc, "SELECT count(*) FROM board_columns WHERE tenant_id=? AND board_id=?",
+                    context.tenantId(), boardId) <= 1) {
+                throw new ConflictException("A board must retain at least one column");
+            }
+            if (count(jdbc, "SELECT count(*) FROM tasks WHERE tenant_id=? AND board_id=? AND board_column_id=?",
+                    context.tenantId(), boardId, columnId) > 0) {
+                throw new ConflictException("Move or delete tasks before deleting this column");
+            }
+            advanceBoardVersion(jdbc, context, boardId, version);
+            try {
+                int deleted = jdbc.update(
+                        "DELETE FROM board_columns WHERE tenant_id=? AND board_id=? AND id=?",
+                        context.tenantId(), boardId, columnId);
+                if (deleted == 0) throw new NotFoundException("Board column not found");
+            } catch (DataIntegrityViolationException exception) {
+                throw new ConflictException("Move or delete tasks before deleting this column");
+            }
+            auditAndOutbox(jdbc, context, "BOARD_COLUMN_DELETED", "BoardColumn", columnId,
+                    Map.of("boardId", boardId));
+            return findBoard(jdbc, context, boardId);
+        });
+    }
+
     public TaskView createTask(UUID boardId, CreateTaskRequest request) {
         TenantContext context = TenantContextHolder.getRequired();
         return executor.write(jdbc -> {
@@ -283,7 +381,8 @@ public class ProjectApplicationService {
             requireProjectRole(jdbc, context, existing.projectId(), ProjectRole.MANAGER);
             int deleted = jdbc.update("DELETE FROM tasks WHERE tenant_id=? AND id=?", context.tenantId(), taskId);
             if (deleted == 0) throw new NotFoundException("Task not found");
-            auditAndOutbox(jdbc, context, "TASK_DELETED", "Task", taskId, Map.of());
+            auditAndOutbox(jdbc, context, "TASK_DELETED", "Task", taskId,
+                    Map.of("projectId", existing.projectId()));
         });
     }
 
@@ -322,8 +421,10 @@ public class ProjectApplicationService {
 
     private BoardView findBoard(JdbcTemplate jdbc, TenantContext context, UUID boardId) {
         BoardHeader header = jdbc.query(
-                "SELECT id,project_id,name FROM boards WHERE tenant_id=? AND id=?",
-                rs -> rs.next() ? new BoardHeader(rs.getObject("id", UUID.class), rs.getObject("project_id", UUID.class), rs.getString("name")) : null,
+                "SELECT id,project_id,name,version FROM boards WHERE tenant_id=? AND id=?",
+                rs -> rs.next() ? new BoardHeader(
+                        rs.getObject("id", UUID.class), rs.getObject("project_id", UUID.class),
+                        rs.getString("name"), rs.getLong("version")) : null,
                 context.tenantId(), boardId);
         if (header == null) throw new NotFoundException("Board not found");
         List<ColumnView> columns = jdbc.query(
@@ -333,7 +434,7 @@ public class ProjectApplicationService {
         List<TaskView> tasks = jdbc.query(
                 "SELECT * FROM tasks WHERE tenant_id=? AND board_id=? ORDER BY board_column_id,position",
                 this::taskRow, context.tenantId(), boardId);
-        return new BoardView(header.id(), header.projectId(), header.name(), columns, tasks);
+        return new BoardView(header.id(), header.projectId(), header.name(), header.version(), columns, tasks);
     }
 
     private ProjectView findProject(JdbcTemplate jdbc, TenantContext context, UUID projectId) {
@@ -408,6 +509,22 @@ public class ProjectApplicationService {
                 "SELECT coalesce(max(position),0) FROM tasks WHERE tenant_id=? AND board_column_id=?",
                 BigDecimal.class, context.tenantId(), columnId);
         return (max == null ? BigDecimal.ZERO : max).add(BigDecimal.valueOf(1000));
+    }
+
+    private BigDecimal nextColumnPosition(JdbcTemplate jdbc, TenantContext context, UUID boardId) {
+        BigDecimal max = jdbc.queryForObject(
+                "SELECT coalesce(max(position),0) FROM board_columns WHERE tenant_id=? AND board_id=?",
+                BigDecimal.class, context.tenantId(), boardId);
+        return (max == null ? BigDecimal.ZERO : max).add(BigDecimal.valueOf(1000));
+    }
+
+    private void advanceBoardVersion(
+            JdbcTemplate jdbc, TenantContext context, UUID boardId, long expectedVersion) {
+        int updated = jdbc.update("""
+                UPDATE boards SET version=version+1,updated_at=now()
+                WHERE tenant_id=? AND id=? AND version=?
+                """, context.tenantId(), boardId, expectedVersion);
+        if (updated == 0) throw new ConflictException("Board columns were updated by another user");
     }
 
     private void requireProjectRole(JdbcTemplate jdbc, TenantContext context, UUID projectId, ProjectRole minimum) {
@@ -491,5 +608,5 @@ public class ProjectApplicationService {
                 aggregateId, context.correlationId(), json);
     }
 
-    private record BoardHeader(UUID id, UUID projectId, String name) {}
+    private record BoardHeader(UUID id, UUID projectId, String name, long version) {}
 }

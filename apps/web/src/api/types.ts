@@ -93,8 +93,13 @@ export interface Board {
   id: UUID;
   projectId: UUID;
   name: string;
+  version: number;
   columns: BoardColumn[];
 }
+
+export type CreateColumnRequest = ApiSchemas['CreateColumnRequest'];
+export type UpdateColumnRequest = ApiSchemas['UpdateColumnRequest'];
+export type ReorderColumnsRequest = ApiSchemas['ReorderColumnsRequest'];
 
 export interface CreateTaskRequest {
   title: string;
@@ -175,6 +180,8 @@ export interface AdminTenant {
   createdAt: string;
   lastError?: string;
 }
+
+export type ResourceDeadLetter = ApiSchemas['ResourceDeadLetterView'];
 
 export interface PageResponse<T> {
   items: T[];

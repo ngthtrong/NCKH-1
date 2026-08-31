@@ -11,6 +11,7 @@ type Status =
   | 'SUCCEEDED'
   | 'RETRYABLE_FAILED'
   | 'FAILED_ROLLED_BACK'
+  | 'ROLLBACK_FAILED'
   | 'INVITED';
 
 const labels: Record<Status, string> = {
@@ -24,6 +25,7 @@ const labels: Record<Status, string> = {
   SUCCEEDED: 'Hoàn tất',
   RETRYABLE_FAILED: 'Có thể thử lại',
   FAILED_ROLLED_BACK: 'Đã hoàn tác',
+  ROLLBACK_FAILED: 'Hoàn tác lỗi',
   INVITED: 'Đã mời',
 };
 
@@ -31,7 +33,7 @@ export function StatusChip({ status }: { status: Status }) {
   const color =
     status === 'ACTIVE' || status === 'SUCCEEDED'
       ? 'success'
-      : status === 'FAILED' || status === 'FAILED_ROLLED_BACK'
+      : status === 'FAILED' || status === 'FAILED_ROLLED_BACK' || status === 'ROLLBACK_FAILED'
         ? 'error'
         : status === 'SUSPENDED'
           ? 'default'

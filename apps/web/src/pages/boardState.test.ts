@@ -6,6 +6,7 @@ const board: Board = {
   id: 'board-1',
   projectId: 'project-1',
   name: 'Research board',
+  version: 0,
   columns: [
     {
       id: 'todo',

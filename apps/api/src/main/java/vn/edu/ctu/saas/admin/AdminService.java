@@ -64,7 +64,8 @@ public class AdminService {
         ProvisioningJobEntity job = jobRepository.findTopByTenantIdOrderByCreatedAtDesc(tenantId)
                 .orElseThrow(() -> new NotFoundException("Provisioning job not found"));
         if (job.getStatus() != ProvisioningStatus.RETRYABLE_FAILED
-                && job.getStatus() != ProvisioningStatus.FAILED_ROLLED_BACK) {
+                && job.getStatus() != ProvisioningStatus.FAILED_ROLLED_BACK
+                && job.getStatus() != ProvisioningStatus.ROLLBACK_FAILED) {
             throw new ConflictException("Provisioning job is not retryable in its current state");
         }
         ProvisioningStatus previousStatus = job.getStatus();

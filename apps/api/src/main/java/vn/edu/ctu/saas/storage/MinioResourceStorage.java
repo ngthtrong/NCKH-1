@@ -19,13 +19,26 @@ import vn.edu.ctu.saas.config.AppProperties;
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "minio", matchIfMissing = true)
 public class MinioResourceStorage implements ResourceStorage {
     private final MinioClient client;
+    private final MinioClient downloadClient;
     private final AppProperties.Storage properties;
     private final AtomicBoolean bucketReady = new AtomicBoolean();
 
     public MinioResourceStorage(AppProperties appProperties) {
         this.properties = appProperties.storage();
+        String region = properties.region() == null || properties.region().isBlank()
+                ? "us-east-1"
+                : properties.region();
         this.client = MinioClient.builder()
                 .endpoint(properties.endpoint())
+                .region(region)
+                .credentials(properties.accessKey(), properties.secretKey())
+                .build();
+        String publicEndpoint = properties.publicEndpoint() == null || properties.publicEndpoint().isBlank()
+                ? properties.endpoint()
+                : properties.publicEndpoint();
+        this.downloadClient = MinioClient.builder()
+                .endpoint(publicEndpoint)
+                .region(region)
                 .credentials(properties.accessKey(), properties.secretKey())
                 .build();
     }
@@ -34,9 +47,7 @@ public class MinioResourceStorage implements ResourceStorage {
     public StoredObject store(
             UUID tenantId, UUID resourceId, String filename, String contentType, long size, InputStream input) {
         ensureBucket();
-        String safeName = filename.replaceAll("[^A-Za-z0-9._-]", "_");
-        if (safeName.isBlank()) safeName = "resource";
-        String key = tenantId + "/" + resourceId + "/" + safeName;
+        String key = ResourceStorageKey.create(tenantId, resourceId, filename);
         try {
             client.putObject(PutObjectArgs.builder()
                     .bucket(properties.bucket())
@@ -52,16 +63,15 @@ public class MinioResourceStorage implements ResourceStorage {
 
     @Override
     public String createDownloadUrl(String storageKey, Duration expiresIn) {
+        if (ResourceStorageKey.parse(storageKey) == null) throw new IllegalArgumentException("Unsafe storage key");
         ensureBucket();
         try {
-            String internalUrl = client.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+            return downloadClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(properties.bucket())
                     .object(storageKey)
                     .expiry((int) Math.min(expiresIn.toSeconds(), 7 * 24 * 60 * 60))
                     .build());
-            if (properties.publicEndpoint() == null || properties.publicEndpoint().isBlank()) return internalUrl;
-            return internalUrl.replaceFirst("^" + java.util.regex.Pattern.quote(properties.endpoint()), properties.publicEndpoint());
         } catch (Exception exception) {
             throw new IllegalStateException("Cannot create resource download URL", exception);
         }
@@ -69,6 +79,7 @@ public class MinioResourceStorage implements ResourceStorage {
 
     @Override
     public void delete(String storageKey) {
+        if (ResourceStorageKey.parse(storageKey) == null) throw new IllegalArgumentException("Unsafe storage key");
         try {
             client.removeObject(RemoveObjectArgs.builder().bucket(properties.bucket()).object(storageKey).build());
         } catch (Exception exception) {
@@ -90,4 +101,3 @@ public class MinioResourceStorage implements ResourceStorage {
         }
     }
 }
-

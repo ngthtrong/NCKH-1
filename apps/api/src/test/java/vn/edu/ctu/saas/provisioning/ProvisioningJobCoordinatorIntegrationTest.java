@@ -22,6 +22,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import vn.edu.ctu.saas.admin.AdminService;
 import vn.edu.ctu.saas.config.AppProperties;
 import vn.edu.ctu.saas.control.ProvisioningEventEntity;
 import vn.edu.ctu.saas.control.ProvisioningEventRepository;
@@ -44,6 +45,7 @@ import vn.edu.ctu.saas.tenant.TenantStatus;
 })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({
+        AdminService.class,
         ProvisioningJobClaimer.class,
         ProvisioningEventRecorder.class,
         ProvisioningJobCoordinator.class,
@@ -66,6 +68,7 @@ class ProvisioningJobCoordinatorIntegrationTest {
     }
 
     @Autowired private ProvisioningJobCoordinator coordinator;
+    @Autowired private AdminService adminService;
     @Autowired private ProvisioningJobRepository jobs;
     @Autowired private ProvisioningEventRepository events;
     @Autowired private TenantRepository tenants;
@@ -179,6 +182,59 @@ class ProvisioningJobCoordinatorIntegrationTest {
                 now.plusSeconds(2))).isTrue();
         assertThat(loadJob().getStatus()).isEqualTo(ProvisioningStatus.FAILED_ROLLED_BACK);
         assertThat(loadTenant().getStatus()).isEqualTo(TenantStatus.FAILED);
+    }
+
+    @Test
+    void rollbackFailureIsNotReportedAsSuccessfullyRolledBack() {
+        Instant now = Instant.now();
+        transactions.executeWithoutResult(ignored -> {
+            ProvisioningJobEntity job = jobs.findById(jobId).orElseThrow();
+            job.setStatus(ProvisioningStatus.RETRYABLE_FAILED);
+            job.setAttempts(2);
+            job.setNextAttemptAt(now.minusSeconds(1));
+            jobs.saveAndFlush(job);
+        });
+        ProvisioningClaim claim = coordinator.claimNext("worker-rollback-failure", now).orElseThrow();
+        assertThat(coordinator.recordFailure(
+                claim, new IllegalStateException("migration failed"), now.plusSeconds(1)))
+                .isEqualTo(FailureOutcome.ROLLBACK_REQUIRED);
+
+        assertThat(coordinator.completeRollback(
+                claim,
+                "MIGRATION_FAILED",
+                "migration failed",
+                new IllegalStateException("database still in use"),
+                now.plusSeconds(2))).isTrue();
+
+        ProvisioningJobEntity failed = loadJob();
+        assertThat(failed.getStatus()).isEqualTo(ProvisioningStatus.ROLLBACK_FAILED);
+        assertThat(failed.getLastErrorMessage()).contains("rollback: database still in use");
+        assertThat(loadTenant().getStatus()).isEqualTo(TenantStatus.FAILED);
+
+        adminService.retryProvisioning(tenantId);
+        ProvisioningJobEntity queued = loadJob();
+        assertThat(queued.getStatus()).isEqualTo(ProvisioningStatus.QUEUED);
+        assertThat(queued.getAttempts()).isZero();
+        assertThat(queued.getLastErrorCode()).isNull();
+        assertThat(queued.getLastErrorMessage()).isNull();
+        assertThat(loadTenant().getStatus()).isEqualTo(TenantStatus.PROVISIONING);
+
+        ProvisioningClaim recovery = coordinator.claimNext(
+                "worker-after-rollback-failure", now.plusSeconds(3)).orElseThrow();
+        assertThat(recovery.attempt()).isEqualTo(1);
+        assertThat(recovery.rollbackOnly()).isFalse();
+        var work = coordinator.loadWork(recovery, now.plusSeconds(4));
+        work.placement().setSchemaVersion(TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION);
+        assertThat(coordinator.completeSuccessfully(
+                recovery, work.placement(), now.plusSeconds(5))).isTrue();
+        assertThat(loadJob().getStatus()).isEqualTo(ProvisioningStatus.SUCCEEDED);
+        assertThat(loadTenant().getStatus()).isEqualTo(TenantStatus.ACTIVE);
+        assertThat(eventTransitions()).containsExactly(
+                "RETRYABLE_FAILED->RUNNING#3",
+                "RUNNING->ROLLBACK_FAILED#3",
+                "ROLLBACK_FAILED->QUEUED#0",
+                "QUEUED->RUNNING#1",
+                "RUNNING->SUCCEEDED#1");
     }
 
     private ProvisioningJobEntity loadJob() {

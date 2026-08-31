@@ -1,7 +1,9 @@
 package vn.edu.ctu.saas.application;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -31,9 +33,24 @@ public final class ApplicationDtos {
     public record ProjectMemberView(UUID projectId, UUID userId, ProjectRole role) {}
     public record SetProjectMemberRequest(@NotNull ProjectRole role) {}
 
-    public record BoardView(UUID id, UUID projectId, String name, List<ColumnView> columns, List<TaskView> tasks) {}
+    public record BoardView(
+            UUID id,
+            UUID projectId,
+            String name,
+            long version,
+            List<ColumnView> columns,
+            List<TaskView> tasks) {}
     public record ColumnView(UUID id, String name, BigDecimal position) {}
     public record CreateBoardRequest(@NotBlank @Size(max = 160) String name) {}
+    public record CreateColumnRequest(
+            @NotBlank @Size(max = 120) String name,
+            @NotNull @PositiveOrZero Long version) {}
+    public record UpdateColumnRequest(
+            @NotBlank @Size(max = 120) String name,
+            @NotNull @PositiveOrZero Long version) {}
+    public record ReorderColumnsRequest(
+            @NotEmpty List<@NotNull UUID> columnIds,
+            @NotNull @PositiveOrZero Long version) {}
 
     public record TaskView(
             UUID id,

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -74,6 +75,37 @@ public class ProjectController {
 
     @GetMapping("/boards/{boardId}")
     public BoardView board(@PathVariable UUID boardId) { return service.getBoard(boardId); }
+
+    @PostMapping("/boards/{boardId}/columns")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BoardView createColumn(
+            @PathVariable UUID boardId,
+            @Valid @RequestBody CreateColumnRequest request) {
+        return service.createColumn(boardId, request);
+    }
+
+    @PatchMapping("/boards/{boardId}/columns/{columnId}")
+    public BoardView updateColumn(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @Valid @RequestBody UpdateColumnRequest request) {
+        return service.updateColumn(boardId, columnId, request);
+    }
+
+    @PutMapping("/boards/{boardId}/columns/order")
+    public BoardView reorderColumns(
+            @PathVariable UUID boardId,
+            @Valid @RequestBody ReorderColumnsRequest request) {
+        return service.reorderColumns(boardId, request);
+    }
+
+    @DeleteMapping("/boards/{boardId}/columns/{columnId}")
+    public BoardView deleteColumn(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @RequestParam long version) {
+        return service.deleteColumn(boardId, columnId, version);
+    }
 
     @PostMapping("/boards/{boardId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)

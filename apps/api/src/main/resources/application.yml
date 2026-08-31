@@ -80,6 +80,7 @@ app:
     type: ${RESOURCE_STORAGE_TYPE:minio}
     endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
     public-endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:9000}
+    region: ${MINIO_REGION:us-east-1}
     access-key: ${MINIO_ACCESS_KEY:minioadmin}
     secret-key: ${MINIO_SECRET_KEY:local-minio-change-me}
     bucket: ${MINIO_BUCKET:tenant-resources}

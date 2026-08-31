@@ -299,6 +299,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/boards/{boardId}/columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createColumn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/boards/{boardId}/columns/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["reorderColumns"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/boards/{boardId}/columns/{columnId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+                columnId: components["parameters"]["ColumnId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteColumn"];
+        options?: never;
+        head?: never;
+        patch: operations["updateColumn"];
+        trace?: never;
+    };
     "/boards/{boardId}/tasks": {
         parameters: {
             query?: never;
@@ -623,6 +674,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/tenants/{tenantId}/resource-dead-letters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listResourceDeadLetters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/tenants/{tenantId}/resource-dead-letters/{eventId}/requeue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["requeueResourceDeadLetter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -644,7 +727,7 @@ export interface components {
         /** @enum {string} */
         PaymentStatus: "CREATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "EXPIRED";
         /** @enum {string} */
-        ProvisioningStatus: "QUEUED" | "RUNNING" | "SUCCEEDED" | "RETRYABLE_FAILED" | "FAILED_ROLLED_BACK";
+        ProvisioningStatus: "QUEUED" | "RUNNING" | "SUCCEEDED" | "RETRYABLE_FAILED" | "FAILED_ROLLED_BACK" | "ROLLBACK_FAILED";
         ApiError: {
             timestamp: components["schemas"]["Instant"];
             status: number;
@@ -804,11 +887,24 @@ export interface components {
             id: components["schemas"]["UUID"];
             projectId: components["schemas"]["UUID"];
             name: string;
+            /** Format: int64 */
+            version: number;
             columns: components["schemas"]["ColumnView"][];
             tasks: components["schemas"]["TaskView"][];
         };
         CreateBoardRequest: {
             name: string;
+        };
+        CreateColumnRequest: {
+            name: string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateColumnRequest: components["schemas"]["CreateColumnRequest"];
+        ReorderColumnsRequest: {
+            columnIds: components["schemas"]["UUID"][];
+            /** Format: int64 */
+            version: number;
         };
         CreateTaskRequest: {
             columnId: components["schemas"]["UUID"];
@@ -947,6 +1043,25 @@ export interface components {
             totalItems: number;
             totalPages: number;
         };
+        ResourceDeadLetterView: {
+            id: components["schemas"]["UUID"];
+            tenantId: components["schemas"]["UUID"];
+            resourceId: components["schemas"]["UUID"];
+            attempts: number;
+            lastError?: string | null;
+            deadLetteredAt: components["schemas"]["Instant"];
+            createdAt: components["schemas"]["Instant"];
+            requeueCount: number;
+            lastRequeuedAt?: components["schemas"]["Instant"] | null;
+        };
+        ResourceDeadLetterPage: {
+            items: components["schemas"]["ResourceDeadLetterView"][];
+            page: number;
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            totalPages: number;
+        };
     };
     responses: {
         /** @description Structured API error */
@@ -967,6 +1082,7 @@ export interface components {
         UserId: components["schemas"]["UUID"];
         ProjectId: components["schemas"]["UUID"];
         BoardId: components["schemas"]["UUID"];
+        ColumnId: components["schemas"]["UUID"];
         TaskId: components["schemas"]["UUID"];
         ResourceId: components["schemas"]["UUID"];
     };
@@ -1511,6 +1627,114 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Board, columns and tasks */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createColumn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateColumnRequest"];
+            };
+        };
+        responses: {
+            /** @description Column created and board version advanced */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    reorderColumns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderColumnsRequest"];
+            };
+        };
+        responses: {
+            /** @description Columns reordered atomically; 409 is returned for a stale board version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteColumn: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+                columnId: components["parameters"]["ColumnId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Empty, non-final column deleted and board version advanced */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateColumn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+                columnId: components["parameters"]["ColumnId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateColumnRequest"];
+            };
+        };
+        responses: {
+            /** @description Column renamed and board version advanced */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2084,6 +2308,54 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Failed job queued again and transition audited */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listResourceDeadLetters: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant-scoped resource cleanup events that exhausted automatic retries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceDeadLetterPage"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    requeueResourceDeadLetter: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+                eventId: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dead-lettered cleanup event reset for retry and action audited */
             200: {
                 headers: {
                     [name: string]: unknown;

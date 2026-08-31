@@ -20,7 +20,8 @@ public final class TestAppProperties {
                 new AppProperties.Payment("fake", "test-payment-webhook-secret"),
                 new AppProperties.Storage(
                         "filesystem", "http://localhost:9000", "http://localhost:9000",
-                        "access", "secret", "resources", ".data/test-resources", "test-signing-secret"),
+                        "us-east-1", "access", "secret", "resources",
+                        ".data/test-resources", "test-signing-secret"),
                 new AppProperties.RateLimit(true, 120),
                 new AppProperties.Seed(false, "owner@example.test", "ChangeMe123!"));
     }

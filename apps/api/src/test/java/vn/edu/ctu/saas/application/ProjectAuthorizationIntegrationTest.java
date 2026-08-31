@@ -2,15 +2,25 @@ package vn.edu.ctu.saas.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static vn.edu.ctu.saas.application.ApplicationDtos.CreateCommentRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.CreateColumnRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.CreateTaskRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.ReorderColumnsRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.SetProjectMemberRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateColumnRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateProjectRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateTaskRequest;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,9 +40,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import tools.jackson.databind.json.JsonMapper;
+import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
+import vn.edu.ctu.saas.storage.ResourceService;
+import vn.edu.ctu.saas.storage.ResourceStorage;
 import vn.edu.ctu.saas.tenant.ProjectRole;
 import vn.edu.ctu.saas.tenant.TenantAccessDeniedException;
 import vn.edu.ctu.saas.tenant.TenantContext;
@@ -64,6 +77,8 @@ class ProjectAuthorizationIntegrationTest {
     private static final UUID TASK_A = UUID.fromString("70000000-0000-0000-0000-000000000001");
     private static final UUID TASK_B = UUID.fromString("70000000-0000-0000-0000-000000000002");
     private static final UUID COMMENT_A = UUID.fromString("80000000-0000-0000-0000-000000000001");
+    private static final UUID RESOURCE_A = UUID.fromString("90000000-0000-0000-0000-000000000001");
+    private static final UUID RESOURCE_B = UUID.fromString("90000000-0000-0000-0000-000000000002");
 
     @Container
     static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:18-alpine")
@@ -76,6 +91,8 @@ class ProjectAuthorizationIntegrationTest {
 
     private TenantMembershipRepository tenantMemberships;
     private ProjectApplicationService service;
+    private ResourceStorage resourceStorage;
+    private ResourceService resourceService;
 
     @BeforeAll
     static void migrateAndCreateRuntimeRole() throws SQLException {
@@ -101,7 +118,7 @@ class ProjectAuthorizationIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        adminJdbc.execute("TRUNCATE TABLE projects, audit_events, outbox_events CASCADE");
+        adminJdbc.execute("TRUNCATE TABLE projects, resources, audit_events, outbox_events CASCADE");
         seedProject(TENANT_A, PROJECT_A, BOARD_A, COLUMN_A, TASK_A, MANAGER, "Alpha project", "Alpha task");
         seedProject(TENANT_B, PROJECT_B, BOARD_B, COLUMN_B, TASK_B, FOREIGN_MANAGER, "Beta project", "Beta task");
         seedProjectMembership(TENANT_A, PROJECT_A, MEMBER, ProjectRole.MEMBER);
@@ -109,6 +126,8 @@ class ProjectAuthorizationIntegrationTest {
         adminJdbc.update(
                 "INSERT INTO comments(id,tenant_id,task_id,author_user_id,body) VALUES (?,?,?,?,?)",
                 COMMENT_A, TENANT_A, TASK_A, MANAGER, "Seed comment");
+        seedResource(TENANT_A, RESOURCE_A, TASK_A, MANAGER, "alpha-evidence.txt");
+        seedResource(TENANT_B, RESOURCE_B, TASK_B, FOREIGN_MANAGER, "beta-secret.txt");
 
         tenantMemberships = mock(TenantMembershipRepository.class);
         TenantJdbcExecutor executor = new TenantJdbcExecutor(new TenantDataSourceResolver() {
@@ -123,6 +142,15 @@ class ProjectAuthorizationIntegrationTest {
             }
         });
         service = new ProjectApplicationService(executor, JsonMapper.builder().build(), tenantMemberships);
+        resourceStorage = mock(ResourceStorage.class);
+        when(resourceStorage.createDownloadUrl(anyString(), any())).thenAnswer(invocation ->
+                "https://storage.example.test/" + invocation.getArgument(0, String.class));
+        when(resourceStorage.store(
+                eq(TENANT_A), any(UUID.class), anyString(), anyString(), anyLong(), any()))
+                .thenAnswer(invocation -> new ResourceStorage.StoredObject(
+                        TENANT_A + "/" + invocation.getArgument(1, UUID.class) + "/uploaded.txt",
+                        invocation.getArgument(4, Long.class)));
+        resourceService = new ResourceService(executor, resourceStorage);
     }
 
     @AfterEach
@@ -141,8 +169,27 @@ class ProjectAuthorizationIntegrationTest {
                 .isInstanceOf(TenantAccessDeniedException.class);
         assertThatThrownBy(() -> service.addComment(TASK_A, new CreateCommentRequest("Viewer comment")))
                 .isInstanceOf(TenantAccessDeniedException.class);
+        assertThatThrownBy(() -> service.createColumn(
+                BOARD_A, new CreateColumnRequest("Viewer column", 0L)))
+                .isInstanceOf(TenantAccessDeniedException.class);
+        assertThat(resourceService.list()).extracting(ResourceService.ResourceView::id)
+                .containsExactly(RESOURCE_A);
+        assertThat(resourceService.downloadUrl(RESOURCE_A).url()).contains(RESOURCE_A.toString());
+        assertThatThrownBy(() -> resourceService.downloadUrl(RESOURCE_B))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Resource not found");
+        assertThatThrownBy(() -> resourceService.attach(RESOURCE_A, TASK_A))
+                .isInstanceOf(TenantAccessDeniedException.class);
+        assertThatThrownBy(() -> resourceService.delete(RESOURCE_A))
+                .isInstanceOf(TenantAccessDeniedException.class);
+        assertThatThrownBy(() -> resourceService.upload(
+                "viewer.txt", "text/plain", 6, new ByteArrayInputStream("viewer".getBytes())))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessage("Project member role is required to upload resources");
+        verify(resourceStorage, never()).store(any(), any(), anyString(), anyString(), anyLong(), any());
 
         assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=?", TENANT_A)).isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM board_columns WHERE tenant_id=?", TENANT_A)).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM comments WHERE tenant_id=?", TENANT_A)).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isZero();
         assertThat(count("SELECT count(*) FROM outbox_events WHERE tenant_id=?", TENANT_A)).isZero();
@@ -155,8 +202,16 @@ class ProjectAuthorizationIntegrationTest {
         ApplicationDtos.TaskView createdTask = service.createTask(BOARD_A, createTask("Member task"));
         ApplicationDtos.CommentView createdComment = service.addComment(
                 TASK_A, new CreateCommentRequest("Member comment"));
+        ResourceService.ResourceView uploaded = resourceService.upload(
+                "member.txt", "text/plain", 6, new ByteArrayInputStream("member".getBytes()));
+        resourceService.attach(uploaded.id(), TASK_A);
         assertThat(createdTask.title()).isEqualTo("Member task");
         assertThat(createdComment.authorUserId()).isEqualTo(MEMBER);
+        assertThat(resourceService.downloadUrl(uploaded.id()).url()).contains(uploaded.id().toString());
+        assertThat(uploaded.storageKey()).startsWith(TENANT_A + "/");
+        assertThatThrownBy(() -> resourceService.delete(uploaded.id()))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessage("Project manager role is required to delete this resource");
 
         assertThatThrownBy(() -> service.updateProject(
                 PROJECT_A, new UpdateProjectRequest("Unauthorized rename", null)))
@@ -172,12 +227,44 @@ class ProjectAuthorizationIntegrationTest {
 
         ApplicationDtos.ProjectView project = service.updateProject(
                 PROJECT_A, new UpdateProjectRequest("Renamed by manager", "Updated"));
+        ApplicationDtos.BoardView withColumn = service.createColumn(
+                BOARD_A, new CreateColumnRequest("Review", 0L));
+        UUID reviewColumnId = withColumn.columns().stream()
+                .filter(column -> column.name().equals("Review"))
+                .findFirst()
+                .orElseThrow()
+                .id();
+
+        assertThat(withColumn.version()).isEqualTo(1);
+        assertThatThrownBy(() -> service.createColumn(
+                BOARD_A, new CreateColumnRequest("Stale", 0L)))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Board columns were updated by another user");
+
+        ApplicationDtos.BoardView renamed = service.updateColumn(
+                BOARD_A, reviewColumnId, new UpdateColumnRequest("Verification", 1L));
+        ApplicationDtos.BoardView reordered = service.reorderColumns(
+                BOARD_A, new ReorderColumnsRequest(java.util.List.of(reviewColumnId, COLUMN_A), renamed.version()));
+        assertThat(reordered.columns()).extracting(ApplicationDtos.ColumnView::id)
+                .containsExactly(reviewColumnId, COLUMN_A);
+        assertThatThrownBy(() -> service.deleteColumn(BOARD_A, COLUMN_A, reordered.version()))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Move or delete tasks before deleting this column");
+
         service.deleteTask(TASK_A);
+        ApplicationDtos.BoardView finalBoard = service.deleteColumn(
+                BOARD_A, reviewColumnId, reordered.version());
+        assertThat(finalBoard.version()).isEqualTo(4);
+        assertThat(finalBoard.columns()).extracting(ApplicationDtos.ColumnView::id)
+                .containsExactly(COLUMN_A);
+        assertThatThrownBy(() -> service.deleteColumn(BOARD_A, COLUMN_A, finalBoard.version()))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("A board must retain at least one column");
 
         assertThat(project.name()).isEqualTo("Renamed by manager");
         assertThat(projectName(PROJECT_A)).isEqualTo("Renamed by manager");
         assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=? AND id=?", TENANT_A, TASK_A)).isZero();
-        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(6);
     }
 
     @Test
@@ -228,11 +315,35 @@ class ProjectAuthorizationIntegrationTest {
                 PROJECT_B, new UpdateProjectRequest("Tampered", null)))
                 .isInstanceOf(TenantAccessDeniedException.class)
                 .hasMessage("Insufficient project role");
+        assertThatThrownBy(() -> service.updateColumn(
+                BOARD_A, COLUMN_B, new UpdateColumnRequest("Tampered", 0L)))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Board column not found");
+        assertThat(resourceService.list()).extracting(ResourceService.ResourceView::id)
+                .containsExactly(RESOURCE_A);
+        assertThatThrownBy(() -> resourceService.downloadUrl(RESOURCE_B))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Resource not found");
+        assertThatThrownBy(() -> resourceService.attach(RESOURCE_B, TASK_A))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Resource not found");
+        assertThatThrownBy(() -> resourceService.attach(RESOURCE_A, TASK_B))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Task not found");
+        assertThatThrownBy(() -> resourceService.delete(RESOURCE_B))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Resource not found");
+        verify(resourceStorage, never()).createDownloadUrl(anyString(), any());
+        verify(resourceStorage, never()).delete(anyString());
 
         assertThat(projectName(PROJECT_B)).isEqualTo("Beta project");
         assertThat(taskTitle(TASK_B)).isEqualTo("Beta task");
         assertThat(count("SELECT count(*) FROM audit_events")).isZero();
         assertThat(count("SELECT count(*) FROM outbox_events")).isZero();
+        assertThat(count("SELECT count(*) FROM resources WHERE tenant_id=? AND id=?", TENANT_B, RESOURCE_B))
+                .isEqualTo(1);
+        assertThat(count("SELECT count(*) FROM task_resources WHERE tenant_id=? AND resource_id=?", TENANT_B, RESOURCE_B))
+                .isEqualTo(1);
     }
 
     @Test
@@ -300,6 +411,23 @@ class ProjectAuthorizationIntegrationTest {
         adminJdbc.update(
                 "INSERT INTO project_memberships(id,tenant_id,project_id,user_id,role) VALUES (?,?,?,?,?)",
                 UUID.randomUUID(), tenantId, projectId, userId, role.name());
+    }
+
+    private static void seedResource(
+            UUID tenantId,
+            UUID resourceId,
+            UUID taskId,
+            UUID uploader,
+            String filename) {
+        String storageKey = tenantId + "/" + resourceId + "/" + filename;
+        adminJdbc.update("""
+                INSERT INTO resources(id,tenant_id,original_name,storage_key,content_type,size_bytes,uploaded_by)
+                VALUES (?,?,?,?,?,?,?)
+                """, resourceId, tenantId, filename, storageKey, "text/plain", 12, uploader);
+        adminJdbc.update("""
+                INSERT INTO task_resources(id,tenant_id,task_id,resource_id)
+                VALUES (?,?,?,?)
+                """, UUID.randomUUID(), tenantId, taskId, resourceId);
     }
 
     private CreateTaskRequest createTask(String title) {

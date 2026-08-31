@@ -5,6 +5,6 @@ public enum ProvisioningStatus {
     RUNNING,
     SUCCEEDED,
     RETRYABLE_FAILED,
-    FAILED_ROLLED_BACK
+    FAILED_ROLLED_BACK,
+    ROLLBACK_FAILED
 }
-

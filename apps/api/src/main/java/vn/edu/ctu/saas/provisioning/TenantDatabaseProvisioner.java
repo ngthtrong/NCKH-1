@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HexFormat;
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vn.edu.ctu.saas.config.AppProperties;
 import vn.edu.ctu.saas.control.TenantEntity;
@@ -18,13 +19,25 @@ import vn.edu.ctu.saas.tenant.TenantPlacement;
 
 @Component
 public class TenantDatabaseProvisioner {
+    public static final String LATEST_APPLICATION_SCHEMA_VERSION = "3";
+
     private final AppProperties properties;
     private final PlacementSecretCipher cipher;
+    private final ProvisioningCheckpoint checkpoint;
     private final SecureRandom random = new SecureRandom();
 
+    @Autowired
     public TenantDatabaseProvisioner(AppProperties properties, PlacementSecretCipher cipher) {
+        this(properties, cipher, (stage, tenant, placement) -> {});
+    }
+
+    TenantDatabaseProvisioner(
+            AppProperties properties,
+            PlacementSecretCipher cipher,
+            ProvisioningCheckpoint checkpoint) {
         this.properties = properties;
         this.cipher = cipher;
+        this.checkpoint = checkpoint;
     }
 
     /**
@@ -61,18 +74,21 @@ public class TenantDatabaseProvisioner {
     public void provision(TenantEntity tenant, TenantPlacementEntity placement) {
         prepare(tenant, placement);
         if (placement.getPlacementType() == TenantPlacement.POOL) {
-            migratePool();
-            placement.setSchemaVersion("1");
+            placement.setSchemaVersion(migratePool());
             return;
         }
         String database = identifier(placement.getDatabaseName());
         String runtimeRole = identifier(placement.getDatabaseUsername());
         String runtimePassword = runtimePassword(placement);
         createRoleAndDatabase(database, runtimeRole, runtimePassword);
+        checkpoint.reached(ProvisioningStage.DATABASE_READY, tenant, placement);
         String tenantUrl = withDatabase(properties.provisioning().adminUrl(), database);
-        migrate(tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+        String schemaVersion = migrate(
+                tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+        checkpoint.reached(ProvisioningStage.APPLICATION_MIGRATED, tenant, placement);
         grantRuntime(tenantUrl, runtimeRole);
-        placement.setSchemaVersion("1");
+        placement.setSchemaVersion(schemaVersion);
+        checkpoint.reached(ProvisioningStage.READY_TO_FINALIZE, tenant, placement);
     }
 
     public void rollback(TenantEntity tenant, TenantPlacementEntity placement) {
@@ -85,24 +101,35 @@ public class TenantDatabaseProvisioner {
             statement.execute("DROP DATABASE IF EXISTS " + database + " WITH (FORCE)");
             statement.execute("DROP ROLE IF EXISTS " + runtimeRole);
         } catch (SQLException exception) {
-            throw new IllegalStateException("Failed to roll back tenant database", exception);
+            throw new IllegalStateException(
+                    "Failed to roll back tenant database: " + exception.getMessage(), exception);
         }
     }
 
-    private void migratePool() {
+    private String migratePool() {
         AppProperties.Datasource.Pool pool = properties.datasource().pool();
         String adminUrl = withDatabase(properties.provisioning().adminUrl(), databaseName(pool.jdbcUrl()));
-        migrate(adminUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+        String schemaVersion = migrate(
+                adminUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
         grantRuntime(adminUrl, identifier(pool.username()));
+        return schemaVersion;
     }
 
-    private void migrate(String url, String username, String password) {
-        Flyway.configure()
+    private String migrate(String url, String username, String password) {
+        Flyway flyway = Flyway.configure()
                 .dataSource(url, username, password)
                 .locations("classpath:db/migration/application")
                 .validateMigrationNaming(true)
-                .load()
-                .migrate();
+                .load();
+        flyway.migrate();
+        var current = flyway.info().current();
+        String schemaVersion = current == null || current.getVersion() == null
+                ? null
+                : current.getVersion().getVersion();
+        if (!LATEST_APPLICATION_SCHEMA_VERSION.equals(schemaVersion)) {
+            throw new IllegalStateException("Unexpected application schema version " + schemaVersion);
+        }
+        return schemaVersion;
     }
 
     private void createRoleAndDatabase(String database, String runtimeRole, String password) {
@@ -217,4 +244,15 @@ public class TenantDatabaseProvisioner {
     }
 
     private record JdbcEndpoint(String host, int port) {}
+
+    enum ProvisioningStage {
+        DATABASE_READY,
+        APPLICATION_MIGRATED,
+        READY_TO_FINALIZE
+    }
+
+    @FunctionalInterface
+    interface ProvisioningCheckpoint {
+        void reached(ProvisioningStage stage, TenantEntity tenant, TenantPlacementEntity placement);
+    }
 }

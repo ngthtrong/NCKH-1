@@ -168,7 +168,10 @@ public class ProvisioningJobCoordinator {
         }
         job.setLastErrorCode(errorCode == null ? "PROVISIONING_FAILED" : errorCode);
         job.setLastErrorMessage(truncate(finalMessage));
-        job.setStatus(ProvisioningStatus.FAILED_ROLLED_BACK);
+        ProvisioningStatus finalStatus = rollbackFailure == null
+                ? ProvisioningStatus.FAILED_ROLLED_BACK
+                : ProvisioningStatus.ROLLBACK_FAILED;
+        job.setStatus(finalStatus);
         job.setNextAttemptAt(null);
         clearLease(job);
         tenantRepository.findById(claim.tenantId()).ifPresent(tenant -> {
@@ -179,7 +182,7 @@ public class ProvisioningJobCoordinator {
         eventRecorder.record(
                 job,
                 ProvisioningStatus.RUNNING,
-                ProvisioningStatus.FAILED_ROLLED_BACK,
+                finalStatus,
                 job.getLastErrorCode(),
                 job.getLastErrorMessage());
         return true;

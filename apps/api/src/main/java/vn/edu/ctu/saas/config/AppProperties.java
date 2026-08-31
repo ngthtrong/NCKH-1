@@ -36,6 +36,7 @@ public record AppProperties(
             String type,
             String endpoint,
             String publicEndpoint,
+            String region,
             String accessKey,
             String secretKey,
             String bucket,

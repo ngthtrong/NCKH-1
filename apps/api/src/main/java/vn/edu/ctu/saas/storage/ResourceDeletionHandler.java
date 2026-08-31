@@ -25,18 +25,16 @@ public class ResourceDeletionHandler {
         if (!supports(event)) {
             throw new IllegalArgumentException("Unsupported resource deletion event");
         }
+        JsonNode payload;
         try {
-            JsonNode payload = objectMapper.readTree(event.payloadJson());
-            String storageKey = payload.path("storageKey").asText();
-            String tenantPrefix = event.tenantId() + "/";
-            if (storageKey.isBlank() || !storageKey.startsWith(tenantPrefix)) {
-                throw new IllegalArgumentException("Resource deletion key does not belong to the event tenant");
-            }
-            storage.delete(storageKey);
-        } catch (IllegalArgumentException exception) {
-            throw exception;
+            payload = objectMapper.readTree(event.payloadJson());
         } catch (Exception exception) {
             throw new IllegalArgumentException("Invalid resource deletion event payload", exception);
         }
+        String storageKey = payload.path("storageKey").asText();
+        if (!ResourceStorageKey.belongsTo(storageKey, event.tenantId(), event.aggregateId())) {
+            throw new IllegalArgumentException("Resource deletion key does not belong to the event resource");
+        }
+        storage.delete(storageKey);
     }
 }

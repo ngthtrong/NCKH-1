@@ -27,8 +27,7 @@ public class FileSystemResourceStorage implements ResourceStorage {
 
     @Override
     public StoredObject store(UUID tenantId, UUID resourceId, String filename, String contentType, long size, InputStream input) {
-        String safeName = filename.replaceAll("[^A-Za-z0-9._-]", "_");
-        String key = tenantId + "/" + resourceId + "/" + safeName;
+        String key = ResourceStorageKey.create(tenantId, resourceId, filename);
         Path target = resolve(key);
         try {
             Files.createDirectories(target.getParent());
@@ -41,6 +40,7 @@ public class FileSystemResourceStorage implements ResourceStorage {
 
     @Override
     public String createDownloadUrl(String storageKey, Duration expiresIn) {
+        resolve(storageKey);
         long expires = Instant.now().plus(expiresIn).getEpochSecond();
         String signature = sign(storageKey + ":" + expires);
         return "/api/v1/resources/content?key=" + java.net.URLEncoder.encode(storageKey, java.nio.charset.StandardCharsets.UTF_8)
@@ -49,8 +49,9 @@ public class FileSystemResourceStorage implements ResourceStorage {
 
     @Override
     public void delete(String storageKey) {
+        Path target = resolve(storageKey);
         try {
-            Files.deleteIfExists(resolve(storageKey));
+            Files.deleteIfExists(target);
         } catch (Exception exception) {
             throw new IllegalStateException("Resource deletion failed", exception);
         }
@@ -64,8 +65,16 @@ public class FileSystemResourceStorage implements ResourceStorage {
     }
 
     private Path resolve(String storageKey) {
-        Path resolved = root.resolve(storageKey).normalize();
-        if (!resolved.startsWith(root)) throw new IllegalArgumentException("Unsafe storage key");
+        ResourceStorageKey.Parsed parsed = ResourceStorageKey.parse(storageKey);
+        if (parsed == null) throw new IllegalArgumentException("Unsafe storage key");
+        Path tenantRoot = root.resolve(parsed.tenantId().toString()).normalize();
+        Path resolved = tenantRoot
+                .resolve(parsed.resourceId().toString())
+                .resolve(parsed.filename())
+                .normalize();
+        if (!tenantRoot.startsWith(root) || !resolved.startsWith(tenantRoot)) {
+            throw new IllegalArgumentException("Unsafe storage key");
+        }
         return resolved;
     }
 
@@ -85,4 +94,3 @@ public class FileSystemResourceStorage implements ResourceStorage {
                 supplied.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
     }
 }
-

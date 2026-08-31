@@ -3,6 +3,7 @@ import type { components as ApiComponents } from './generated';
 import type {
   AdminTenant,
   Board,
+  CreateColumnRequest,
   CreateProjectRequest,
   CreateTaskRequest,
   DashboardResponse,
@@ -15,12 +16,15 @@ import type {
   PageResponse,
   ProjectRole,
   ProjectSummary,
+  ReorderColumnsRequest,
   RefreshResponse,
   ResourceItem,
+  ResourceDeadLetter,
   ResourcesResponse,
   TenantRole,
   TenantSummary,
   TenantTransferResponse,
+  UpdateColumnRequest,
   UUID,
 } from './types';
 
@@ -54,6 +58,7 @@ function mapBoard(raw: RawBoard): Board {
     id: raw.id,
     projectId: raw.projectId,
     name: raw.name,
+    version: raw.version,
     columns: raw.columns.map((column) => ({
       id: column.id,
       name: column.name,
@@ -166,6 +171,26 @@ export const dashboardApi = {
 
 export const boardsApi = {
   get: async (boardId: UUID) => mapBoard(await request<RawBoard>(`/boards/${boardId}`)),
+  createColumn: async (boardId: UUID, payload: CreateColumnRequest) =>
+    mapBoard(await request<RawBoard>(`/boards/${boardId}/columns`, {
+      method: 'POST',
+      body: payload,
+    })),
+  updateColumn: async (boardId: UUID, columnId: UUID, payload: UpdateColumnRequest) =>
+    mapBoard(await request<RawBoard>(`/boards/${boardId}/columns/${columnId}`, {
+      method: 'PATCH',
+      body: payload,
+    })),
+  reorderColumns: async (boardId: UUID, payload: ReorderColumnsRequest) =>
+    mapBoard(await request<RawBoard>(`/boards/${boardId}/columns/order`, {
+      method: 'PUT',
+      body: payload,
+    })),
+  deleteColumn: async (boardId: UUID, columnId: UUID, version: number) =>
+    mapBoard(await request<RawBoard>(
+      `/boards/${boardId}/columns/${columnId}?version=${encodeURIComponent(version)}`,
+      { method: 'DELETE' },
+    )),
   createTask: async (boardId: UUID, columnId: UUID, payload: CreateTaskRequest) => {
     await request<RawTask>(`/boards/${boardId}/tasks`, {
       method: 'POST',
@@ -261,4 +286,13 @@ export const adminApi = {
     ),
   retryProvisioning: (tenantId: UUID) =>
     request<void>(`/admin/tenants/${tenantId}/provisioning/retry`, { method: 'POST' }),
+  resourceDeadLetters: (tenantId: UUID, page = 0) =>
+    request<PageResponse<ResourceDeadLetter>>(
+      `/admin/tenants/${tenantId}/resource-dead-letters?page=${page}`,
+    ),
+  requeueResourceDeadLetter: ({ tenantId, eventId }: { tenantId: UUID; eventId: UUID }) =>
+    request<void>(
+      `/admin/tenants/${tenantId}/resource-dead-letters/${eventId}/requeue`,
+      { method: 'POST' },
+    ),
 };
