@@ -43,6 +43,7 @@
     "resource-metrics",
     "environment-manifest"
   ],
+  "elimination_artifact_kinds": ["security-report", "environment-manifest"],
   "measurements": [
     "latency-median-ms",
     "latency-p95-ms",
@@ -55,6 +56,21 @@
     "any-cross-tenant-read-write-delete-succeeds",
     "any-required-escape-hatch-cannot-be-tested"
   ],
+  "elimination_triggers": {
+    "any-cross-tenant-read-write-delete-succeeds": [
+      "project-read-known-foreign-id",
+      "project-update-known-foreign-id",
+      "project-delete-known-foreign-id",
+      "native-query-cross-tenant",
+      "bulk-update-cross-tenant",
+      "background-job-cross-tenant"
+    ],
+    "any-required-escape-hatch-cannot-be-tested": [
+      "native-query-cross-tenant",
+      "bulk-update-cross-tenant",
+      "background-job-cross-tenant"
+    ]
+  },
   "rubric": [
     {"id": "isolation", "weight_percent": 30},
     {"id": "testability", "weight_percent": 20},

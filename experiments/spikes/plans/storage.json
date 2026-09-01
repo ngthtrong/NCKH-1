@@ -36,6 +36,7 @@
     "backup-restore-report",
     "environment-manifest"
   ],
+  "elimination_artifact_kinds": ["contract-report", "environment-manifest"],
   "measurements": [
     "operation-latency-median-ms",
     "operation-latency-p95-ms",
@@ -48,6 +49,16 @@
     "quota-can-be-exceeded-by-concurrent-upload",
     "safe-expiring-download-cannot-be-provided"
   ],
+  "elimination_triggers": {
+    "tenant-namespace-bypass-succeeds": [
+      "canonical-tenant-resource-key",
+      "path-or-key-traversal",
+      "cross-tenant-prefix",
+      "unauthorized-project-download"
+    ],
+    "quota-can-be-exceeded-by-concurrent-upload": ["concurrent-quota"],
+    "safe-expiring-download-cannot-be-provided": ["expired-download-url"]
+  },
   "rubric": [
     {"id": "security-and-testability", "weight_percent": 35},
     {"id": "backup-and-operations", "weight_percent": 25},

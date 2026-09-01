@@ -9,6 +9,7 @@ python3 -m json.tool "$repository_root/experiments/schemas/observation.schema.js
 python3 -m json.tool "$repository_root/experiments/schemas/resource-metrics.schema.json" >/dev/null
 python3 -m json.tool "$repository_root/experiments/schemas/spike-plan.schema.json" >/dev/null
 python3 -m json.tool "$repository_root/experiments/schemas/spike-evidence.schema.json" >/dev/null
+python3 -m json.tool "$repository_root/experiments/schemas/spike-elimination.schema.json" >/dev/null
 python3 -m py_compile \
   "$repository_root/experiments/analysis/analyze_results.py" \
   "$repository_root/experiments/analysis/capture_manifest.py" \

@@ -2,8 +2,8 @@
 
 **Cập nhật:** 2026-08-31 (UTC)
 **Nhánh đang làm:** `main`
-**Commit nền trước phần P2 hiện tại:** `71b8092` (`complete P1 local hardening`)
-**Trạng thái:** P0 hoàn tất local; các ưu tiên P1 từ lượt 2 gồm startup-order V3/outbox, role matrix, file/download/background-job tenant matrix, MinIO outage kéo dài trong Compose và recovery sau rollback PostgreSQL thất bại lặp lại đã đóng bằng kiểm tra local. P1 tổng thể vẫn còn các adapter phụ thuộc credential/hạ tầng thật và diễn tập worker container tùy chọn. P2 đã có protocol/evidence gate đăng ký trước và Project CRUD security harness 3 ứng viên × Pool/Silo pass local; vẫn chưa có adversarial guard-omission matrix, raw measurement, score hoặc ADR được chấp nhận.
+**Commit nền trước phần P2 hiện tại:** `2b430b7` (`p2`)
+**Trạng thái:** P0 hoàn tất local; các ưu tiên P1 từ lượt 2 gồm startup-order V3/outbox, role matrix, file/download/background-job tenant matrix, MinIO outage kéo dài trong Compose và recovery sau rollback PostgreSQL thất bại lặp lại đã đóng bằng kiểm tra local. P1 tổng thể vẫn còn các adapter phụ thuộc credential/hạ tầng thật và diễn tập worker container tùy chọn. P2 đã có protocol/evidence gate, guarded Project CRUD 3 ứng viên × Pool/Silo và guard-omission matrix local. Matrix ghi 6 leak cho explicit/Hibernate trên Pool, RLS chặn 3/3 đường omission; vẫn chưa có hồ sơ loại checksum-backed, raw measurement, score hoặc ADR được chấp nhận.
 
 Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. Nó phân biệt rõ mã đã hiện thực, kiểm tra đã chạy, phần mới chỉ là khung và phần bắt buộc phải chờ dữ liệu/hạ tầng thật.
 
@@ -13,9 +13,10 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 - Kế hoạch thực hiện: [`resource/plan.md`](../resource/plan.md).
 - Không khôi phục hai file người dùng đang chủ động xóa: `resource/important.md` và `resource/thuyet_minh_SaaS.md`.
 - `draft.md` không còn tồn tại tại checkpoint; nếu người dùng tạo lại file này thì không được ghi đè khi chưa kiểm tra nội dung.
-- Phần P1 local đã được commit tại `71b8092`; `main` và `origin/main` cùng trỏ tới commit này khi bắt đầu
-  lượt chuẩn bị P2. Protocol/schema/validator, isolation harness P2 và các biên bản mới đang ở working
-  tree, chưa commit. Phiên sau vẫn phải đọc `git status --short` vì trạng thái có thể đã thay đổi.
+- Phần P1 local đã được commit tại `71b8092`; protocol/evidence gate, isolation harness và hai biên bản
+  chuẩn bị P2 đầu đã được commit tại `2b430b7`. `main` và `origin/main` cùng trỏ tới `2b430b7` khi chạy
+  guard-omission matrix cuối; schema hỗ trợ hồ sơ loại và biên bản lượt 3 đang ở working tree, chưa commit.
+  Phiên sau vẫn phải đọc `git status --short` vì trạng thái có thể đã thay đổi.
 - Không tạo số đo, DOI, kết quả khảo sát, SUS hoặc kết quả thực nghiệm giả. Mục có nhãn `UNVERIFIED` phải tiếp tục giữ nhãn đến khi kiểm chứng nguồn thật.
 - Không tuyên bố Cổng B/E đạt chỉ từ compile, unit test hoặc test dùng fixture.
 
@@ -24,7 +25,7 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 | Giai đoạn | Trạng thái tại checkpoint | Phần còn thiếu để qua cổng |
 |---|---|---|
 | A — Repo và giao thức nghiên cứu | **Đang thực hiện, khung chính đã có** | Kiểm chứng trực tuyến toàn bộ nguồn/DOI, hoàn tất sàng lọc và bảo đảm mọi yêu cầu đều truy vết được |
-| B — Spike và ADR | **Một phần** | Chạy đủ ba phương án cô lập trên Pool/Silo bằng PostgreSQL thật; đo latency/RAM/connection; chạy spike storage/payment; chấm điểm và chốt ADR 0003–0005 |
+| B — Spike và ADR | **Một phần** | Review/khóa hồ sơ loại hai ứng viên Pool đã leak local; đo ứng viên còn lại; chạy spike storage/payment; chấm điểm và chốt ADR 0003–0005 |
 | C — Kiến trúc và hợp đồng | **Khung chính đã có** | Review tính nhất quán sau khi ADR B được chốt; bổ sung chi tiết nếu spike làm thay đổi quyết định |
 | D — Lát cắt dọc | **Baseline chức năng + hardening P1 local** | Web Push thật, adapter payment sandbox và các trạng thái/phạm vi vận hành chưa có credential hoặc chưa được diễn tập |
 | E — Triển khai và thực nghiệm | **Local Compose/Testcontainers/k6 smoke đã xác minh; chưa có số đo chính** | Pilot VPS, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
@@ -83,12 +84,17 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
   fail-closed: checksum artifact, commit sạch, mandatory security case, workload/environment fingerprint,
   coverage candidate/placement và replicate. Payment vẫn bị chặn bởi credential/trọng số chưa phê duyệt.
 - Có Maven isolation harness độc lập cho explicit predicate, Hibernate filter và PostgreSQL RLS trên một
-  Pool database cùng hai Silo database vật lý; matrix Project CRUD có guard pass 6/6 trên PostgreSQL 18.6.
+  Pool database cùng hai Silo database vật lý; matrix Project CRUD có guard pass 6/6 trên PostgreSQL
+  18.6. Guard omission ở native/bulk/background ghi 6 leak cho explicit/Hibernate Pool, RLS chặn 3/3 và
+  Silo physical boundary chặn 9/9.
+- Evidence gate có hồ sơ `elimination.json` fail-closed riêng: reason phải đăng ký trước, mandatory case
+  có ít nhất một `FAIL` đúng mapping trigger của reason, commit sạch và artifact checksum. Candidate bị loại hợp lệ mới được miễn measured
+  replicate; không thể đổi security failure thành `PASS` để làm gate hoàn tất.
 - `experiments/results` và `experiments/derived` bị ignore; analyzer dừng nếu không có run hợp lệ thay vì sinh dữ liệu mẫu.
 
 ## 4. Bằng chứng kiểm tra đã có
 
-Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại [P0 verification 2026-08-26](testing/p0-verification-2026-08-26.md), [P1 verification 2026-08-26](testing/p1-verification-2026-08-26.md), [P1 continuation verification 2026-08-27](testing/p1-verification-2026-08-27.md), [P1 verification lượt 2](testing/p1-verification-2026-08-27-part-2.md), [P1 file/worker/MinIO verification 2026-08-31](testing/p1-verification-2026-08-31.md), [P1 rollback recovery verification 2026-08-31](testing/p1-verification-2026-08-31-part-2.md), [P2 preparation 2026-08-31](testing/p2-preparation-2026-08-31.md) và [P2 isolation harness 2026-08-31](testing/p2-preparation-2026-08-31-part-2.md). Các kết quả dưới đây là kiểm tra kỹ thuật, không phải kết quả thực nghiệm nghiên cứu.
+Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại [P0 verification 2026-08-26](testing/p0-verification-2026-08-26.md), [P1 verification 2026-08-26](testing/p1-verification-2026-08-26.md), [P1 continuation verification 2026-08-27](testing/p1-verification-2026-08-27.md), [P1 verification lượt 2](testing/p1-verification-2026-08-27-part-2.md), [P1 file/worker/MinIO verification 2026-08-31](testing/p1-verification-2026-08-31.md), [P1 rollback recovery verification 2026-08-31](testing/p1-verification-2026-08-31-part-2.md), [P2 preparation 2026-08-31](testing/p2-preparation-2026-08-31.md), [P2 isolation harness 2026-08-31](testing/p2-preparation-2026-08-31-part-2.md) và [P2 guard-omission/evidence gate 2026-08-31](testing/p2-preparation-2026-08-31-part-3.md). Các kết quả dưới đây là kiểm tra kỹ thuật, không phải kết quả thực nghiệm nghiên cứu.
 
 | Kiểm tra | Kết quả xác minh |
 |---|---|
@@ -106,9 +112,9 @@ Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại 
 | Playwright E2E | Đúng 2/2 case Pool/Silo pass runtime bằng Chromium thật; host/role, stale-version `409`, file/download, notification và resource cleanup tenant matrix đều pass |
 | npm install/audit | 263 package cài, audit 264 package, 0 vulnerability |
 | k6 JavaScript syntax | Tất cả file `experiments/k6/*.js` và `lib/*.js` qua `node --check` |
-| Infra/analyzer validation | Compose interpolation pass; 6/6 Python test (3 analyzer nền + 3 evidence gate) và JSON/Python/static checks pass |
-| P2 protocol/evidence gate | 3 plan isolation/storage/payment hợp lệ; 6/6 Python test tổng cộng pass; payment giữ 5 trọng số và credential ở `PENDING_DATA`; chưa có measured result |
-| P2 Project CRUD isolation harness | Module độc lập 1 suite, 6/6 pass trên PostgreSQL 18.6: explicit/Hibernate/RLS × Pool/Silo; chỉ là guarded local contract, chưa có guard-omission matrix hoặc số đo |
+| Infra/analyzer validation | Compose interpolation pass; 8/8 Python test (3 analyzer nền + 5 evidence gate) và JSON/Python/static checks pass |
+| P2 protocol/evidence gate | 3 plan isolation/storage/payment hợp lệ; 8/8 Python test tổng cộng pass; payment giữ 5 trọng số và credential ở `PENDING_DATA`; chưa có measured result/elimination artifact |
+| P2 Project CRUD isolation harness | Module độc lập 1 suite, 6/6 pass trên PostgreSQL 18.6; 18 guard-omission observation gồm 6 candidate leak explicit/Hibernate Pool, 3 RLS Pool protected và 9 Silo boundary protected; chưa có số đo |
 | Docker Compose runtime | `scripts/dev-up.sh` rebuild/restart exit 0 trên volume hiện hữu; API healthy/readiness pass; worker log mới sạch WARN/ERROR qua nhiều vòng outbox poll |
 | Compose MinIO outage | Pool và Silo cùng đạt resource cleanup dead letter ở `attempts=5`; requeue từng tenant dọn đúng object, không đổi dead letter/object tenant còn lại; audit có mặt và MinIO được khởi động lại |
 | Flyway/upgrade | Truy vấn cuối xác nhận control V1–V4, Pool V1–V3 và Silo V1–V3 đều `success=true`; hai placement `ACTIVE`, `schema_version=3` |
@@ -152,8 +158,9 @@ E2E_ENV_FILE=../../infra/.env npm run test:e2e
 - Web Push mới lưu subscription và trả trạng thái `VAPID_NOT_CONFIGURED`; chưa gửi thật.
 - VNPay/Stripe adapter thật chưa có do chưa có credential; FakePaymentProvider là mặc định hợp lệ cho local/test.
 - ADR isolation/payment/storage vẫn ở trạng thái Proposed vì spike và số đo chưa hoàn tất.
-- Protocol/evidence gate và guarded Project CRUD harness P2 đã có; adversarial guard-omission matrix,
-  measured artifact và scorecard kết quả chưa có. Validator không thay thế review raw data hoặc quyết định ADR.
+- Protocol/evidence gate, guarded Project CRUD và adversarial guard-omission matrix P2 đã có. Hai
+  application-only candidate có hành vi loại local nhưng chưa có hồ sơ loại checksum-backed được review;
+  measured artifact và scorecard chưa có. Validator không thay thế review raw data hoặc quyết định ADR.
 - Chưa có notebook `.ipynb`; hiện có Python pipeline tái lập. Có thể thêm notebook mỏng gọi cùng analyzer sau khi schema dữ liệu ổn định.
 - Prometheus hiện scrape API; worker không chạy web server nên chưa có endpoint metric riêng.
 - Rate limiter v1 là in-memory, phù hợp một API instance nhưng chưa có eviction dài hạn.
@@ -188,9 +195,9 @@ E2E_ENV_FILE=../../infra/.env npm run test:e2e
    trọng số isolation/storage; payment giữ credential/trọng số là `PENDING_DATA`.
 2. **Đã dựng guarded contract local:** cùng `Project CRUD` cho ba phương án isolation trên Pool và Silo,
    pass 6/6 trong module độc lập.
-3. Bổ sung guard-omission/native/bulk/background adversarial matrix; loại ngay phương án có truy cập chéo
-   thành công ngoài negative control được định nghĩa trước.
-4. Đo latency, RAM và connection bằng cùng seed/workload; lưu raw artifact + manifest.
+3. **Đã chạy guard omission local:** native/bulk/background ghi 6 leak cho explicit/Hibernate Pool và
+   RLS chặn 3/3; tiếp theo review rồi khóa hồ sơ loại checksum-backed, không đổi leak thành `PASS`.
+4. Đo latency, RAM và connection cho ứng viên còn lại bằng cùng seed/workload; lưu raw artifact + manifest.
 5. Chạy storage và payment spike bằng credential thật nếu được cung cấp.
 6. Chấm theo trọng số trong kế hoạch, cập nhật ADR 0003–0005 từ Proposed sang Accepted kèm bằng chứng.
 

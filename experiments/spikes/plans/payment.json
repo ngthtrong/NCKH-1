@@ -40,6 +40,7 @@
     "sanitized-provider-log",
     "environment-manifest"
   ],
+  "elimination_artifact_kinds": ["contract-report", "environment-manifest"],
   "measurements": [
     "contract-case-result",
     "adapter-process-rss-bytes"
@@ -50,6 +51,17 @@
     "fake-or-duplicate-callback-mutates-state",
     "secret-appears-in-source-log-or-fixture"
   ],
+  "elimination_triggers": {
+    "sandbox-credential-unavailable": ["create-session"],
+    "official-signature-verification-cannot-be-tested": ["invalid-signature"],
+    "fake-or-duplicate-callback-mutates-state": [
+      "invalid-signature",
+      "duplicate-callback",
+      "out-of-order-callback",
+      "duplicate-provisioning-prevented"
+    ],
+    "secret-appears-in-source-log-or-fixture": ["secret-redaction"]
+  },
   "credential_gate": {
     "status": "PENDING_DATA",
     "required": [

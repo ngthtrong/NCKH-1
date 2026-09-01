@@ -16,8 +16,10 @@
     "required_cases",
     "mandatory_pass_cases",
     "required_artifact_kinds",
+    "elimination_artifact_kinds",
     "measurements",
     "eliminate_if",
+    "elimination_triggers",
     "rubric"
   ],
   "properties": {
@@ -57,6 +59,12 @@
       "uniqueItems": true,
       "items": {"type": "string", "minLength": 1}
     },
+    "elimination_artifact_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
     "measurements": {
       "type": "array",
       "minItems": 1,
@@ -68,6 +76,16 @@
       "minItems": 1,
       "uniqueItems": true,
       "items": {"type": "string", "minLength": 1}
+    },
+    "elimination_triggers": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {"type": "string", "minLength": 1}
+      }
     },
     "credential_gate": {
       "type": "object",

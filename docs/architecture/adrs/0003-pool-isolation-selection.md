@@ -29,3 +29,15 @@ Mỗi ứng viên chạy Pool và Silo, Flyway, IDOR/list/search, native query, 
 
 Schema và test được thiết kế tenant-aware để không khóa vào một ứng viên. Mọi business repository vẫn nhận tenant context qua infrastructure boundary; native/bulk escape hatch phải được đăng ký/review. ADR này chuyển `Accepted` hoặc được supersede chỉ khi có liên kết code spike, test report, raw measurement và scorecard.
 
+## Bằng chứng sàng lọc local 2026-08-31
+
+Project CRUD guarded contract pass 6/6 cho ba ứng viên × Pool/Silo trên PostgreSQL 18.6. Khi cố ý bỏ
+application predicate/filter ở native query, bulk update và background mutation, harness ghi 18 quan
+sát: explicit predicate và Hibernate cùng để lộ tenant khác ở cả ba đường Pool (6
+`CANDIDATE_CROSS_TENANT_LEAK`); RLS chặn cả ba đường Pool; cả chín đường Silo được physical database
+boundary bảo vệ.
+
+Đây là technical screening trên commit sạch `2b430b7`, chưa phải measured spike artifact/scorecard.
+Theo điều kiện loại đã đăng ký, hai ứng viên application-only có hành vi loại ở Pool; trạng thái ADR vẫn
+`Proposed` cho đến khi nhóm review hồ sơ loại checksum-backed, đo ứng viên còn lại và chấp nhận quyết
+định rõ ràng. Harness pass nghĩa là phân loại quan sát đúng, không có nghĩa sáu leak đã pass bảo mật.

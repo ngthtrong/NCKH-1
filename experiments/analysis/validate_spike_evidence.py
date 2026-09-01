@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate pre-registered P2 spike plans and checksum-backed measured evidence."""
+"""Validate pre-registered P2 spike plans and checksum-backed decision evidence."""
 
 from __future__ import annotations
 
@@ -77,6 +77,12 @@ def validate_plan(path: Path) -> tuple[dict[str, Any] | None, list[str], list[st
     artifact_kinds = unique_non_empty_strings(
         plan.get("required_artifact_kinds"), f"{path}: required_artifact_kinds", errors
     )
+    elimination_artifact_kinds = unique_non_empty_strings(
+        plan.get("elimination_artifact_kinds"), f"{path}: elimination_artifact_kinds", errors
+    )
+    elimination_reasons = unique_non_empty_strings(
+        plan.get("eliminate_if"), f"{path}: eliminate_if", errors
+    )
     if candidates and len(candidates) < 2:
         errors.append(f"{path}: at least two candidates are required")
     unknown_mandatory_cases = sorted(set(mandatory_pass_cases) - set(required_cases))
@@ -85,6 +91,38 @@ def validate_plan(path: Path) -> tuple[dict[str, Any] | None, list[str], list[st
             f"{path}: mandatory_pass_cases are absent from required_cases: "
             f"{', '.join(unknown_mandatory_cases)}"
         )
+    unknown_elimination_artifacts = sorted(set(elimination_artifact_kinds) - set(artifact_kinds))
+    if unknown_elimination_artifacts:
+        errors.append(
+            f"{path}: elimination_artifact_kinds are absent from required_artifact_kinds: "
+            f"{', '.join(unknown_elimination_artifacts)}"
+        )
+    elimination_triggers = plan.get("elimination_triggers")
+    if not isinstance(elimination_triggers, dict) or not elimination_triggers:
+        errors.append(f"{path}: elimination_triggers must be a non-empty object")
+    else:
+        missing_trigger_reasons = sorted(set(elimination_reasons) - set(elimination_triggers))
+        unknown_trigger_reasons = sorted(set(elimination_triggers) - set(elimination_reasons))
+        if missing_trigger_reasons:
+            errors.append(
+                f"{path}: eliminate_if reasons lack trigger cases: "
+                f"{', '.join(missing_trigger_reasons)}"
+            )
+        if unknown_trigger_reasons:
+            errors.append(
+                f"{path}: elimination_triggers contain unregistered reasons: "
+                f"{', '.join(unknown_trigger_reasons)}"
+            )
+        for reason, trigger_cases_value in elimination_triggers.items():
+            trigger_cases = unique_non_empty_strings(
+                trigger_cases_value, f"{path}: elimination_triggers[{reason!r}]", errors
+            )
+            non_mandatory_triggers = sorted(set(trigger_cases) - set(mandatory_pass_cases))
+            if non_mandatory_triggers:
+                errors.append(
+                    f"{path}: elimination trigger cases must be mandatory cases: "
+                    f"{', '.join(non_mandatory_triggers)}"
+                )
 
     minimum_replicates = plan.get("minimum_replicates")
     if not isinstance(minimum_replicates, int) or isinstance(minimum_replicates, bool) or minimum_replicates < 1:
@@ -138,6 +176,16 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def valid_git_object_id(value: Any) -> bool:
+    if not isinstance(value, str) or len(value) not in (40, 64):
+        return False
+    try:
+        int(value, 16)
+    except ValueError:
+        return False
+    return True
+
+
 def validate_artifacts(
     manifest_path: Path, artifacts: Any, required_kinds: set[str], errors: list[str]
 ) -> None:
@@ -146,6 +194,7 @@ def validate_artifacts(
         return
 
     seen_kinds: set[str] = set()
+    seen_paths: set[str] = set()
     for index, artifact in enumerate(artifacts):
         label = f"{manifest_path}: artifacts[{index}]"
         if not isinstance(artifact, dict):
@@ -157,10 +206,17 @@ def validate_artifacts(
         if not isinstance(kind, str) or not kind:
             errors.append(f"{label}.kind is required")
             continue
+        if kind in seen_kinds:
+            errors.append(f"{label}.kind duplicates artifact kind {kind!r}")
+        if kind not in required_kinds:
+            errors.append(f"{label}.kind is not registered by the spike plan: {kind!r}")
         seen_kinds.add(kind)
         if not isinstance(relative, str) or not relative:
             errors.append(f"{label}.path is required")
             continue
+        if relative in seen_paths:
+            errors.append(f"{label}.path duplicates artifact path {relative!r}")
+        seen_paths.add(relative)
         candidate_path = (manifest_path.parent / relative).resolve()
         try:
             candidate_path.relative_to(manifest_path.parent.resolve())
@@ -240,10 +296,9 @@ def validate_manifest(
     source = manifest.get("source")
     if (
         not isinstance(source, dict)
-        or not isinstance(source.get("git_commit"), str)
-        or not source.get("git_commit")
+        or not valid_git_object_id(source.get("git_commit"))
     ):
-        errors.append(f"{manifest_path}: source.git_commit is required")
+        errors.append(f"{manifest_path}: source.git_commit must be a full 40- or 64-digit Git object ID")
     elif source.get("git_dirty") is not False:
         errors.append(f"{manifest_path}: decision evidence must come from a clean commit")
 
@@ -296,6 +351,113 @@ def validate_manifest(
     return manifest, errors
 
 
+def validate_elimination(
+    elimination_path: Path, plan: dict[str, Any]
+) -> tuple[dict[str, Any] | None, list[str]]:
+    errors: list[str] = []
+    try:
+        elimination = load_object(elimination_path)
+    except (OSError, json.JSONDecodeError, ValueError) as error:
+        return None, [str(error)]
+
+    if elimination.get("schema_version") != EVIDENCE_VERSION:
+        errors.append(f"{elimination_path}: schema_version must be {EVIDENCE_VERSION}")
+    if elimination.get("data_kind") != "spike_candidate_elimination":
+        errors.append(f"{elimination_path}: data_kind must be spike_candidate_elimination")
+    if elimination.get("spike_id") != plan.get("spike_id"):
+        errors.append(f"{elimination_path}: spike_id does not match its plan")
+    if elimination.get("status") != "eliminated":
+        errors.append(f"{elimination_path}: status must be eliminated")
+
+    elimination_id = elimination.get("elimination_id")
+    if not isinstance(elimination_id, str) or not elimination_id:
+        errors.append(f"{elimination_path}: elimination_id is required")
+    candidate = elimination.get("candidate")
+    if candidate not in plan.get("candidates", []):
+        errors.append(f"{elimination_path}: unknown candidate {candidate!r}")
+    placement = elimination.get("placement")
+    if placement not in plan.get("placements", []):
+        errors.append(f"{elimination_path}: unknown placement {placement!r}")
+    reason = elimination.get("reason")
+    if reason not in plan.get("eliminate_if", []):
+        errors.append(f"{elimination_path}: reason is not registered in eliminate_if")
+    if parse_datetime(elimination.get("observed_at_utc")) is None:
+        errors.append(f"{elimination_path}: observed_at_utc is missing or invalid")
+
+    source = elimination.get("source")
+    if (
+        not isinstance(source, dict)
+        or not valid_git_object_id(source.get("git_commit"))
+    ):
+        errors.append(
+            f"{elimination_path}: source.git_commit must be a full 40- or 64-digit Git object ID"
+        )
+    elif source.get("git_dirty") is not False:
+        errors.append(f"{elimination_path}: elimination evidence must come from a clean commit")
+
+    environment = elimination.get("environment")
+    if not isinstance(environment, dict):
+        errors.append(f"{elimination_path}: environment is required")
+    else:
+        for field in ("label", "postgresql_version", "cpu"):
+            value = environment.get(field)
+            if not isinstance(value, str) or not value:
+                errors.append(f"{elimination_path}: environment.{field} is required")
+        memory = environment.get("memory_bytes")
+        if not isinstance(memory, int) or isinstance(memory, bool) or memory < 1:
+            errors.append(f"{elimination_path}: environment.memory_bytes must be a positive integer")
+
+    case_results = elimination.get("case_results")
+    if not isinstance(case_results, dict) or not case_results:
+        errors.append(f"{elimination_path}: case_results must be a non-empty object")
+    else:
+        unknown_cases = sorted(set(case_results) - set(plan.get("required_cases", [])))
+        if unknown_cases:
+            errors.append(f"{elimination_path}: unregistered cases: {', '.join(unknown_cases)}")
+        invalid_results = sorted(
+            case for case, result in case_results.items() if result not in ("PASS", "FAIL")
+        )
+        if invalid_results:
+            errors.append(
+                f"{elimination_path}: elimination cases must be PASS or FAIL: "
+                f"{', '.join(invalid_results)}"
+            )
+        missing_mandatory = sorted(
+            set(plan.get("mandatory_pass_cases", [])) - set(case_results)
+        )
+        if missing_mandatory:
+            errors.append(
+                f"{elimination_path}: elimination evidence lacks mandatory cases: "
+                f"{', '.join(missing_mandatory)}"
+            )
+        failed_mandatory = [
+            case
+            for case in plan.get("mandatory_pass_cases", [])
+            if case_results.get(case) == "FAIL"
+        ]
+        if not failed_mandatory:
+            errors.append(
+                f"{elimination_path}: at least one mandatory case must be FAIL to eliminate a candidate"
+            )
+        trigger_cases = set(plan.get("elimination_triggers", {}).get(reason, []))
+        failed_trigger_cases = sorted(
+            case for case in trigger_cases if case_results.get(case) == "FAIL"
+        )
+        if reason in plan.get("eliminate_if", []) and not failed_trigger_cases:
+            errors.append(
+                f"{elimination_path}: reason {reason!r} is not supported by a FAIL in its registered "
+                "trigger cases"
+            )
+
+    validate_artifacts(
+        elimination_path,
+        elimination.get("artifacts"),
+        set(plan.get("elimination_artifact_kinds", [])),
+        errors,
+    )
+    return elimination, errors
+
+
 def validate_evidence_root(
     plans: list[dict[str, Any]], evidence_root: Path, require_complete: bool = False
 ) -> tuple[list[str], list[str]]:
@@ -304,8 +466,9 @@ def validate_evidence_root(
     plans_by_id = {str(plan["spike_id"]): plan for plan in plans}
     manifests_by_spike: dict[str, list[dict[str, Any]]] = defaultdict(list)
     manifest_paths = sorted(evidence_root.rglob("manifest.json")) if evidence_root.exists() else []
-    if not manifest_paths:
-        return [f"No measured spike manifest found in {evidence_root}"], findings
+    elimination_paths = sorted(evidence_root.rglob("elimination.json")) if evidence_root.exists() else []
+    if not manifest_paths and not elimination_paths:
+        return [f"No measured spike manifest or candidate elimination found in {evidence_root}"], findings
 
     seen_run_ids: set[str] = set()
     for path in manifest_paths:
@@ -330,8 +493,42 @@ def validate_evidence_root(
         seen_run_ids.add(run_id)
         manifests_by_spike[str(spike_id)].append(manifest)
 
+    eliminations_by_spike: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    seen_elimination_ids: set[str] = set()
+    for path in elimination_paths:
+        try:
+            raw = load_object(path)
+        except (OSError, json.JSONDecodeError, ValueError) as error:
+            errors.append(str(error))
+            continue
+        spike_id = raw.get("spike_id")
+        plan = plans_by_id.get(str(spike_id))
+        if plan is None:
+            errors.append(f"{path}: no registered plan for spike_id={spike_id!r}")
+            continue
+        elimination, elimination_errors = validate_elimination(path, plan)
+        errors.extend(elimination_errors)
+        if elimination is None or elimination_errors:
+            continue
+        elimination_id = str(elimination["elimination_id"])
+        if elimination_id in seen_elimination_ids:
+            errors.append(f"Duplicate spike elimination_id: {elimination_id}")
+            continue
+        seen_elimination_ids.add(elimination_id)
+        eliminations_by_spike[str(spike_id)].append(elimination)
+
     for spike_id, plan in plans_by_id.items():
         spike_manifests = manifests_by_spike.get(spike_id, [])
+        spike_eliminations = eliminations_by_spike.get(spike_id, [])
+        eliminated_counts = Counter(str(item["candidate"]) for item in spike_eliminations)
+        duplicate_eliminations = sorted(
+            candidate for candidate, count in eliminated_counts.items() if count > 1
+        )
+        if duplicate_eliminations:
+            errors.append(
+                f"{spike_id}: candidates have multiple elimination records: "
+                f"{', '.join(duplicate_eliminations)}"
+            )
         for fingerprint_field in ("comparison_group", "workload_fingerprint", "environment_fingerprint"):
             values = {str(item[fingerprint_field]) for item in spike_manifests}
             if len(values) > 1:
@@ -351,9 +548,18 @@ def validate_evidence_root(
             errors.append(f"{spike_id}: duplicate candidate/placement/replicate records")
         if not require_complete:
             findings.append(f"{spike_id}: {len(spike_manifests)} valid measured runs")
+            findings.append(f"{spike_id}: {len(spike_eliminations)} valid candidate eliminations")
             continue
+        remaining_candidates = [
+            candidate for candidate in plan["candidates"] if eliminated_counts[candidate] == 0
+        ]
+        if not remaining_candidates:
+            errors.append(f"{spike_id}: all candidates are eliminated; no viable decision remains")
         minimum = int(plan["minimum_replicates"])
         for candidate in plan["candidates"]:
+            if eliminated_counts[candidate] == 1:
+                findings.append(f"{spike_id}: {candidate} eliminated by checksum-backed security evidence")
+                continue
             for placement in plan["placements"]:
                 count = counts[(candidate, placement)]
                 if count < minimum:

@@ -54,9 +54,10 @@ Nếu không có run hợp lệ, lệnh dừng thay vì sinh bảng/biểu đồ
 
 Các giao thức so sánh isolation, storage và payment được đăng ký trước tại `experiments/spikes/`.
 `scripts/validate-p2-spikes.sh` kiểm tra protocol mà không tạo kết quả; chế độ `--require-complete` chỉ
-pass khi có đủ measured artifact được khóa checksum. Payment tiếp tục bị chặn ở credential và trọng số
-chưa được nhóm phê duyệt. Xem `experiments/spikes/README.md`; không dùng validator này để tự động tuyên
-bố Cổng B đạt.
+pass khi có đủ measured artifact được khóa checksum cho ứng viên còn lại hoặc hồ sơ loại ứng viên
+fail-closed theo đúng điều kiện và case kích hoạt đã đăng ký trước. Payment tiếp tục bị chặn ở credential và trọng số chưa
+được nhóm phê duyệt. Xem `experiments/spikes/README.md`; không dùng validator này để tự động tuyên bố
+Cổng B đạt.
 
 Guarded Project CRUD security harness cho ba isolation candidate × Pool/Silo chạy riêng bằng
 `scripts/run-p2-isolation-security.sh`. Surefire output của harness là kiểm tra kỹ thuật local, không phải

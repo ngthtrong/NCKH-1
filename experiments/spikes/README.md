@@ -40,6 +40,16 @@ fingerprint, with numbered repetitions. The validator rejects dirty-commit evide
 cases, mandatory cases marked `NOT_APPLICABLE`, failed cases, missing candidates, mixed workload or
 environment fingerprints, missing Pool/Silo coverage, and too few repetitions.
 
+A candidate that triggers a pre-registered `eliminate_if` rule is represented separately by an
+`elimination.json` following `experiments/schemas/spike-elimination.schema.json`. Elimination evidence
+must come from a clean commit, use a registered reason, include every mandatory security case with at
+least one real `FAIL`, bind that reason to a `FAIL` in its pre-registered `elimination_triggers`, and
+checksum distinct artifacts named by the plan's `elimination_artifact_kinds`. Source provenance uses a
+full 40- or 64-digit Git object ID; duplicate artifact kinds/paths are rejected. The completion gate then
+requires measured replicates only for candidates not validly eliminated. This prevents a real security
+failure from being relabelled `PASS` merely to make the evidence gate complete. The gate also fails if
+every candidate is eliminated, because no viable decision remains.
+
 ```bash
 scripts/validate-p2-spikes.sh experiments/results/spikes
 scripts/validate-p2-spikes.sh experiments/results/spikes --require-complete
