@@ -19,7 +19,8 @@ class FakePaymentProviderTest {
 
     @Test
     void acceptsAuthenticWebhookAndRejectsForgery() throws Exception {
-        String body = "{\"reference\":\"pay-1\",\"eventId\":\"evt-1\",\"status\":\"SUCCEEDED\"}";
+        String body = "{\"reference\":\"pay-1\",\"eventId\":\"evt-1\",\"status\":\"SUCCEEDED\","
+                + "\"amountMinor\":100000,\"currency\":\"VND\"}";
 
         PaymentProvider.VerifiedPayment verified = provider.verifyWebhook(
                 body, Map.of("x-payment-signature", hmac(body)));
@@ -27,6 +28,8 @@ class FakePaymentProviderTest {
         assertThat(verified.reference()).isEqualTo("pay-1");
         assertThat(verified.eventId()).isEqualTo("evt-1");
         assertThat(verified.successful()).isTrue();
+        assertThat(verified.amountMinor()).isEqualTo(100_000);
+        assertThat(verified.currency()).isEqualTo("VND");
         assertThatThrownBy(() -> provider.verifyWebhook(
                 body, Map.of("x-payment-signature", "forged")))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -40,6 +43,19 @@ class FakePaymentProviderTest {
 
         assertThat(session.checkoutUrl())
                 .isEqualTo("http://alpha.localhost:8080/payment?source=app&payment_reference=pay-1");
+    }
+
+    @Test
+    void createsAuthenticStableCallbackForLocalCheckout() {
+        FakePaymentProvider.SignedWebhook webhook = provider.successfulCheckout("pay-local-1", 100_000, "VND");
+
+        PaymentProvider.VerifiedPayment verified = provider.verifyWebhook(webhook.body(), webhook.headers());
+
+        assertThat(verified.reference()).isEqualTo("pay-local-1");
+        assertThat(verified.eventId()).isEqualTo("local-checkout-pay-local-1");
+        assertThat(verified.successful()).isTrue();
+        assertThat(provider.successfulCheckout("pay-local-1", 100_000, "VND").body())
+                .isEqualTo(webhook.body());
     }
 
     private String hmac(String body) throws Exception {

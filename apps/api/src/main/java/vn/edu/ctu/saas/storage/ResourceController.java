@@ -4,6 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -42,11 +46,19 @@ public class ResourceController {
         return service.upload(file.getOriginalFilename(), file.getContentType(), file.getSize(), file.getInputStream());
     }
 
+    @PostMapping("/links")
+    public ResourceService.ResourceView createLink(@Valid @RequestBody CreateLinkRequest request) {
+        return service.createLink(request.name(), request.url());
+    }
+
     @GetMapping("/{resourceId}/download-url")
     public ResourceService.DownloadUrl downloadUrl(@PathVariable UUID resourceId) { return service.downloadUrl(resourceId); }
 
     @PostMapping("/{resourceId}/tasks/{taskId}")
     public void attach(@PathVariable UUID resourceId, @PathVariable UUID taskId) { service.attach(resourceId, taskId); }
+
+    @DeleteMapping("/{resourceId}/tasks/{taskId}")
+    public void detach(@PathVariable UUID resourceId, @PathVariable UUID taskId) { service.detach(resourceId, taskId); }
 
     @DeleteMapping("/{resourceId}")
     public void delete(@PathVariable UUID resourceId) { service.delete(resourceId); }
@@ -62,4 +74,8 @@ public class ResourceController {
         if (!Files.isRegularFile(path)) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(new FileSystemResource(path));
     }
+
+    public record CreateLinkRequest(
+            @NotBlank @Size(max = 255) String name,
+            @NotBlank @Size(max = 2000) String url) {}
 }

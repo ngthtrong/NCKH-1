@@ -124,32 +124,6 @@ public class TenantManagementService {
     }
 
     @Transactional
-    public MemberView inviteExistingUser(TenantContext context, String email, TenantRole role) {
-        requireAdmin(context);
-        if (role == TenantRole.OWNER) throw new ConflictException("Only one tenant owner is supported");
-        UserAccountEntity user = userRepository.findByEmailIgnoreCase(email.trim())
-                .orElseThrow(() -> new NotFoundException("User must register before being invited"));
-        TenantMembershipEntity membership = membershipRepository
-                .findByTenantIdAndUserId(context.tenantId(), user.getId())
-                .orElseGet(() -> {
-                    TenantMembershipEntity created = new TenantMembershipEntity();
-                    created.setTenantId(context.tenantId());
-                    created.setUserId(user.getId());
-                    return created;
-                });
-        if (membership.isActive() && membership.getId() != null) {
-            throw new ConflictException("User is already an active tenant member");
-        }
-        membership.setRole(role);
-        membership.setActive(true);
-        if (membership.getId() != null) membership.setSecurityVersion(membership.getSecurityVersion() + 1);
-        membershipRepository.save(membership);
-        return new MemberView(
-                membership.getId(), user.getId(), user.getEmail(), user.getDisplayName(),
-                membership.getRole(), membership.isActive(), membership.getSecurityVersion());
-    }
-
-    @Transactional
     public MemberView changeRole(TenantContext context, UUID membershipId, TenantRole role) {
         return updateMember(context, membershipId, role, true);
     }
@@ -161,6 +135,44 @@ public class TenantManagementService {
                 .filter(item -> item.getTenantId().equals(context.tenantId()))
                 .orElseThrow(() -> new NotFoundException("Membership not found"));
         updateMember(context, membershipId, membership.getRole(), false);
+    }
+
+    @Transactional
+    public MemberView transferOwnership(TenantContext context, UUID targetMembershipId) {
+        if (!context.hasAnyRole(TenantRole.OWNER)) {
+            throw new TenantAccessDeniedException("Only the tenant owner can transfer ownership");
+        }
+        List<TenantMembershipEntity> activeMemberships = membershipRepository
+                .lockActiveByTenantId(context.tenantId());
+        TenantMembershipEntity currentOwner = activeMemberships.stream()
+                .filter(membership -> membership.getUserId().equals(context.userId()))
+                .filter(membership -> membership.getRole() == TenantRole.OWNER)
+                .findFirst()
+                .orElseThrow(() -> new TenantAccessDeniedException("Current owner membership is unavailable"));
+        long owners = activeMemberships.stream()
+                .filter(membership -> membership.getRole() == TenantRole.OWNER)
+                .count();
+        if (owners != 1) {
+            throw new ConflictException("Tenant ownership invariant is not satisfied");
+        }
+        TenantMembershipEntity target = activeMemberships.stream()
+                .filter(membership -> membership.getId().equals(targetMembershipId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Active target membership not found"));
+        if (target.getId().equals(currentOwner.getId())) {
+            throw new ConflictException("Select another active member as the new owner");
+        }
+
+        currentOwner.setRole(TenantRole.ADMIN);
+        currentOwner.setSecurityVersion(currentOwner.getSecurityVersion() + 1);
+        target.setRole(TenantRole.OWNER);
+        target.setSecurityVersion(target.getSecurityVersion() + 1);
+        membershipRepository.saveAll(List.of(currentOwner, target));
+
+        UserAccountEntity user = userRepository.findById(target.getUserId()).orElseThrow();
+        return new MemberView(
+                target.getId(), user.getId(), user.getEmail(), user.getDisplayName(), target.getRole(),
+                target.isActive(), target.getSecurityVersion());
     }
 
     private void requireAdmin(TenantContext context) {

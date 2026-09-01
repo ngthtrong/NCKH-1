@@ -7,14 +7,16 @@ type ApiTenantView = ApiSchemas['TenantView'];
 export type UUID = ApiSchemas['UUID'];
 export type TenantRole = ApiSchemas['TenantRole'];
 export type ProjectRole = ApiSchemas['ProjectRole'];
+export type ProjectStatus = ApiSchemas['ProjectStatus'];
 export type TenantTier = ApiSchemas['TenantTier'];
 export type TenantPlacement = ApiSchemas['TenantPlacement'];
 export type TenantStatus = ApiSchemas['TenantStatus'];
 export type ProvisioningStatus = ApiSchemas['ProvisioningStatus'];
+export type PaymentStatus = ApiSchemas['PaymentStatus'];
+export type InvitationStatus = ApiSchemas['InvitationStatus'];
 
 export interface UserSummary extends ApiUserView {
   avatarUrl?: string;
-  platformRoles?: Array<'PLATFORM_ADMIN'>;
 }
 
 export interface TenantSummary extends ApiTenantView {
@@ -29,11 +31,19 @@ export interface Session {
 
 export type LoginRequest = ApiSchemas['LoginRequest'];
 
+export type RegisterRequest = ApiSchemas['RegisterRequest'];
+
 export type LoginResponse = ApiSchemas['LoginResponse'];
 
 export type RefreshResponse = ApiSchemas['TenantSessionResponse'];
 
 export type TenantTransferResponse = ApiSchemas['TenantTransferResponse'];
+
+export type CreateTenantRequest = ApiSchemas['CreateTenantRequest'];
+
+export type OnboardingView = ApiSchemas['OnboardingView'];
+
+export type PaymentSession = ApiSchemas['PaymentSessionView'];
 
 export interface DashboardMetric {
   label: string;
@@ -46,6 +56,7 @@ export interface ProjectSummary {
   id: UUID;
   name: string;
   description?: string;
+  status: ProjectStatus;
   role: ProjectRole;
   boardId?: UUID;
   memberCount: number;
@@ -65,10 +76,15 @@ export interface CreateProjectRequest {
   description?: string;
 }
 
+export type UpdateProjectRequest = ApiSchemas['UpdateProjectRequest'];
+export type ProjectMember = ApiSchemas['ProjectMemberView'];
+
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
 export interface TaskCard {
   id: UUID;
+  columnId: UUID;
+  parentTaskId?: UUID;
   title: string;
   description?: string;
   priority: TaskPriority;
@@ -97,6 +113,9 @@ export interface Board {
   columns: BoardColumn[];
 }
 
+export type BoardSummary = ApiSchemas['BoardSummaryView'];
+export type Comment = ApiSchemas['CommentView'];
+
 export type CreateColumnRequest = ApiSchemas['CreateColumnRequest'];
 export type UpdateColumnRequest = ApiSchemas['UpdateColumnRequest'];
 export type ReorderColumnsRequest = ApiSchemas['ReorderColumnsRequest'];
@@ -108,6 +127,16 @@ export interface CreateTaskRequest {
   assigneeId?: UUID;
   dueDate?: string;
   parentTaskId?: UUID;
+}
+
+export interface UpdateTaskRequest {
+  columnId: UUID;
+  title: string;
+  description?: string;
+  assigneeId?: UUID;
+  dueDate?: string;
+  position?: number;
+  version: number;
 }
 
 export interface MoveTaskRequest {
@@ -130,6 +159,10 @@ export interface InviteMemberRequest {
   role: Exclude<TenantRole, 'OWNER'>;
 }
 
+export type InvitationView = ApiSchemas['InvitationView'];
+
+export type InvitationCreatedView = ApiSchemas['InvitationCreatedView'];
+
 export interface ResourceItem {
   id: UUID;
   fileName: string;
@@ -138,6 +171,9 @@ export interface ResourceItem {
   uploadedBy: UserSummary;
   uploadedAt: string;
   taskCount: number;
+  kind: 'FILE' | 'LINK';
+  linkUrl?: string;
+  taskIds: UUID[];
 }
 
 export interface ResourceQuota {
@@ -168,20 +204,12 @@ export interface AuditEntry {
   occurredAt: string;
 }
 
-export interface AdminTenant {
-  id: UUID;
-  name: string;
-  slug: string;
-  tier: TenantTier;
-  placement: TenantPlacement;
-  status: TenantStatus;
-  provisioningStatus?: ProvisioningStatus;
-  memberCount: number;
-  createdAt: string;
-  lastError?: string;
-}
+export type AdminTenant = ApiSchemas['AdminTenantView'];
+export type AdminTenantDetail = ApiSchemas['AdminTenantDetailView'];
 
 export type ResourceDeadLetter = ApiSchemas['ResourceDeadLetterView'];
+export type NotificationPreferences = ApiSchemas['NotificationPreferences'];
+export type PushSubscription = ApiSchemas['PushSubscriptionView'];
 
 export interface PageResponse<T> {
   items: T[];

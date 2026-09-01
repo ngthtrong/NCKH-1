@@ -12,11 +12,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static vn.edu.ctu.saas.application.ApplicationDtos.CreateCommentRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.CreateBoardRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.CreateColumnRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.CreateTaskRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.ChangeProjectStatusRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.ReorderColumnsRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.ReorderTaskItem;
+import static vn.edu.ctu.saas.application.ApplicationDtos.ReorderTasksRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.SetProjectMemberRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateColumnRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateBoardRequest;
+import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateCommentRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateProjectRequest;
 import static vn.edu.ctu.saas.application.ApplicationDtos.UpdateTaskRequest;
 
@@ -44,9 +50,11 @@ import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
+import vn.edu.ctu.saas.notification.NotificationService;
 import vn.edu.ctu.saas.storage.ResourceService;
 import vn.edu.ctu.saas.storage.ResourceStorage;
 import vn.edu.ctu.saas.tenant.ProjectRole;
+import vn.edu.ctu.saas.tenant.ProjectStatus;
 import vn.edu.ctu.saas.tenant.TenantAccessDeniedException;
 import vn.edu.ctu.saas.tenant.TenantContext;
 import vn.edu.ctu.saas.tenant.TenantContextHolder;
@@ -93,6 +101,7 @@ class ProjectAuthorizationIntegrationTest {
     private ProjectApplicationService service;
     private ResourceStorage resourceStorage;
     private ResourceService resourceService;
+    private TenantJdbcExecutor tenantExecutor;
 
     @BeforeAll
     static void migrateAndCreateRuntimeRole() throws SQLException {
@@ -130,7 +139,7 @@ class ProjectAuthorizationIntegrationTest {
         seedResource(TENANT_B, RESOURCE_B, TASK_B, FOREIGN_MANAGER, "beta-secret.txt");
 
         tenantMemberships = mock(TenantMembershipRepository.class);
-        TenantJdbcExecutor executor = new TenantJdbcExecutor(new TenantDataSourceResolver() {
+        tenantExecutor = new TenantJdbcExecutor(new TenantDataSourceResolver() {
             @Override
             public DataSource resolve(TenantContext ignored) {
                 return applicationDataSource;
@@ -141,7 +150,7 @@ class ProjectAuthorizationIntegrationTest {
                 // The fixed Testcontainer data source has no per-tenant cache to evict.
             }
         });
-        service = new ProjectApplicationService(executor, JsonMapper.builder().build(), tenantMemberships);
+        service = new ProjectApplicationService(tenantExecutor, JsonMapper.builder().build(), tenantMemberships);
         resourceStorage = mock(ResourceStorage.class);
         when(resourceStorage.createDownloadUrl(anyString(), any())).thenAnswer(invocation ->
                 "https://storage.example.test/" + invocation.getArgument(0, String.class));
@@ -150,7 +159,7 @@ class ProjectAuthorizationIntegrationTest {
                 .thenAnswer(invocation -> new ResourceStorage.StoredObject(
                         TENANT_A + "/" + invocation.getArgument(1, UUID.class) + "/uploaded.txt",
                         invocation.getArgument(4, Long.class)));
-        resourceService = new ResourceService(executor, resourceStorage);
+        resourceService = new ResourceService(tenantExecutor, resourceStorage);
     }
 
     @AfterEach
@@ -263,7 +272,9 @@ class ProjectAuthorizationIntegrationTest {
 
         assertThat(project.name()).isEqualTo("Renamed by manager");
         assertThat(projectName(PROJECT_A)).isEqualTo("Renamed by manager");
-        assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=? AND id=?", TENANT_A, TASK_A)).isZero();
+        assertThat(count("""
+                SELECT count(*) FROM tasks WHERE tenant_id=? AND id=? AND deleted_at IS NOT NULL
+                """, TENANT_A, TASK_A)).isOne();
         assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(6);
     }
 
@@ -382,6 +393,212 @@ class ProjectAuthorizationIntegrationTest {
                 TENANT_A, PROJECT_A, OUTSIDER)).isEqualTo(1);
     }
 
+    @Test
+    void archivedProjectRemainsReadableButRejectsContentMutationsUntilRestored() {
+        useContext(MANAGER, TenantRole.MEMBER);
+
+        ApplicationDtos.ProjectView archived = service.changeProjectStatus(
+                PROJECT_A, new ChangeProjectStatusRequest(ProjectStatus.ARCHIVED));
+
+        assertThat(archived.status()).isEqualTo(ProjectStatus.ARCHIVED);
+        assertThat(service.getBoard(BOARD_A).id()).isEqualTo(BOARD_A);
+        assertThatThrownBy(() -> service.updateProject(
+                PROJECT_A, new UpdateProjectRequest("Blocked rename", null)))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Archived projects are read-only");
+        assertThatThrownBy(() -> service.createTask(BOARD_A, createTask("Blocked task")))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Archived projects are read-only");
+        assertThatThrownBy(() -> resourceService.attach(RESOURCE_A, TASK_A))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Archived projects are read-only");
+        assertThat(projectName(PROJECT_A)).isEqualTo("Alpha project");
+        assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=?", TENANT_A)).isEqualTo(1);
+
+        ApplicationDtos.ProjectView restored = service.changeProjectStatus(
+                PROJECT_A, new ChangeProjectStatusRequest(ProjectStatus.ACTIVE));
+        ApplicationDtos.CommentView comment = service.addComment(
+                TASK_A, new CreateCommentRequest("Mutation after restore"));
+
+        assertThat(restored.status()).isEqualTo(ProjectStatus.ACTIVE);
+        assertThat(comment.body()).isEqualTo("Mutation after restore");
+        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(3);
+        assertThat(count("SELECT count(*) FROM outbox_events WHERE tenant_id=?", TENANT_A)).isEqualTo(3);
+    }
+
+    @Test
+    void deletingProjectIsAuditedSoftDeleteAndHidesRetainedContent() {
+        useContext(MANAGER, TenantRole.MEMBER);
+
+        service.deleteProject(PROJECT_A);
+
+        assertThat(projectStatus(PROJECT_A)).isEqualTo(ProjectStatus.DELETED.name());
+        assertThat(service.listProjects()).isEmpty();
+        assertThat(count("SELECT count(*) FROM boards WHERE tenant_id=? AND id=?", TENANT_A, BOARD_A)).isOne();
+        assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=? AND id=?", TENANT_A, TASK_A)).isOne();
+        assertThatThrownBy(() -> service.getBoard(BOARD_A))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessage("Insufficient project role");
+        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isOne();
+        assertThat(count("SELECT count(*) FROM outbox_events WHERE tenant_id=?", TENANT_A)).isOne();
+    }
+
+    @Test
+    void managerCanCreateRenameAndSoftDeleteAdditionalBoard() {
+        useContext(MANAGER, TenantRole.MEMBER);
+
+        ApplicationDtos.BoardView created = service.createBoard(
+                PROJECT_A, new CreateBoardRequest("Release board"));
+        assertThat(service.projectBoards(PROJECT_A)).hasSize(2);
+
+        ApplicationDtos.BoardView renamed = service.updateBoard(
+                created.id(), new UpdateBoardRequest("Launch board", created.version()));
+        service.deleteBoard(renamed.id());
+
+        assertThat(renamed.name()).isEqualTo("Launch board");
+        assertThat(renamed.version()).isEqualTo(1);
+        assertThat(service.projectBoards(PROJECT_A)).extracting(ApplicationDtos.BoardSummaryView::id)
+                .containsExactly(BOARD_A);
+        assertThat(count(
+                "SELECT count(*) FROM boards WHERE tenant_id=? AND id=? AND deleted_at IS NOT NULL",
+                TENANT_A, created.id())).isOne();
+        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(3);
+    }
+
+    @Test
+    void taskBatchReorderIsAtomicAndManagerSoftDeleteIncludesOneLevelSubtasks() {
+        useContext(MEMBER, TenantRole.MEMBER);
+        ApplicationDtos.TaskView parent = service.createTask(BOARD_A, createTask("Parent task"));
+        ApplicationDtos.TaskView child = service.createTask(BOARD_A, new CreateTaskRequest(
+                COLUMN_A, parent.id(), "Child task", null, null, null, null));
+
+        assertThatThrownBy(() -> service.createTask(BOARD_A, new CreateTaskRequest(
+                COLUMN_A, child.id(), "Grandchild", null, null, null, null)))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Subtasks can only have a top-level parent in the same board");
+        ApplicationDtos.BoardView reordered = service.reorderTasks(BOARD_A, new ReorderTasksRequest(java.util.List.of(
+                new ReorderTaskItem(parent.id(), COLUMN_A, BigDecimal.valueOf(2000), parent.version()),
+                new ReorderTaskItem(child.id(), COLUMN_A, BigDecimal.valueOf(2100), child.version()))));
+        BigDecimal parentPosition = reordered.tasks().stream()
+                .filter(task -> task.id().equals(parent.id()))
+                .findFirst()
+                .orElseThrow()
+                .position();
+        assertThat(parentPosition).isEqualByComparingTo("2000");
+
+        assertThatThrownBy(() -> service.reorderTasks(BOARD_A, new ReorderTasksRequest(java.util.List.of(
+                new ReorderTaskItem(parent.id(), COLUMN_A, BigDecimal.ONE, parent.version()),
+                new ReorderTaskItem(child.id(), COLUMN_A, BigDecimal.TWO, child.version() + 1)))))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Task was updated by another user")
+                .extracting(exception -> ((ConflictException) exception).fieldErrors().get("currentVersion"))
+                .isEqualTo("1");
+        assertThat(service.getTask(parent.id()).position()).isEqualByComparingTo("2000");
+
+        useContext(MANAGER, TenantRole.MEMBER);
+        service.deleteTask(parent.id());
+        assertThatThrownBy(() -> service.getTask(parent.id())).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.getTask(child.id())).isInstanceOf(NotFoundException.class);
+        assertThat(count("""
+                SELECT count(*) FROM tasks WHERE tenant_id=? AND id IN (?,?) AND deleted_at IS NOT NULL
+                """, TENANT_A, parent.id(), child.id())).isEqualTo(2);
+    }
+
+    @Test
+    void commentAuthorCanEditAndManagerCanModerateWithSoftDeleteAudit() {
+        useContext(MEMBER, TenantRole.MEMBER);
+        ApplicationDtos.CommentView created = service.addComment(
+                TASK_A, new CreateCommentRequest("Original body"));
+        ApplicationDtos.CommentView edited = service.updateComment(
+                created.id(), new UpdateCommentRequest("Author edit"));
+        assertThat(edited.body()).isEqualTo("Author edit");
+
+        useContext(VIEWER, TenantRole.MEMBER);
+        assertThatThrownBy(() -> service.updateComment(
+                created.id(), new UpdateCommentRequest("Viewer tamper")))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessage("Comment author or project manager role is required");
+
+        useContext(MANAGER, TenantRole.MEMBER);
+        assertThat(service.updateComment(created.id(), new UpdateCommentRequest("Manager moderation")).body())
+                .isEqualTo("Manager moderation");
+        service.deleteComment(created.id());
+        assertThat(service.comments(TASK_A)).extracting(ApplicationDtos.CommentView::id)
+                .containsExactly(COMMENT_A);
+        assertThat(count(
+                "SELECT count(*) FROM comments WHERE tenant_id=? AND id=? AND deleted_at IS NOT NULL",
+                TENANT_A, created.id())).isOne();
+        assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=?", TENANT_A)).isEqualTo(4);
+    }
+
+    @Test
+    void memberCanCreateValidatedLinkAndAttachDetachItAcrossResourceLibrary() {
+        useContext(MEMBER, TenantRole.MEMBER);
+
+        assertThatThrownBy(() -> resourceService.createLink("Unsafe", "javascript:alert(1)"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Resource link must use an absolute HTTP(S) URL");
+        ResourceService.ResourceView link = resourceService.createLink(
+                "Design reference", "https://example.test/design?q=tenant");
+        resourceService.attach(link.id(), TASK_A);
+
+        ResourceService.ResourceView attached = resourceService.list().stream()
+                .filter(resource -> resource.id().equals(link.id()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(attached.kind()).isEqualTo(ResourceService.ResourceKind.LINK);
+        assertThat(attached.taskIds()).containsExactly(TASK_A);
+        assertThat(resourceService.downloadUrl(link.id()).url())
+                .isEqualTo("https://example.test/design?q=tenant");
+
+        resourceService.detach(link.id(), TASK_A);
+        assertThat(resourceService.list().stream()
+                .filter(resource -> resource.id().equals(link.id()))
+                .findFirst().orElseThrow().taskIds()).isEmpty();
+        resourceService.delete(link.id());
+
+        assertThat(resourceService.list()).extracting(ResourceService.ResourceView::id)
+                .doesNotContain(link.id());
+        assertThat(count("""
+                SELECT count(*) FROM resources WHERE tenant_id=? AND id=? AND deleted_at IS NOT NULL
+                """, TENANT_A, link.id())).isOne();
+        assertThat(count("SELECT count(*) FROM outbox_events WHERE tenant_id=?", TENANT_A)).isZero();
+    }
+
+    @Test
+    void notificationPreferencesKeepInAppMandatoryAndPushSubscriptionIsIdempotentPerUser() {
+        useContext(MEMBER, TenantRole.MEMBER);
+        NotificationService notifications = new NotificationService(tenantExecutor);
+
+        assertThat(notifications.preferences())
+                .isEqualTo(new NotificationService.NotificationPreferences(true, true, false));
+        assertThatThrownBy(() -> notifications.updatePreferences(
+                new NotificationService.NotificationPreferences(false, true, false)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Mandatory in-app notifications cannot be disabled");
+        assertThat(notifications.updatePreferences(
+                new NotificationService.NotificationPreferences(true, false, true)))
+                .isEqualTo(new NotificationService.NotificationPreferences(true, false, true));
+
+        NotificationService.PushSubscriptionRequest request = new NotificationService.PushSubscriptionRequest(
+                "https://push.example.test/subscription/member", "public-key", "auth-secret");
+        NotificationService.PushSubscriptionView first = notifications.addPushSubscription(request);
+        NotificationService.PushSubscriptionView repeated = notifications.addPushSubscription(
+                new NotificationService.PushSubscriptionRequest(
+                        request.endpoint(), "rotated-public-key", "rotated-auth-secret"));
+        assertThat(repeated.id()).isEqualTo(first.id());
+        assertThat(notifications.pushSubscriptions()).extracting(NotificationService.PushSubscriptionView::id)
+                .containsExactly(first.id());
+
+        useContext(VIEWER, TenantRole.MEMBER);
+        assertThatThrownBy(() -> notifications.removePushSubscription(first.id()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Push subscription not found");
+        useContext(MEMBER, TenantRole.MEMBER);
+        notifications.removePushSubscription(first.id());
+        assertThat(notifications.pushSubscriptions()).isEmpty();
+    }
+
     private static void seedProject(
             UUID tenantId,
             UUID projectId,
@@ -447,6 +664,10 @@ class ProjectAuthorizationIntegrationTest {
 
     private String projectName(UUID projectId) {
         return adminJdbc.queryForObject("SELECT name FROM projects WHERE id=?", String.class, projectId);
+    }
+
+    private String projectStatus(UUID projectId) {
+        return adminJdbc.queryForObject("SELECT status FROM projects WHERE id=?", String.class, projectId);
     }
 
     private String taskTitle(UUID taskId) {

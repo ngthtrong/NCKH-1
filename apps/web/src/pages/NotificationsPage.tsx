@@ -1,12 +1,30 @@
 import {
   Check,
   CommentOutlined,
+  DeleteOutline,
   GroupAddOutlined,
   NotificationsOutlined,
+  SettingsOutlined,
   TaskAltOutlined,
 } from '@mui/icons-material';
-import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  IconButton,
+  Paper,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { notificationsApi } from '../api/endpoints';
@@ -33,7 +51,21 @@ function relativeTime(value: string): string {
 export function NotificationsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [endpoint, setEndpoint] = useState('');
+  const [p256dh, setP256dh] = useState('');
+  const [authSecret, setAuthSecret] = useState('');
   const notifications = useQuery({ queryKey: ['notifications'], queryFn: notificationsApi.list });
+  const preferences = useQuery({
+    queryKey: ['notification-preferences'],
+    queryFn: notificationsApi.preferences,
+    enabled: settingsOpen,
+  });
+  const subscriptions = useQuery({
+    queryKey: ['push-subscriptions'],
+    queryFn: notificationsApi.pushSubscriptions,
+    enabled: settingsOpen,
+  });
   const markRead = useMutation({
     mutationFn: notificationsApi.markRead,
     onMutate: async (id) => {
@@ -52,6 +84,30 @@ export function NotificationsPage() {
     mutationFn: notificationsApi.markAllRead,
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   });
+  const updatePreferences = useMutation({
+    mutationFn: notificationsApi.updatePreferences,
+    onSuccess: (updated) => queryClient.setQueryData(['notification-preferences'], updated),
+  });
+  const addSubscription = useMutation({
+    mutationFn: notificationsApi.addPushSubscription,
+    onSuccess: async () => {
+      setEndpoint('');
+      setP256dh('');
+      setAuthSecret('');
+      await queryClient.invalidateQueries({ queryKey: ['push-subscriptions'] });
+    },
+  });
+  const removeSubscription = useMutation({
+    mutationFn: notificationsApi.removePushSubscription,
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['push-subscriptions'] }),
+  });
+
+  const submitSubscription = (event: FormEvent) => {
+    event.preventDefault();
+    if (endpoint.trim() && p256dh.trim() && authSecret.trim()) {
+      addSubscription.mutate({ endpoint: endpoint.trim(), p256dh: p256dh.trim(), auth: authSecret.trim() });
+    }
+  };
 
   const openNotification = (item: NotificationItem) => {
     if (!item.readAt) markRead.mutate(item.id);
@@ -71,11 +127,16 @@ export function NotificationsPage() {
         title="Thông báo"
         description={`${unread} thông báo chưa đọc trong không gian này.`}
         actions={
-          unread ? (
-            <Button startIcon={<Check />} onClick={() => markAll.mutate()} disabled={markAll.isPending}>
-              Đánh dấu tất cả đã đọc
+          <Stack direction="row" spacing={1}>
+            {Boolean(unread) && (
+              <Button startIcon={<Check />} onClick={() => markAll.mutate()} disabled={markAll.isPending}>
+                Đánh dấu tất cả đã đọc
+              </Button>
+            )}
+            <Button startIcon={<SettingsOutlined />} onClick={() => setSettingsOpen(true)}>
+              Tùy chọn
             </Button>
-          ) : undefined
+          </Stack>
         }
       />
       {markAll.isError && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage(markAll.error)}</Alert>}
@@ -122,6 +183,113 @@ export function NotificationsPage() {
           </Stack>
         )}
       </Paper>
+      <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} fullWidth maxWidth="md">
+        <DialogTitle>Tùy chọn thông báo</DialogTitle>
+        <DialogContent>
+          {preferences.isLoading ? (
+            <SectionLoader />
+          ) : preferences.isError ? (
+            <ErrorState message={errorMessage(preferences.error)} onRetry={() => void preferences.refetch()} />
+          ) : preferences.data ? (
+            <Stack spacing={1} mb={3}>
+              <FormControlLabel
+                control={<Switch checked disabled />}
+                label="Trong ứng dụng (bắt buộc cho sự kiện cốt lõi)"
+              />
+              <FormControlLabel
+                control={(
+                  <Switch
+                    checked={preferences.data.emailEnabled}
+                    disabled={updatePreferences.isPending}
+                    onChange={(event) => updatePreferences.mutate({
+                      ...preferences.data,
+                      inAppEnabled: true,
+                      emailEnabled: event.target.checked,
+                    })}
+                  />
+                )}
+                label="Email qua adapter local"
+              />
+              <FormControlLabel
+                control={(
+                  <Switch
+                    checked={preferences.data.webPushEnabled}
+                    disabled={updatePreferences.isPending}
+                    onChange={(event) => updatePreferences.mutate({
+                      ...preferences.data,
+                      inAppEnabled: true,
+                      webPushEnabled: event.target.checked,
+                    })}
+                  />
+                )}
+                label="Web Push"
+              />
+            </Stack>
+          ) : null}
+          {(updatePreferences.isError || addSubscription.isError || removeSubscription.isError) && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMessage(updatePreferences.error ?? addSubscription.error ?? removeSubscription.error)}
+            </Alert>
+          )}
+          <Typography variant="h6">Đăng ký Push local/test</Typography>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Lưu subscription để kiểm tra contract. Gửi VAPID thật vẫn tạm dừng cho đến khi có HTTPS và credential.
+          </Typography>
+          <Box component="form" onSubmit={submitSubscription}>
+            <Stack spacing={1.5}>
+              <TextField
+                label="Endpoint HTTPS"
+                type="url"
+                value={endpoint}
+                onChange={(event) => setEndpoint(event.target.value)}
+                required
+              />
+              <TextField
+                label="p256dh"
+                value={p256dh}
+                onChange={(event) => setP256dh(event.target.value)}
+                required
+              />
+              <TextField
+                label="Auth secret"
+                type="password"
+                value={authSecret}
+                onChange={(event) => setAuthSecret(event.target.value)}
+                required
+              />
+              <Button
+                type="submit"
+                variant="outlined"
+                disabled={!endpoint.trim() || !p256dh.trim() || !authSecret.trim() || addSubscription.isPending}
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                Lưu subscription
+              </Button>
+            </Stack>
+          </Box>
+          <Stack spacing={1} mt={2}>
+            {(subscriptions.data ?? []).map((subscription) => (
+              <Paper key={subscription.id} variant="outlined" sx={{ p: 1.25 }}>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  <Typography variant="body2" noWrap title={subscription.endpoint} flex={1}>
+                    {subscription.endpoint}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    aria-label="Xóa push subscription"
+                    disabled={removeSubscription.isPending}
+                    onClick={() => removeSubscription.mutate(subscription.id)}
+                  >
+                    <DeleteOutline fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions><Button onClick={() => setSettingsOpen(false)}>Đóng</Button></DialogActions>
+      </Dialog>
     </Box>
   );
 }

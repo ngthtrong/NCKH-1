@@ -5,9 +5,14 @@ import { useAuth } from './AuthContext';
 interface RequireAuthProps {
   tenant?: boolean;
   administrator?: boolean;
+  systemAdministrator?: boolean;
 }
 
-export function RequireAuth({ tenant = false, administrator = false }: RequireAuthProps) {
+export function RequireAuth({
+  tenant = false,
+  administrator = false,
+  systemAdministrator = false,
+}: RequireAuthProps) {
   const { status, session } = useAuth();
   const location = useLocation();
 
@@ -18,10 +23,13 @@ export function RequireAuth({ tenant = false, administrator = false }: RequireAu
   if (tenant && !session.activeTenant) return <Navigate to="/select-tenant" replace />;
   if (
     administrator &&
-    !session.user.platformRoles?.includes('PLATFORM_ADMIN') &&
+    !session.user.platformRoles.includes('SYSTEM_ADMIN') &&
     (!session.activeTenant || !['OWNER', 'ADMIN'].includes(session.activeTenant.role))
   ) {
     return <Navigate to="/dashboard" replace />;
+  }
+  if (systemAdministrator && !session.user.platformRoles.includes('SYSTEM_ADMIN')) {
+    return <Navigate to={session.activeTenant ? '/dashboard' : '/select-tenant'} replace />;
   }
   return <Outlet />;
 }

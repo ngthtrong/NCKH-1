@@ -45,8 +45,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/resources/content").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/invitations/*").permitAll()
                         .requestMatchers(HttpMethod.POST,
-                                "/api/v1/auth/login", "/api/v1/auth/exchange", "/api/v1/auth/refresh",
+                                "/api/v1/auth/login", "/api/v1/auth/register",
+                                "/api/v1/auth/exchange", "/api/v1/auth/refresh",
                                 "/api/v1/auth/logout",
                                 "/api/v1/payments/webhooks/**").permitAll()
                         .anyRequest().authenticated())

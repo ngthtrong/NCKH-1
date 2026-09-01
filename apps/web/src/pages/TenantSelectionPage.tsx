@@ -4,6 +4,7 @@ import {
   StorageOutlined,
   Logout,
   Refresh,
+  Add,
 } from '@mui/icons-material';
 import {
   Alert,
@@ -18,6 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import type { TenantSummary } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
@@ -26,6 +28,7 @@ import { StatusChip } from '../components/StatusChip';
 
 export function TenantSelectionPage() {
   const { session, tenants, selectTenant, reloadTenants, logout } = useAuth();
+  const navigate = useNavigate();
   const [openingSlug, setOpeningSlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,17 +72,22 @@ export function TenantSelectionPage() {
               Mỗi tổ chức có miền truy cập và phạm vi dữ liệu độc lập.
             </Typography>
           </Box>
-          <Tooltip title="Tải lại danh sách">
-            <IconButton onClick={() => void reloadTenants()}>
-              <Refresh />
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" gap={1}>
+            <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/onboarding')}>
+              Tạo workspace
+            </Button>
+            <Tooltip title="Tải lại danh sách">
+              <IconButton onClick={() => void reloadTenants()}>
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {tenants.length === 0 ? (
           <EmptyState
             title="Chưa có không gian làm việc"
-            description="Tài khoản này chưa được cấp quyền vào tenant nào. Hãy liên hệ người quản trị."
+            description="Tạo workspace Pool/Silo đầu tiên hoặc chờ lời mời từ một tổ chức."
           />
         ) : (
           <Box className="tenant-grid">
@@ -108,16 +116,29 @@ export function TenantSelectionPage() {
                       label={`${tenant.placement} · ${tenant.tier}`}
                     />
                   </Stack>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 2.5 }}
-                    endIcon={<ArrowForward />}
-                    disabled={!canOpen || openingSlug !== null}
-                    onClick={() => void openTenant(tenant)}
-                  >
-                    {openingSlug === tenant.slug ? 'Đang chuyển hướng…' : 'Mở không gian'}
-                  </Button>
+                  {canOpen ? (
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{ mt: 2.5 }}
+                      endIcon={<ArrowForward />}
+                      disabled={openingSlug !== null}
+                      onClick={() => void openTenant(tenant)}
+                    >
+                      {openingSlug === tenant.slug ? 'Đang chuyển hướng…' : 'Mở không gian'}
+                    </Button>
+                  ) : tenant.role === 'OWNER' || tenant.role === 'ADMIN' ? (
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      sx={{ mt: 2.5 }}
+                      onClick={() => navigate(`/onboarding?tenant=${tenant.id}`)}
+                    >
+                      Tiếp tục onboarding
+                    </Button>
+                  ) : (
+                    <Button fullWidth disabled sx={{ mt: 2.5 }}>Chưa thể truy cập</Button>
+                  )}
                 </Paper>
               );
             })}

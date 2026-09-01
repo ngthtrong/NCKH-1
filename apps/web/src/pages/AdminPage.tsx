@@ -1,9 +1,12 @@
 import {
+  ArrowBack,
   BusinessOutlined,
   StorageOutlined,
   ErrorOutline,
+  Logout,
   Refresh,
   Search,
+  Visibility,
 } from '@mui/icons-material';
 import {
   Alert,
@@ -13,8 +16,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Table,
   TableBody,
@@ -29,29 +36,42 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { adminApi } from '../api/endpoints';
-import type { UUID } from '../api/types';
+import type { TenantPlacement, TenantStatus, UUID } from '../api/types';
+import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
 import { StatusChip } from '../components/StatusChip';
 
 export function AdminPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [page, setPage] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<TenantStatus | ''>('');
+  const [placement, setPlacement] = useState<TenantPlacement | ''>('');
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [detailTenantId, setDetailTenantId] = useState<UUID | null>(null);
   const [deadLetterTenant, setDeadLetterTenant] = useState<{ id: UUID; name: string } | null>(null);
   const tenants = useQuery({
-    queryKey: ['admin', 'tenants', page, search],
-    queryFn: () => adminApi.tenants(page, search),
+    queryKey: ['admin', 'tenants', page, search, status, placement],
+    queryFn: () => adminApi.tenants(page, search, status, placement),
+  });
+  const tenantDetail = useQuery({
+    queryKey: ['admin', 'tenant', detailTenantId],
+    queryFn: () => adminApi.tenant(detailTenantId!),
+    enabled: detailTenantId !== null,
   });
   const retry = useMutation({
     mutationFn: adminApi.retryProvisioning,
     onSuccess: async () => {
       setFeedback('Đã đưa tác vụ provisioning vào hàng đợi.');
       await queryClient.invalidateQueries({ queryKey: ['admin', 'tenants'] });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'tenant'] });
     },
     onError: (cause) => setFeedback(errorMessage(cause)),
   });
@@ -85,6 +105,16 @@ export function AdminPage() {
         eyebrow="Control plane"
         title="Quản trị tenant"
         description="Theo dõi placement, trạng thái thanh toán và vòng đời provisioning."
+        actions={(
+          <>
+            <Button startIcon={<ArrowBack />} onClick={() => navigate('/select-tenant')}>
+              Workspace
+            </Button>
+            <Button color="inherit" startIcon={<Logout />} onClick={() => void logout()}>
+              Đăng xuất
+            </Button>
+          </>
+        )}
       />
       {feedback && (
         <Alert severity={feedback.startsWith('Đã') ? 'success' : 'error'} onClose={() => setFeedback(null)} sx={{ mb: 2 }}>
@@ -94,15 +124,15 @@ export function AdminPage() {
       <Box className="admin-summary">
         <Paper variant="outlined">
           <BusinessOutlined />
-          <Box><Typography variant="h5">{activeCount}</Typography><Typography>Tenant hoạt động</Typography></Box>
+          <Box><Typography variant="h5">{activeCount}</Typography><Typography>Hoạt động trên trang</Typography></Box>
         </Paper>
         <Paper variant="outlined">
           <StorageOutlined />
-          <Box><Typography variant="h5">{siloCount}</Typography><Typography>Tenant Silo</Typography></Box>
+          <Box><Typography variant="h5">{siloCount}</Typography><Typography>Silo trên trang</Typography></Box>
         </Paper>
         <Paper variant="outlined" className={failedCount ? 'admin-summary__danger' : ''}>
           <ErrorOutline />
-          <Box><Typography variant="h5">{failedCount}</Typography><Typography>Cần xử lý</Typography></Box>
+          <Box><Typography variant="h5">{failedCount}</Typography><Typography>Cần xử lý trên trang</Typography></Box>
         </Paper>
       </Box>
       <Paper className="panel" variant="outlined">
@@ -118,6 +148,41 @@ export function AdminPage() {
               ),
             }}
           />
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="admin-status-filter-label">Trạng thái</InputLabel>
+            <Select
+              labelId="admin-status-filter-label"
+              label="Trạng thái"
+              value={status}
+              onChange={(event) => {
+                setPage(0);
+                setStatus(event.target.value as TenantStatus | '');
+              }}
+            >
+              <MenuItem value="">Tất cả</MenuItem>
+              <MenuItem value="PENDING_PAYMENT">Chờ thanh toán</MenuItem>
+              <MenuItem value="PROVISIONING">Đang khởi tạo</MenuItem>
+              <MenuItem value="ACTIVE">Đang hoạt động</MenuItem>
+              <MenuItem value="FAILED">Thất bại</MenuItem>
+              <MenuItem value="SUSPENDED">Tạm ngưng</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel id="admin-placement-filter-label">Placement</InputLabel>
+            <Select
+              labelId="admin-placement-filter-label"
+              label="Placement"
+              value={placement}
+              onChange={(event) => {
+                setPage(0);
+                setPlacement(event.target.value as TenantPlacement | '');
+              }}
+            >
+              <MenuItem value="">Tất cả</MenuItem>
+              <MenuItem value="POOL">Pool</MenuItem>
+              <MenuItem value="SILO_DATABASE">Silo database</MenuItem>
+            </Select>
+          </FormControl>
           <Button type="submit">Tìm kiếm</Button>
           <Tooltip title="Làm mới">
             <Button onClick={() => void tenants.refetch()} startIcon={<Refresh />}>Làm mới</Button>
@@ -138,6 +203,7 @@ export function AdminPage() {
                     <TableCell>Tenant</TableCell>
                     <TableCell>Tier / placement</TableCell>
                     <TableCell>Trạng thái</TableCell>
+                    <TableCell>Thanh toán</TableCell>
                     <TableCell>Provisioning</TableCell>
                     <TableCell>Thành viên</TableCell>
                     <TableCell align="right">Thao tác</TableCell>
@@ -156,6 +222,16 @@ export function AdminPage() {
                       </TableCell>
                       <TableCell><StatusChip status={tenant.status} /></TableCell>
                       <TableCell>
+                        {tenant.paymentStatus ? (
+                          <Stack gap={0.5} alignItems="flex-start">
+                            <StatusChip status={tenant.paymentStatus} />
+                            <Typography variant="caption" color="text.secondary">
+                              {tenant.paymentProvider}
+                            </Typography>
+                          </Stack>
+                        ) : '—'}
+                      </TableCell>
+                      <TableCell>
                         {tenant.provisioningStatus ? (
                           <Stack gap={0.5} alignItems="flex-start">
                             <StatusChip status={tenant.provisioningStatus} />
@@ -172,6 +248,13 @@ export function AdminPage() {
                       <TableCell>{tenant.memberCount}</TableCell>
                       <TableCell align="right">
                         <Stack direction="row" gap={0.5} justifyContent="flex-end">
+                          <Button
+                            size="small"
+                            startIcon={<Visibility />}
+                            onClick={() => setDetailTenantId(tenant.id)}
+                          >
+                            Chi tiết
+                          </Button>
                           <Button
                             size="small"
                             color="warning"
@@ -213,6 +296,88 @@ export function AdminPage() {
           </>
         )}
       </Paper>
+      <Dialog
+        open={detailTenantId !== null}
+        onClose={() => setDetailTenantId(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Chi tiết tenant · {tenantDetail.data?.tenant.name ?? ''}</DialogTitle>
+        <DialogContent>
+          {tenantDetail.isLoading ? (
+            <SectionLoader />
+          ) : tenantDetail.isError ? (
+            <ErrorState message={errorMessage(tenantDetail.error)} onRetry={() => void tenantDetail.refetch()} />
+          ) : tenantDetail.data ? (
+            <Stack gap={3} sx={{ pt: 1 }}>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>Workspace</Typography>
+                <Typography>{tenantDetail.data.tenant.name} · {tenantDetail.data.tenant.slug}</Typography>
+                <Typography color="text.secondary" variant="body2">
+                  {tenantDetail.data.tenant.tier} · {tenantDetail.data.tenant.placement ?? 'Chưa cấp placement'} · {tenantDetail.data.tenant.memberCount} thành viên
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>Thanh toán local</Typography>
+                {tenantDetail.data.payment ? (
+                  <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
+                    <StatusChip status={tenantDetail.data.payment.status} />
+                    <Typography variant="body2">
+                      {tenantDetail.data.payment.provider} · {tenantDetail.data.payment.amountMinor.toLocaleString('vi-VN')} {tenantDetail.data.payment.currency}
+                    </Typography>
+                  </Stack>
+                ) : <Typography color="text.secondary">Chưa có giao dịch.</Typography>}
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>Provisioning</Typography>
+                {tenantDetail.data.provisioning ? (
+                  <Stack gap={0.5} alignItems="flex-start">
+                    <StatusChip status={tenantDetail.data.provisioning.status} />
+                    <Typography variant="body2">
+                      {tenantDetail.data.provisioning.attempts} lần thử · tạo lúc {new Date(tenantDetail.data.provisioning.createdAt).toLocaleString('vi-VN')}
+                    </Typography>
+                    {tenantDetail.data.provisioning.lastErrorMessage && (
+                      <Alert severity="error">{tenantDetail.data.provisioning.lastErrorMessage}</Alert>
+                    )}
+                  </Stack>
+                ) : <Typography color="text.secondary">Chưa có tác vụ provisioning.</Typography>}
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>Lịch sử chuyển trạng thái</Typography>
+                {tenantDetail.data.events.length === 0 ? (
+                  <Typography color="text.secondary">Chưa có sự kiện.</Typography>
+                ) : (
+                  <TableContainer component={Paper} variant="outlined">
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Thời điểm</TableCell>
+                          <TableCell>Chuyển trạng thái</TableCell>
+                          <TableCell>Lần thử</TableCell>
+                          <TableCell>Ghi chú</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {tenantDetail.data.events.map((event) => (
+                          <TableRow key={event.id}>
+                            <TableCell>{new Date(event.createdAt).toLocaleString('vi-VN')}</TableCell>
+                            <TableCell>{event.fromStatus ?? '—'} → {event.toStatus}</TableCell>
+                            <TableCell>{event.attempt}</TableCell>
+                            <TableCell>{event.message ?? event.errorCode ?? '—'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </Box>
+            </Stack>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDetailTenantId(null)}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={deadLetterTenant !== null}
         onClose={() => setDeadLetterTenant(null)}

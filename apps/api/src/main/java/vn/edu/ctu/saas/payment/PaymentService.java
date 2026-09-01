@@ -22,6 +22,7 @@ import vn.edu.ctu.saas.control.TenantMembershipRepository;
 import vn.edu.ctu.saas.control.TenantRepository;
 import vn.edu.ctu.saas.provisioning.ProvisioningService;
 import vn.edu.ctu.saas.security.TokenHasher;
+import vn.edu.ctu.saas.tenant.TenantAccessDeniedException;
 import vn.edu.ctu.saas.tenant.TenantRole;
 import vn.edu.ctu.saas.tenant.TenantStatus;
 
@@ -65,12 +66,7 @@ public class PaymentService {
         String normalizedCurrency = normalizeCurrency(currency);
         String validatedReturnUrl = validateReturnUrl(returnUrl);
         if (amountMinor <= 0) throw new IllegalArgumentException("Payment amount must be positive");
-        TenantMembershipEntity membership = membershipRepository.findByTenantIdAndUserId(tenantId, userId)
-                .filter(TenantMembershipEntity::isActive)
-                .orElseThrow(() -> new NotFoundException("Tenant membership not found"));
-        if (membership.getRole() != TenantRole.OWNER) {
-            throw new IllegalArgumentException("Only the tenant owner can create a payment session");
-        }
+        requireOwner(userId, tenantId);
         idempotencyLock.acquire(normalizedKey);
         PaymentTransactionEntity payment = paymentRepository.findByIdempotencyKey(normalizedKey).orElse(null);
         if (payment != null) {
@@ -98,6 +94,23 @@ public class PaymentService {
     }
 
     @Transactional
+    public PaymentResultView completeFakeCheckout(UUID userId, UUID tenantId, UUID paymentId) {
+        requireOwner(userId, tenantId);
+        PaymentTransactionEntity payment = paymentRepository.findById(paymentId)
+                .filter(candidate -> candidate.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new NotFoundException("Payment not found"));
+        if (!(provider instanceof FakePaymentProvider fakeProvider) || !"fake".equals(payment.getProvider())) {
+            throw new ConflictException("Local checkout confirmation is only available with the fake payment provider");
+        }
+        if (payment.getStatus() == PaymentStatus.FAILED || payment.getStatus() == PaymentStatus.EXPIRED) {
+            throw new ConflictException("Payment is no longer eligible for local checkout confirmation");
+        }
+        FakePaymentProvider.SignedWebhook webhook = fakeProvider.successfulCheckout(
+                payment.getProviderReference(), payment.getAmountMinor(), payment.getCurrency());
+        return handleWebhook(webhook.body(), webhook.headers());
+    }
+
+    @Transactional
     public PaymentResultView handleWebhook(String body, Map<String, String> headers) {
         PaymentProvider.VerifiedPayment verified = provider.verifyWebhook(body, headers);
         if (verified.eventId() == null || verified.eventId().isBlank() || verified.eventId().length() > 160) {
@@ -105,6 +118,10 @@ public class PaymentService {
         }
         PaymentTransactionEntity payment = paymentRepository.findByProviderReference(verified.reference())
                 .orElseThrow(() -> new NotFoundException("Payment reference not found"));
+        if (payment.getAmountMinor() != verified.amountMinor()
+                || !payment.getCurrency().equals(normalizeCurrency(verified.currency()))) {
+            throw new ConflictException("Payment callback amount or currency does not match the transaction");
+        }
         String payloadHash = tokenHasher.sha256(body);
         PaymentWebhookEventEntity priorEvent = webhookEventRepository
                 .findByProviderAndProviderEventId(payment.getProvider(), verified.eventId())
@@ -161,6 +178,16 @@ public class PaymentService {
                 || !Objects.equals(payment.getReturnUrl(), returnUrl)) {
             throw new ConflictException("Idempotency-Key was already used for a different payment request");
         }
+    }
+
+    private TenantMembershipEntity requireOwner(UUID userId, UUID tenantId) {
+        TenantMembershipEntity membership = membershipRepository.findByTenantIdAndUserId(tenantId, userId)
+                .filter(TenantMembershipEntity::isActive)
+                .orElseThrow(() -> new NotFoundException("Tenant membership not found"));
+        if (membership.getRole() != TenantRole.OWNER) {
+            throw new TenantAccessDeniedException("Only the tenant owner can manage onboarding payment");
+        }
+        return membership;
     }
 
     private String normalizeIdempotencyKey(String value) {

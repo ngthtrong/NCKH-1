@@ -46,11 +46,40 @@ public class FakePaymentProvider implements PaymentProvider {
             JsonNode payload = objectMapper.readTree(rawBody);
             String reference = payload.path("reference").asText();
             String eventId = payload.path("eventId").asText();
-            if (reference.isBlank() || eventId.isBlank()) throw new IllegalArgumentException("Invalid payment webhook body");
-            return new VerifiedPayment(reference, "SUCCEEDED".equals(payload.path("status").asText()), eventId);
+            long amountMinor = payload.path("amountMinor").asLong(-1);
+            String currency = payload.path("currency").asText();
+            if (reference.isBlank() || eventId.isBlank() || amountMinor <= 0 || !currency.matches("[A-Z]{3}")) {
+                throw new IllegalArgumentException("Invalid payment webhook body");
+            }
+            return new VerifiedPayment(
+                    reference,
+                    "SUCCEEDED".equals(payload.path("status").asText()),
+                    eventId,
+                    amountMinor,
+                    currency);
         } catch (Exception exception) {
             if (exception instanceof IllegalArgumentException illegal) throw illegal;
             throw new IllegalArgumentException("Invalid payment webhook body", exception);
+        }
+    }
+
+    public SignedWebhook successfulCheckout(String reference, long amountMinor, String currency) {
+        if (reference == null || reference.isBlank()) {
+            throw new IllegalArgumentException("Payment reference is required");
+        }
+        if (amountMinor <= 0 || currency == null || !currency.matches("[A-Z]{3}")) {
+            throw new IllegalArgumentException("Payment amount and currency are invalid");
+        }
+        try {
+            String body = objectMapper.writeValueAsString(Map.of(
+                    "reference", reference,
+                    "eventId", "local-checkout-" + reference,
+                    "status", "SUCCEEDED",
+                    "amountMinor", amountMinor,
+                    "currency", currency));
+            return new SignedWebhook(body, Map.of("x-payment-signature", hmac(body)));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Cannot create the local payment callback", exception);
         }
     }
 
@@ -63,4 +92,6 @@ public class FakePaymentProvider implements PaymentProvider {
             throw new IllegalStateException("Cannot verify webhook", exception);
         }
     }
+
+    public record SignedWebhook(String body, Map<String, String> headers) {}
 }

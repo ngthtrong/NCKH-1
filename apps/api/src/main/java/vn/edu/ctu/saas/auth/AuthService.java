@@ -2,15 +2,19 @@ package vn.edu.ctu.saas.auth;
 
 import static vn.edu.ctu.saas.auth.AuthDtos.*;
 
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.config.AppProperties;
 import vn.edu.ctu.saas.control.RefreshSessionEntity;
@@ -79,6 +83,39 @@ public class AuthService {
                 properties.jwt().globalTtl().toSeconds(),
                 userView(user),
                 tenantViews(user.getId()));
+    }
+
+    @Transactional
+    public LoginResponse register(RegisterRequest request) {
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        String displayName = request.displayName().trim();
+        if (displayName.length() < 2) {
+            throw new IllegalArgumentException("Display name must contain at least 2 characters");
+        }
+        int passwordBytes = request.password().getBytes(StandardCharsets.UTF_8).length;
+        if (passwordBytes > 72) {
+            throw new IllegalArgumentException("Password must not exceed 72 UTF-8 bytes");
+        }
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
+            throw new ConflictException("An account with this email already exists");
+        }
+
+        UserAccountEntity user = new UserAccountEntity();
+        user.setEmail(email);
+        user.setDisplayName(displayName);
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        user.setEnabled(true);
+        user.setSystemAdmin(false);
+        try {
+            user = userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ConflictException("An account with this email already exists");
+        }
+        return new LoginResponse(
+                jwtTokenService.globalToken(user),
+                properties.jwt().globalTtl().toSeconds(),
+                userView(user),
+                List.of());
     }
 
     @Transactional
@@ -198,7 +235,9 @@ public class AuthService {
     }
 
     private UserView userView(UserAccountEntity user) {
-        return new UserView(user.getId(), user.getEmail(), user.getDisplayName());
+        return new UserView(
+                user.getId(), user.getEmail(), user.getDisplayName(),
+                user.isSystemAdmin() ? List.of("SYSTEM_ADMIN") : List.of());
     }
 
     private TenantView tenantView(

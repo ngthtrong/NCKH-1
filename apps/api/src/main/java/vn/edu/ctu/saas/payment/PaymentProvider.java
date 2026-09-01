@@ -8,5 +8,10 @@ public interface PaymentProvider {
     VerifiedPayment verifyWebhook(String rawBody, Map<String, String> headers);
 
     record CheckoutSession(String provider, String reference, String checkoutUrl) {}
-    record VerifiedPayment(String reference, boolean successful, String eventId) {}
+    record VerifiedPayment(
+            String reference,
+            boolean successful,
+            String eventId,
+            long amountMinor,
+            String currency) {}
 }

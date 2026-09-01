@@ -49,6 +49,11 @@ public class NotificationController {
         return service.addPushSubscription(new PushSubscriptionRequest(request.endpoint(), request.p256dh(), request.auth()));
     }
 
+    @GetMapping("/push-subscriptions")
+    public List<PushSubscriptionView> pushSubscriptions() {
+        return service.pushSubscriptions();
+    }
+
     @DeleteMapping("/push-subscriptions/{id}")
     public void removePushSubscription(@PathVariable UUID id) { service.removePushSubscription(id); }
 

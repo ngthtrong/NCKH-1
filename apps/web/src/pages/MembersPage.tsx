@@ -1,4 +1,11 @@
-import { Add, DeleteOutline, MailOutline, Search } from '@mui/icons-material';
+import {
+  Add,
+  ContentCopy,
+  DeleteOutline,
+  MailOutline,
+  Search,
+  SwapHoriz,
+} from '@mui/icons-material';
 import {
   Alert,
   Avatar,
@@ -21,6 +28,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from '@mui/material';
@@ -28,7 +37,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState, type FormEvent } from 'react';
 import { errorMessage } from '../api/client';
 import { membersApi } from '../api/endpoints';
-import type { Member, TenantRole } from '../api/types';
+import type { InvitationCreatedView, Member, TenantRole } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
@@ -44,20 +53,30 @@ export function MembersPage() {
   const queryClient = useQueryClient();
   const { session } = useAuth();
   const canManage = ['OWNER', 'ADMIN'].includes(session?.activeTenant?.role ?? 'MEMBER');
+  const isOwner = session?.activeTenant?.role === 'OWNER';
   const [search, setSearch] = useState('');
+  const [tab, setTab] = useState<'members' | 'invitations'>('members');
   const [inviteOpen, setInviteOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<Exclude<TenantRole, 'OWNER'>>('MEMBER');
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [createdInvitation, setCreatedInvitation] = useState<InvitationCreatedView | null>(null);
   const members = useQuery({ queryKey: ['members'], queryFn: membersApi.list });
+  const invitations = useQuery({
+    queryKey: ['member-invitations'],
+    queryFn: membersApi.invitations,
+    enabled: canManage,
+  });
   const invite = useMutation({
     mutationFn: membersApi.invite,
-    onSuccess: async () => {
+    onSuccess: async (created) => {
       setInviteOpen(false);
       setEmail('');
       setRole('MEMBER');
-      setFeedback('Đã gửi lời mời thành viên.');
-      await queryClient.invalidateQueries({ queryKey: ['members'] });
+      setCreatedInvitation(created);
+      setFeedback('Đã tạo lời mời. Hãy gửi liên kết local bên dưới cho đúng người nhận.');
+      setTab('invitations');
+      await queryClient.invalidateQueries({ queryKey: ['member-invitations'] });
     },
     onError: (cause) => setFeedback(errorMessage(cause)),
   });
@@ -70,6 +89,21 @@ export function MembersPage() {
   const revoke = useMutation({
     mutationFn: membersApi.revoke,
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['members'] }),
+    onError: (cause) => setFeedback(errorMessage(cause)),
+  });
+  const revokeInvitation = useMutation({
+    mutationFn: membersApi.revokeInvitation,
+    onSuccess: async () => {
+      setFeedback('Đã thu hồi lời mời.');
+      await queryClient.invalidateQueries({ queryKey: ['member-invitations'] });
+    },
+    onError: (cause) => setFeedback(errorMessage(cause)),
+  });
+  const transferOwnership = useMutation({
+    mutationFn: membersApi.transferOwnership,
+    onSuccess: () => {
+      setFeedback('Đã chuyển ownership. Phiên tenant hiện tại đã hết hiệu lực; hãy đăng nhập lại.');
+    },
     onError: (cause) => setFeedback(errorMessage(cause)),
   });
 
@@ -94,6 +128,18 @@ export function MembersPage() {
     }
   };
 
+  const transferTo = (member: Member) => {
+    if (window.confirm(
+      `Chuyển quyền chủ sở hữu cho ${member.user.displayName}? Bạn sẽ trở thành Quản trị viên và phải đăng nhập lại.`,
+    )) {
+      transferOwnership.mutate(member.id);
+    }
+  };
+
+  const invitationUrl = createdInvitation
+    ? new URL(createdInvitation.acceptancePath, window.location.origin).toString()
+    : null;
+
   return (
     <Box className="page-container">
       <PageHeader
@@ -113,6 +159,76 @@ export function MembersPage() {
           {feedback}
         </Alert>
       )}
+      {createdInvitation && invitationUrl && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2 }}
+          action={(
+            <Button
+              color="inherit"
+              size="small"
+              startIcon={<ContentCopy />}
+              onClick={() => void navigator.clipboard.writeText(invitationUrl)}
+            >
+              Sao chép
+            </Button>
+          )}
+          onClose={() => setCreatedInvitation(null)}
+        >
+          Liên kết chỉ hiện ở lần tạo này: {invitationUrl}
+        </Alert>
+      )}
+      {canManage && (
+        <Tabs value={tab} onChange={(_, value: 'members' | 'invitations') => setTab(value)} sx={{ mb: 2 }}>
+          <Tab value="members" label="Thành viên" />
+          <Tab value="invitations" label={`Lời mời (${invitations.data?.length ?? 0})`} />
+        </Tabs>
+      )}
+      {tab === 'invitations' && canManage ? (
+        <Paper className="panel" variant="outlined">
+          {invitations.isLoading ? (
+            <SectionLoader />
+          ) : invitations.isError ? (
+            <ErrorState message={errorMessage(invitations.error)} onRetry={() => void invitations.refetch()} />
+          ) : !invitations.data?.length ? (
+            <EmptyState title="Chưa có lời mời" description="Tạo lời mời mới để cộng tác trong tenant." />
+          ) : (
+            <TableContainer>
+              <Table className="data-table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Vai trò</TableCell>
+                    <TableCell>Hết hạn</TableCell>
+                    <TableCell>Trạng thái</TableCell>
+                    <TableCell align="right">Thao tác</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {invitations.data.map((invitation) => (
+                    <TableRow key={invitation.id}>
+                      <TableCell>{invitation.email}</TableCell>
+                      <TableCell>{tenantRoleLabel[invitation.role]}</TableCell>
+                      <TableCell>{new Date(invitation.expiresAt).toLocaleString('vi-VN')}</TableCell>
+                      <TableCell><StatusChip status={invitation.status} /></TableCell>
+                      <TableCell align="right">
+                        <Button
+                          color="error"
+                          size="small"
+                          disabled={invitation.status !== 'PENDING' || revokeInvitation.isPending}
+                          onClick={() => revokeInvitation.mutate(invitation.id)}
+                        >
+                          Thu hồi
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Paper>
+      ) : (
       <Paper className="panel" variant="outlined">
         <TextField
           placeholder="Tìm theo tên hoặc email"
@@ -218,6 +334,16 @@ export function MembersPage() {
                         >
                           Thu hồi
                         </Button>
+                        {isOwner && member.role !== 'OWNER' && (
+                          <Button
+                            size="small"
+                            startIcon={<SwapHoriz />}
+                            disabled={transferOwnership.isPending}
+                            onClick={() => transferTo(member)}
+                          >
+                            Chuyển owner
+                          </Button>
+                        )}
                       </TableCell>
                     )}
                   </TableRow>
@@ -227,6 +353,7 @@ export function MembersPage() {
           </TableContainer>
         )}
       </Paper>
+      )}
       <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} fullWidth maxWidth="xs">
         <Box component="form" onSubmit={submitInvite}>
           <DialogTitle>Mời thành viên</DialogTitle>

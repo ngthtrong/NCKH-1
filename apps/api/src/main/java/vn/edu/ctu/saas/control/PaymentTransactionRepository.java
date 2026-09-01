@@ -11,4 +11,5 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
     Optional<PaymentTransactionEntity> findByProviderReference(String reference);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<PaymentTransactionEntity> findByIdempotencyKey(String idempotencyKey);
+    Optional<PaymentTransactionEntity> findTopByTenantIdOrderByCreatedAtDesc(UUID tenantId);
 }

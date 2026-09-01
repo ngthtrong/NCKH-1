@@ -41,6 +41,23 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/LoginResponse'}
         default: {$ref: '#/components/responses/Error'}
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RegisterRequest'}
+      responses:
+        '200':
+          description: New global account session with no tenant membership yet
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LoginResponse'}
+        default: {$ref: '#/components/responses/Error'}
   /auth/tenant-transfer:
     post:
       tags: [Auth]
@@ -140,6 +157,19 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/TenantView'}
         default: {$ref: '#/components/responses/Error'}
+  /tenants/{tenantId}/onboarding:
+    get:
+      tags: [Tenants, Payments]
+      operationId: getTenantOnboarding
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant, payment and provisioning state visible to its Owner or Admin
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/OnboardingView'}
+        default: {$ref: '#/components/responses/Error'}
   /members:
     get:
       tags: [Tenants]
@@ -154,9 +184,21 @@ paths:
                 items: {$ref: '#/components/schemas/MemberView'}
         default: {$ref: '#/components/responses/Error'}
   /members/invitations:
+    get:
+      tags: [Tenants]
+      operationId: listTenantInvitations
+      responses:
+        '200':
+          description: Tenant-scoped invitation status ordered newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/InvitationView'}
+        default: {$ref: '#/components/responses/Error'}
     post:
       tags: [Tenants]
-      operationId: inviteExistingTenantMember
+      operationId: createTenantInvitation
       requestBody:
         required: true
         content:
@@ -164,10 +206,22 @@ paths:
             schema: {$ref: '#/components/schemas/InviteMemberRequest'}
       responses:
         '200':
-          description: Membership created or reactivated
+          description: Pending invitation and one-time local delivery token
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/MemberView'}
+              schema: {$ref: '#/components/schemas/InvitationCreatedView'}
+        default: {$ref: '#/components/responses/Error'}
+  /members/invitations/{invitationId}:
+    delete:
+      tags: [Tenants]
+      operationId: revokeTenantInvitation
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema: {$ref: '#/components/schemas/UUID'}
+      responses:
+        '200': {description: Pending invitation revoked idempotently}
         default: {$ref: '#/components/responses/Error'}
   /members/{membershipId}:
     parameters:
@@ -210,6 +264,68 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /members/{membershipId}/transfer-ownership:
+    post:
+      tags: [Tenants]
+      operationId: transferTenantOwnership
+      parameters:
+        - $ref: '#/components/parameters/MembershipId'
+      responses:
+        '200':
+          description: Target is the sole Owner and the previous Owner is now Admin
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MemberView'}
+        default: {$ref: '#/components/responses/Error'}
+  /invitations/{token}:
+    get:
+      tags: [Tenants]
+      operationId: previewTenantInvitation
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: {type: string, minLength: 32, maxLength: 200}
+      responses:
+        '200':
+          description: Invitation preview addressed by an opaque capability token
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/InvitationView'}
+        default: {$ref: '#/components/responses/Error'}
+  /invitations/{token}/accept:
+    post:
+      tags: [Tenants]
+      operationId: acceptTenantInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: {type: string, minLength: 32, maxLength: 200}
+      responses:
+        '200':
+          description: Invitation accepted idempotently by the matching account
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/InvitationView'}
+        default: {$ref: '#/components/responses/Error'}
+  /invitations/{token}/reject:
+    post:
+      tags: [Tenants]
+      operationId: rejectTenantInvitation
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: {type: string, minLength: 32, maxLength: 200}
+      responses:
+        '200':
+          description: Invitation rejected idempotently by the matching account
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/InvitationView'}
         default: {$ref: '#/components/responses/Error'}
   /dashboard:
     get:
@@ -272,7 +388,25 @@ paths:
       tags: [Projects]
       operationId: deleteProject
       responses:
-        '204': {description: Project deleted}
+        '204': {description: Project soft-deleted with its content retained for audit}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/status:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    patch:
+      tags: [Projects]
+      operationId: changeProjectStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ChangeProjectStatusRequest'}
+      responses:
+        '200':
+          description: Project archived or restored by a project manager
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProjectView'}
         default: {$ref: '#/components/responses/Error'}
   /projects/{projectId}/members:
     get:
@@ -315,6 +449,20 @@ paths:
         '204': {description: Project membership removed}
         default: {$ref: '#/components/responses/Error'}
   /projects/{projectId}/boards:
+    get:
+      tags: [Projects]
+      operationId: listProjectBoards
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Active boards visible through project membership
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/BoardSummaryView'}
+        default: {$ref: '#/components/responses/Error'}
     post:
       tags: [Projects]
       operationId: createBoard
@@ -333,17 +481,38 @@ paths:
               schema: {$ref: '#/components/schemas/BoardView'}
         default: {$ref: '#/components/responses/Error'}
   /boards/{boardId}:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
     get:
       tags: [Projects]
       operationId: getBoard
-      parameters:
-        - $ref: '#/components/parameters/BoardId'
       responses:
         '200':
           description: Board, columns and tasks
           content:
             application/json:
               schema: {$ref: '#/components/schemas/BoardView'}
+        default: {$ref: '#/components/responses/Error'}
+    put:
+      tags: [Projects]
+      operationId: updateBoard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateBoardRequest'}
+      responses:
+        '200':
+          description: Board renamed with optimistic version check
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BoardView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Projects]
+      operationId: deleteBoard
+      responses:
+        '204': {description: Board soft-deleted}
         default: {$ref: '#/components/responses/Error'}
   /boards/{boardId}/columns:
     post:
@@ -452,9 +621,37 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/TaskView'}
         default: {$ref: '#/components/responses/Error'}
+  /boards/{boardId}/tasks/order:
+    put:
+      tags: [Projects]
+      operationId: reorderTasks
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ReorderTasksRequest'}
+      responses:
+        '200':
+          description: Task positions updated atomically; any stale version rolls back the batch
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BoardView'}
+        default: {$ref: '#/components/responses/Error'}
   /tasks/{taskId}:
     parameters:
       - $ref: '#/components/parameters/TaskId'
+    get:
+      tags: [Projects]
+      operationId: getTask
+      responses:
+        '200':
+          description: Active task visible through project membership
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskView'}
+        default: {$ref: '#/components/responses/Error'}
     patch:
       tags: [Projects]
       operationId: updateTask
@@ -474,7 +671,7 @@ paths:
       tags: [Projects]
       operationId: deleteTask
       responses:
-        '204': {description: Task deleted}
+        '204': {description: Task and its one-level subtasks soft-deleted}
         default: {$ref: '#/components/responses/Error'}
   /tasks/{taskId}/comments:
     parameters:
@@ -506,6 +703,33 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CommentView'}
         default: {$ref: '#/components/responses/Error'}
+  /comments/{commentId}:
+    parameters:
+      - name: commentId
+        in: path
+        required: true
+        schema: {$ref: '#/components/schemas/UUID'}
+    patch:
+      tags: [Projects]
+      operationId: updateComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateCommentRequest'}
+      responses:
+        '200':
+          description: Comment updated by its author or moderated by a project manager
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CommentView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Projects]
+      operationId: deleteComment
+      responses:
+        '204': {description: Comment soft-deleted by its author or a project manager}
+        default: {$ref: '#/components/responses/Error'}
   /resources:
     get:
       tags: [Resources]
@@ -534,6 +758,22 @@ paths:
       responses:
         '200':
           description: Resource stored in tenant namespace
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ResourceView'}
+        default: {$ref: '#/components/responses/Error'}
+  /resources/links:
+    post:
+      tags: [Resources]
+      operationId: createLinkResource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateLinkResourceRequest'}
+      responses:
+        '200':
+          description: Validated HTTP(S) link created in the tenant resource library
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ResourceView'}
@@ -572,6 +812,15 @@ paths:
       responses:
         '200': {description: Resource attached idempotently}
         default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Resources]
+      operationId: detachResourceFromTask
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200': {description: Resource detached from task}
+        default: {$ref: '#/components/responses/Error'}
   /resources/{resourceId}:
     delete:
       tags: [Resources]
@@ -579,7 +828,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/ResourceId'
       responses:
-        '200': {description: Resource deleted}
+        '200': {description: Resource metadata soft-deleted; file cleanup is handled by outbox}
         default: {$ref: '#/components/responses/Error'}
   /notifications:
     get:
@@ -644,6 +893,18 @@ paths:
               schema: {$ref: '#/components/schemas/NotificationPreferences'}
         default: {$ref: '#/components/responses/Error'}
   /notifications/push-subscriptions:
+    get:
+      tags: [Notifications]
+      operationId: listPushSubscriptions
+      responses:
+        '200':
+          description: Current user's push subscriptions in this tenant
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/PushSubscriptionView'}
+        default: {$ref: '#/components/responses/Error'}
     post:
       tags: [Notifications]
       operationId: addPushSubscription
@@ -724,10 +985,24 @@ paths:
         required: true
         content:
           application/json:
-            schema: {type: object, additionalProperties: true}
+            schema: {$ref: '#/components/schemas/FakePaymentWebhook'}
       responses:
         '200':
           description: Verified and idempotently processed callback
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PaymentResultView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tenants/{tenantId}/payments/{paymentId}/fake-complete:
+    post:
+      tags: [Payments]
+      operationId: completeFakePayment
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/PaymentId'
+      responses:
+        '200':
+          description: Local fake provider emits a signed, idempotent successful callback
           content:
             application/json:
               schema: {$ref: '#/components/schemas/PaymentResultView'}
@@ -746,12 +1021,31 @@ paths:
         - name: search
           in: query
           schema: {type: string, default: ''}
+        - name: status
+          in: query
+          schema: {$ref: '#/components/schemas/TenantStatus'}
+        - name: placement
+          in: query
+          schema: {$ref: '#/components/schemas/TenantPlacement'}
       responses:
         '200':
           description: Control-plane tenant page for system administrators
           content:
             application/json:
               schema: {$ref: '#/components/schemas/AdminTenantPage'}
+        default: {$ref: '#/components/responses/Error'}
+  /admin/tenants/{tenantId}:
+    get:
+      tags: [Administration]
+      operationId: getAdminTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Control-plane tenant detail, latest payment and provisioning transition history
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminTenantDetailView'}
         default: {$ref: '#/components/responses/Error'}
   /admin/tenants/{tenantId}/provisioning/retry:
     post:
@@ -851,6 +1145,11 @@ components:
       in: path
       required: true
       schema: {$ref: '#/components/schemas/UUID'}
+    PaymentId:
+      name: paymentId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
   responses:
     Error:
       description: Structured API error
@@ -861,12 +1160,15 @@ components:
     UUID: {type: string, format: uuid}
     Instant: {type: string, format: date-time}
     TenantRole: {type: string, enum: [OWNER, ADMIN, MEMBER]}
+    InvitationStatus: {type: string, enum: [PENDING, ACCEPTED, REJECTED, REVOKED, EXPIRED]}
     ProjectRole: {type: string, enum: [MANAGER, MEMBER, VIEWER]}
+    ProjectStatus: {type: string, enum: [ACTIVE, ARCHIVED, DELETED]}
     TenantTier: {type: string, enum: [STARTER, PROFESSIONAL, ENTERPRISE]}
     TenantPlacement: {type: string, enum: [POOL, SILO_DATABASE]}
     TenantStatus: {type: string, enum: [PENDING_PAYMENT, PROVISIONING, ACTIVE, FAILED, SUSPENDED]}
     PaymentStatus: {type: string, enum: [CREATED, PENDING, SUCCEEDED, FAILED, EXPIRED]}
     ProvisioningStatus: {type: string, enum: [QUEUED, RUNNING, SUCCEEDED, RETRYABLE_FAILED, FAILED_ROLLED_BACK, ROLLBACK_FAILED]}
+    PlatformRole: {type: string, enum: [SYSTEM_ADMIN]}
     ApiError:
       type: object
       required: [timestamp, status, code, message, path, fieldErrors]
@@ -880,11 +1182,14 @@ components:
         requestId: {type: [string, 'null']}
     UserView:
       type: object
-      required: [id, email, displayName]
+      required: [id, email, displayName, platformRoles]
       properties:
         id: {$ref: '#/components/schemas/UUID'}
         email: {type: string, format: email}
         displayName: {type: string}
+        platformRoles:
+          type: array
+          items: {$ref: '#/components/schemas/PlatformRole'}
     TenantView:
       type: object
       required: [id, slug, name, tier, status, placement, role]
@@ -902,6 +1207,13 @@ components:
       properties:
         email: {type: string, format: email}
         password: {type: string, format: password}
+    RegisterRequest:
+      type: object
+      required: [email, displayName, password]
+      properties:
+        email: {type: string, format: email, maxLength: 320}
+        displayName: {type: string, minLength: 2, maxLength: 160}
+        password: {type: string, format: password, minLength: 10, maxLength: 128}
     LoginResponse:
       type: object
       required: [accessToken, expiresInSeconds, user, tenants]
@@ -966,7 +1278,27 @@ components:
       required: [email, role]
       properties:
         email: {type: string, format: email}
-        role: {$ref: '#/components/schemas/TenantRole'}
+        role: {type: string, enum: [ADMIN, MEMBER]}
+    InvitationView:
+      type: object
+      required: [id, tenantId, tenantSlug, tenantName, email, role, status, expiresAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        tenantId: {$ref: '#/components/schemas/UUID'}
+        tenantSlug: {type: string}
+        tenantName: {type: string}
+        email: {type: string, format: email}
+        role: {type: string, enum: [ADMIN, MEMBER]}
+        status: {$ref: '#/components/schemas/InvitationStatus'}
+        expiresAt: {$ref: '#/components/schemas/Instant'}
+        respondedAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+    InvitationCreatedView:
+      type: object
+      required: [invitation, token, acceptancePath]
+      properties:
+        invitation: {$ref: '#/components/schemas/InvitationView'}
+        token: {type: string, minLength: 32, writeOnly: true}
+        acceptancePath: {type: string}
     UpdateMemberRequest:
       type: object
       required: [role, active]
@@ -988,11 +1320,12 @@ components:
         unreadNotifications: {type: integer, format: int64}
     ProjectView:
       type: object
-      required: [id, name, createdBy, createdAt, updatedAt, role, memberCount, taskCount, completedTaskCount]
+      required: [id, name, status, createdBy, createdAt, updatedAt, role, memberCount, taskCount, completedTaskCount]
       properties:
         id: {$ref: '#/components/schemas/UUID'}
         name: {type: string}
         description: {type: [string, 'null']}
+        status: {$ref: '#/components/schemas/ProjectStatus'}
         createdBy: {$ref: '#/components/schemas/UUID'}
         createdAt: {$ref: '#/components/schemas/Instant'}
         updatedAt: {$ref: '#/components/schemas/Instant'}
@@ -1009,6 +1342,11 @@ components:
         description: {type: [string, 'null'], maxLength: 5000}
     UpdateProjectRequest:
       $ref: '#/components/schemas/CreateProjectRequest'
+    ChangeProjectStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status: {$ref: '#/components/schemas/ProjectStatus'}
     ProjectMemberView:
       type: object
       required: [projectId, userId, role]
@@ -1054,10 +1392,25 @@ components:
         version: {type: integer, format: int64, minimum: 0}
         columns: {type: array, items: {$ref: '#/components/schemas/ColumnView'}}
         tasks: {type: array, items: {$ref: '#/components/schemas/TaskView'}}
+    BoardSummaryView:
+      type: object
+      required: [id, projectId, name, version, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        version: {type: integer, format: int64, minimum: 0}
+        createdAt: {$ref: '#/components/schemas/Instant'}
     CreateBoardRequest:
       type: object
       required: [name]
       properties: {name: {type: string, maxLength: 160}}
+    UpdateBoardRequest:
+      type: object
+      required: [name, version]
+      properties:
+        name: {type: string, maxLength: 160}
+        version: {type: integer, format: int64, minimum: 0}
     CreateColumnRequest:
       type: object
       required: [name, version]
@@ -1105,6 +1458,22 @@ components:
         targetColumnId: {$ref: '#/components/schemas/UUID'}
         targetPosition: {type: number}
         version: {type: integer, format: int64}
+    ReorderTaskItem:
+      type: object
+      required: [taskId, targetColumnId, targetPosition, version]
+      properties:
+        taskId: {$ref: '#/components/schemas/UUID'}
+        targetColumnId: {$ref: '#/components/schemas/UUID'}
+        targetPosition: {type: number}
+        version: {type: integer, format: int64, minimum: 0}
+    ReorderTasksRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items: {$ref: '#/components/schemas/ReorderTaskItem'}
     CommentView:
       type: object
       required: [id, taskId, authorUserId, body, createdAt]
@@ -1118,18 +1487,33 @@ components:
       type: object
       required: [body]
       properties: {body: {type: string, maxLength: 10000}}
+    UpdateCommentRequest:
+      $ref: '#/components/schemas/CreateCommentRequest'
     ResourceView:
       type: object
-      required: [id, originalName, storageKey, contentType, sizeBytes, uploadedBy, createdAt, taskCount]
+      required: [id, originalName, contentType, sizeBytes, uploadedBy, createdAt, taskCount, kind, taskIds]
       properties:
         id: {$ref: '#/components/schemas/UUID'}
         originalName: {type: string}
-        storageKey: {type: string, description: Server-generated key; clients must not use it for authorization}
+        storageKey:
+          type: [string, 'null']
+          description: Server-generated FILE key; clients must not use it for authorization
         contentType: {type: string}
         sizeBytes: {type: integer, format: int64}
         uploadedBy: {$ref: '#/components/schemas/UUID'}
         createdAt: {$ref: '#/components/schemas/Instant'}
         taskCount: {type: integer, format: int64}
+        kind: {type: string, enum: [FILE, LINK]}
+        linkUrl: {type: [string, 'null'], format: uri}
+        taskIds:
+          type: array
+          items: {$ref: '#/components/schemas/UUID'}
+    CreateLinkResourceRequest:
+      type: object
+      required: [name, url]
+      properties:
+        name: {type: string, maxLength: 255}
+        url: {type: string, format: uri, maxLength: 2000}
     QuotaView:
       type: object
       required: [usedBytes, limitBytes]
@@ -1193,6 +1577,15 @@ components:
         amountMinor: {type: integer, format: int64, minimum: 1}
         currency: {type: string, pattern: '^[A-Za-z]{3}$'}
         returnUrl: {type: string, format: uri}
+    FakePaymentWebhook:
+      type: object
+      required: [reference, eventId, status, amountMinor, currency]
+      properties:
+        reference: {type: string}
+        eventId: {type: string}
+        status: {type: string, enum: [SUCCEEDED, FAILED]}
+        amountMinor: {type: integer, format: int64, minimum: 1}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
     PaymentSessionView:
       type: object
       required: [paymentId, provider, reference, checkoutUrl, status]
@@ -1210,6 +1603,33 @@ components:
         tenantId: {$ref: '#/components/schemas/UUID'}
         status: {$ref: '#/components/schemas/PaymentStatus'}
         duplicate: {type: boolean}
+    OnboardingPaymentView:
+      type: object
+      required: [id, provider, status, amountMinor, currency]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        provider: {type: string}
+        status: {$ref: '#/components/schemas/PaymentStatus'}
+        amountMinor: {type: integer, format: int64, minimum: 0}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
+    OnboardingProvisioningView:
+      type: object
+      required: [id, status, attempts]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        status: {$ref: '#/components/schemas/ProvisioningStatus'}
+        attempts: {type: integer, minimum: 0}
+        lastErrorCode: {type: [string, 'null']}
+        lastErrorMessage: {type: [string, 'null']}
+    OnboardingView:
+      type: object
+      required: [tenant]
+      properties:
+        tenant: {$ref: '#/components/schemas/TenantView'}
+        payment:
+          anyOf: [{$ref: '#/components/schemas/OnboardingPaymentView'}, {type: 'null'}]
+        provisioning:
+          anyOf: [{$ref: '#/components/schemas/OnboardingProvisioningView'}, {type: 'null'}]
     AdminTenantView:
       type: object
       required: [id, name, slug, tier, status, memberCount, createdAt]
@@ -1224,6 +1644,50 @@ components:
         memberCount: {type: integer, format: int64}
         createdAt: {$ref: '#/components/schemas/Instant'}
         lastError: {type: [string, 'null']}
+        paymentStatus: {anyOf: [{$ref: '#/components/schemas/PaymentStatus'}, {type: 'null'}]}
+        paymentProvider: {type: [string, 'null']}
+    AdminPaymentView:
+      type: object
+      required: [id, provider, status, amountMinor, currency, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        provider: {type: string}
+        status: {$ref: '#/components/schemas/PaymentStatus'}
+        amountMinor: {type: integer, format: int64}
+        currency: {type: string}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    AdminProvisioningView:
+      type: object
+      required: [id, status, attempts, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        status: {$ref: '#/components/schemas/ProvisioningStatus'}
+        attempts: {type: integer}
+        lastErrorCode: {type: [string, 'null']}
+        lastErrorMessage: {type: [string, 'null']}
+        nextAttemptAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    ProvisioningEventView:
+      type: object
+      required: [id, toStatus, attempt, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        fromStatus: {anyOf: [{$ref: '#/components/schemas/ProvisioningStatus'}, {type: 'null'}]}
+        toStatus: {$ref: '#/components/schemas/ProvisioningStatus'}
+        attempt: {type: integer}
+        errorCode: {type: [string, 'null']}
+        message: {type: [string, 'null']}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    AdminTenantDetailView:
+      type: object
+      required: [tenant, events]
+      properties:
+        tenant: {$ref: '#/components/schemas/AdminTenantView'}
+        payment: {anyOf: [{$ref: '#/components/schemas/AdminPaymentView'}, {type: 'null'}]}
+        provisioning: {anyOf: [{$ref: '#/components/schemas/AdminProvisioningView'}, {type: 'null'}]}
+        events:
+          type: array
+          items: {$ref: '#/components/schemas/ProvisioningEventView'}
     AdminTenantPage:
       type: object
       required: [items, page, size, totalItems, totalPages]

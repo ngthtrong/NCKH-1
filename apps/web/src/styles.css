@@ -248,6 +248,26 @@ select {
   background: #e8efff !important;
 }
 
+/* Local tenant onboarding */
+.onboarding-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 0, rgb(36 107 253 / 9%), transparent 34%),
+    #f7f9fd;
+}
+
+.onboarding-content {
+  width: min(820px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 54px 0 80px;
+}
+
+.onboarding-card {
+  padding: clamp(22px, 4vw, 38px);
+  border-color: #e0e6f0 !important;
+  box-shadow: 0 18px 54px rgb(29 53 92 / 7%);
+}
+
 /* Application chrome */
 .app-frame {
   min-height: 100vh;

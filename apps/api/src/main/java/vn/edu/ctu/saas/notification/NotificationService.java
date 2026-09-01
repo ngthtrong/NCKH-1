@@ -74,6 +74,9 @@ public class NotificationService {
 
     public NotificationPreferences updatePreferences(NotificationPreferences request) {
         TenantContext context = TenantContextHolder.getRequired();
+        if (!request.inAppEnabled()) {
+            throw new IllegalArgumentException("Mandatory in-app notifications cannot be disabled");
+        }
         executor.writeWithoutResult(jdbc -> jdbc.update("""
                 INSERT INTO notification_preferences(
                     id,tenant_id,user_id,in_app_enabled,email_enabled,web_push_enabled)
@@ -90,12 +93,39 @@ public class NotificationService {
 
     public PushSubscriptionView addPushSubscription(PushSubscriptionRequest request) {
         TenantContext context = TenantContextHolder.getRequired();
-        UUID id = UUID.randomUUID();
-        executor.writeWithoutResult(jdbc -> jdbc.update("""
-                INSERT INTO push_subscriptions(id,tenant_id,user_id,endpoint,p256dh,auth_secret)
-                VALUES (?,?,?,?,?,?)
-                """, id, context.tenantId(), context.userId(), request.endpoint(), request.p256dh(), request.auth()));
-        return new PushSubscriptionView(id, request.endpoint(), Instant.now());
+        return executor.write(jdbc -> {
+            List<PushSubscriptionView> existing = jdbc.query("""
+                    SELECT id,endpoint,created_at FROM push_subscriptions
+                    WHERE tenant_id=? AND user_id=? AND endpoint=?
+                    """, (rs, rowNum) -> new PushSubscriptionView(
+                    rs.getObject("id", UUID.class), rs.getString("endpoint"),
+                    rs.getTimestamp("created_at").toInstant()),
+                    context.tenantId(), context.userId(), request.endpoint());
+            if (!existing.isEmpty()) {
+                jdbc.update("""
+                        UPDATE push_subscriptions SET p256dh=?,auth_secret=?,updated_at=now()
+                        WHERE tenant_id=? AND user_id=? AND id=?
+                        """, request.p256dh(), request.auth(), context.tenantId(), context.userId(),
+                        existing.getFirst().id());
+                return existing.getFirst();
+            }
+            UUID id = UUID.randomUUID();
+            jdbc.update("""
+                    INSERT INTO push_subscriptions(id,tenant_id,user_id,endpoint,p256dh,auth_secret)
+                    VALUES (?,?,?,?,?,?)
+                    """, id, context.tenantId(), context.userId(), request.endpoint(), request.p256dh(), request.auth());
+            return new PushSubscriptionView(id, request.endpoint(), Instant.now());
+        });
+    }
+
+    public List<PushSubscriptionView> pushSubscriptions() {
+        TenantContext context = TenantContextHolder.getRequired();
+        return executor.read(jdbc -> jdbc.query("""
+                SELECT id,endpoint,created_at FROM push_subscriptions
+                WHERE tenant_id=? AND user_id=? ORDER BY created_at,id
+                """, (rs, rowNum) -> new PushSubscriptionView(
+                rs.getObject("id", UUID.class), rs.getString("endpoint"),
+                rs.getTimestamp("created_at").toInstant()), context.tenantId(), context.userId()));
     }
 
     public void removePushSubscription(UUID id) {

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ class TenantManagementServiceSecurityTest {
     private static final UUID ACTOR = UUID.fromString("30000000-0000-0000-0000-000000000001");
     private static final UUID TARGET_USER = UUID.fromString("30000000-0000-0000-0000-000000000002");
     private static final UUID MEMBERSHIP_ID = UUID.fromString("40000000-0000-0000-0000-000000000001");
+    private static final UUID OWNER_MEMBERSHIP_ID = UUID.fromString("40000000-0000-0000-0000-000000000002");
 
     private TenantMembershipRepository memberships;
     private UserAccountRepository users;
@@ -127,6 +129,50 @@ class TenantManagementServiceSecurityTest {
         verifyNoInteractions(users);
     }
 
+    @Test
+    void ownerTransfersOwnershipAtomicallyAndRotatesBothSecurityVersions() {
+        TenantMembershipEntity owner = membership(
+                OWNER_MEMBERSHIP_ID, TENANT_A, ACTOR, TenantRole.OWNER, true, 4);
+        TenantMembershipEntity target = membership(
+                MEMBERSHIP_ID, TENANT_A, TARGET_USER, TenantRole.MEMBER, true, 7);
+        UserAccountEntity user = user(TARGET_USER);
+        when(memberships.lockActiveByTenantId(TENANT_A)).thenReturn(List.of(owner, target));
+        when(users.findById(TARGET_USER)).thenReturn(Optional.of(user));
+
+        TenantManagementService.MemberView result = service.transferOwnership(
+                context(TenantRole.OWNER), MEMBERSHIP_ID);
+
+        assertThat(result.role()).isEqualTo(TenantRole.OWNER);
+        assertThat(owner.getRole()).isEqualTo(TenantRole.ADMIN);
+        assertThat(owner.getSecurityVersion()).isEqualTo(5);
+        assertThat(target.getRole()).isEqualTo(TenantRole.OWNER);
+        assertThat(target.getSecurityVersion()).isEqualTo(8);
+        verify(memberships).saveAll(List.of(owner, target));
+    }
+
+    @Test
+    void administratorCannotTransferOwnership() {
+        assertThatThrownBy(() -> service.transferOwnership(context(TenantRole.ADMIN), MEMBERSHIP_ID))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessageContaining("tenant owner");
+
+        verifyNoInteractions(memberships, users);
+    }
+
+    @Test
+    void ownerCannotProbeForeignOrInactiveTransferTarget() {
+        TenantMembershipEntity owner = membership(
+                OWNER_MEMBERSHIP_ID, TENANT_A, ACTOR, TenantRole.OWNER, true, 4);
+        when(memberships.lockActiveByTenantId(TENANT_A)).thenReturn(List.of(owner));
+
+        assertThatThrownBy(() -> service.transferOwnership(context(TenantRole.OWNER), MEMBERSHIP_ID))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Active target");
+
+        verify(memberships, never()).saveAll(org.mockito.ArgumentMatchers.anyList());
+        verifyNoInteractions(users);
+    }
+
     private TenantContext context(TenantRole role) {
         return new TenantContext(
                 ACTOR, TENANT_A, "alpha", "STARTER", TenantPlacement.POOL,
@@ -134,10 +180,20 @@ class TenantManagementServiceSecurityTest {
     }
 
     private TenantMembershipEntity membership(UUID tenantId, TenantRole role, boolean active, long version) {
+        return membership(MEMBERSHIP_ID, tenantId, TARGET_USER, role, active, version);
+    }
+
+    private TenantMembershipEntity membership(
+            UUID id,
+            UUID tenantId,
+            UUID userId,
+            TenantRole role,
+            boolean active,
+            long version) {
         TenantMembershipEntity membership = new TenantMembershipEntity();
-        membership.setId(MEMBERSHIP_ID);
+        membership.setId(id);
         membership.setTenantId(tenantId);
-        membership.setUserId(TARGET_USER);
+        membership.setUserId(userId);
         membership.setRole(role);
         membership.setActive(active);
         membership.setSecurityVersion(version);

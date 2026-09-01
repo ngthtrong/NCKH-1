@@ -1,9 +1,11 @@
 package vn.edu.ctu.saas.storage;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.UUID;
@@ -33,14 +35,18 @@ public class ResourceService {
         TenantContext context = TenantContextHolder.getRequired();
         return executor.read(jdbc -> jdbc.query("""
                 SELECT r.id,r.original_name,r.storage_key,r.content_type,r.size_bytes,r.uploaded_by,r.created_at,
-                       (SELECT count(*) FROM task_resources tr WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_count
+                       r.kind,r.link_url,
+                       (SELECT count(*) FROM task_resources tr WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_count,
+                       (SELECT coalesce(array_agg(tr.task_id),'{}'::uuid[]) FROM task_resources tr
+                        WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_ids
                 FROM resources r
-                WHERE r.tenant_id=? AND (
+                WHERE r.tenant_id=? AND r.deleted_at IS NULL AND (
                     r.uploaded_by=? OR EXISTS (
                         SELECT 1 FROM task_resources tr
                         JOIN tasks t ON t.tenant_id=tr.tenant_id AND t.id=tr.task_id
                         JOIN project_memberships pm ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
                         WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id AND pm.user_id=?
+                          AND t.deleted_at IS NULL
                     )
                 )
                 ORDER BY r.created_at DESC
@@ -56,7 +62,8 @@ public class ResourceService {
             long current = executor.read(jdbc -> {
                 requireAnyProjectRole(jdbc, context, ProjectRole.MEMBER);
                 return value(jdbc,
-                        "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=?", context.tenantId());
+                        "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=? AND deleted_at IS NULL",
+                        context.tenantId());
             });
             if (size < 0 || size > quota - current) throw new ConflictException("Tenant resource quota exceeded");
             UUID id = UUID.randomUUID();
@@ -82,16 +89,36 @@ public class ResourceService {
         }
     }
 
+    public ResourceView createLink(String name, String url) {
+        TenantContext context = TenantContextHolder.getRequired();
+        String normalizedUrl = validateLinkUrl(url);
+        return executor.write(jdbc -> {
+            requireAnyProjectRole(jdbc, context, ProjectRole.MEMBER);
+            UUID id = UUID.randomUUID();
+            jdbc.update("""
+                    INSERT INTO resources(
+                        id,tenant_id,original_name,storage_key,content_type,size_bytes,uploaded_by,kind,link_url)
+                    VALUES (?,?,?,NULL,'text/uri-list',0,?,'LINK',?)
+                    """, id, context.tenantId(), name.trim(), context.userId(), normalizedUrl);
+            return find(jdbc, context, id);
+        });
+    }
+
     public DownloadUrl downloadUrl(UUID resourceId) {
         TenantContext context = TenantContextHolder.getRequired();
         ResourceView resource = executor.read(jdbc -> {
             ResourceView found = find(jdbc, context, resourceId);
             requireReadable(jdbc, context, resourceId);
-            requireResourceStorageKey(context, found.id(), found.storageKey());
+            if (found.kind() == ResourceKind.FILE) {
+                requireResourceStorageKey(context, found.id(), found.storageKey());
+            }
             return found;
         });
         Duration expiresIn = Duration.ofMinutes(10);
-        return new DownloadUrl(storage.createDownloadUrl(resource.storageKey(), expiresIn), Instant.now().plus(expiresIn));
+        String url = resource.kind() == ResourceKind.LINK
+                ? resource.linkUrl()
+                : storage.createDownloadUrl(resource.storageKey(), expiresIn);
+        return new DownloadUrl(url, Instant.now().plus(expiresIn));
     }
 
     public QuotaView quota() {
@@ -100,7 +127,8 @@ public class ResourceService {
             throw new TenantAccessDeniedException("Tenant administrator role is required to view aggregate quota");
         }
         long used = executor.read(jdbc -> value(jdbc,
-                "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=?", context.tenantId()));
+                "SELECT coalesce(sum(size_bytes),0) FROM resources WHERE tenant_id=? AND deleted_at IS NULL",
+                context.tenantId()));
         return new QuotaView(used, quotaBytes(context.tier()));
     }
 
@@ -110,15 +138,34 @@ public class ResourceService {
             find(jdbc, context, resourceId);
             requireReadable(jdbc, context, resourceId);
             UUID projectId = jdbc.query(
-                    "SELECT project_id FROM tasks WHERE tenant_id=? AND id=?",
+                    "SELECT project_id FROM tasks WHERE tenant_id=? AND id=? AND deleted_at IS NULL",
                     rs -> rs.next() ? rs.getObject(1, UUID.class) : null,
                     context.tenantId(), taskId);
             if (projectId == null) throw new NotFoundException("Task not found");
             requireProjectRole(jdbc, context, projectId, ProjectRole.MEMBER);
+            requireActiveProject(jdbc, context, projectId);
             jdbc.update("""
                     INSERT INTO task_resources(id,tenant_id,task_id,resource_id)
                     VALUES (?,?,?,?) ON CONFLICT (tenant_id,task_id,resource_id) DO NOTHING
                     """, UUID.randomUUID(), context.tenantId(), taskId, resourceId);
+        });
+    }
+
+    public void detach(UUID resourceId, UUID taskId) {
+        TenantContext context = TenantContextHolder.getRequired();
+        executor.writeWithoutResult(jdbc -> {
+            find(jdbc, context, resourceId);
+            UUID projectId = jdbc.query(
+                    "SELECT project_id FROM tasks WHERE tenant_id=? AND id=? AND deleted_at IS NULL",
+                    rs -> rs.next() ? rs.getObject(1, UUID.class) : null,
+                    context.tenantId(), taskId);
+            if (projectId == null) throw new NotFoundException("Task not found");
+            requireProjectRole(jdbc, context, projectId, ProjectRole.MEMBER);
+            requireActiveProject(jdbc, context, projectId);
+            int deleted = jdbc.update("""
+                    DELETE FROM task_resources WHERE tenant_id=? AND resource_id=? AND task_id=?
+                    """, context.tenantId(), resourceId, taskId);
+            if (deleted == 0) throw new NotFoundException("Resource attachment not found");
         });
     }
 
@@ -127,21 +174,30 @@ public class ResourceService {
         executor.writeWithoutResult(jdbc -> {
             ResourceView found = find(jdbc, context, resourceId);
             requireDeletable(jdbc, context, found);
-            requireResourceStorageKey(context, found.id(), found.storageKey());
+            requireLinkedProjectsActive(jdbc, context, resourceId);
+            if (found.kind() == ResourceKind.FILE) {
+                requireResourceStorageKey(context, found.id(), found.storageKey());
+            }
             jdbc.update("""
                     INSERT INTO audit_events(
                         id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
                     VALUES (?,?,?,?,?,?,?,jsonb_build_object('storageKey',?,'originalName',?))
                     """, UUID.randomUUID(), context.tenantId(), context.userId(), "RESOURCE_DELETED",
-                    "RESOURCE", resourceId, context.correlationId(), found.storageKey(), found.originalName());
-            jdbc.update("""
+                    "RESOURCE", resourceId, context.correlationId(),
+                    found.storageKey() == null ? "" : found.storageKey(), found.originalName());
+            if (found.kind() == ResourceKind.FILE) jdbc.update("""
                     INSERT INTO outbox_events(
                         id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,payload_json)
                     VALUES (?,?,?,?,?,?,?,jsonb_build_object('storageKey',?))
                     """, UUID.randomUUID(), context.tenantId(), context.userId(),
                     ResourceDeletionHandler.EVENT_TYPE, "RESOURCE", resourceId,
                     context.correlationId(), found.storageKey());
-            int deleted = jdbc.update("DELETE FROM resources WHERE tenant_id=? AND id=?", context.tenantId(), resourceId);
+            jdbc.update("DELETE FROM task_resources WHERE tenant_id=? AND resource_id=?",
+                    context.tenantId(), resourceId);
+            int deleted = jdbc.update("""
+                    UPDATE resources SET deleted_at=now(),updated_at=now()
+                    WHERE tenant_id=? AND id=? AND deleted_at IS NULL
+                    """, context.tenantId(), resourceId);
             if (deleted == 0) throw new NotFoundException("Resource not found");
         });
     }
@@ -151,14 +207,18 @@ public class ResourceService {
         ResourceStorageKey.Parsed parsed = ResourceStorageKey.parse(key);
         if (parsed == null || !parsed.tenantId().equals(context.tenantId())) return false;
         return executor.read(jdbc -> value(jdbc,
-                "SELECT count(*) FROM resources WHERE tenant_id=? AND id=? AND storage_key=?",
+                "SELECT count(*) FROM resources WHERE tenant_id=? AND id=? AND storage_key=? AND deleted_at IS NULL",
                 context.tenantId(), parsed.resourceId(), key) > 0);
     }
 
     private void requireAnyProjectRole(
             JdbcTemplate jdbc, TenantContext context, ProjectRole minimum) {
         List<String> roles = jdbc.query(
-                "SELECT role FROM project_memberships WHERE tenant_id=? AND user_id=?",
+                """
+                SELECT pm.role FROM project_memberships pm
+                JOIN projects p ON p.tenant_id=pm.tenant_id AND p.id=pm.project_id
+                WHERE pm.tenant_id=? AND pm.user_id=? AND p.status='ACTIVE'
+                """,
                 (rs, rowNum) -> rs.getString(1), context.tenantId(), context.userId());
         boolean allowed = roles.stream()
                 .map(ProjectRole::valueOf)
@@ -175,8 +235,11 @@ public class ResourceService {
     private ResourceView find(JdbcTemplate jdbc, TenantContext context, UUID resourceId) {
         List<ResourceView> resources = jdbc.query("""
                 SELECT r.id,r.original_name,r.storage_key,r.content_type,r.size_bytes,r.uploaded_by,r.created_at,
-                       (SELECT count(*) FROM task_resources tr WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_count
-                FROM resources r WHERE r.tenant_id=? AND r.id=?
+                       r.kind,r.link_url,
+                       (SELECT count(*) FROM task_resources tr WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_count,
+                       (SELECT coalesce(array_agg(tr.task_id),'{}'::uuid[]) FROM task_resources tr
+                        WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id) task_ids
+                FROM resources r WHERE r.tenant_id=? AND r.id=? AND r.deleted_at IS NULL
                 """, (rs, rowNum) -> resourceRow(rs), context.tenantId(), resourceId);
         if (resources.isEmpty()) throw new NotFoundException("Resource not found");
         return resources.getFirst();
@@ -185,12 +248,13 @@ public class ResourceService {
     private void requireReadable(JdbcTemplate jdbc, TenantContext context, UUID resourceId) {
         long allowed = value(jdbc, """
                 SELECT count(*) FROM resources r
-                WHERE r.tenant_id=? AND r.id=? AND (
+                WHERE r.tenant_id=? AND r.id=? AND r.deleted_at IS NULL AND (
                     r.uploaded_by=? OR EXISTS (
                         SELECT 1 FROM task_resources tr
                         JOIN tasks t ON t.tenant_id=tr.tenant_id AND t.id=tr.task_id
                         JOIN project_memberships pm ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
                         WHERE tr.tenant_id=r.tenant_id AND tr.resource_id=r.id AND pm.user_id=?
+                          AND t.deleted_at IS NULL
                     )
                 )
                 """, context.tenantId(), resourceId, context.userId(), context.userId());
@@ -219,11 +283,34 @@ public class ResourceService {
     private void requireProjectRole(
             JdbcTemplate jdbc, TenantContext context, UUID projectId, ProjectRole minimum) {
         List<String> roles = jdbc.query(
-                "SELECT role FROM project_memberships WHERE tenant_id=? AND project_id=? AND user_id=?",
+                """
+                SELECT pm.role FROM project_memberships pm
+                JOIN projects p ON p.tenant_id=pm.tenant_id AND p.id=pm.project_id
+                WHERE pm.tenant_id=? AND pm.project_id=? AND pm.user_id=? AND p.status<>'DELETED'
+                """,
                 (rs, rowNum) -> rs.getString(1), context.tenantId(), projectId, context.userId());
         if (roles.isEmpty() || roleRank(ProjectRole.valueOf(roles.getFirst())) < roleRank(minimum)) {
             throw new TenantAccessDeniedException("Insufficient project role");
         }
+    }
+
+    private void requireActiveProject(JdbcTemplate jdbc, TenantContext context, UUID projectId) {
+        long active = value(jdbc,
+                "SELECT count(*) FROM projects WHERE tenant_id=? AND id=? AND status='ACTIVE'",
+                context.tenantId(), projectId);
+        if (active == 0) throw new ConflictException("Archived projects are read-only");
+    }
+
+    private void requireLinkedProjectsActive(
+            JdbcTemplate jdbc, TenantContext context, UUID resourceId) {
+        long archived = value(jdbc, """
+                SELECT count(DISTINCT t.project_id)
+                FROM task_resources tr
+                JOIN tasks t ON t.tenant_id=tr.tenant_id AND t.id=tr.task_id
+                JOIN projects p ON p.tenant_id=t.tenant_id AND p.id=t.project_id
+                WHERE tr.tenant_id=? AND tr.resource_id=? AND p.status<>'ACTIVE'
+                """, context.tenantId(), resourceId);
+        if (archived > 0) throw new ConflictException("Archived projects are read-only");
     }
 
     private int roleRank(ProjectRole role) {
@@ -235,10 +322,26 @@ public class ResourceService {
     }
 
     private ResourceView resourceRow(java.sql.ResultSet rs) throws java.sql.SQLException {
+        UUID[] taskIds = (UUID[]) rs.getArray("task_ids").getArray();
         return new ResourceView(
                 rs.getObject("id", UUID.class), rs.getString("original_name"), rs.getString("storage_key"),
                 rs.getString("content_type"), rs.getLong("size_bytes"), rs.getObject("uploaded_by", UUID.class),
-                rs.getTimestamp("created_at").toInstant(), rs.getLong("task_count"));
+                rs.getTimestamp("created_at").toInstant(), rs.getLong("task_count"),
+                ResourceKind.valueOf(rs.getString("kind")), rs.getString("link_url"), Arrays.asList(taskIds));
+    }
+
+    private String validateLinkUrl(String value) {
+        try {
+            URI uri = URI.create(value.trim());
+            String scheme = uri.getScheme();
+            if (!uri.isAbsolute() || uri.getHost() == null
+                    || !("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))) {
+                throw new IllegalArgumentException("Resource link must use an absolute HTTP(S) URL");
+            }
+            return uri.toASCIIString();
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("Resource link must use an absolute HTTP(S) URL");
+        }
     }
 
     private long value(JdbcTemplate jdbc, String sql, Object... args) {
@@ -257,7 +360,9 @@ public class ResourceService {
 
     public record ResourceView(
             UUID id, String originalName, String storageKey, String contentType, long sizeBytes,
-            UUID uploadedBy, Instant createdAt, long taskCount) {}
+            UUID uploadedBy, Instant createdAt, long taskCount,
+            ResourceKind kind, String linkUrl, List<UUID> taskIds) {}
+    public enum ResourceKind { FILE, LINK }
     public record DownloadUrl(String url, Instant expiresAt) {}
     public record QuotaView(long usedBytes, long limitBytes) {}
 }

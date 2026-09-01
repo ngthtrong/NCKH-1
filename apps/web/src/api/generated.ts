@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/tenant-transfer": {
         parameters: {
             query?: never;
@@ -116,6 +132,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/{tenantId}/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTenantOnboarding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/members": {
         parameters: {
             query?: never;
@@ -139,10 +171,26 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        get: operations["listTenantInvitations"];
+        put?: never;
+        post: operations["createTenantInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/invitations/{invitationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         get?: never;
         put?: never;
-        post: operations["inviteExistingTenantMember"];
-        delete?: never;
+        post?: never;
+        delete: operations["revokeTenantInvitation"];
         options?: never;
         head?: never;
         patch?: never;
@@ -180,6 +228,70 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["changeTenantMemberRole"];
+        trace?: never;
+    };
+    "/members/{membershipId}/transfer-ownership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["transferTenantOwnership"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["previewTenantInvitation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/{token}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["acceptTenantInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/{token}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["rejectTenantInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/dashboard": {
@@ -232,6 +344,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["changeProjectStatus"];
+        trace?: never;
+    };
     "/projects/{projectId}/members": {
         parameters: {
             query?: never;
@@ -274,7 +404,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listProjectBoards"];
         put?: never;
         post: operations["createBoard"];
         delete?: never;
@@ -287,13 +417,15 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
             cookie?: never;
         };
         get: operations["getBoard"];
-        put?: never;
+        put: operations["updateBoard"];
         post?: never;
-        delete?: never;
+        delete: operations["deleteBoard"];
         options?: never;
         head?: never;
         patch?: never;
@@ -382,6 +514,22 @@ export interface paths {
         patch: operations["moveTask"];
         trace?: never;
     };
+    "/boards/{boardId}/tasks/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["reorderTasks"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks/{taskId}": {
         parameters: {
             query?: never;
@@ -391,7 +539,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        get?: never;
+        get: operations["getTask"];
         put?: never;
         post?: never;
         delete: operations["deleteTask"];
@@ -418,6 +566,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                commentId: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteComment"];
+        options?: never;
+        head?: never;
+        patch: operations["updateComment"];
+        trace?: never;
+    };
     "/resources": {
         parameters: {
             query?: never;
@@ -428,6 +594,22 @@ export interface paths {
         get: operations["listResources"];
         put?: never;
         post: operations["uploadResource"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createLinkResource"];
         delete?: never;
         options?: never;
         head?: never;
@@ -476,7 +658,7 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["attachResourceToTask"];
-        delete?: never;
+        delete: operations["detachResourceFromTask"];
         options?: never;
         head?: never;
         patch?: never;
@@ -569,7 +751,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listPushSubscriptions"];
         put?: never;
         post: operations["addPushSubscription"];
         delete?: never;
@@ -642,6 +824,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/{tenantId}/payments/{paymentId}/fake-complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeFakePayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/tenants": {
         parameters: {
             query?: never;
@@ -650,6 +848,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["listAdminTenants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/tenants/{tenantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAdminTenant"];
         put?: never;
         post?: never;
         delete?: never;
@@ -717,7 +931,11 @@ export interface components {
         /** @enum {string} */
         TenantRole: "OWNER" | "ADMIN" | "MEMBER";
         /** @enum {string} */
+        InvitationStatus: "PENDING" | "ACCEPTED" | "REJECTED" | "REVOKED" | "EXPIRED";
+        /** @enum {string} */
         ProjectRole: "MANAGER" | "MEMBER" | "VIEWER";
+        /** @enum {string} */
+        ProjectStatus: "ACTIVE" | "ARCHIVED" | "DELETED";
         /** @enum {string} */
         TenantTier: "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
         /** @enum {string} */
@@ -728,6 +946,8 @@ export interface components {
         PaymentStatus: "CREATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "EXPIRED";
         /** @enum {string} */
         ProvisioningStatus: "QUEUED" | "RUNNING" | "SUCCEEDED" | "RETRYABLE_FAILED" | "FAILED_ROLLED_BACK" | "ROLLBACK_FAILED";
+        /** @enum {string} */
+        PlatformRole: "SYSTEM_ADMIN";
         ApiError: {
             timestamp: components["schemas"]["Instant"];
             status: number;
@@ -744,6 +964,7 @@ export interface components {
             /** Format: email */
             email: string;
             displayName: string;
+            platformRoles: components["schemas"]["PlatformRole"][];
         };
         TenantView: {
             id: components["schemas"]["UUID"];
@@ -757,6 +978,13 @@ export interface components {
         LoginRequest: {
             /** Format: email */
             email: string;
+            /** Format: password */
+            password: string;
+        };
+        RegisterRequest: {
+            /** Format: email */
+            email: string;
+            displayName: string;
             /** Format: password */
             password: string;
         };
@@ -812,7 +1040,26 @@ export interface components {
         InviteMemberRequest: {
             /** Format: email */
             email: string;
-            role: components["schemas"]["TenantRole"];
+            /** @enum {string} */
+            role: "ADMIN" | "MEMBER";
+        };
+        InvitationView: {
+            id: components["schemas"]["UUID"];
+            tenantId: components["schemas"]["UUID"];
+            tenantSlug: string;
+            tenantName: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            role: "ADMIN" | "MEMBER";
+            status: components["schemas"]["InvitationStatus"];
+            expiresAt: components["schemas"]["Instant"];
+            respondedAt?: components["schemas"]["Instant"] | null;
+        };
+        InvitationCreatedView: {
+            invitation: components["schemas"]["InvitationView"];
+            token: string;
+            acceptancePath: string;
         };
         UpdateMemberRequest: {
             role: components["schemas"]["TenantRole"];
@@ -837,6 +1084,7 @@ export interface components {
             id: components["schemas"]["UUID"];
             name: string;
             description?: string | null;
+            status: components["schemas"]["ProjectStatus"];
             createdBy: components["schemas"]["UUID"];
             createdAt: components["schemas"]["Instant"];
             updatedAt: components["schemas"]["Instant"];
@@ -854,6 +1102,9 @@ export interface components {
             description?: string | null;
         };
         UpdateProjectRequest: components["schemas"]["CreateProjectRequest"];
+        ChangeProjectStatusRequest: {
+            status: components["schemas"]["ProjectStatus"];
+        };
         ProjectMemberView: {
             projectId: components["schemas"]["UUID"];
             userId: components["schemas"]["UUID"];
@@ -892,8 +1143,21 @@ export interface components {
             columns: components["schemas"]["ColumnView"][];
             tasks: components["schemas"]["TaskView"][];
         };
+        BoardSummaryView: {
+            id: components["schemas"]["UUID"];
+            projectId: components["schemas"]["UUID"];
+            name: string;
+            /** Format: int64 */
+            version: number;
+            createdAt: components["schemas"]["Instant"];
+        };
         CreateBoardRequest: {
             name: string;
+        };
+        UpdateBoardRequest: {
+            name: string;
+            /** Format: int64 */
+            version: number;
         };
         CreateColumnRequest: {
             name: string;
@@ -931,6 +1195,16 @@ export interface components {
             /** Format: int64 */
             version: number;
         };
+        ReorderTaskItem: {
+            taskId: components["schemas"]["UUID"];
+            targetColumnId: components["schemas"]["UUID"];
+            targetPosition: number;
+            /** Format: int64 */
+            version: number;
+        };
+        ReorderTasksRequest: {
+            items: components["schemas"]["ReorderTaskItem"][];
+        };
         CommentView: {
             id: components["schemas"]["UUID"];
             taskId: components["schemas"]["UUID"];
@@ -941,11 +1215,12 @@ export interface components {
         CreateCommentRequest: {
             body: string;
         };
+        UpdateCommentRequest: components["schemas"]["CreateCommentRequest"];
         ResourceView: {
             id: components["schemas"]["UUID"];
             originalName: string;
-            /** @description Server-generated key; clients must not use it for authorization */
-            storageKey: string;
+            /** @description Server-generated FILE key; clients must not use it for authorization */
+            storageKey?: string | null;
             contentType: string;
             /** Format: int64 */
             sizeBytes: number;
@@ -953,6 +1228,16 @@ export interface components {
             createdAt: components["schemas"]["Instant"];
             /** Format: int64 */
             taskCount: number;
+            /** @enum {string} */
+            kind: "FILE" | "LINK";
+            /** Format: uri */
+            linkUrl?: string | null;
+            taskIds: components["schemas"]["UUID"][];
+        };
+        CreateLinkResourceRequest: {
+            name: string;
+            /** Format: uri */
+            url: string;
         };
         QuotaView: {
             /** Format: int64 */
@@ -1008,6 +1293,15 @@ export interface components {
             /** Format: uri */
             returnUrl: string;
         };
+        FakePaymentWebhook: {
+            reference: string;
+            eventId: string;
+            /** @enum {string} */
+            status: "SUCCEEDED" | "FAILED";
+            /** Format: int64 */
+            amountMinor: number;
+            currency: string;
+        };
         PaymentSessionView: {
             paymentId: components["schemas"]["UUID"];
             provider: string;
@@ -1022,6 +1316,26 @@ export interface components {
             status: components["schemas"]["PaymentStatus"];
             duplicate: boolean;
         };
+        OnboardingPaymentView: {
+            id: components["schemas"]["UUID"];
+            provider: string;
+            status: components["schemas"]["PaymentStatus"];
+            /** Format: int64 */
+            amountMinor: number;
+            currency: string;
+        };
+        OnboardingProvisioningView: {
+            id: components["schemas"]["UUID"];
+            status: components["schemas"]["ProvisioningStatus"];
+            attempts: number;
+            lastErrorCode?: string | null;
+            lastErrorMessage?: string | null;
+        };
+        OnboardingView: {
+            tenant: components["schemas"]["TenantView"];
+            payment?: components["schemas"]["OnboardingPaymentView"] | null;
+            provisioning?: components["schemas"]["OnboardingProvisioningView"] | null;
+        };
         AdminTenantView: {
             id: components["schemas"]["UUID"];
             name: string;
@@ -1034,6 +1348,41 @@ export interface components {
             memberCount: number;
             createdAt: components["schemas"]["Instant"];
             lastError?: string | null;
+            paymentStatus?: components["schemas"]["PaymentStatus"] | null;
+            paymentProvider?: string | null;
+        };
+        AdminPaymentView: {
+            id: components["schemas"]["UUID"];
+            provider: string;
+            status: components["schemas"]["PaymentStatus"];
+            /** Format: int64 */
+            amountMinor: number;
+            currency: string;
+            createdAt: components["schemas"]["Instant"];
+        };
+        AdminProvisioningView: {
+            id: components["schemas"]["UUID"];
+            status: components["schemas"]["ProvisioningStatus"];
+            attempts: number;
+            lastErrorCode?: string | null;
+            lastErrorMessage?: string | null;
+            nextAttemptAt?: components["schemas"]["Instant"] | null;
+            createdAt: components["schemas"]["Instant"];
+        };
+        ProvisioningEventView: {
+            id: components["schemas"]["UUID"];
+            fromStatus?: components["schemas"]["ProvisioningStatus"] | null;
+            toStatus: components["schemas"]["ProvisioningStatus"];
+            attempt: number;
+            errorCode?: string | null;
+            message?: string | null;
+            createdAt: components["schemas"]["Instant"];
+        };
+        AdminTenantDetailView: {
+            tenant: components["schemas"]["AdminTenantView"];
+            payment?: components["schemas"]["AdminPaymentView"] | null;
+            provisioning?: components["schemas"]["AdminProvisioningView"] | null;
+            events: components["schemas"]["ProvisioningEventView"][];
         };
         AdminTenantPage: {
             items: components["schemas"]["AdminTenantView"][];
@@ -1085,6 +1434,7 @@ export interface components {
         ColumnId: components["schemas"]["UUID"];
         TaskId: components["schemas"]["UUID"];
         ResourceId: components["schemas"]["UUID"];
+        PaymentId: components["schemas"]["UUID"];
     };
     requestBodies: never;
     headers: never;
@@ -1106,6 +1456,31 @@ export interface operations {
         };
         responses: {
             /** @description Global session and available tenants */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description New global account session with no tenant membership yet */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1279,6 +1654,29 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    getTenantOnboarding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant, payment and provisioning state visible to its Owner or Admin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     listTenantMembers: {
         parameters: {
             query?: never;
@@ -1300,7 +1698,28 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
-    inviteExistingTenantMember: {
+    listTenantInvitations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant-scoped invitation status ordered newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createTenantInvitation: {
         parameters: {
             query?: never;
             header?: never;
@@ -1313,14 +1732,35 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Membership created or reactivated */
+            /** @description Pending invitation and one-time local delivery token */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MemberView"];
+                    "application/json": components["schemas"]["InvitationCreatedView"];
                 };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    revokeTenantInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitationId: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending invitation revoked idempotently */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             default: components["responses"]["Error"];
         };
@@ -1395,6 +1835,98 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    transferTenantOwnership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                membershipId: components["parameters"]["MembershipId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Target is the sole Owner and the previous Owner is now Admin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    previewTenantInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invitation preview addressed by an opaque capability token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    acceptTenantInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invitation accepted idempotently by the matching account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    rejectTenantInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invitation rejected idempotently by the matching account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationView"];
                 };
             };
             default: components["responses"]["Error"];
@@ -1505,12 +2037,39 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Project deleted */
+            /** @description Project soft-deleted with its content retained for audit */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    changeProjectStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeProjectStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Project archived or restored by a project manager */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectView"];
+                };
             };
             default: components["responses"]["Error"];
         };
@@ -1588,6 +2147,29 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    listProjectBoards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active boards visible through project membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardSummaryView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     createBoard: {
         parameters: {
             query?: never;
@@ -1634,6 +2216,54 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["BoardView"];
                 };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateBoard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBoardRequest"];
+            };
+        };
+        responses: {
+            /** @description Board renamed with optimistic version check */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteBoard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Board soft-deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             default: components["responses"]["Error"];
         };
@@ -1801,6 +2431,56 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    reorderTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderTasksRequest"];
+            };
+        };
+        responses: {
+            /** @description Task positions updated atomically; any stale version rolls back the batch */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    getTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active task visible through project membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     deleteTask: {
         parameters: {
             query?: never;
@@ -1812,7 +2492,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Task deleted */
+            /** @description Task and its one-level subtasks soft-deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -1899,6 +2579,54 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    deleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                commentId: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comment soft-deleted by its author or a project manager */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                commentId: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCommentRequest"];
+            };
+        };
+        responses: {
+            /** @description Comment updated by its author or moderated by a project manager */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     listResources: {
         parameters: {
             query?: never;
@@ -1937,6 +2665,31 @@ export interface operations {
         };
         responses: {
             /** @description Resource stored in tenant namespace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createLinkResource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLinkResourceRequest"];
+            };
+        };
+        responses: {
+            /** @description Validated HTTP(S) link created in the tenant resource library */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2014,6 +2767,28 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    detachResourceFromTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resourceId: components["parameters"]["ResourceId"];
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resource detached from task */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     deleteResource: {
         parameters: {
             query?: never;
@@ -2025,7 +2800,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Resource deleted */
+            /** @description Resource metadata soft-deleted; file cleanup is handled by outbox */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2144,6 +2919,27 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    listPushSubscriptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current user's push subscriptions in this tenant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushSubscriptionView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     addPushSubscription: {
         parameters: {
             query?: never;
@@ -2253,13 +3049,35 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
+                "application/json": components["schemas"]["FakePaymentWebhook"];
             };
         };
         responses: {
             /** @description Verified and idempotently processed callback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentResultView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    completeFakePayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+                paymentId: components["parameters"]["PaymentId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Local fake provider emits a signed, idempotent successful callback */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2277,6 +3095,8 @@ export interface operations {
                 page?: number;
                 size?: number;
                 search?: string;
+                status?: components["schemas"]["TenantStatus"];
+                placement?: components["schemas"]["TenantPlacement"];
             };
             header?: never;
             path?: never;
@@ -2291,6 +3111,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminTenantPage"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    getAdminTenant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Control-plane tenant detail, latest payment and provisioning transition history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTenantDetailView"];
                 };
             };
             default: components["responses"]["Error"];

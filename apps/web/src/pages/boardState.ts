@@ -53,7 +53,7 @@ export function moveBoardTask(board: Board, taskId: UUID, overId: UUID): MoveRes
     .filter((item) => item.id !== taskId)
     .map((item, index) => ({ ...item, position: index }));
   const targetTasks = [...targetColumn.tasks];
-  targetTasks.splice(targetIndex, 0, task);
+  targetTasks.splice(targetIndex, 0, { ...task, columnId: targetColumn.id });
 
   return {
     board: {

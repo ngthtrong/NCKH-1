@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { authApi, tenantsApi } from '../api/endpoints';
 import { ApiError, setApiAccessToken } from '../api/client';
-import type { LoginRequest, Session, TenantSummary } from '../api/types';
+import type { LoginRequest, RegisterRequest, Session, TenantSummary } from '../api/types';
 
 type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
 
@@ -18,6 +18,7 @@ interface AuthContextValue {
   session: Session | null;
   tenants: TenantSummary[];
   login: (credentials: LoginRequest) => Promise<TenantSummary[]>;
+  register: (details: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   selectTenant: (tenant: TenantSummary) => Promise<void>;
   exchangeTenantCode: (code: string) => Promise<void>;
@@ -79,6 +80,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     [commitSession],
   );
 
+  const register = useCallback(
+    async (details: RegisterRequest) => {
+      const response = await authApi.register(details);
+      const { tenants: availableTenants, ...nextSession } = response;
+      commitSession(nextSession);
+      setTenants(availableTenants);
+    },
+    [commitSession],
+  );
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
@@ -132,12 +143,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
       session,
       tenants,
       login,
+      register,
       logout,
       selectTenant,
       exchangeTenantCode,
       reloadTenants,
     }),
-    [status, session, tenants, login, logout, selectTenant, exchangeTenantCode, reloadTenants],
+    [status, session, tenants, login, register, logout, selectTenant, exchangeTenantCode, reloadTenants],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

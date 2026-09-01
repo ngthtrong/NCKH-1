@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     ResponseEntity<ApiError> conflict(ConflictException exception, HttpServletRequest request) {
-        return error(HttpStatus.CONFLICT, "CONFLICT", exception.getMessage(), request, Map.of());
+        return error(HttpStatus.CONFLICT, "CONFLICT", exception.getMessage(), request, exception.fieldErrors());
     }
 
     @ExceptionHandler({TenantAccessDeniedException.class, MissingTenantContextException.class, AccessDeniedException.class})

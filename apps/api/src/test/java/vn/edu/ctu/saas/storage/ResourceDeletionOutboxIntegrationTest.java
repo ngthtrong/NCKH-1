@@ -150,7 +150,8 @@ class ResourceDeletionOutboxIntegrationTest {
     void deletionCommitsMetadataAuditAndCleanupEventAtomicallyWithoutCallingStorageInline() {
         service.delete(RESOURCE_A);
 
-        assertThat(count("SELECT count(*) FROM resources WHERE id=?", RESOURCE_A)).isZero();
+        assertThat(count(
+                "SELECT count(*) FROM resources WHERE id=? AND deleted_at IS NOT NULL", RESOURCE_A)).isOne();
         assertThat(count("SELECT count(*) FROM audit_events WHERE tenant_id=? AND aggregate_id=?", TENANT_A, RESOURCE_A))
                 .isEqualTo(1);
         assertThat(count("""

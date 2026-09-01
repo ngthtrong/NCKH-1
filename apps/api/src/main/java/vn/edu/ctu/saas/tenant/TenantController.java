@@ -21,9 +21,13 @@ import vn.edu.ctu.saas.auth.AuthDtos.TenantView;
 @RequestMapping("/api/v1")
 public class TenantController {
     private final TenantManagementService tenantService;
+    private final TenantInvitationService invitationService;
 
-    public TenantController(TenantManagementService tenantService) {
+    public TenantController(
+            TenantManagementService tenantService,
+            TenantInvitationService invitationService) {
         this.tenantService = tenantService;
+        this.invitationService = invitationService;
     }
 
     @PostMapping("/tenants")
@@ -50,10 +54,20 @@ public class TenantController {
     }
 
     @PostMapping("/members/invitations")
-    public TenantManagementService.MemberView invite(
+    public TenantInvitationService.InvitationCreatedView invite(
             @Valid @RequestBody InviteMemberRequest request) {
-        return tenantService.inviteExistingUser(
+        return invitationService.create(
                 TenantContextHolder.getRequired(), request.email(), request.role());
+    }
+
+    @GetMapping("/members/invitations")
+    public List<TenantInvitationService.InvitationView> invitations() {
+        return invitationService.list(TenantContextHolder.getRequired());
+    }
+
+    @DeleteMapping("/members/invitations/{invitationId}")
+    public void revokeInvitation(@PathVariable UUID invitationId) {
+        invitationService.revoke(TenantContextHolder.getRequired(), invitationId);
     }
 
     @PatchMapping("/members/{membershipId}/role")
@@ -66,6 +80,11 @@ public class TenantController {
     @DeleteMapping("/members/{membershipId}")
     public void revoke(@PathVariable UUID membershipId) {
         tenantService.revoke(TenantContextHolder.getRequired(), membershipId);
+    }
+
+    @PostMapping("/members/{membershipId}/transfer-ownership")
+    public TenantManagementService.MemberView transferOwnership(@PathVariable UUID membershipId) {
+        return tenantService.transferOwnership(TenantContextHolder.getRequired(), membershipId);
     }
 
     public record CreateTenantRequest(

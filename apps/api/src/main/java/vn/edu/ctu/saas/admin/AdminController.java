@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.edu.ctu.saas.tenant.TenantPlacement;
+import vn.edu.ctu.saas.tenant.TenantStatus;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -27,8 +29,15 @@ public class AdminController {
     public AdminService.PageView<AdminService.AdminTenantView> tenants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "") String search) {
-        return service.tenants(page, size, search);
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(required = false) TenantStatus status,
+            @RequestParam(required = false) TenantPlacement placement) {
+        return service.tenants(page, size, search, status, placement);
+    }
+
+    @GetMapping("/tenants/{tenantId}")
+    public AdminService.AdminTenantDetailView tenant(@PathVariable UUID tenantId) {
+        return service.tenant(tenantId);
     }
 
     @PostMapping("/tenants/{tenantId}/provisioning/retry")

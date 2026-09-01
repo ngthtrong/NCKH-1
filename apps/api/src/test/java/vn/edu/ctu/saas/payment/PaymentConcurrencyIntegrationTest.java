@@ -161,7 +161,8 @@ class PaymentConcurrencyIntegrationTest {
                 "http://payment-concurrency.localhost:8080/payment"));
         String body = "signed-concurrent-webhook";
         when(provider.verifyWebhook(body, java.util.Map.of())).thenReturn(
-                new PaymentProvider.VerifiedPayment(session.reference(), true, "concurrent-event-001"));
+                new PaymentProvider.VerifiedPayment(
+                        session.reference(), true, "concurrent-event-001", 100_000, "VND"));
 
         CountDownLatch ready = new CountDownLatch(2);
         CountDownLatch start = new CountDownLatch(1);

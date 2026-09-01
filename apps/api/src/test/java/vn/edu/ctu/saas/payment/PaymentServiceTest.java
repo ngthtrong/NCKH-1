@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import tools.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.control.PaymentStatus;
 import vn.edu.ctu.saas.control.PaymentTransactionEntity;
@@ -30,6 +31,7 @@ import vn.edu.ctu.saas.security.TokenHasher;
 import vn.edu.ctu.saas.support.TestAppProperties;
 import vn.edu.ctu.saas.tenant.TenantRole;
 import vn.edu.ctu.saas.tenant.TenantStatus;
+import vn.edu.ctu.saas.tenant.TenantAccessDeniedException;
 
 class PaymentServiceTest {
     private PaymentProvider provider;
@@ -96,7 +98,8 @@ class PaymentServiceTest {
         tenant.setId(payment.getTenantId());
         tenant.setStatus(TenantStatus.PENDING_PAYMENT);
         when(provider.verifyWebhook(body, Map.of())).thenReturn(
-                new PaymentProvider.VerifiedPayment(payment.getProviderReference(), true, "event-001"));
+                new PaymentProvider.VerifiedPayment(
+                        payment.getProviderReference(), true, "event-001", 100_000, "VND"));
         when(payments.findByProviderReference(payment.getProviderReference())).thenReturn(Optional.of(payment));
         when(events.findByProviderAndProviderEventId("fake", "event-001")).thenReturn(Optional.empty());
         when(tenants.findById(payment.getTenantId())).thenReturn(Optional.of(tenant));
@@ -120,7 +123,8 @@ class PaymentServiceTest {
         PaymentWebhookEventEntity prior = new PaymentWebhookEventEntity();
         prior.setPayloadSha256(hasher.sha256(body));
         when(provider.verifyWebhook(body, Map.of())).thenReturn(
-                new PaymentProvider.VerifiedPayment(payment.getProviderReference(), true, "event-duplicate"));
+                new PaymentProvider.VerifiedPayment(
+                        payment.getProviderReference(), true, "event-duplicate", 100_000, "VND"));
         when(payments.findByProviderReference(payment.getProviderReference())).thenReturn(Optional.of(payment));
         when(events.findByProviderAndProviderEventId("fake", "event-duplicate")).thenReturn(Optional.of(prior));
 
@@ -135,7 +139,8 @@ class PaymentServiceTest {
         PaymentWebhookEventEntity prior = new PaymentWebhookEventEntity();
         prior.setPayloadSha256(hasher.sha256("original"));
         when(provider.verifyWebhook("changed", Map.of())).thenReturn(
-                new PaymentProvider.VerifiedPayment(payment.getProviderReference(), true, "event-reused"));
+                new PaymentProvider.VerifiedPayment(
+                        payment.getProviderReference(), true, "event-reused", 100_000, "VND"));
         when(payments.findByProviderReference(payment.getProviderReference())).thenReturn(Optional.of(payment));
         when(events.findByProviderAndProviderEventId("fake", "event-reused")).thenReturn(Optional.of(prior));
 
@@ -143,6 +148,84 @@ class PaymentServiceTest {
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("different payload");
         verify(provisioning, never()).enqueue(any(), any());
+    }
+
+    @Test
+    void rejectsWebhookAmountMismatchBeforeChangingState() {
+        String body = "signed-wrong-amount";
+        PaymentTransactionEntity payment = payment(UUID.randomUUID(), UUID.randomUUID(), PaymentStatus.PENDING);
+        when(provider.verifyWebhook(body, Map.of())).thenReturn(
+                new PaymentProvider.VerifiedPayment(
+                        payment.getProviderReference(), true, "event-wrong-amount", 1, "VND"));
+        when(payments.findByProviderReference(payment.getProviderReference())).thenReturn(Optional.of(payment));
+
+        assertThatThrownBy(() -> service.handleWebhook(body, Map.of()))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("amount or currency");
+
+        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.PENDING);
+        verify(provisioning, never()).enqueue(any(), any());
+    }
+
+    @Test
+    void localCheckoutUsesSignedWebhookPathAndQueuesProvisioning() {
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
+        ownerMembership(userId, tenantId);
+        PaymentTransactionEntity payment = payment(paymentId, tenantId, PaymentStatus.PENDING);
+        TenantEntity tenant = new TenantEntity();
+        tenant.setId(tenantId);
+        tenant.setStatus(TenantStatus.PENDING_PAYMENT);
+        provider = new FakePaymentProvider(JsonMapper.builder().build(), TestAppProperties.create());
+        service = new PaymentService(
+                provider, payments, events, tenants, memberships, provisioning,
+                idempotencyLock, hasher, TestAppProperties.create());
+        when(payments.findById(paymentId)).thenReturn(Optional.of(payment));
+        when(payments.findByProviderReference(payment.getProviderReference())).thenReturn(Optional.of(payment));
+        when(events.findByProviderAndProviderEventId(
+                "fake", "local-checkout-" + payment.getProviderReference())).thenReturn(Optional.empty());
+        when(tenants.findById(tenantId)).thenReturn(Optional.of(tenant));
+
+        PaymentService.PaymentResultView result = service.completeFakeCheckout(userId, tenantId, paymentId);
+
+        assertThat(result.status()).isEqualTo(PaymentStatus.SUCCEEDED);
+        assertThat(tenant.getStatus()).isEqualTo(TenantStatus.PROVISIONING);
+        verify(provisioning).enqueue(tenantId, "payment:" + paymentId);
+    }
+
+    @Test
+    void localCheckoutRequiresTenantOwner() {
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        TenantMembershipEntity membership = new TenantMembershipEntity();
+        membership.setTenantId(tenantId);
+        membership.setUserId(userId);
+        membership.setRole(TenantRole.ADMIN);
+        membership.setActive(true);
+        when(memberships.findByTenantIdAndUserId(tenantId, userId)).thenReturn(Optional.of(membership));
+
+        assertThatThrownBy(() -> service.completeFakeCheckout(userId, tenantId, UUID.randomUUID()))
+                .isInstanceOf(TenantAccessDeniedException.class)
+                .hasMessageContaining("tenant owner");
+
+        verify(payments, never()).findById(any());
+    }
+
+    @Test
+    void localCheckoutIsUnavailableForARealProviderAdapter() {
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        UUID paymentId = UUID.randomUUID();
+        ownerMembership(userId, tenantId);
+        when(payments.findById(paymentId))
+                .thenReturn(Optional.of(payment(paymentId, tenantId, PaymentStatus.PENDING)));
+
+        assertThatThrownBy(() -> service.completeFakeCheckout(userId, tenantId, paymentId))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("only available with the fake payment provider");
+
+        verify(provider, never()).verifyWebhook(any(), any());
     }
 
     private void ownerMembership(UUID userId, UUID tenantId) {

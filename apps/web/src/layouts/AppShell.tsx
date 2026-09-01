@@ -2,6 +2,7 @@ import {
   AdminPanelSettingsOutlined,
   DashboardOutlined,
   FolderOutlined,
+  WorkspacesOutlined,
   GroupsOutlined,
   KeyboardArrowDown,
   Logout,
@@ -40,6 +41,7 @@ const drawerWidth = 252;
 
 const primaryNavigation = [
   { label: 'Tổng quan', to: '/dashboard', icon: <DashboardOutlined /> },
+  { label: 'Dự án', to: '/projects', icon: <WorkspacesOutlined /> },
   { label: 'Bảng công việc', to: '/kanban', icon: <SpaceDashboardOutlined /> },
   { label: 'Thành viên', to: '/members', icon: <GroupsOutlined /> },
   { label: 'Tài nguyên', to: '/resources', icon: <FolderOutlined /> },
@@ -63,9 +65,8 @@ export function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const tenant = session?.activeTenant;
-  const canAdminister =
-    session?.user.platformRoles?.includes('PLATFORM_ADMIN') ||
-    (tenant && ['OWNER', 'ADMIN'].includes(tenant.role));
+  const canAdministerTenant = tenant && ['OWNER', 'ADMIN'].includes(tenant.role);
+  const canAdministerSystem = session?.user.platformRoles.includes('SYSTEM_ADMIN');
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: notificationsApi.list,
@@ -139,21 +140,31 @@ export function AppShell() {
           <ListItemText primary="Thông báo" />
         </ListItemButton>
       </List>
-      {canAdminister && (
+      {(canAdministerTenant || canAdministerSystem) && (
         <>
           <Typography className="nav-label">Quản trị</Typography>
           <List className="app-nav">
-            <ListItemButton
-              component={NavLink}
-              to="/admin"
-              onClick={closeDrawer}
-              className={location.pathname.startsWith('/admin') ? 'active' : ''}
-            >
-              <ListItemIcon>
-                <AdminPanelSettingsOutlined />
-              </ListItemIcon>
-              <ListItemText primary="Quản trị tenant" />
-            </ListItemButton>
+            {canAdministerTenant && tenant && (
+              <ListItemButton
+                component={NavLink}
+                to={`/onboarding?tenant=${tenant.id}`}
+                onClick={closeDrawer}
+              >
+                <ListItemIcon><AdminPanelSettingsOutlined /></ListItemIcon>
+                <ListItemText primary="Trạng thái workspace" />
+              </ListItemButton>
+            )}
+            {canAdministerSystem && (
+              <ListItemButton
+                component={NavLink}
+                to="/admin"
+                onClick={closeDrawer}
+                className={location.pathname.startsWith('/admin') ? 'active' : ''}
+              >
+                <ListItemIcon><AdminPanelSettingsOutlined /></ListItemIcon>
+                <ListItemText primary="System Admin" />
+              </ListItemButton>
+            )}
           </List>
         </>
       )}

@@ -15,6 +15,7 @@ const board: Board = {
       tasks: [
         {
           id: 'task-1',
+          columnId: 'todo',
           title: 'First',
           priority: 'MEDIUM',
           position: 0,
@@ -25,6 +26,7 @@ const board: Board = {
         },
         {
           id: 'task-2',
+          columnId: 'todo',
           title: 'Second',
           priority: 'LOW',
           position: 1,

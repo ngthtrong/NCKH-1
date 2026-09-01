@@ -44,6 +44,13 @@ public class ProjectController {
         return service.updateProject(projectId, request);
     }
 
+    @PatchMapping("/projects/{projectId}/status")
+    public ProjectView changeProjectStatus(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody ChangeProjectStatusRequest request) {
+        return service.changeProjectStatus(projectId, request);
+    }
+
     @DeleteMapping("/projects/{projectId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProject(@PathVariable UUID projectId) { service.deleteProject(projectId); }
@@ -73,8 +80,22 @@ public class ProjectController {
         return service.createBoard(projectId, request);
     }
 
+    @GetMapping("/projects/{projectId}/boards")
+    public List<BoardSummaryView> projectBoards(@PathVariable UUID projectId) {
+        return service.projectBoards(projectId);
+    }
+
     @GetMapping("/boards/{boardId}")
     public BoardView board(@PathVariable UUID boardId) { return service.getBoard(boardId); }
+
+    @PutMapping("/boards/{boardId}")
+    public BoardView updateBoard(@PathVariable UUID boardId, @Valid @RequestBody UpdateBoardRequest request) {
+        return service.updateBoard(boardId, request);
+    }
+
+    @DeleteMapping("/boards/{boardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBoard(@PathVariable UUID boardId) { service.deleteBoard(boardId); }
 
     @PostMapping("/boards/{boardId}/columns")
     @ResponseStatus(HttpStatus.CREATED)
@@ -126,6 +147,16 @@ public class ProjectController {
         return service.moveTask(boardId, taskId, request);
     }
 
+    @PutMapping("/boards/{boardId}/tasks/order")
+    public BoardView reorderTasks(
+            @PathVariable UUID boardId,
+            @Valid @RequestBody ReorderTasksRequest request) {
+        return service.reorderTasks(boardId, request);
+    }
+
+    @GetMapping("/tasks/{taskId}")
+    public TaskView task(@PathVariable UUID taskId) { return service.getTask(taskId); }
+
     @DeleteMapping("/tasks/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable UUID taskId) { service.deleteTask(taskId); }
@@ -138,4 +169,15 @@ public class ProjectController {
     public CommentView addComment(@PathVariable UUID taskId, @Valid @RequestBody CreateCommentRequest request) {
         return service.addComment(taskId, request);
     }
+
+    @PatchMapping("/comments/{commentId}")
+    public CommentView updateComment(
+            @PathVariable UUID commentId,
+            @Valid @RequestBody UpdateCommentRequest request) {
+        return service.updateComment(commentId, request);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable UUID commentId) { service.deleteComment(commentId); }
 }

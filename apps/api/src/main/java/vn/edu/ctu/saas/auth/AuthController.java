@@ -66,6 +66,11 @@ public class AuthController {
         return authService.login(request);
     }
 
+    @PostMapping("/register")
+    public LoginResponse register(@Valid @RequestBody RegisterRequest request) {
+        return authService.register(request);
+    }
+
     @PostMapping("/tenant-transfer")
     public TenantTransferResponse tenantTransfer(
             @AuthenticationPrincipal Jwt jwt,
@@ -119,7 +124,9 @@ public class AuthController {
     public MeResponse me(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());
         UserAccountEntity user = userRepository.findById(userId).orElseThrow();
-        UserView userView = new UserView(user.getId(), user.getEmail(), user.getDisplayName());
+        UserView userView = new UserView(
+                user.getId(), user.getEmail(), user.getDisplayName(),
+                user.isSystemAdmin() ? java.util.List.of("SYSTEM_ADMIN") : java.util.List.of());
         TenantContext context = TenantContextHolder.getNullable();
         if (context == null) return new MeResponse(userView, null, false);
         TenantEntity tenant = tenantRepository.findById(context.tenantId()).orElseThrow();

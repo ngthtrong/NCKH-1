@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 
@@ -161,6 +162,12 @@ export function LoginPage() {
           <Typography variant="caption" color="text.secondary" display="block" mt={3}>
             Access token chỉ được giữ trong bộ nhớ của tab. Phiên làm việc được khôi phục bằng
             cookie bảo mật.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mt={2}>
+            Chưa có tài khoản?{' '}
+            <Link component={RouterLink} to="/register" underline="hover">
+              Đăng ký và tạo workspace
+            </Link>
           </Typography>
         </Paper>
       </Box>
