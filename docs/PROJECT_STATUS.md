@@ -1,8 +1,11 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-09-01 (UTC)
+**Cập nhật:** 2026-09-01 14:33 (UTC)
 **Nhánh đang làm:** `main`
-**Commit nền trước giai đoạn P-App hiện tại:** `8309f03` (`p2 2`)
+**Checkpoint mã nguồn P-App:** `c226676` (`p-app`)
+**Trạng thái Git khi bắt đầu cập nhật tài liệu:** `main`, `origin/main` và `origin/HEAD` cùng trỏ tới
+`c226676`; working tree sạch. Sau lần cập nhật này, thay đổi chưa commit dự kiến chỉ là
+`docs/PROJECT_STATUS.md`; phiên sau vẫn phải tự kiểm tra lại.
 **Trạng thái:** P0 và các ưu tiên hardening P1 đã hoàn tất local trong phạm vi biên bản. P2 đã có
 protocol/evidence gate, guarded Project CRUD 3 ứng viên × Pool/Silo và guard-omission matrix local;
 matrix ghi 6 leak cho explicit/Hibernate trên Pool, RLS chặn 3/3 đường omission, nhưng chưa có hồ sơ
@@ -11,7 +14,9 @@ loại checksum-backed, raw measurement, score hoặc ADR được chấp nhận
 luồng nghiệp vụ cơ bản. Checklist P-App đã khóa; APP-01 đến APP-06 đã hoàn tất trên stack local và full
 regression giữ nguyên các baseline tối thiểu. Triển khai VPS, tích hợp provider thật, spike/đo chính
 thức, kiểm thử nghiệm thu diện rộng, thực nghiệm và đánh giá người dùng vẫn tạm dừng cho đến quyết định
-tiếp theo của nhóm.
+tiếp theo của nhóm. Tại thời điểm ghi checkpoint, Compose local có chín service dài hạn đang chạy;
+API/web/PostgreSQL/Mailpit healthy và `http://accounts.localhost:8080` trả HTTP `200`. Đây chỉ là trạng
+thái runtime tức thời, không được giả định còn nguyên ở phiên sau.
 
 Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. Nó phân biệt rõ mã đã hiện thực, kiểm tra đã chạy, phần mới chỉ là khung và phần bắt buộc phải chờ dữ liệu/hạ tầng thật.
 
@@ -23,8 +28,10 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 - `draft.md` không còn tồn tại tại checkpoint; nếu người dùng tạo lại file này thì không được ghi đè khi chưa kiểm tra nội dung.
 - Phần P1 local đã được commit tại `71b8092`; protocol/evidence gate, isolation harness và hai biên bản
   chuẩn bị P2 đầu đã được commit tại `2b430b7`. Guard-omission matrix, evidence elimination gate và biên
-  bản P2 lượt 3 đã được commit tại `8309f03`. `main` và `origin/main` cùng trỏ tới `8309f03` tại thời
-  điểm bắt đầu P-App; phiên sau vẫn phải đọc `git status --short` vì trạng thái có thể đã thay đổi.
+  bản P2 lượt 3 đã được commit tại `8309f03`. Toàn bộ APP-01 đến APP-06, OpenAPI, test bổ sung và biên
+  bản P-App đã được commit tại `c226676`. Khi bắt đầu cập nhật checkpoint này, `main`, `origin/main` và
+  `origin/HEAD` cùng trỏ tới commit đó, working tree sạch; phiên sau vẫn phải đọc `git status --short`
+  vì trạng thái có thể đã thay đổi.
 - Không tạo số đo, DOI, kết quả khảo sát, SUS hoặc kết quả thực nghiệm giả. Mục có nhãn `UNVERIFIED` phải tiếp tục giữ nhãn đến khi kiểm chứng nguồn thật.
 - Không tuyên bố Cổng B/E đạt chỉ từ compile, unit test hoặc test dùng fixture.
 - **Quyết định thứ tự ngày 2026-09-01:** tạm dừng mở rộng P2 và chưa triển khai pilot/thực nghiệm chính;
@@ -40,10 +47,10 @@ Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. N�
 | Giai đoạn | Trạng thái tại checkpoint | Phần còn thiếu để qua cổng |
 |---|---|---|
 | A — Repo và giao thức nghiên cứu | **Khung chính đã có; chưa phải ưu tiên hiện tại** | Kiểm chứng trực tuyến toàn bộ nguồn/DOI, hoàn tất sàng lọc và bảo đảm mọi yêu cầu đều truy vết được |
-| B — Spike và ADR | **Một phần; tạm dừng sau phần chuẩn bị local** | Sau mốc app: review/khóa hồ sơ loại hai ứng viên Pool đã leak local; đo ứng viên còn lại; chạy spike storage/payment; chấm điểm và chốt ADR 0003–0005 |
+| B — Spike và ADR | **Một phần; vẫn tạm dừng sau phần chuẩn bị local** | Chỉ khi nhóm quyết định mở lại: review/khóa hồ sơ loại hai ứng viên Pool đã leak local; đo ứng viên còn lại; chạy spike storage/payment; chấm điểm và chốt ADR 0003–0005 |
 | C — Kiến trúc và hợp đồng | **Khung chính đã có** | Review tính nhất quán sau khi ADR B được chốt; bổ sung chi tiết nếu spike làm thay đổi quyết định |
-| D — Lát cắt dọc | **APP-01 đến APP-06 hoàn tất local** | Review working tree và biên bản P-App; chỉ bổ sung lỗi/hardening phát hiện trong review, không mở rộng sang provider/VPS/P2 khi chưa có quyết định mới |
-| E — Triển khai và thực nghiệm | **Tạm hoãn; local Compose/Testcontainers/k6 smoke đã xác minh, chưa có số đo chính** | Sau mốc app: VPS/domain/TLS, provider thật, pilot, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
+| D — Lát cắt dọc | **APP-01 đến APP-06 hoàn tất local, đã commit tại `c226676`** | Chỉ sửa lỗi/hardening phát hiện trong review và giữ regression; không tự mở rộng sang provider/VPS/P2 |
+| E — Triển khai và thực nghiệm | **Tạm hoãn; local Compose/Testcontainers/k6 smoke đã xác minh, chưa có số đo chính** | Chỉ khi nhóm quyết định mở lại: VPS/domain/TLS, provider thật, pilot, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
 | F — Tổng hợp | **Chưa thực hiện** | Chỉ bắt đầu sau khi có bằng chứng A–E; hoàn thiện báo cáo, bản tin, demo và video |
 
 **Kết luận cổng:** chưa đánh dấu Cổng A, B hoặc E là đạt. **Mốc hoàn thiện ứng dụng local đã đạt** theo
@@ -158,7 +165,7 @@ Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại 
 | Infra/analyzer validation | Compose interpolation pass; 8/8 Python test (3 analyzer nền + 5 evidence gate) và JSON/Python/static checks pass |
 | P2 protocol/evidence gate | 3 plan isolation/storage/payment hợp lệ; 8/8 Python test tổng cộng pass; payment giữ 5 trọng số và credential ở `PENDING_DATA`; chưa có measured result/elimination artifact |
 | P2 Project CRUD isolation harness | Module độc lập 1 suite, 6/6 pass trên PostgreSQL 18.6; 18 guard-omission observation gồm 6 candidate leak explicit/Hibernate Pool, 3 RLS Pool protected và 9 Silo boundary protected; chưa có số đo |
-| Docker Compose runtime | `scripts/dev-up.sh` rebuild/restart exit 0 trên volume hiện hữu; API healthy/readiness pass; worker log mới sạch WARN/ERROR qua nhiều vòng outbox poll |
+| Docker Compose runtime | `scripts/dev-up.sh` rebuild/restart exit 0 trên volume hiện hữu; API healthy/readiness pass; worker log mới sạch WARN/ERROR qua nhiều vòng outbox poll. Lúc 14:33 UTC ngày 2026-09-01, chín service dài hạn đều đang chạy, API/web/PostgreSQL/Mailpit healthy và host accounts trả HTTP `200` |
 | Compose MinIO outage | Pool và Silo cùng đạt resource cleanup dead letter ở `attempts=5`; requeue từng tenant dọn đúng object, không đổi dead letter/object tenant còn lại; audit có mặt và MinIO được khởi động lại |
 | Flyway/upgrade | Clean test và Compose xác nhận control V1–V5, application V1–V7; Pool/Silo placement active được worker đưa đến `schema_version=7` |
 | Role/RLS | 14/14 bảng Pool bật RLS + FORCE RLS; application roles không có `BYPASSRLS` |
@@ -273,15 +280,16 @@ ma trận nghiệm thu cuối.
 
 ### P-App — Hoàn thiện ứng dụng và luồng nghiệp vụ cơ bản — hoàn tất local
 
-Thực hiện theo lát cắt dọc, hoàn tất cả API/OpenAPI/frontend và kiểm tra hồi quy tối thiểu cho từng luồng
-trước khi chuyển sang luồng kế tiếp:
+Đã thực hiện theo lát cắt dọc, hoàn tất cả API/OpenAPI/frontend và kiểm tra hồi quy tối thiểu cho từng
+luồng trước khi chuyển sang luồng kế tiếp:
 
 1. **Đã làm:** khóa [checklist P-App](app/P-APP-CHECKLIST.md) từ SRS và danh sách khoảng trống ở mục 5;
    phân biệt rõ tính năng cốt lõi, provider thật làm sau và hạng mục ngoài phạm vi.
 2. **Đã làm APP-01 local:** hoàn thiện đăng ký/đăng nhập và onboarding bằng fake payment đến khi tenant
    được provision và người dùng vào đúng subdomain; regression Pool/Silo baseline vẫn pass.
 3. **Đã làm APP-02 local:** invitation accept/reject, quản trị tenant membership và ownership transfer;
-   email delivery thật cùng tier/suspend lifecycle để APP-06 hoặc giai đoạn có provider.
+   email delivery thật cùng tier/suspend lifecycle không thuộc phạm vi local đã khóa và tiếp tục chờ
+   giai đoạn có provider/hạ tầng tương ứng.
 4. **Đã làm APP-03/APP-04 local:** project lifecycle/membership, multi-board, task detail/assignee/due
    date/conflict, subtask một cấp và comment lifecycle đã nối backend/OpenAPI/web.
 5. **Đã làm APP-05 local:** file/link resource gắn nhiều task, soft-delete, notification preference và
@@ -294,19 +302,21 @@ trước khi chuyển sang luồng kế tiếp:
 8. Mốc app local đã hoàn tất theo [checklist khóa](app/P-APP-CHECKLIST.md). Mọi quyết định mở lại P2,
    provider/VPS, nghiệm thu diện rộng hoặc thực nghiệm cần được nhóm đưa ra riêng.
 
-### P2 — Hoàn tất spike và chốt Cổng B — tạm hoãn đến sau P-App
+### P2 — Hoàn tất spike và chốt Cổng B — vẫn tạm hoãn, chờ quyết định mở lại
 
 1. **Đã chuẩn bị protocol/evidence gate:** khóa candidate, case, artifact, fingerprint, replicate và
    trọng số isolation/storage; payment giữ credential/trọng số là `PENDING_DATA`.
 2. **Đã dựng guarded contract local:** cùng `Project CRUD` cho ba phương án isolation trên Pool và Silo,
    pass 6/6 trong module độc lập.
 3. **Đã chạy guard omission local:** native/bulk/background ghi 6 leak cho explicit/Hibernate Pool và
-   RLS chặn 3/3; tiếp theo review rồi khóa hồ sơ loại checksum-backed, không đổi leak thành `PASS`.
-4. **Chưa chạy trong giai đoạn ưu tiên app:** đo latency, RAM và connection cho ứng viên còn lại bằng
-   cùng seed/workload; lưu raw artifact + manifest.
-5. **Chưa chạy trong giai đoạn ưu tiên app:** storage và payment spike bằng credential thật.
-6. Sau khi P-App hoàn tất, chấm theo trọng số trong kế hoạch, cập nhật ADR 0003–0005 từ Proposed sang
-   Accepted kèm bằng chứng đã được nhóm review.
+   RLS chặn 3/3. Review và khóa hồ sơ loại checksum-backed chỉ được tiếp tục sau quyết định mở lại;
+   không đổi leak thành `PASS`.
+4. **Chưa chạy và vẫn tạm dừng:** đo latency, RAM và connection cho ứng viên còn lại bằng cùng
+   seed/workload; lưu raw artifact + manifest.
+5. **Chưa chạy và vẫn tạm dừng:** storage và payment spike bằng credential thật.
+6. Nếu nhóm quyết định mở lại P2, chỉ chấm theo trọng số và cập nhật ADR 0003–0005 từ `Proposed` sau khi
+   có đủ artifact hợp lệ và bằng chứng đã được nhóm review. Việc P-App hoàn tất không tự động đáp ứng
+   điều kiện này.
 
 ### P3 — Triển khai, pilot, kiểm thử nghiệm thu, thực nghiệm và tổng hợp — tạm hoãn
 
@@ -319,17 +329,20 @@ trước khi chuyển sang luồng kế tiếp:
 6. QA dữ liệu, sinh lại bảng/biểu đồ, rồi mới viết kết luận cho từng câu hỏi nghiên cứu.
 7. Nhóm nghiên cứu thực hiện user study/SUS; repo chỉ nhận dữ liệu đã ẩn danh hoặc tổng hợp.
 
-## 7. Lệnh phục hồi và kiểm tra trong giai đoạn P-App
+## 7. Lệnh phục hồi và kiểm tra từ checkpoint P-App
 
 Kiểm tra trạng thái trước khi làm:
 
 ```bash
 git status --short
 git diff --stat
+git rev-parse --short HEAD
+git log -1 --oneline --decorate
 ```
 
-Các lệnh dưới đây bảo vệ baseline trong lúc phát triển app; chúng không phải lượt kiểm thử nghiệm thu
-hay thực nghiệm chính. Backend cần Docker hoạt động để test RLS không bị skip:
+Tại checkpoint mã nguồn, `HEAD` kỳ vọng là `c226676`; không reset hoặc ghi đè nếu working tree có thay
+đổi mới. Các lệnh dưới đây bảo vệ baseline khi sửa tiếp ứng dụng; chúng không phải lượt kiểm thử nghiệm
+thu hay thực nghiệm chính. Backend cần Docker hoạt động để test RLS không bị skip:
 
 ```bash
 cd apps/api
@@ -349,9 +362,11 @@ npm run test:e2e:install
 E2E_ENV_FILE=../../infra/.env npm run test:e2e
 ```
 
-Local stack chỉ khởi động khi cần phát triển/kiểm tra luồng Pool/Silo:
+Local stack chỉ khởi động khi cần phát triển/kiểm tra luồng Pool/Silo. Stack đang chạy tại thời điểm
+checkpoint nhưng phiên sau phải kiểm tra hoặc chạy lại script thay vì giả định:
 
 ```bash
+docker compose --env-file infra/.env -f infra/compose.yaml ps
 scripts/validate-infra.sh
 scripts/dev-up.sh
 ```
@@ -378,14 +393,16 @@ Các workload nghiệp vụ cần token tenant thật trong environment; xem `ex
 
 Có thể dùng nguyên văn:
 
-> Đọc `docs/PROJECT_STATUS.md`, `resource/plan.md`, `resource/thuyetMinhSaasMultiTenancy.md`, SRS và
-> OpenAPI; kiểm tra working tree trước khi sửa. Theo quyết định ngày 2026-09-01, tạm dừng triển khai VPS,
-> provider thật, P2 measurement, kiểm thử nghiệm thu diện rộng và thực nghiệm. Ưu tiên P-App: khóa
-> checklist rồi hoàn thiện `apps/api` + `apps/web` theo lát cắt dọc, bắt đầu từ đăng ký và onboarding
-> local `tạo tenant → fake payment → provisioning → ACTIVE → vào subdomain`, sau đó invitation,
-> project/board/task/subtask/comment, resource/notification và admin UX. Không khôi phục hai file
-> resource đang bị xóa, không tạo dữ liệu nghiên cứu giả và không làm thay đổi artifact P2 thành kết quả
-> chính thức. Giữ toàn bộ 58 backend test, 5 frontend unit test và 2 Playwright E2E hiện hữu làm baseline
-> tối thiểu; được bổ sung test mới khi thêm chức năng, không cố định tổng test ở các con số cũ.
+> Đọc `docs/PROJECT_STATUS.md`, `resource/plan.md`, `resource/thuyetMinhSaasMultiTenancy.md`, SRS,
+> OpenAPI và checklist P-App; kiểm tra working tree trước khi sửa. Checkpoint mã nguồn hiện tại là
+> `c226676` (`p-app`): APP-01 đến APP-06 đã hoàn tất local, OpenAPI đã đồng bộ và regression gần nhất đạt
+> 88 backend test, 11 frontend unit test cùng đúng 2 Playwright E2E Pool/Silo. Không làm lại các lát cắt
+> đã đóng nếu không có lỗi hoặc yêu cầu mới. Theo quyết định ngày 2026-09-01, VPS, provider thật, P2
+> measurement, kiểm thử nghiệm thu diện rộng và thực nghiệm vẫn tạm dừng cho đến quyết định riêng của
+> nhóm; P-App hoàn tất không tự động mở lại các giai đoạn đó. Không khôi phục `resource/important.md` hay
+> `resource/thuyet_minh_SaaS.md`, không tạo `draft.md`, không tạo dữ liệu nghiên cứu giả và không biến
+> artifact P2 thành kết quả chính thức. Khi sửa ứng dụng, giữ đầy đủ test hiện có tại checkpoint; 58
+> backend và 5 frontend test ban đầu vẫn là baseline lịch sử tối thiểu, được bổ sung test mới và không cố
+> định tổng test ở các con số cũ.
 
 Sau mỗi mốc đáng kể, cập nhật ngày, bảng tiến độ, kết quả test và danh sách nợ kỹ thuật trong chính tài liệu này.
