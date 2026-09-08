@@ -9,6 +9,7 @@
 - Identity, membership, role, access/refresh/transfer token.
 - Payment state, provider secret và provisioning authority.
 - Database credential/control route, migration integrity và backup.
+- Capability grant/enable, branding object, custom metadata/DDL, approval snapshot và automation rule/execution.
 - Audit/log/metric không bị sửa hoặc làm lộ dữ liệu.
 - Availability công bằng giữa tenant trên compute/database dùng chung.
 
@@ -33,6 +34,7 @@ flowchart LR
     subgraph TB3["TB3: Data"]
       Control[(Control DB)]
       Pool[(Pool DB)]
+      Schema[(Schema DB / tenant schemas)]
       Silo[(Silo DBs)]
       Storage[(Object storage)]
     end
@@ -44,16 +46,19 @@ flowchart LR
     PaymentCallback --> Proxy
     API --> Control
     API --> Pool
+    API --> Schema
     API --> Silo
     API --> Storage
     Worker --> Control
     Worker --> Pool
+    Worker --> Schema
     Worker --> Silo
     Worker --> Storage
-    Worker --> DBAdmin --> Silo
+    Worker --> DBAdmin --> Schema
+    DBAdmin --> Silo
 ```
 
-Entry points: auth/login/refresh/exchange, mọi `/api/v1` business endpoint, upload/finalize/download, payment webhook/IPN/Return URL, Web Push subscription, worker job/outbox payload, admin retry/suspend, metrics/actuator và migration/backup command.
+Entry points: auth/login/refresh/exchange, mọi `/api/v1` business endpoint, capability/tenant settings, branding upload, Custom Data metadata/value/record API, approval/automation API, upload/finalize/download, payment webhook/IPN/Return URL, Web Push subscription, provisioning/schema/outbox worker payload, admin retry/suspend, metrics/actuator và migration/backup command.
 
 ## 3. Threat register
 
@@ -70,7 +75,7 @@ Entry points: auth/login/refresh/exchange, mọi `/api/v1` business endpoint, up
 | T-09 | E/I | Native/bulk query bỏ tenant filter | Mass leak/corruption | Isolation mechanism + application guard; review escape hatches; tests | Native/bulk/background spike tests |
 | T-10 | E | DB owner/superuser/`BYPASSRLS` vượt policy | Toàn bộ Pool lộ | App role non-owner; no BYPASSRLS; FORCE RLS; separate migration role | Role catalog assertions + owner tests |
 | T-11 | T/I | Connection Pool giữ tenant session variable cũ | Request A chạy context B | Transaction-local setting where possible; reset in finally; validation query | Forced connection reuse/concurrency test |
-| T-12 | T/E | Resolver nhận JDBC URL/placement từ client/control row bị sửa | Route sai Silo/SSRF DB | Opaque registry, allowlisted DB host, encrypted secret ref, placement immutable, audit | Tampered route/config tests |
+| T-12 | T/E | Resolver nhận JDBC URL/schema/placement từ client hoặc control row bị sửa | Route sai DB/schema/SSRF DB | Opaque registry, allowlisted DB host, encrypted secret ref, server-generated schema, placement immutable, audit | Tampered route/schema/config tests |
 | T-13 | T/E | Job/outbox payload có tenant A nhưng object thuộc B | Background cross-tenant side effect | Immutable event tenant; resolve DB from context; DB marker/assertion; recipient recheck | Wrong-tenant job injection test |
 | T-14 | R/T | Duplicate/out-of-order event làm ghi lặp | Double notification/provision | Event ID/aggregate version/dedupe, legal transition, idempotent handler | Duplicate/reorder/crash-after-send tests |
 | T-15 | S/T | Webhook giả hoặc sửa amount/ref/status | Free activation | Verify raw signature/checksum first; compare local amount/currency/ref; unique event | Fake/mismatch/duplicate callback tests |
@@ -82,11 +87,20 @@ Entry points: auth/login/refresh/exchange, mọi `/api/v1` business endpoint, up
 | T-21 | I | Notification gửi nhầm user/tenant | Data disclosure | Resolve active recipient in event tenant; minimal payload; preference; dedupe | Revoked/cross-recipient tests |
 | T-22 | I | Log/metric chứa token, secret, URL hoặc task text | Secondary leak | Structured allowlist, redaction, access control, cardinality review | Log capture/secret scanning tests |
 | T-23 | D | Noisy tenant cạn thread/connection/CPU | Availability tenant khác | Tenant+tier limiter, bounded queues/pools, timeout, global connection cap | Aggressor/victim before/after test |
-| T-24 | D | Nhiều Silo làm cạn PostgreSQL connection | Toàn hệ thống fail | Lazy pool, ≤2 each, idle eviction, global cap, fail-fast | Pool registry saturation test |
+| T-24 | D | Nhiều tenant Schema/Silo làm cạn PostgreSQL connection | Toàn hệ thống fail | Lazy per-tenant pool, bounded max, idle eviction, global cap, fail-fast | Pool registry saturation test cho cả Schema/Silo |
 | T-25 | E/I | Actuator/admin endpoint công khai | Control/data leak | Separate admin auth/network exposure; minimal health detail | Anonymous endpoint scan |
-| T-26 | T | Migration artifact bị thay đổi/không đồng nhất Silo | Integrity/schema drift | Versioned immutable migrations, checksum validation, registry/health | Migration checksum and upgrade tests |
+| T-26 | T | Migration artifact bị thay đổi/không đồng nhất tenant schema/Silo | Integrity/schema drift | Versioned immutable core migrations, Flyway history từng schema/DB, checksum validation, registry/health | Migration checksum and mixed upgrade tests |
 | T-27 | R | Audit bị sửa/xóa hoặc thiếu correlation | Không quy trách nhiệm | Append-only application path, DB permission, correlation/request ID | Privilege test + completeness checks |
 | T-28 | I | Backup/test fixture chứa dữ liệu/secrets thật | Broad disclosure | Encryption/access/retention; anonymized seed; secret scanning | Backup restore + scan checklist |
+| T-29 | E/I/T | Runtime role tenant A dùng qualified name truy cập schema B | Cross-schema leak/corruption | Không grant `USAGE`/object privilege schema B; revoke public; RLS + tenant guard; `search_path` không được xem là security boundary | Catalog privilege assertions; explicit `schema_b.table` read/write tests |
+| T-30 | T/I | Connection tái sử dụng giữ `search_path` hoặc tenant setting của request trước | Request A đọc/ghi namespace B | Chỉ `SET LOCAL` trong transaction; context bắt buộc; reset/validation khi trả connection | Forced reuse sau commit và rollback, song song A/B |
+| T-31 | E/T | User đưa display name/type/value vào DDL để SQL injection hoặc sửa bảng lõi | Chiếm schema/mất dữ liệu | Identifier sinh từ UUID; type allowlist; DDL chỉ worker credential; runtime role không DDL; không expose SQL/plugin/code | Malicious name/value/type tests; privilege assertions; core table checksum |
+| T-32 | E | Client tự bật capability hoặc gọi thẳng API ẩn | Vượt giới hạn placement/module | Effective = placement ∧ grant ∧ enabled; SystemAdmin/Owner/Admin separation; server/worker recheck; optimistic version + audit | Grant/enable/revoke API matrix và direct-call tests |
+| T-33 | I/T | Logo/branding tenant A hiện ở tenant B hoặc upload active content | Cross-tenant content leak/XSS | Tenant storage namespace; image content/size allowlist; short URL; no HTML/CSS/JS; resolve by tenant context | Cross-host/cache/object tests; spoofed MIME/polyglot handling |
+| T-34 | E/T/R | Quyết định approval đồng thời/đến muộn hoặc approver mất quyền vẫn thay kết quả | Bypass workflow/audit sai | Run snapshot; row lock + version; current-step undecided predicate; current membership/role recheck; submitter exclusion | ANY/ALL race, stale version, revoked approver, self-approval tests |
+| T-35 | E/T/D | Task vào cột hoàn thành qua đường API khác hoặc tái dùng approval cũ sau khi sửa | Bypass approval/inconsistent decision | Guard ở create/update/batch move; protected-edit rule; invalidate run `PENDING` và approval `APPROVED` của snapshot cũ khi nội dung/assignee/custom field đổi | Test mọi mutation path, sửa task đã duyệt sau khi chuyển ra và direct API calls |
+| T-36 | T/D | Outbox retry chạy automation hai lần hoặc tạo chuỗi vô hạn | Duplicate assignment/notification, resource exhaustion | Unique event-rule execution; immutable rule version; capability/rule/recipient recheck; automation side effect không emit trigger | Crash/retry/duplicate event, revoked capability và no-chain tests |
+| T-37 | T | DDL job lỗi/rollback dọn nhầm schema/role hoặc báo metadata ACTIVE giả | Cross-tenant outage/schema drift | Deterministic ownership, transaction, per-tenant job lock/version, bounded retry; chỉ mark ACTIVE sau DDL commit | Fault injection mỗi bước; retry; tenant B unaffected assertions |
 
 ## 4. Security invariants
 
@@ -97,10 +111,15 @@ Entry points: auth/login/refresh/exchange, mọi `/api/v1` business endpoint, up
 5. Không callback browser/provider chưa verify được phép queue provisioning.
 6. Không worker thực thi event nếu tenant/event/DB marker không nhất quán.
 7. Không log/metric/audit chứa plaintext credential/token hoặc sensitive business payload ngoài allowlist.
+8. Không runtime role Schema nào có DDL hoặc quyền object/schema tenant khác, kể cả qualified query.
+9. Không Custom Data DDL nào lấy SQL identifier/type từ chuỗi tự do của user.
+10. Không capability nào có hiệu lực nếu placement không hỗ trợ, chưa được cấp hoặc đã tắt.
+11. Không task đi vào cột hoàn thành đã bảo vệ nếu chưa có approval hợp lệ; stale/concurrent decision không viết lại kết quả.
+12. Không source event/rule tạo nhiều automation execution có hiệu lực hoặc tự kích hoạt chuỗi rule.
 
 ## 5. Ma trận kiểm chứng theo placement
 
-Mọi T-07..T-14, T-19, T-21 chạy ở cả Pool và Silo. Test phải bao phủ:
+Mọi T-07..T-14, T-19, T-21 chạy ở cả Pool, Schema và Silo. T-29..T-31/T-37 bắt buộc cho Schema và đường DDL Schema/Silo; T-32..T-33 chạy ở mọi placement; T-34..T-36 chạy ở Silo có capability tương ứng. Test phải bao phủ:
 
 - hai tenant cùng user; hai tenant khác user;
 - role cho phép ở A nhưng không cho phép ở B;
@@ -109,13 +128,17 @@ Mọi T-07..T-14, T-19, T-21 chạy ở cả Pool và Silo. Test phải bao ph�
 - native query, bulk update, pagination/count/search và background worker;
 - tenant suspended và membership vừa revoke;
 - nếu RLS: migration owner, app role, superuser/BYPASSRLS negative control.
+- ít nhất hai tenant Schema dùng chung database, qualified cross-schema SQL và connection reuse sau commit/rollback;
+- capability unsupported/ungranted/disabled/revoked, kể cả direct API và worker đã claim event/job;
+- DDL failure/retry/rollback, approval ANY/ALL concurrent decision và automation duplicate/no-chain.
 
 Tiêu chí release: zero successful cross-tenant read/write/delete/download/delivery. Một trường hợp thành công loại cơ chế khỏi spike hoặc chặn release; không “bù” bằng điểm hiệu năng.
 
 ## 6. Residual risks và ngoài phạm vi
 
 - Side-channel timing/cost ở shared compute chỉ được giảm, không chứng minh loại bỏ hoàn toàn trên một VPS.
-- Silo DB không cô lập API CPU/network/object storage.
+- Schema/Silo không cô lập API CPU/network/object storage; Schema tenants còn chia sẻ database process và catalog.
+- Dynamic table/column làm tăng schema drift và chi phí backup/upgrade; baseline giảm rủi ro bằng allowlist/job/audit nhưng chỉ fault/restore drill mới xác nhận khả năng vận hành.
+- Capability giới hạn sản phẩm, không phải ranh giới mật mã; lỗi server-side enforcement vẫn có thể làm lộ endpoint nên direct-call test là điều kiện release.
 - DDoS hạ tầng quy mô Internet, supply-chain formal verification, WAF nâng cao và penetration test bên thứ ba ngoài v1.
 - Endpoint support/break-glass không được triển khai trong v1; nếu bổ sung phải có ADR, approval, time-bound access và audit riêng.
-

@@ -55,6 +55,20 @@ class TenantDatabaseProvisionerTest {
 
         assertThat(placement.getDatabaseName()).isEqualTo("pool_db");
         assertThat(placement.getEncryptedPassword()).isNull();
+        assertThat(placement.getSchemaName()).isEqualTo("public");
+    }
+
+    @Test
+    void schemaPreparationUsesSharedDatabaseAndDeterministicSchemaAndCredential() {
+        UUID tenantId = UUID.fromString("12345678-1234-1234-1234-123456789abc");
+        TenantPlacementEntity placement = placement(tenantId, TenantPlacement.SCHEMA_PER_TENANT);
+
+        provisioner.prepare(tenant(tenantId), placement);
+
+        assertThat(placement.getDatabaseName()).isEqualTo("schema_db");
+        assertThat(placement.getSchemaName()).isEqualTo("tenant_12345678123412341234123456789abc");
+        assertThat(placement.getDatabaseUsername()).isEqualTo("tenant_12345678123412341234123456789abc_app");
+        assertThat(cipher.decrypt(placement.getEncryptedPassword())).matches("[0-9a-f]{64}");
     }
 
     private TenantEntity tenant(UUID tenantId) {

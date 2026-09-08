@@ -6,7 +6,7 @@ import {
   type Page,
 } from '@playwright/test';
 
-type Placement = 'POOL' | 'SILO_DATABASE';
+type Placement = 'POOL' | 'SCHEMA_PER_TENANT' | 'SILO_DATABASE';
 
 interface TenantCase {
   label: string;
@@ -140,6 +140,13 @@ const tenants = [
     'E2E_POOL_TENANT_URL',
     'pool-demo',
     'POOL',
+  ),
+  configuredTenant(
+    'Schema per tenant',
+    'E2E_SCHEMA_TENANT_SLUG',
+    'E2E_SCHEMA_TENANT_URL',
+    'schema-demo',
+    'SCHEMA_PER_TENANT',
   ),
   configuredTenant(
     'Silo',

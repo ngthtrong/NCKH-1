@@ -1,6 +1,6 @@
 # ADR-0002: Bridge với control plane chung, Pool và database-per-tenant Silo
 
-- **Trạng thái:** Accepted
+- **Trạng thái:** Superseded bởi [ADR-0008](0008-three-placement-bridge.md)
 - **Ngày:** 2026-08-25
 - **RQ/yêu cầu:** RQ2, RQ3; ARC-02..05, DATA-02..03
 
@@ -28,4 +28,3 @@ Tích cực: so sánh placement trong cùng workload; Silo giảm biên dữ li�
 - DB marker/Silo assertion phát hiện resolver/job sai tenant.
 - Load test connection registry theo budget; restore test ít nhất một DB Silo.
 - C4/report phải gọi đúng “database-only Silo”, không mô tả là không có noisy neighbor.
-

@@ -5,14 +5,20 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 import vn.edu.ctu.saas.tenant.TenantPlacement;
 import vn.edu.ctu.saas.tenant.TenantStatus;
 
 public interface TenantRepository extends JpaRepository<TenantEntity, UUID> {
     Optional<TenantEntity> findBySlug(String slug);
     boolean existsBySlug(String slug);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM TenantEntity t WHERE t.id=:id")
+    Optional<TenantEntity> lockById(@Param("id") UUID id);
     long countByStatus(TenantStatus status);
     Page<TenantEntity> findByNameContainingIgnoreCaseOrSlugContainingIgnoreCase(
             String name, String slug, Pageable pageable);

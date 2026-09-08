@@ -3,6 +3,10 @@ import type { components as ApiComponents } from './generated';
 import type {
   AdminTenant,
   AdminTenantDetail,
+  ApprovalRun,
+  ApprovalWorkflow,
+  AutomationExecution,
+  AutomationRule,
   Board,
   BoardSummary,
   Comment,
@@ -10,6 +14,9 @@ import type {
   CreateProjectRequest,
   CreateTenantRequest,
   CreateTaskRequest,
+  CustomDefinition,
+  CustomRecord,
+  CustomSchemaJob,
   DashboardResponse,
   InviteMemberRequest,
   InvitationCreatedView,
@@ -38,6 +45,8 @@ import type {
   TenantPlacement,
   TenantStatus,
   TenantSummary,
+  TenantSettings,
+  TaskCustomValues,
   TenantTransferResponse,
   UpdateColumnRequest,
   UpdateTaskRequest,
@@ -426,4 +435,128 @@ export const adminApi = {
       `/admin/tenants/${tenantId}/resource-dead-letters/${eventId}/requeue`,
       { method: 'POST' },
     ),
+  capabilities: (tenantId: UUID) =>
+    request<ApiSchemas['CapabilityView'][]>(`/admin/tenants/${tenantId}/capabilities`),
+  setCapability: (
+    tenantId: UUID,
+    capability: ApiSchemas['TenantCapability'],
+    granted: boolean,
+    version: number,
+  ) => request<ApiSchemas['CapabilityView'][]>(
+    `/admin/tenants/${tenantId}/capabilities/${capability}`,
+    { method: 'PATCH', body: { granted, version } },
+  ),
+};
+
+export const tenantSettingsApi = {
+  get: () => request<TenantSettings>('/tenant-settings'),
+  setEnabled: (capability: ApiSchemas['TenantCapability'], enabled: boolean, version: number) =>
+    request<ApiSchemas['CapabilityView'][]>('/tenant-settings/capabilities', {
+      method: 'PATCH', body: { capability, enabled, version },
+    }),
+  updateBranding: (primaryColor: string, accentColor: string, version: number) =>
+    request<ApiSchemas['BrandingView']>('/tenant-settings/branding', {
+      method: 'PATCH', body: { primaryColor, accentColor, version },
+    }),
+  uploadLogo: (file: File, version: number) => {
+    const body = new FormData();
+    body.append('file', file);
+    return request<ApiSchemas['BrandingView']>(
+      `/tenant-settings/branding/logo?version=${encodeURIComponent(version)}`,
+      { method: 'POST', body },
+    );
+  },
+  deleteLogo: (version: number) => request<ApiSchemas['BrandingView']>(
+    `/tenant-settings/branding/logo?version=${encodeURIComponent(version)}`,
+    { method: 'DELETE' },
+  ),
+};
+
+export const customDataApi = {
+  definitions: (projectId: UUID) =>
+    request<CustomDefinition[]>(`/projects/${projectId}/custom-definitions`),
+  createDefinition: (projectId: UUID, kind: 'TASK' | 'ENTITY', displayName: string) =>
+    request<CustomDefinition>(`/projects/${projectId}/custom-definitions`, {
+      method: 'POST', body: { kind, displayName },
+    }),
+  deleteDefinition: (definitionId: UUID, version: number) =>
+    request<void>(`/custom-definitions/${definitionId}?version=${version}`, { method: 'DELETE' }),
+  restoreDefinition: (definitionId: UUID, version: number) =>
+    request<CustomDefinition>(`/custom-definitions/${definitionId}/restore?version=${version}`, {
+      method: 'POST',
+    }),
+  addField: (
+    definitionId: UUID,
+    payload: ApiSchemas['CreateCustomFieldRequest'],
+  ) => request<CustomDefinition>(`/custom-definitions/${definitionId}/fields`, {
+    method: 'POST', body: payload,
+  }),
+  updateField: (
+    definitionId: UUID,
+    fieldId: UUID,
+    payload: ApiSchemas['UpdateCustomFieldRequest'],
+  ) => request<CustomDefinition>(`/custom-definitions/${definitionId}/fields/${fieldId}`, {
+    method: 'PATCH', body: payload,
+  }),
+  deleteField: (definitionId: UUID, fieldId: UUID, version: number) =>
+    request<void>(`/custom-definitions/${definitionId}/fields/${fieldId}?version=${version}`, {
+      method: 'DELETE',
+    }),
+  restoreField: (definitionId: UUID, fieldId: UUID, version: number) =>
+    request<CustomDefinition>(
+      `/custom-definitions/${definitionId}/fields/${fieldId}/restore?version=${version}`,
+      { method: 'POST' },
+    ),
+  jobs: (projectId: UUID) =>
+    request<CustomSchemaJob[]>(`/projects/${projectId}/custom-schema-jobs`),
+  records: (definitionId: UUID) =>
+    request<CustomRecord[]>(`/custom-definitions/${definitionId}/records`),
+  createRecord: (definitionId: UUID, values: Record<string, unknown>) =>
+    request<CustomRecord>(`/custom-definitions/${definitionId}/records`, {
+      method: 'POST', body: { values },
+    }),
+  updateRecord: (definitionId: UUID, recordId: UUID, values: Record<string, unknown>, version: number) =>
+    request<CustomRecord>(`/custom-definitions/${definitionId}/records/${recordId}`, {
+      method: 'PUT', body: { values, version },
+    }),
+  deleteRecord: (definitionId: UUID, recordId: UUID, version: number) =>
+    request<void>(`/custom-definitions/${definitionId}/records/${recordId}?version=${version}`, {
+      method: 'DELETE',
+    }),
+  taskValues: (taskId: UUID) => request<TaskCustomValues>(`/tasks/${taskId}/custom-values`),
+  updateTaskValues: (taskId: UUID, values: Record<string, unknown>, version: number) =>
+    request<TaskCustomValues>(`/tasks/${taskId}/custom-values`, {
+      method: 'PUT', body: { values, version },
+    }),
+};
+
+export const approvalsApi = {
+  workflow: (boardId: UUID) =>
+    request<ApprovalWorkflow | null>(`/boards/${boardId}/approval-workflow`),
+  saveWorkflow: (boardId: UUID, payload: ApiSchemas['SaveApprovalWorkflowRequest']) =>
+    request<ApprovalWorkflow>(`/boards/${boardId}/approval-workflow`, {
+      method: 'PUT', body: payload,
+    }),
+  runs: (taskId: UUID) => request<ApprovalRun[]>(`/tasks/${taskId}/approval-runs`),
+  submit: (taskId: UUID) => request<ApprovalRun>(`/tasks/${taskId}/approval-runs`, { method: 'POST' }),
+  decide: (runId: UUID, decision: 'APPROVED' | 'REJECTED', version: number) =>
+    request<ApprovalRun>(`/approval-runs/${runId}/decisions`, {
+      method: 'POST', body: { decision, version },
+    }),
+  withdraw: (runId: UUID, version: number) => request<ApprovalRun>(
+    `/approval-runs/${runId}/withdraw`, { method: 'POST', body: { version } },
+  ),
+};
+
+export const automationApi = {
+  rules: (projectId: UUID) => request<AutomationRule[]>(`/projects/${projectId}/automation-rules`),
+  create: (projectId: UUID, payload: ApiSchemas['CreateAutomationRuleRequest']) =>
+    request<AutomationRule>(`/projects/${projectId}/automation-rules`, {
+      method: 'POST', body: payload,
+    }),
+  disable: (ruleId: UUID, version: number) => request<AutomationRule>(
+    `/automation-rules/${ruleId}/disable`, { method: 'POST', body: { version } },
+  ),
+  executions: (projectId: UUID) =>
+    request<AutomationExecution[]>(`/projects/${projectId}/automation-executions`),
 };

@@ -5,12 +5,14 @@
 | ADR | Tóm tắt | Trạng thái | Bằng chứng cần bổ sung |
 | --- | --- | --- | --- |
 | [ADR-0001](../architecture/adrs/0001-modular-monolith-stack.md) | Modular monolith Spring/React, API và worker tách process | Accepted | Profiling VPS khi pilot |
-| [ADR-0002](../architecture/adrs/0002-bridge-placement.md) | Control plane chung; application plane Pool hoặc database Silo | Accepted | Contract test cả hai placement |
+| [ADR-0002](../architecture/adrs/0002-bridge-placement.md) | Baseline control plane chung; application plane Pool hoặc database Silo | Superseded bởi ADR-0008 | Giữ làm lịch sử checkpoint P-App |
 | [ADR-0003](../architecture/adrs/0003-pool-isolation-selection.md) | Chọn cơ chế cô lập Pool bằng spike, chưa chốt RLS/ORM/predicate | Proposed | Guard omission local ghi 6 leak cho predicate/Hibernate Pool và 0 cho RLS; còn hồ sơ loại checksum-backed, raw measurement ứng viên còn lại và review |
 | [ADR-0004](../architecture/adrs/0004-payment-provider.md) | Adapter payment; fake mặc định local; VNPay/Stripe chờ spike | Proposed | Protocol đã đăng ký; còn trọng số được duyệt, credential sandbox và test signature |
 | [ADR-0005](../architecture/adrs/0005-resource-storage.md) | Adapter storage; MinIO là mặc định có điều kiện | Proposed | Protocol đã đăng ký tại `experiments/spikes/plans/storage.json`; còn run filesystem/MinIO |
 | [ADR-0006](../architecture/adrs/0006-provisioning-and-outbox.md) | Saga/state machine + PostgreSQL outbox, không broker/distributed TX | Accepted | Fault-injection test |
 | [ADR-0007](../architecture/adrs/0007-tenant-bound-session.md) | Host, token, tenant status và membership cùng tham gia authorization | Accepted | Security matrix test |
+| [ADR-0008](../architecture/adrs/0008-three-placement-bridge.md) | Bridge ba placement, thêm Shared Database/Separate Schema | Accepted cho triển khai local | Còn pilot/protocol và phê duyệt phạm vi học thuật |
+| [ADR-0009](../architecture/adrs/0009-placement-capability-policy.md) | Capability tách khỏi placement/tier, giới hạn tăng dần theo placement | Accepted cho triển khai local | Còn bằng chứng checkpoint EXT và phê duyệt phạm vi học thuật |
 
 ## Câu hỏi đang mở
 

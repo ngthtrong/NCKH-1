@@ -23,6 +23,10 @@ tags:
   - name: Notifications
   - name: Payments
   - name: Administration
+  - name: Tenant customization
+  - name: Custom data
+  - name: Approvals
+  - name: Automation
 paths:
   /auth/login:
     post:
@@ -1088,6 +1092,497 @@ paths:
       responses:
         '200': {description: Dead-lettered cleanup event reset for retry and action audited}
         default: {$ref: '#/components/responses/Error'}
+  /admin/tenants/{tenantId}/capabilities:
+    get:
+      tags: [Administration]
+      operationId: listTenantCapabilitiesAsSystemAdmin
+      parameters: [{$ref: '#/components/parameters/TenantId'}]
+      responses:
+        '200':
+          description: Placement-constrained capability grants and tenant enablement
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CapabilityView'}}
+        default: {$ref: '#/components/responses/Error'}
+  /admin/tenants/{tenantId}/capabilities/{capability}:
+    patch:
+      tags: [Administration]
+      operationId: setTenantCapabilityGrant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: capability
+          in: path
+          required: true
+          schema: {$ref: '#/components/schemas/TenantCapability'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateCapabilityGrantRequest'}
+      responses:
+        '200':
+          description: Updated capability matrix
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CapabilityView'}}
+        default: {$ref: '#/components/responses/Error'}
+  /tenant-settings:
+    get:
+      tags: [Tenant customization]
+      operationId: getTenantSettings
+      responses:
+        '200':
+          description: Effective capability and branding settings for the active tenant
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantSettingsView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tenant-settings/capabilities:
+    patch:
+      tags: [Tenant customization]
+      operationId: enableTenantCapability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/EnableCapabilityRequest'}
+      responses:
+        '200':
+          description: Updated tenant capability settings
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CapabilityView'}}
+        default: {$ref: '#/components/responses/Error'}
+  /tenant-settings/branding:
+    patch:
+      tags: [Tenant customization]
+      operationId: updateTenantBranding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateBrandingRequest'}
+      responses:
+        '200':
+          description: Updated branding
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BrandingView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tenant-settings/branding/logo:
+    post:
+      tags: [Tenant customization]
+      operationId: uploadTenantLogo
+      parameters:
+        - name: version
+          in: query
+          required: true
+          schema: {type: integer, format: int64, minimum: 0}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: {type: string, format: binary}
+      responses:
+        '200':
+          description: Branding with tenant-namespaced logo
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BrandingView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Tenant customization]
+      operationId: deleteTenantLogo
+      parameters:
+        - name: version
+          in: query
+          required: true
+          schema: {type: integer, format: int64, minimum: 0}
+      responses:
+        '200':
+          description: Branding reset without a logo
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BrandingView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/custom-definitions:
+    get:
+      tags: [Custom data]
+      operationId: listCustomDefinitions
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      responses:
+        '200':
+          description: Active custom Task/entity definitions; remains readable after capability revocation
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CustomDefinitionView'}}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Custom data]
+      operationId: createCustomDefinition
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCustomDefinitionRequest'}
+      responses:
+        '200':
+          description: Pending definition queued for controlled DDL
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomDefinitionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}:
+    delete:
+      tags: [Custom data]
+      operationId: deleteCustomDefinition
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200': {description: Definition soft-deleted; physical data retained}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/restore:
+    post:
+      tags: [Custom data]
+      operationId: restoreCustomDefinition
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200':
+          description: Restored definition
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomDefinitionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/fields:
+    post:
+      tags: [Custom data]
+      operationId: createCustomField
+      parameters: [{$ref: '#/components/parameters/DefinitionId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCustomFieldRequest'}
+      responses:
+        '200':
+          description: Pending field queued for controlled DDL
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomDefinitionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/fields/{fieldId}:
+    patch:
+      tags: [Custom data]
+      operationId: updateCustomField
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/FieldId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateCustomFieldRequest'}
+      responses:
+        '200':
+          description: Updated mutable field metadata
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomDefinitionView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Custom data]
+      operationId: deleteCustomField
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/FieldId'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200': {description: Field metadata soft-deleted; physical column and values retained}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/fields/{fieldId}/restore:
+    post:
+      tags: [Custom data]
+      operationId: restoreCustomField
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/FieldId'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200':
+          description: Restored field metadata and retained physical values
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomDefinitionView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/custom-schema-jobs:
+    get:
+      tags: [Custom data]
+      operationId: listCustomSchemaJobs
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      responses:
+        '200':
+          description: Controlled DDL job status and retry evidence
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CustomSchemaJobView'}}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/records:
+    get:
+      tags: [Custom data]
+      operationId: listCustomRecords
+      parameters: [{$ref: '#/components/parameters/DefinitionId'}]
+      responses:
+        '200':
+          description: Project-authorized records
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/CustomRecordView'}}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Custom data]
+      operationId: createCustomRecord
+      parameters: [{$ref: '#/components/parameters/DefinitionId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CustomValuesRequest'}
+      responses:
+        '200':
+          description: Created custom entity record
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomRecordView'}
+        default: {$ref: '#/components/responses/Error'}
+  /custom-definitions/{definitionId}/records/{recordId}:
+    put:
+      tags: [Custom data]
+      operationId: updateCustomRecord
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/VersionedCustomValuesRequest'}
+      responses:
+        '200':
+          description: Updated custom entity record
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CustomRecordView'}
+        default: {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [Custom data]
+      operationId: deleteCustomRecord
+      parameters:
+        - $ref: '#/components/parameters/DefinitionId'
+        - $ref: '#/components/parameters/RecordId'
+        - $ref: '#/components/parameters/VersionQuery'
+      responses:
+        '200': {description: Record soft-deleted}
+        default: {$ref: '#/components/responses/Error'}
+  /tasks/{taskId}/custom-values:
+    get:
+      tags: [Custom data]
+      operationId: getTaskCustomValues
+      parameters: [{$ref: '#/components/parameters/TaskId'}]
+      responses:
+        '200':
+          description: Task custom-field metadata and values
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskCustomValuesView'}
+        default: {$ref: '#/components/responses/Error'}
+    put:
+      tags: [Custom data]
+      operationId: updateTaskCustomValues
+      parameters: [{$ref: '#/components/parameters/TaskId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/VersionedCustomValuesRequest'}
+      responses:
+        '200':
+          description: Updated Task custom values; pending approval is invalidated
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TaskCustomValuesView'}
+        default: {$ref: '#/components/responses/Error'}
+  /boards/{boardId}/approval-workflow:
+    get:
+      tags: [Approvals]
+      operationId: getApprovalWorkflow
+      parameters: [{$ref: '#/components/parameters/BoardId'}]
+      responses:
+        '200':
+          description: Board approval workflow or null
+          content:
+            application/json:
+              schema: {anyOf: [{$ref: '#/components/schemas/ApprovalWorkflowView'}, {type: 'null'}]}
+        default: {$ref: '#/components/responses/Error'}
+    put:
+      tags: [Approvals]
+      operationId: saveApprovalWorkflow
+      parameters: [{$ref: '#/components/parameters/BoardId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SaveApprovalWorkflowRequest'}
+      responses:
+        '200':
+          description: Saved workflow; changes affect future submissions
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApprovalWorkflowView'}
+        default: {$ref: '#/components/responses/Error'}
+  /tasks/{taskId}/approval-runs:
+    get:
+      tags: [Approvals]
+      operationId: listTaskApprovalRuns
+      parameters: [{$ref: '#/components/parameters/TaskId'}]
+      responses:
+        '200':
+          description: Immutable approval history and the current run
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/ApprovalRunView'}}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Approvals]
+      operationId: submitTaskForApproval
+      parameters: [{$ref: '#/components/parameters/TaskId'}]
+      responses:
+        '200':
+          description: Submitted run with workflow, approver, and Task snapshots
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApprovalRunView'}
+        default: {$ref: '#/components/responses/Error'}
+  /approval-runs/{runId}/decisions:
+    post:
+      tags: [Approvals]
+      operationId: decideApprovalRun
+      parameters: [{$ref: '#/components/parameters/ApprovalRunId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ApprovalDecisionRequest'}
+      responses:
+        '200':
+          description: Versioned approval decision
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApprovalRunView'}
+        default: {$ref: '#/components/responses/Error'}
+  /approval-runs/{runId}/withdraw:
+    post:
+      tags: [Approvals]
+      operationId: withdrawApprovalRun
+      parameters: [{$ref: '#/components/parameters/ApprovalRunId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/VersionRequest'}
+      responses:
+        '200':
+          description: Withdrawn run
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApprovalRunView'}
+        default: {$ref: '#/components/responses/Error'}
+  /approval-runs/{runId}/steps/{position}/approvers:
+    patch:
+      tags: [Approvals]
+      operationId: replaceApprovalRunApprover
+      parameters:
+        - $ref: '#/components/parameters/ApprovalRunId'
+        - name: position
+          in: path
+          required: true
+          schema: {type: integer, minimum: 1}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ReplaceApproverRequest'}
+      responses:
+        '200':
+          description: Updated future/current unfinished step snapshot with audit
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApprovalRunView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/automation-rules:
+    get:
+      tags: [Automation]
+      operationId: listAutomationRules
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      responses:
+        '200':
+          description: Project rules including disabled history
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/AutomationRuleView'}}
+        default: {$ref: '#/components/responses/Error'}
+    post:
+      tags: [Automation]
+      operationId: createAutomationRule
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateAutomationRuleRequest'}
+      responses:
+        '200':
+          description: New immutable rule version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AutomationRuleView'}
+        default: {$ref: '#/components/responses/Error'}
+  /automation-rules/{ruleId}/disable:
+    post:
+      tags: [Automation]
+      operationId: disableAutomationRule
+      parameters: [{$ref: '#/components/parameters/AutomationRuleId'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/VersionRequest'}
+      responses:
+        '200':
+          description: Disabled rule retained for execution history
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AutomationRuleView'}
+        default: {$ref: '#/components/responses/Error'}
+  /projects/{projectId}/automation-executions:
+    get:
+      tags: [Automation]
+      operationId: listAutomationExecutions
+      parameters: [{$ref: '#/components/parameters/ProjectId'}]
+      responses:
+        '200':
+          description: Idempotent execution history with retry results
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/AutomationExecutionView'}}
+        default: {$ref: '#/components/responses/Error'}
 components:
   securitySchemes:
     bearerAuth:
@@ -1150,6 +1645,36 @@ components:
       in: path
       required: true
       schema: {$ref: '#/components/schemas/UUID'}
+    DefinitionId:
+      name: definitionId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    FieldId:
+      name: fieldId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    RecordId:
+      name: recordId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    ApprovalRunId:
+      name: runId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    AutomationRuleId:
+      name: ruleId
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/UUID'}
+    VersionQuery:
+      name: version
+      in: query
+      required: true
+      schema: {type: integer, format: int64, minimum: 0}
   responses:
     Error:
       description: Structured API error
@@ -1164,7 +1689,7 @@ components:
     ProjectRole: {type: string, enum: [MANAGER, MEMBER, VIEWER]}
     ProjectStatus: {type: string, enum: [ACTIVE, ARCHIVED, DELETED]}
     TenantTier: {type: string, enum: [STARTER, PROFESSIONAL, ENTERPRISE]}
-    TenantPlacement: {type: string, enum: [POOL, SILO_DATABASE]}
+    TenantPlacement: {type: string, enum: [POOL, SCHEMA_PER_TENANT, SILO_DATABASE]}
     TenantStatus: {type: string, enum: [PENDING_PAYMENT, PROVISIONING, ACTIVE, FAILED, SUSPENDED]}
     PaymentStatus: {type: string, enum: [CREATED, PENDING, SUCCEEDED, FAILED, EXPIRED]}
     ProvisioningStatus: {type: string, enum: [QUEUED, RUNNING, SUCCEEDED, RETRYABLE_FAILED, FAILED_ROLLED_BACK, ROLLBACK_FAILED]}
@@ -1697,6 +2222,272 @@ components:
         size: {type: integer}
         totalItems: {type: integer, format: int64}
         totalPages: {type: integer}
+    TenantCapability: {type: string, enum: [BRANDING, CUSTOM_DATA, APPROVALS, AUTOMATION]}
+    CapabilityView:
+      type: object
+      required: [capability, supported, granted, enabled, version]
+      properties:
+        capability: {$ref: '#/components/schemas/TenantCapability'}
+        supported: {type: boolean}
+        granted: {type: boolean}
+        enabled: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+    UpdateCapabilityGrantRequest:
+      type: object
+      required: [granted, version]
+      properties:
+        granted: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+    EnableCapabilityRequest:
+      type: object
+      required: [capability, enabled, version]
+      properties:
+        capability: {$ref: '#/components/schemas/TenantCapability'}
+        enabled: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+    BrandingView:
+      type: object
+      required: [primaryColor, accentColor, version]
+      properties:
+        primaryColor: {type: string, pattern: '^#[0-9A-F]{6}$'}
+        accentColor: {type: string, pattern: '^#[0-9A-F]{6}$'}
+        logoUrl: {type: [string, 'null'], format: uri}
+        version: {type: integer, format: int64, minimum: 0}
+    UpdateBrandingRequest:
+      type: object
+      required: [primaryColor, accentColor, version]
+      properties:
+        primaryColor: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
+        accentColor: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
+        version: {type: integer, format: int64, minimum: 0}
+    TenantSettingsView:
+      type: object
+      required: [capabilities, branding]
+      properties:
+        capabilities: {type: array, items: {$ref: '#/components/schemas/CapabilityView'}}
+        branding: {$ref: '#/components/schemas/BrandingView'}
+    CustomDefinitionKind: {type: string, enum: [TASK, ENTITY]}
+    CustomFieldType: {type: string, enum: [TEXT, NUMBER, BOOLEAN, DATE, SINGLE_SELECT]}
+    CustomFieldView:
+      type: object
+      required: [id, displayName, dataType, options, required, position, status, version]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        displayName: {type: string}
+        dataType: {$ref: '#/components/schemas/CustomFieldType'}
+        options: {type: array, items: {type: string}}
+        required: {type: boolean}
+        position: {type: integer}
+        status: {type: string, enum: [PENDING, ACTIVE, FAILED]}
+        version: {type: integer, format: int64, minimum: 0}
+        lastError: {type: [string, 'null']}
+    CustomDefinitionView:
+      type: object
+      required: [id, projectId, kind, displayName, status, version, fields]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        kind: {$ref: '#/components/schemas/CustomDefinitionKind'}
+        displayName: {type: string}
+        status: {type: string, enum: [PENDING, ACTIVE, FAILED]}
+        version: {type: integer, format: int64, minimum: 0}
+        lastError: {type: [string, 'null']}
+        fields: {type: array, items: {$ref: '#/components/schemas/CustomFieldView'}}
+    CreateCustomDefinitionRequest:
+      type: object
+      required: [kind, displayName]
+      properties:
+        kind: {$ref: '#/components/schemas/CustomDefinitionKind'}
+        displayName: {type: string, minLength: 2, maxLength: 120}
+    CreateCustomFieldRequest:
+      type: object
+      required: [displayName, dataType, required, position]
+      properties:
+        displayName: {type: string, minLength: 2, maxLength: 120}
+        dataType: {$ref: '#/components/schemas/CustomFieldType'}
+        required: {type: boolean}
+        position: {type: integer}
+        options: {type: array, maxItems: 50, items: {type: string, maxLength: 120}}
+    UpdateCustomFieldRequest:
+      type: object
+      required: [displayName, required, position, version]
+      properties:
+        displayName: {type: string, minLength: 2, maxLength: 120}
+        required: {type: boolean}
+        position: {type: integer}
+        options: {type: array, maxItems: 50, items: {type: string, maxLength: 120}}
+        version: {type: integer, format: int64, minimum: 0}
+    CustomValuesRequest:
+      type: object
+      required: [values]
+      properties:
+        values: {type: object, additionalProperties: true}
+    VersionedCustomValuesRequest:
+      allOf:
+        - $ref: '#/components/schemas/CustomValuesRequest'
+        - type: object
+          required: [version]
+          properties:
+            version: {type: integer, format: int64, minimum: 0}
+    CustomRecordView:
+      type: object
+      required: [id, version, values]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        version: {type: integer, format: int64, minimum: 0}
+        values: {type: object, additionalProperties: true}
+    TaskCustomValuesView:
+      type: object
+      required: [values, version]
+      properties:
+        definition: {anyOf: [{$ref: '#/components/schemas/CustomDefinitionView'}, {type: 'null'}]}
+        values: {type: object, additionalProperties: true}
+        version: {type: integer, format: int64, minimum: 0}
+    CustomSchemaJobView:
+      type: object
+      required: [id, definitionId, operation, targetVersion, status, attempts, createdAt, updatedAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        definitionId: {$ref: '#/components/schemas/UUID'}
+        fieldId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        operation: {type: string, enum: [CREATE_DEFINITION, ADD_FIELD]}
+        targetVersion: {type: integer, format: int64, minimum: 0}
+        status: {type: string, enum: [QUEUED, RUNNING, SUCCEEDED, FAILED]}
+        attempts: {type: integer, minimum: 0}
+        lastError: {type: [string, 'null']}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        updatedAt: {$ref: '#/components/schemas/Instant'}
+    ApprovalMode: {type: string, enum: [ANY, ALL]}
+    ApprovalDecision: {type: string, enum: [APPROVED, REJECTED]}
+    ApprovalWorkflowStepView:
+      type: object
+      required: [id, name, position, mode, approverIds]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        position: {type: integer, minimum: 1}
+        mode: {$ref: '#/components/schemas/ApprovalMode'}
+        approverIds: {type: array, items: {$ref: '#/components/schemas/UUID'}}
+    ApprovalWorkflowView:
+      type: object
+      required: [id, projectId, boardId, completionColumnId, name, enabled, version, steps]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        boardId: {$ref: '#/components/schemas/UUID'}
+        completionColumnId: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        enabled: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+        steps: {type: array, items: {$ref: '#/components/schemas/ApprovalWorkflowStepView'}}
+    SaveApprovalWorkflowRequest:
+      type: object
+      required: [completionColumnId, name, enabled, steps, version]
+      properties:
+        completionColumnId: {$ref: '#/components/schemas/UUID'}
+        name: {type: string, minLength: 2, maxLength: 120}
+        enabled: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+        steps:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            required: [name, mode, approverIds]
+            properties:
+              name: {type: string, minLength: 2, maxLength: 120}
+              mode: {$ref: '#/components/schemas/ApprovalMode'}
+              approverIds: {type: array, minItems: 1, items: {$ref: '#/components/schemas/UUID'}}
+    ApprovalApproverView:
+      type: object
+      required: [userId]
+      properties:
+        userId: {$ref: '#/components/schemas/UUID'}
+        decision: {type: [string, 'null'], enum: [APPROVED, REJECTED, null]}
+        decidedAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+    ApprovalRunStepView:
+      type: object
+      required: [id, position, name, mode, status, approvers]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        position: {type: integer, minimum: 1}
+        name: {type: string}
+        mode: {$ref: '#/components/schemas/ApprovalMode'}
+        status: {type: string, enum: [WAITING, PENDING, APPROVED, REJECTED]}
+        approvers: {type: array, items: {$ref: '#/components/schemas/ApprovalApproverView'}}
+    ApprovalRunView:
+      type: object
+      required: [id, workflowId, taskId, submittedBy, status, currentStep, version, createdAt, steps]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        workflowId: {$ref: '#/components/schemas/UUID'}
+        taskId: {$ref: '#/components/schemas/UUID'}
+        submittedBy: {$ref: '#/components/schemas/UUID'}
+        status: {type: string, enum: [PENDING, APPROVED, REJECTED, WITHDRAWN, INVALIDATED]}
+        currentStep: {type: integer, minimum: 1}
+        version: {type: integer, format: int64, minimum: 0}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        completedAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
+        steps: {type: array, items: {$ref: '#/components/schemas/ApprovalRunStepView'}}
+    ApprovalDecisionRequest:
+      type: object
+      required: [decision, version]
+      properties:
+        decision: {$ref: '#/components/schemas/ApprovalDecision'}
+        version: {type: integer, format: int64, minimum: 0}
+    VersionRequest:
+      type: object
+      required: [version]
+      properties:
+        version: {type: integer, format: int64, minimum: 0}
+    ReplaceApproverRequest:
+      type: object
+      required: [oldUserId, newUserId, version]
+      properties:
+        oldUserId: {$ref: '#/components/schemas/UUID'}
+        newUserId: {$ref: '#/components/schemas/UUID'}
+        version: {type: integer, format: int64, minimum: 0}
+    AutomationTriggerType: {type: string, enum: [TASK_CREATED, TASK_MOVED, APPROVAL_APPROVED, APPROVAL_REJECTED]}
+    AutomationActionType: {type: string, enum: [ASSIGN_USER, NOTIFY_USERS]}
+    CreateAutomationRuleRequest:
+      type: object
+      required: [name, triggerType, actionType, actionUserIds]
+      properties:
+        name: {type: string, minLength: 2, maxLength: 120}
+        triggerType: {$ref: '#/components/schemas/AutomationTriggerType'}
+        triggerBoardId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        triggerColumnId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        actionType: {$ref: '#/components/schemas/AutomationActionType'}
+        actionUserIds: {type: array, minItems: 1, items: {$ref: '#/components/schemas/UUID'}}
+    AutomationRuleView:
+      type: object
+      required: [id, projectId, name, triggerType, actionType, actionUserIds, enabled, version, createdAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        projectId: {$ref: '#/components/schemas/UUID'}
+        name: {type: string}
+        triggerType: {$ref: '#/components/schemas/AutomationTriggerType'}
+        triggerBoardId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        triggerColumnId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
+        actionType: {$ref: '#/components/schemas/AutomationActionType'}
+        actionUserIds: {type: array, items: {$ref: '#/components/schemas/UUID'}}
+        enabled: {type: boolean}
+        version: {type: integer, format: int64, minimum: 0}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+    AutomationExecutionView:
+      type: object
+      required: [id, ruleId, sourceEventId, ruleVersion, status, attempts, createdAt, updatedAt]
+      properties:
+        id: {$ref: '#/components/schemas/UUID'}
+        ruleId: {$ref: '#/components/schemas/UUID'}
+        sourceEventId: {$ref: '#/components/schemas/UUID'}
+        ruleVersion: {type: integer, format: int64, minimum: 0}
+        status: {type: string, enum: [RUNNING, SUCCEEDED, FAILED, SKIPPED]}
+        attempts: {type: integer, minimum: 0}
+        errorCode: {type: [string, 'null']}
+        createdAt: {$ref: '#/components/schemas/Instant'}
+        updatedAt: {$ref: '#/components/schemas/Instant'}
     ResourceDeadLetterView:
       type: object
       required: [id, tenantId, resourceId, attempts, deadLetteredAt, createdAt, requeueCount]

@@ -30,6 +30,9 @@ public class TenantPlacementEntity extends ControlEntity {
     @Column(name = "database_username", length = 63)
     private String databaseUsername;
 
+    @Column(name = "schema_name", length = 63)
+    private String schemaName;
+
     @Column(name = "encrypted_password", length = 1000)
     private String encryptedPassword;
 
@@ -48,9 +51,10 @@ public class TenantPlacementEntity extends ControlEntity {
     public void setDatabaseName(String databaseName) { this.databaseName = databaseName; }
     public String getDatabaseUsername() { return databaseUsername; }
     public void setDatabaseUsername(String databaseUsername) { this.databaseUsername = databaseUsername; }
+    public String getSchemaName() { return schemaName; }
+    public void setSchemaName(String schemaName) { this.schemaName = schemaName; }
     public String getEncryptedPassword() { return encryptedPassword; }
     public void setEncryptedPassword(String encryptedPassword) { this.encryptedPassword = encryptedPassword; }
     public String getSchemaVersion() { return schemaVersion; }
     public void setSchemaVersion(String schemaVersion) { this.schemaVersion = schemaVersion; }
 }
-

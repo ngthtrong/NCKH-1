@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Profile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
@@ -22,6 +23,7 @@ import vn.edu.ctu.saas.control.TenantPlacementRepository;
 import vn.edu.ctu.saas.control.TenantRepository;
 import vn.edu.ctu.saas.control.UserAccountEntity;
 import vn.edu.ctu.saas.control.UserAccountRepository;
+import vn.edu.ctu.saas.customization.AutomationEventHandler;
 import vn.edu.ctu.saas.provisioning.TenantDatabaseProvisioner;
 import vn.edu.ctu.saas.storage.ResourceDeletionHandler;
 import vn.edu.ctu.saas.tenant.TenantContext;
@@ -41,7 +43,30 @@ public class OutboxWorker {
     private final TenantJdbcExecutor executor;
     private final NotificationDispatcher dispatcher;
     private final ResourceDeletionHandler resourceDeletionHandler;
+    private final AutomationEventHandler automationEventHandler;
     private final ObjectMapper objectMapper;
+
+    @Autowired
+    public OutboxWorker(
+            TenantRepository tenantRepository,
+            TenantPlacementRepository placementRepository,
+            TenantMembershipRepository membershipRepository,
+            UserAccountRepository userRepository,
+            TenantJdbcExecutor executor,
+            NotificationDispatcher dispatcher,
+            ResourceDeletionHandler resourceDeletionHandler,
+            AutomationEventHandler automationEventHandler,
+            ObjectMapper objectMapper) {
+        this.tenantRepository = tenantRepository;
+        this.placementRepository = placementRepository;
+        this.membershipRepository = membershipRepository;
+        this.userRepository = userRepository;
+        this.executor = executor;
+        this.dispatcher = dispatcher;
+        this.resourceDeletionHandler = resourceDeletionHandler;
+        this.automationEventHandler = automationEventHandler;
+        this.objectMapper = objectMapper;
+    }
 
     public OutboxWorker(
             TenantRepository tenantRepository,
@@ -52,14 +77,8 @@ public class OutboxWorker {
             NotificationDispatcher dispatcher,
             ResourceDeletionHandler resourceDeletionHandler,
             ObjectMapper objectMapper) {
-        this.tenantRepository = tenantRepository;
-        this.placementRepository = placementRepository;
-        this.membershipRepository = membershipRepository;
-        this.userRepository = userRepository;
-        this.executor = executor;
-        this.dispatcher = dispatcher;
-        this.resourceDeletionHandler = resourceDeletionHandler;
-        this.objectMapper = objectMapper;
+        this(tenantRepository, placementRepository, membershipRepository, userRepository, executor,
+                dispatcher, resourceDeletionHandler, null, objectMapper);
     }
 
     @Scheduled(fixedDelayString = "${OUTBOX_POLL_INTERVAL:PT3S}")
@@ -138,6 +157,7 @@ public class OutboxWorker {
             if (resourceDeletionHandler.supports(event)) {
                 resourceDeletionHandler.handle(event);
             } else {
+                if (automationEventHandler != null) automationEventHandler.handle(event);
                 Set<UUID> recipientUserIds = projectRecipientUserIds(event);
                 for (TenantMembershipEntity membership : memberships) {
                     if (membership.getUserId().equals(event.actorUserId())) continue;

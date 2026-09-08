@@ -74,7 +74,9 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   if (response.status === 204) return undefined as T;
-  return (await response.json()) as T;
+  const responseBody = await response.text();
+  if (!responseBody) return null as T;
+  return JSON.parse(responseBody) as T;
 }
 
 export function errorMessage(error: unknown): string {

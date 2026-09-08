@@ -1,6 +1,6 @@
 # NCKH-1 — Multi-tenant SaaS Task Management
 
-Monorepo phục vụ đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**. Hệ thống hướng tới mô hình Bridge: tenant Pool dùng chung PostgreSQL database/schema, tenant Silo dùng database riêng; control plane, mã ứng dụng và quy trình vận hành được dùng chung.
+Monorepo phục vụ đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**. Hệ thống hướng tới mô hình Bridge ba placement: tenant Pool dùng chung PostgreSQL database/schema/bảng, tenant Schema-per-tenant dùng schema riêng trong database chung và tenant Silo dùng database riêng; control plane, mã API/worker/frontend và quy trình vận hành được dùng chung.
 
 > Điểm tiếp tục mới nhất nằm tại [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md). Đọc tài liệu này trước khi phát triển tiếp; các cổng thực nghiệm chưa được đánh dấu đạt nếu chưa có số đo thật.
 
@@ -27,6 +27,7 @@ Sau khi health check thành công:
 
 - Trang đăng nhập: `http://accounts.localhost:8080`
 - Tenant Pool mẫu: `http://pool-demo.localhost:8080`
+- Tenant Schema-per-tenant mẫu: `http://schema-demo.localhost:8080`
 - Tenant Silo mẫu: `http://silo-demo.localhost:8080`
 - Mailpit: `http://127.0.0.1:8025`
 - MinIO console: `http://127.0.0.1:9001`
@@ -68,4 +69,4 @@ Không commit secrets, token, dữ liệu định danh người tham gia hoặc 
 
 ## Trạng thái phạm vi
 
-Repo đã có baseline cho control plane, tenant context, Pool/Silo resolver, RLS, provisioning state machine, Kanban API/UI, resource/notification adapters, container stack và test/experiment harness. Đây chưa phải bản nghiệm thu cuối. VPS, provider sandbox, thực nghiệm chính và đánh giá người dùng cần hạ tầng, credential, phê duyệt và dữ liệu thật từ nhóm nghiên cứu.
+Repo đã có baseline cho control plane, tenant context, resolver ba placement, RLS/quyền schema, provisioning state machine, Kanban API/UI, capability và các module tùy biến, resource/notification adapters, container stack và test/experiment harness. Đây chưa phải bản nghiệm thu cuối. VPS, provider sandbox, thực nghiệm chính và đánh giá người dùng cần hạ tầng, credential, phê duyệt và dữ liệu thật từ nhóm nghiên cứu.

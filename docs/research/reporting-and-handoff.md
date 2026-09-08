@@ -50,15 +50,15 @@ Tối đa nội dung theo biểu mẫu Đại học Cần Thơ: vấn đề → 
 | Thời lượng | Nội dung | Minh chứng bắt buộc |
 | --- | --- | --- |
 | 0–20s | Vấn đề và RQ | Không cần số liệu |
-| 20–45s | Bridge: control chung, Pool và Silo | C4/animation đúng kiến trúc |
-| 45–90s | Demo cùng Kanban trên một Pool tenant và một Silo tenant | URL/tenant badge rõ, không lộ secret |
+| 20–45s | Bridge: control chung và ba placement | C4/animation đúng kiến trúc |
+| 45–90s | Demo cùng Kanban trên ba placement và capability/tùy biến theo tầng | URL/tenant badge rõ, không lộ secret |
 | 90–110s | Tấn công chéo bị từ chối; provisioning retry/idempotent; dashboard | Test/demo thật, không dựng response giả |
 | 110–120s | Kết quả chính và giới hạn | Chỉ số lấy từ run đã duyệt |
 
 ## 4. Gói bàn giao
 
 - Mã API/worker/web, lockfiles và OpenAPI.
-- Control/pool/silo migrations; seed Pool/Silo; contract/security tests.
+- Control/application migrations; seed Pool/Schema/Silo; contract/security tests.
 - Compose và `.env.example`; không có secret thật.
 - k6 scenarios, raw results được chọn, manifest/checksum và notebook tái tạo hình.
 - Protocol, search/screening register, source/BibTeX, SRS, ADR, C4/ERD/sequence/threat model.
@@ -69,8 +69,8 @@ Tối đa nội dung theo biểu mẫu Đại học Cần Thơ: vấn đề → 
 ## 5. Demo acceptance
 
 1. Khởi động từ clone sạch bằng hướng dẫn, không secret thật.
-2. Seed một tenant Pool và một tenant Silo.
-3. Thực hiện cùng Project/Board/Task API trên cả hai.
+2. Seed tenant Pool, Schema-per-tenant và Silo.
+3. Thực hiện cùng Project/Board/Task API trên cả ba; demo module theo đúng ma trận capability.
 4. Token tenant A trên host B và ID task B từ A đều bị chặn trước side effect.
 5. Gửi callback/payment/job trùng và chứng minh chỉ một provisioning result.
 6. Hiển thị dashboard/log có tenant/tier/placement/correlation nhưng không có token/nội dung nhạy cảm.
@@ -83,4 +83,3 @@ Tối đa nội dung theo biểu mẫu Đại học Cần Thơ: vấn đề → 
 - Cấp VPS/domain/wildcard TLS, SMTP thật và payment sandbox credentials.
 - Chạy pilot/thí nghiệm chính trên hạ tầng đã khóa và duyệt exclusion của run lỗi.
 - Xác nhận ngày khóa literature search và sàng lọc hai người.
-

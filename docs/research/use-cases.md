@@ -83,10 +83,11 @@ Các use case dùng mã ổn định để liên kết test. “Hệ thống” 
 - **Ngoại lệ:** signature sai; ref không tồn tại; amount mismatch; event trùng; success sau terminal invalid state; callback đến trước Return URL. Return URL chỉ hiển thị trạng thái truy vấn từ server.
 - **Truy vết:** FR-70..74, SEC-14.
 
-## UC-12 — Provision tenant Pool/Silo
+## UC-12 — Provision tenant theo ba placement
 
 - **Tác nhân:** ProvisioningWorker.
 - **Luồng Pool:** claim job → tạo logical tenant/application seed bằng app migration hiện hành → kiểm health/schema → tạo route → commit `SUCCEEDED` → control plane chuyển Active.
+- **Luồng Schema-per-tenant:** claim → cấp schema + runtime role quyền tối thiểu trong shared schema database → chạy migration có history riêng → grant DML → health check → Active.
 - **Luồng Silo:** claim → cấp database+least-privilege role → chạy shared application migrations → seed tenant → register encrypted connection route → health check → Active.
 - **Ngoại lệ:** crash ở bất kỳ checkpoint; migration fail; connection fail; route conflict. Retry nhận ra tài nguyên đã tồn tại; rollback chỉ xóa tài nguyên chắc chắn thuộc job và chưa chứa dữ liệu user; mọi bước audit.
 - **Truy vết:** FR-75..78, REL-01..03.
@@ -98,10 +99,37 @@ Các use case dùng mã ổn định để liên kết test. “Hệ thống” 
 - **Giới hạn:** SystemAdmin không có “impersonate” hoặc tự động đọc project/task/resource trong v1; không force Active khi thiếu step.
 - **Truy vết:** FR-74, FR-78, SEC-09, OBS-01..04.
 
-## UC-14 — Thí nghiệm cô lập và noisy neighbor
+## UC-14 — Quản lý capability và Branding
+
+- **Tác nhân:** SystemAdmin; TenantOwner/TenantAdmin.
+- **Luồng chính:** SystemAdmin cấp capability trong giới hạn placement → Owner/Admin bật module → cập nhật màu/logo hợp lệ → giao diện tenant áp dụng cấu hình; mọi thay đổi có version và audit.
+- **Ngoại lệ:** capability vượt placement; stale version; role không đủ; logo sai MIME/quá lớn; tắt Approvals khi còn run pending hoặc workflow bật. Server từ chối trước mutation.
+- **Truy vết:** FR-80..89, SEC-17, UX-05.
+
+## UC-15 — Tùy biến dữ liệu project
+
+- **Tác nhân:** ProjectManager; ProjectMember; ProjectViewer; CustomizationWorker.
+- **Luồng chính:** Manager tạo định nghĩa/field → worker áp dụng DDL bằng tên vật lý do server sinh → Manager/Member CRUD dữ liệu hoặc giá trị Task → Viewer đọc → xóa mềm/khôi phục giữ dữ liệu.
+- **Ngoại lệ:** Pool hoặc capability chưa bật; type/option/required sai; stale version; DDL lỗi/retry; role project không đủ; identifier do client chèn. Runtime role không có DDL.
+- **Truy vết:** FR-90..99, SEC-18..19, REL-06.
+
+## UC-16 — Phê duyệt Task nhiều bước
+
+- **Tác nhân:** ProjectManager; ProjectMember trong nhóm duyệt.
+- **Luồng chính:** Manager cấu hình workflow → user gửi Task → hệ thống chụp snapshot → xử lý tuần tự `ANY`/`ALL` → khi toàn bộ bước đạt, hệ thống đưa Task vào cột hoàn thành và phát event.
+- **Ngoại lệ:** tự duyệt; Viewer/người mất quyền; bước rỗng; quyết định đồng thời đến muộn; Task thay đổi; direct/batch move vào cột hoàn thành; reject/withdraw. Backend chặn hoặc invalidates run theo contract.
+- **Truy vết:** FR-100..109, SEC-20, REL-07.
+
+## UC-17 — Tự động hóa hữu hạn
+
+- **Tác nhân:** ProjectManager; AutomationWorker.
+- **Luồng chính:** Manager tạo rule một trigger–một action → outbox event khớp rule → worker chống trùng, kiểm lại quyền/capability → assign active member hoặc tạo in-app notification → lưu execution.
+- **Ngoại lệ:** rule/capability/project bị tắt; recipient mất quyền; retry/trùng event; action vi phạm phê duyệt. Không thực thi code/SQL, tự move Task hoặc phát sinh chuỗi rule.
+- **Truy vết:** FR-110..116, SEC-21, REL-08.
+
+## UC-18 — Thí nghiệm cô lập và noisy neighbor
 
 - **Tác nhân:** nhà nghiên cứu/k6.
-- **Luồng chính:** seed 3–5 tenant Pool/Silo → chạy smoke/baseline/load với manifest → chạy adversarial isolation tests → chạy aggressor/victim trước/sau rate limit → lưu raw data/checksum → notebook sinh bảng/biểu đồ.
+- **Luồng chính:** seed 3–5 tenant thuộc ba placement → chạy smoke/baseline/load với manifest → chạy adversarial isolation tests → chạy aggressor/victim trước/sau rate limit → lưu raw data/checksum → notebook sinh bảng/biểu đồ. Lượt đo chi phí module/tùy biến được tách riêng.
 - **Ngoại lệ:** version/config khác, thiếu metric, run gián đoạn hoặc seed sai. Đánh dấu run invalid có lý do; không trộn vào phân tích.
 - **Truy vết:** RQ3, RQ4, PERF-01..05, OBS-05.
-

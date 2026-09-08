@@ -41,6 +41,7 @@ public class TenantJdbcExecutor {
                 setLocal(connection, "app.tenant_id", context.tenantId().toString());
                 setLocal(connection, "app.user_id", context.userId().toString());
                 setLocal(connection, "app.correlation_id", context.correlationId());
+                setLocal(connection, "search_path", dataSourceResolver.schemaName(context));
                 JdbcTemplate template = new JdbcTemplate(new SingleConnectionDataSource(connection, true));
                 T result = work.apply(template);
                 connection.commit();
@@ -64,4 +65,3 @@ public class TenantJdbcExecutor {
         }
     }
 }
-

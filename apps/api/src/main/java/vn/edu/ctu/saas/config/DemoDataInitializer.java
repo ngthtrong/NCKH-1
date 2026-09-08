@@ -65,7 +65,7 @@ public class DemoDataInitializer {
     @Scheduled(initialDelayString = "PT1S", fixedDelayString = "PT30S")
     public void ensureDemoData() {
         SeedUsers users = ensureControlData();
-        for (String slug : List.of("pool-demo", "silo-demo")) {
+        for (String slug : List.of("pool-demo", "schema-demo", "silo-demo")) {
             TenantEntity tenant = tenantRepository.findBySlug(slug).orElse(null);
             if (tenant != null && tenant.getStatus() == TenantStatus.ACTIVE) {
                 seedApplicationData(tenant, users);
@@ -94,6 +94,7 @@ public class DemoDataInitializer {
             return userRepository.save(created);
         });
         ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, member);
+        ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
         ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
         return new SeedUsers(owner, member);
     }
@@ -113,15 +114,21 @@ public class DemoDataInitializer {
             created.setStatus(TenantStatus.PROVISIONING);
             return tenantRepository.save(created);
         });
-        if (placementRepository.findByTenantId(tenant.getId()).isEmpty()) {
-            TenantPlacementEntity placement = new TenantPlacementEntity();
-            placement.setTenantId(tenant.getId());
-            placement.setPlacementType(placementType);
-            placementRepository.save(placement);
+        TenantPlacementEntity placement = placementRepository.findByTenantId(tenant.getId()).orElse(null);
+        if (placement == null) {
+            TenantPlacementEntity createdPlacement = new TenantPlacementEntity();
+            createdPlacement.setTenantId(tenant.getId());
+            createdPlacement.setPlacementType(placementType);
+            placementRepository.save(createdPlacement);
+        } else if (placementType == TenantPlacement.SCHEMA_PER_TENANT
+                && tenant.getStatus() == TenantStatus.ACTIVE
+                && (placement.getSchemaName() == null || placement.getSchemaName().isBlank())) {
+            tenant.setStatus(TenantStatus.PROVISIONING);
+            tenant = tenantRepository.save(tenant);
         }
         ensureMembership(tenant.getId(), owner.getId(), TenantRole.OWNER);
         ensureMembership(tenant.getId(), member.getId(), TenantRole.MEMBER);
-        String key = "seed:" + tenant.getId();
+        String key = "seed:bridge-v2:" + tenant.getId();
         if (tenant.getStatus() != TenantStatus.ACTIVE) {
             provisioningService.enqueue(tenant.getId(), key);
         }

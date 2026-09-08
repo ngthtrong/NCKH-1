@@ -250,6 +250,7 @@ export function OnboardingPage() {
                       onChange={(event) => setPlacement(event.target.value as TenantPlacement)}
                     >
                       <MenuItem value="POOL">Pool — shared database</MenuItem>
+                      <MenuItem value="SCHEMA_PER_TENANT">Schema — lược đồ riêng</MenuItem>
                       <MenuItem value="SILO_DATABASE">Silo — database riêng</MenuItem>
                     </Select>
                   </FormControl>

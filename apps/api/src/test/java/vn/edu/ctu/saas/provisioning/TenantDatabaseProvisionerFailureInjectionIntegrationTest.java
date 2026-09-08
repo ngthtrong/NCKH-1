@@ -400,6 +400,7 @@ class TenantDatabaseProvisionerFailureInjectionIntegrationTest {
                 new AppProperties.Datasource(
                         new AppProperties.Datasource.Pool(
                                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword(), 2),
+                        baseline.datasource().schema(),
                         baseline.datasource().silo()),
                 new AppProperties.Provisioning(
                         POSTGRES.getJdbcUrl(),

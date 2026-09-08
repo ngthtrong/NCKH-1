@@ -61,6 +61,7 @@ final class ProvisioningCrashProcess {
                 baseline.jwt(),
                 new AppProperties.Datasource(
                         new AppProperties.Datasource.Pool(adminUrl, username, password, 2),
+                        baseline.datasource().schema(),
                         baseline.datasource().silo()),
                 new AppProperties.Provisioning(
                         adminUrl,

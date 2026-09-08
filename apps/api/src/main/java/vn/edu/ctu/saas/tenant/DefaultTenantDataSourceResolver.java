@@ -24,7 +24,7 @@ public class DefaultTenantDataSourceResolver implements TenantDataSourceResolver
     private final PlacementSecretCipher cipher;
     private final AppProperties properties;
     private final HikariDataSource poolDataSource;
-    private final Map<UUID, CachedDataSource> siloDataSources = new ConcurrentHashMap<>();
+    private final Map<UUID, CachedDataSource> isolatedDataSources = new ConcurrentHashMap<>();
 
     public DefaultTenantDataSourceResolver(
             TenantPlacementRepository placementRepository,
@@ -34,7 +34,8 @@ public class DefaultTenantDataSourceResolver implements TenantDataSourceResolver
         this.cipher = cipher;
         this.properties = properties;
         AppProperties.Datasource.Pool pool = properties.datasource().pool();
-        this.poolDataSource = build("pool-application", pool.jdbcUrl(), pool.username(), pool.password(), pool.maximumPoolSize());
+        this.poolDataSource = build("pool-application", pool.jdbcUrl(), pool.username(), pool.password(),
+                pool.maximumPoolSize(), properties.datasource().silo().idleTimeout());
     }
 
     @Override
@@ -42,32 +43,49 @@ public class DefaultTenantDataSourceResolver implements TenantDataSourceResolver
         if (context.placement() == TenantPlacement.POOL) {
             return poolDataSource;
         }
-        CachedDataSource cached = siloDataSources.compute(context.tenantId(), (tenantId, existing) -> {
+        CachedDataSource cached = isolatedDataSources.compute(context.tenantId(), (tenantId, existing) -> {
             if (existing != null && !existing.dataSource().isClosed()) {
                 return existing.touch();
             }
-            enforceGlobalCap();
+            enforceGlobalCap(context.placement());
             TenantPlacementEntity placement = placementRepository.findByTenantId(tenantId)
                     .orElseThrow(() -> new NotFoundException("Tenant placement not found"));
+            if (placement.getPlacementType() != context.placement()) {
+                throw new IllegalStateException("Tenant placement does not match the authenticated context");
+            }
             if (placement.getDatabaseName() == null || placement.getDatabaseUsername() == null
                     || placement.getEncryptedPassword() == null) {
-                throw new IllegalStateException("Silo tenant has not been provisioned");
+                throw new IllegalStateException("Tenant data placement has not been provisioned");
             }
             String host = placement.getDatabaseHost() == null ? "localhost" : placement.getDatabaseHost();
             int port = placement.getDatabasePort() == null ? 5432 : placement.getDatabasePort();
             String url = "jdbc:postgresql://" + host + ":" + port + "/" + placement.getDatabaseName();
             HikariDataSource dataSource = build(
-                    "silo-" + tenantId,
+                    context.placement().name().toLowerCase() + "-" + tenantId,
                     url,
                     placement.getDatabaseUsername(),
                     cipher.decrypt(placement.getEncryptedPassword()),
-                    properties.datasource().silo().maximumPoolSize());
-            return new CachedDataSource(dataSource, Instant.now());
+                    maximumPoolSize(context.placement()), idleTimeout(context.placement()));
+            return new CachedDataSource(dataSource, context.placement(), Instant.now());
         });
         return cached.dataSource();
     }
 
-    private HikariDataSource build(String name, String url, String username, String password, int maxPoolSize) {
+    @Override
+    public String schemaName(TenantContext context) {
+        if (context.placement() != TenantPlacement.SCHEMA_PER_TENANT) return "public";
+        TenantPlacementEntity placement = placementRepository.findByTenantId(context.tenantId())
+                .orElseThrow(() -> new NotFoundException("Tenant placement not found"));
+        if (placement.getPlacementType() != context.placement()
+                || placement.getSchemaName() == null
+                || !placement.getSchemaName().matches("[a-z_][a-z0-9_]{0,62}")) {
+            throw new IllegalStateException("Tenant schema placement has not been provisioned");
+        }
+        return placement.getSchemaName();
+    }
+
+    private HikariDataSource build(
+            String name, String url, String username, String password, int maxPoolSize, Duration idleTimeout) {
         HikariConfig config = new HikariConfig();
         config.setPoolName(name);
         config.setJdbcUrl(url);
@@ -76,26 +94,28 @@ public class DefaultTenantDataSourceResolver implements TenantDataSourceResolver
         config.setMaximumPoolSize(maxPoolSize);
         config.setMinimumIdle(0);
         config.setConnectionTimeout(5_000);
-        config.setIdleTimeout(Math.max(30_000, properties.datasource().silo().idleTimeout().toMillis()));
+        config.setIdleTimeout(Math.max(30_000, idleTimeout.toMillis()));
         config.setMaxLifetime(30 * 60_000);
         return new HikariDataSource(config);
     }
 
-    private void enforceGlobalCap() {
-        int perTenant = Math.max(1, properties.datasource().silo().maximumPoolSize());
-        int maxCached = Math.max(1, properties.datasource().silo().globalConnectionCap() / perTenant);
-        if (siloDataSources.size() < maxCached) return;
-        siloDataSources.entrySet().stream()
-                .min(Comparator.comparing(entry -> entry.getValue().lastUsed()))
-                .ifPresent(entry -> evict(entry.getKey()));
+    private void enforceGlobalCap(TenantPlacement placement) {
+        int maxCached = Math.max(1, globalConnectionCap(placement) / Math.max(1, maximumPoolSize(placement)));
+        while (isolatedDataSources.values().stream().filter(value -> value.placement() == placement).count() >= maxCached) {
+            UUID oldest = isolatedDataSources.entrySet().stream()
+                    .filter(entry -> entry.getValue().placement() == placement)
+                    .min(Comparator.comparing(entry -> entry.getValue().lastUsed()))
+                    .map(Map.Entry::getKey).orElse(null);
+            if (oldest == null) return;
+            evict(oldest);
+        }
     }
 
     @Scheduled(fixedDelayString = "PT1M")
     public void evictIdleDataSources() {
-        Duration idleTimeout = properties.datasource().silo().idleTimeout();
-        Instant cutoff = Instant.now().minus(idleTimeout);
-        siloDataSources.entrySet().stream()
-                .filter(entry -> entry.getValue().lastUsed().isBefore(cutoff))
+        isolatedDataSources.entrySet().stream()
+                .filter(entry -> entry.getValue().lastUsed().isBefore(
+                        Instant.now().minus(idleTimeout(entry.getValue().placement()))))
                 .map(Map.Entry::getKey)
                 .toList()
                 .forEach(this::evict);
@@ -103,18 +123,36 @@ public class DefaultTenantDataSourceResolver implements TenantDataSourceResolver
 
     @Override
     public void evict(UUID tenantId) {
-        CachedDataSource removed = siloDataSources.remove(tenantId);
+        CachedDataSource removed = isolatedDataSources.remove(tenantId);
         if (removed != null) removed.dataSource().close();
     }
 
     @PreDestroy
     void close() {
-        siloDataSources.values().forEach(cached -> cached.dataSource().close());
+        isolatedDataSources.values().forEach(cached -> cached.dataSource().close());
         poolDataSource.close();
     }
 
-    private record CachedDataSource(HikariDataSource dataSource, Instant lastUsed) {
-        CachedDataSource touch() { return new CachedDataSource(dataSource, Instant.now()); }
+    private int maximumPoolSize(TenantPlacement placement) {
+        return placement == TenantPlacement.SCHEMA_PER_TENANT
+                ? properties.datasource().schema().maximumPoolSize()
+                : properties.datasource().silo().maximumPoolSize();
+    }
+
+    private int globalConnectionCap(TenantPlacement placement) {
+        return placement == TenantPlacement.SCHEMA_PER_TENANT
+                ? properties.datasource().schema().globalConnectionCap()
+                : properties.datasource().silo().globalConnectionCap();
+    }
+
+    private Duration idleTimeout(TenantPlacement placement) {
+        return placement == TenantPlacement.SCHEMA_PER_TENANT
+                ? properties.datasource().schema().idleTimeout()
+                : properties.datasource().silo().idleTimeout();
+    }
+
+    private record CachedDataSource(
+            HikariDataSource dataSource, TenantPlacement placement, Instant lastUsed) {
+        CachedDataSource touch() { return new CachedDataSource(dataSource, placement, Instant.now()); }
     }
 }
-

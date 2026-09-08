@@ -13,6 +13,8 @@ public final class TestAppProperties {
                 new AppProperties.Jwt("test-jwt-secret-test-jwt-secret", "test", Duration.ofMinutes(15), Duration.ofMinutes(15), Duration.ofDays(7)),
                 new AppProperties.Datasource(
                         new AppProperties.Datasource.Pool("jdbc:postgresql://localhost/pool_db", "pool_app", "pool-secret", 10),
+                        new AppProperties.Datasource.Schema(
+                                "jdbc:postgresql://localhost/schema_db", 2, Duration.ofMinutes(10), 10),
                         new AppProperties.Datasource.Silo(2, Duration.ofMinutes(10), 10)),
                 new AppProperties.Provisioning(
                         "jdbc:postgresql://localhost/postgres", "provisioner", "provisioner-secret",

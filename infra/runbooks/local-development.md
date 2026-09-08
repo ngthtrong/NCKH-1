@@ -23,7 +23,7 @@ docker compose --env-file infra/.env -f infra/compose.yaml logs --tail=200 api w
 curl -H 'Host: accounts.localhost' http://127.0.0.1:8080/actuator/health
 ```
 
-Mặc định `DEMO_DATA_ENABLED=true` yêu cầu application seed do backend cung cấp. Tài khoản local nằm trong `infra/.env`; không dùng credential đó trong dữ liệu khảo sát hoặc môi trường công khai.
+Mặc định `DEMO_DATA_ENABLED=true` tạo tenant mẫu `pool-demo`, `schema-demo` và `silo-demo`. Tài khoản local nằm trong `infra/.env`; không dùng credential đó trong dữ liệu khảo sát hoặc môi trường công khai.
 
 ## Dừng và xử lý lỗi
 
@@ -43,10 +43,10 @@ Không dùng thao tác xóa volume để xử lý migration lỗi trong môi tr�
 
 ## Xác minh cô lập tối thiểu
 
-Sau khi backend seed một tenant Pool và một tenant Silo:
+Sau khi backend seed đủ ba placement:
 
 1. Đăng nhập ở `accounts.localhost`, lấy token riêng cho từng tenant.
 2. Gửi token tenant A đến host tenant B và xác nhận bị từ chối trước service nghiệp vụ.
-3. Dùng application database role kiểm tra `rolsuper=false`, `rolbypassrls=false`.
-4. Kiểm tra bảng pooled có cả RLS và force-RLS bật trong `pg_class`.
-5. Chạy test tự động backend; không xem thao tác thủ công là bằng chứng thay thế test.
+3. Dùng application database role kiểm tra `rolsuper=false`, `rolbypassrls=false`; role Schema/Silo không có DDL.
+4. Kiểm tra bảng pooled có cả RLS và force-RLS bật trong `pg_class`; thử role của một schema truy vấn bảng bằng tên schema tenant khác và xác nhận bị từ chối.
+5. Chạy `node scripts/verify-extension-workflow.mjs` và test tự động backend; không xem thao tác thủ công là bằng chứng thay thế test.

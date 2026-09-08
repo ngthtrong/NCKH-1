@@ -4,6 +4,9 @@
 **Ngày thiết lập:** 2026-08-25  
 **Trạng thái:** đang thực hiện; chưa khóa tìm kiếm tài liệu và chưa thu dữ liệu người dùng
 
+> [!NOTE]
+> Phiên bản 0.1 được đăng ký cho baseline Pool/Silo trước phần mở rộng ngày 2026-09-07. Mọi phép đo so sánh ba placement hoặc chi phí Custom Data/Approval/Automation phải có phụ lục protocol đăng ký trước; không sửa hồi tố run hay artifact P2 cũ.
+
 ## 1. Mục tiêu và câu hỏi nghiên cứu
 
 Mục tiêu là thiết kế, hiện thực và kiểm chứng một khung kiến trúc tham chiếu Bridge cho ứng dụng quản lý công việc Kanban trong môi trường đại học. Khung dùng chung danh tính, onboarding, mã nghiệp vụ và vận hành; dữ liệu nghiệp vụ được đặt ở Pool hoặc database Silo theo tenant.
@@ -102,4 +105,3 @@ Tên run khuyến nghị: `YYYYMMDD-HHMMZ_<scenario>_<placement>_<git-short-sha>
 - **Cổng B:** mã spike, dữ liệu thô, bảng điểm và ADR có thể tái kiểm tra.
 - **Cổng E:** không có truy cập chéo thành công; provisioning idempotent; môi trường và kết quả dựng lại được.
 - **Cổng F:** mỗi kết luận phân loại là `MEASURED`, `INFERRED`, `LIMITATION` hoặc `PENDING_DATA` và liên kết bằng chứng.
-

@@ -62,6 +62,11 @@ app:
       username: ${POOL_DB_USER:pool_app}
       password: ${POOL_DB_PASSWORD:local-pool-change-me}
       maximum-pool-size: ${POOL_DB_POOL_SIZE:10}
+    schema:
+      jdbc-url: ${SCHEMA_DB_URL:jdbc:postgresql://localhost:5432/schema_db}
+      maximum-pool-size: ${SCHEMA_DB_POOL_SIZE:2}
+      idle-timeout: ${SCHEMA_DB_IDLE_TIMEOUT:PT10M}
+      global-connection-cap: ${SCHEMA_GLOBAL_CONNECTION_CAP:10}
     silo:
       maximum-pool-size: ${SILO_DB_POOL_SIZE:2}
       idle-timeout: ${SILO_DB_IDLE_TIMEOUT:PT10M}

@@ -35,6 +35,7 @@ import {
   Avatar,
   Box,
   Button,
+  Checkbox,
   Chip,
   Dialog,
   DialogActions,
@@ -42,6 +43,7 @@ import {
   DialogTitle,
   Divider,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   MenuItem,
@@ -56,7 +58,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
-import { boardsApi, membersApi, projectsApi } from '../api/endpoints';
+import { approvalsApi, boardsApi, customDataApi, membersApi, projectsApi, tenantSettingsApi } from '../api/endpoints';
 import type { Board, BoardColumn, Comment, ProjectRole, TaskCard, TaskPriority, UUID } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
@@ -286,6 +288,7 @@ export function KanbanPage() {
   const [detailDescription, setDetailDescription] = useState('');
   const [detailDueAt, setDetailDueAt] = useState('');
   const [detailAssigneeId, setDetailAssigneeId] = useState<UUID | ''>('');
+  const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
   const [commentBody, setCommentBody] = useState('');
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [editingCommentBody, setEditingCommentBody] = useState('');
@@ -334,6 +337,25 @@ export function KanbanPage() {
     queryFn: () => boardsApi.comments(selectedTaskId as UUID),
     enabled: Boolean(selectedTaskId),
   });
+  const tenantSettings = useQuery({
+    queryKey: ['tenant-settings'],
+    queryFn: tenantSettingsApi.get,
+  });
+  const customCapability = tenantSettings.data?.capabilities.find((item) => item.capability === 'CUSTOM_DATA');
+  const approvalCapability = tenantSettings.data?.capabilities.find((item) => item.capability === 'APPROVALS');
+  const taskCustom = useQuery({
+    queryKey: ['task-custom-values', selectedTaskId],
+    queryFn: () => customDataApi.taskValues(selectedTaskId as UUID),
+    enabled: Boolean(selectedTaskId && customCapability?.supported),
+  });
+  const approvalRuns = useQuery({
+    queryKey: ['task-approval-runs', selectedTaskId],
+    queryFn: () => approvalsApi.runs(selectedTaskId as UUID),
+    enabled: Boolean(selectedTaskId && approvalCapability?.supported),
+  });
+  useEffect(() => {
+    if (taskCustom.data) setCustomValues(taskCustom.data.values);
+  }, [taskCustom.data]);
 
   const acceptBoard = (updatedBoard: Board) => {
     setBoard(updatedBoard);
@@ -513,6 +535,40 @@ export function KanbanPage() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['task-comments', selectedTaskId] }),
     onError: (cause) => setSnackbar(errorMessage(cause)),
   });
+  const saveCustomValues = useMutation({
+    mutationFn: () => customDataApi.updateTaskValues(
+      selectedTaskId as UUID, customValues, taskCustom.data?.version ?? 0,
+    ),
+    onSuccess: async () => {
+      setSnackbar('Đã lưu field mở rộng của công việc.');
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['task-custom-values', selectedTaskId] }),
+        queryClient.invalidateQueries({ queryKey: ['task-approval-runs', selectedTaskId] }),
+      ]);
+    },
+    onError: (cause) => setSnackbar(errorMessage(cause)),
+  });
+  const submitApproval = useMutation({
+    mutationFn: () => approvalsApi.submit(selectedTaskId as UUID),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['task-approval-runs', selectedTaskId] }),
+    onError: (cause) => setSnackbar(errorMessage(cause)),
+  });
+  const decideApproval = useMutation({
+    mutationFn: ({ runId, decision, version }: { runId: UUID; decision: 'APPROVED' | 'REJECTED'; version: number }) =>
+      approvalsApi.decide(runId, decision, version),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['task-approval-runs', selectedTaskId] }),
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] }),
+      ]);
+    },
+    onError: (cause) => setSnackbar(errorMessage(cause)),
+  });
+  const withdrawApproval = useMutation({
+    mutationFn: ({ runId, version }: { runId: UUID; version: number }) => approvalsApi.withdraw(runId, version),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['task-approval-runs', selectedTaskId] }),
+    onError: (cause) => setSnackbar(errorMessage(cause)),
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -557,6 +613,13 @@ export function KanbanPage() {
   const canManageColumns = projectActive && selectedProject?.role === 'MANAGER';
   const selectedTask = board?.columns.flatMap((column) => column.tasks)
     .find((task) => task.id === selectedTaskId);
+  const latestApproval = approvalRuns.data?.[0];
+  const currentApprovalStep = latestApproval?.steps.find(
+    (step) => step.position === latestApproval.currentStep && step.status === 'PENDING',
+  );
+  const currentUserCanDecide = currentApprovalStep?.approvers.some(
+    (approver) => approver.userId === session?.user.id && !approver.decision,
+  );
   const memberNameByUserId = new Map(
     (tenantMembers.data ?? []).map((member) => [member.user.id, member.user.displayName]),
   );
@@ -936,6 +999,92 @@ export function KanbanPage() {
                     </Button>
                   )}
                 </Stack>
+              )}
+              {customCapability?.supported && taskCustom.data?.definition && (
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="h6" gutterBottom>Field mở rộng</Typography>
+                  {!customCapability.enabled && (
+                    <Alert severity="info" sx={{ mb: 2 }}>Capability đã tắt; dữ liệu hiện có chỉ đọc.</Alert>
+                  )}
+                  <Stack spacing={1.5}>
+                    {taskCustom.data.definition.fields
+                      .filter((field) => field.status === 'ACTIVE')
+                      .map((field) => field.dataType === 'BOOLEAN' ? (
+                        <FormControlLabel
+                          key={field.id}
+                          label={field.displayName}
+                          control={<Checkbox checked={Boolean(customValues[field.id])} />}
+                          disabled={!canEditTasks || !customCapability.enabled}
+                          onChange={(_, checked) => setCustomValues((current) => ({ ...current, [field.id]: checked }))}
+                        />
+                      ) : field.dataType === 'SINGLE_SELECT' ? (
+                        <FormControl key={field.id} fullWidth size="small" disabled={!canEditTasks || !customCapability.enabled}>
+                          <InputLabel>{field.displayName}</InputLabel>
+                          <Select
+                            label={field.displayName}
+                            value={String(customValues[field.id] ?? '')}
+                            onChange={(event) => setCustomValues((current) => ({ ...current, [field.id]: event.target.value }))}
+                          >
+                            {!field.required && <MenuItem value="">Không chọn</MenuItem>}
+                            {field.options.map((option) => <MenuItem key={option} value={option}>{option}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <TextField
+                          key={field.id}
+                          label={field.displayName}
+                          required={field.required}
+                          type={field.dataType === 'NUMBER' ? 'number' : field.dataType === 'DATE' ? 'date' : 'text'}
+                          InputLabelProps={field.dataType === 'DATE' ? { shrink: true } : undefined}
+                          value={String(customValues[field.id] ?? '')}
+                          disabled={!canEditTasks || !customCapability.enabled}
+                          onChange={(event) => setCustomValues((current) => ({ ...current, [field.id]: event.target.value }))}
+                        />
+                      ))}
+                    {canEditTasks && customCapability.enabled && (
+                      <Button
+                        variant="outlined"
+                        disabled={saveCustomValues.isPending}
+                        onClick={() => saveCustomValues.mutate()}
+                        sx={{ alignSelf: 'flex-start' }}
+                      >
+                        Lưu field mở rộng
+                      </Button>
+                    )}
+                  </Stack>
+                </Paper>
+              )}
+              {approvalCapability?.supported && (
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
+                    <Box>
+                      <Typography variant="h6">Phê duyệt</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {latestApproval
+                          ? `${latestApproval.status} · bước ${latestApproval.currentStep}/${latestApproval.steps.length}`
+                          : 'Chưa có lượt duyệt.'}
+                      </Typography>
+                    </Box>
+                    {latestApproval && <Chip label={latestApproval.status} color={latestApproval.status === 'APPROVED' ? 'success' : latestApproval.status === 'REJECTED' ? 'error' : 'default'} />}
+                  </Stack>
+                  <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
+                    {approvalCapability.enabled && canEditTasks && latestApproval && latestApproval.status !== 'PENDING' && (
+                      <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending}>Gửi duyệt</Button>
+                    )}
+                    {approvalCapability.enabled && canEditTasks && !latestApproval && (
+                      <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending}>Gửi duyệt</Button>
+                    )}
+                    {approvalCapability.enabled && currentUserCanDecide && latestApproval && (
+                      <>
+                        <Button color="success" variant="contained" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'APPROVED', version: latestApproval.version })}>Đồng ý</Button>
+                        <Button color="error" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'REJECTED', version: latestApproval.version })}>Từ chối</Button>
+                      </>
+                    )}
+                    {approvalCapability.enabled && latestApproval?.status === 'PENDING' && (latestApproval.submittedBy === session?.user.id || selectedProject?.role === 'MANAGER') && (
+                      <Button disabled={withdrawApproval.isPending} onClick={() => withdrawApproval.mutate({ runId: latestApproval.id, version: latestApproval.version })}>Thu hồi lượt duyệt</Button>
+                    )}
+                  </Stack>
+                </Paper>
               )}
               <Divider />
               <Stack direction="row" alignItems="center" gap={1}>

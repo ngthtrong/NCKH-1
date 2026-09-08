@@ -211,6 +211,20 @@ export type ResourceDeadLetter = ApiSchemas['ResourceDeadLetterView'];
 export type NotificationPreferences = ApiSchemas['NotificationPreferences'];
 export type PushSubscription = ApiSchemas['PushSubscriptionView'];
 
+export type TenantCapability = ApiSchemas['TenantCapability'];
+export type CapabilityView = ApiSchemas['CapabilityView'];
+export type TenantSettings = ApiSchemas['TenantSettingsView'];
+export type BrandingView = ApiSchemas['BrandingView'];
+export type CustomDefinition = ApiSchemas['CustomDefinitionView'];
+export type CustomField = ApiSchemas['CustomFieldView'];
+export type CustomRecord = ApiSchemas['CustomRecordView'];
+export type TaskCustomValues = ApiSchemas['TaskCustomValuesView'];
+export type CustomSchemaJob = ApiSchemas['CustomSchemaJobView'];
+export type ApprovalWorkflow = ApiSchemas['ApprovalWorkflowView'];
+export type ApprovalRun = ApiSchemas['ApprovalRunView'];
+export type AutomationRule = ApiSchemas['AutomationRuleView'];
+export type AutomationExecution = ApiSchemas['AutomationExecutionView'];
+
 export interface PageResponse<T> {
   items: T[];
   page: number;

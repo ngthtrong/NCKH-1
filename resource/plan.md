@@ -10,15 +10,15 @@ Khung kiến trúc phải thống nhất được:
 
 - Quản lý danh tính và ngữ cảnh thuê bao.
 - Cô lập dữ liệu và phân quyền xuyên suốt các tầng.
-- Nhánh **Pool** dùng chung CSDL và nhánh **Silo** dùng CSDL riêng cho từng thuê bao.
+- Ba placement dữ liệu: Pool dùng chung database/schema/bảng; Schema-per-tenant dùng chung database nhưng riêng schema/bảng; Silo dùng database riêng cho từng thuê bao.
 - Quy trình đăng ký, thanh toán thử nghiệm và cấp phát tự động.
 - Vận hành, ghi log, thu thập chỉ số và giới hạn tải theo thuê bao.
-- Cùng một nghiệp vụ ứng dụng hoạt động nhất quán trên cả Pool và Silo.
+- Cùng một ứng dụng API/worker/frontend và nghiệp vụ lõi hoạt động nhất quán trên cả ba placement.
 
 ### Câu hỏi nghiên cứu
 
 1. Ứng dụng quản lý công việc trong môi trường đại học cần những yêu cầu nghiệp vụ và yêu cầu đa thuê bao nào?
-2. Làm thế nào xây dựng một khung kiến trúc Bridge kết hợp Pool và Silo nhưng vẫn dùng chung danh tính, quy trình cấp phát, mã nghiệp vụ và trải nghiệm vận hành?
+2. Làm thế nào xây dựng một khung kiến trúc Bridge kết hợp ba placement nhưng vẫn dùng chung danh tính, quy trình cấp phát, mã nghiệp vụ và trải nghiệm vận hành?
 3. Kiến trúc đề xuất đáp ứng đến mức nào các yêu cầu về cô lập dữ liệu, phân quyền, cấp phát, hiệu năng, kiểm soát noisy neighbor và khả dụng?
 4. Những cơ chế và công nghệ nào phù hợp nhất để hiện thực kiến trúc trên một VPS có tài nguyên giới hạn?
 
@@ -27,7 +27,7 @@ Khung kiến trúc phải thống nhất được:
 - Ứng dụng web; không xây ứng dụng di động.
 - Một tài khoản có thể tham gia nhiều tenant/workspace.
 - Mọi tài khoản được tạo tenant; người tạo trở thành Owner.
-- Tenant chọn Pool hoặc Silo khi đăng ký; không hiện thực chuyển đổi gói sau khi đã có dữ liệu.
+- Tenant chọn Pool, Schema-per-tenant hoặc Silo khi đăng ký; placement bất biến sau onboarding và không chuyển tenant đã có dữ liệu giữa các placement trong đợt này.
 - Silo chỉ tách CSDL; ứng dụng, compute, định danh, giám sát và kho tệp vẫn dùng chung.
 - Tenant được nhận diện bằng subdomain và token chứa `tenant_id`; hai giá trị bắt buộc khớp.
 - Thanh toán dùng sandbox, nhà cung cấp được chọn sau khảo sát kỹ thuật.
@@ -35,6 +35,14 @@ Khung kiến trúc phải thống nhất được:
 - Có giới hạn request và logging/metrics theo tenant.
 - Đánh giá với 3–5 nhóm, tổng cộng 30–60 người, chủ yếu là sinh viên; tải đồng thời được bổ sung bằng người dùng ảo.
 - Không phân chia đầu việc theo thành viên hoặc thời gian; thứ tự dưới đây biểu thị quan hệ phụ thuộc.
+
+### Thuật ngữ bố trí dữ liệu đã thống nhất
+
+- **Shared Database, Shared Schema — chung CSDL, chung lược đồ:** tenant chung database, chung schema và chung các bảng. **Pool hiện tại thuộc mô hình này**, dùng `tenant_id` và RLS để cô lập dữ liệu.
+- **Shared Database, Separate Schema — chung CSDL, riêng lược đồ:** tenant chung database nhưng mỗi tenant có schema riêng chứa bộ bảng riêng. Placement tương ứng là **Schema-per-tenant (`SCHEMA_PER_TENANT`)**.
+- **Separate Database — riêng CSDL:** mỗi tenant dùng database riêng, không phụ thuộc các database nằm cùng hay khác máy chủ vật lý. **Silo hiện tại (`SILO_DATABASE`) thuộc mô hình này.**
+
+Ánh xạ trên áp dụng cho dữ liệu nghiệp vụ; control database vẫn dùng chung. Bridge trong phần mở rộng kết hợp cả ba placement, không phải một mức cô lập CSDL thứ tư. Ba placement dùng chung mã ứng dụng và migration lõi nhưng không dùng chung bảng vật lý ở mức schema/database riêng. Xem [thuật ngữ chuẩn](./chuan_hoa_thuat_ngu.md).
 
 ## 2. Các nhóm đầu việc và nội dung nghiên cứu
 
@@ -103,7 +111,7 @@ Các chiều so sánh:
 
 #### Chức năng ứng dụng
 
-- Đăng ký, đăng nhập, tạo tenant và chọn gói Pool hoặc Silo.
+- Đăng ký, đăng nhập, tạo tenant và chọn placement Pool, Schema-per-tenant hoặc Silo.
 - Thanh toán thử nghiệm và theo dõi trạng thái cấp phát.
 - Chuyển đổi ngữ cảnh giữa các tenant mà tài khoản đang tham gia.
 - Mời, chấp nhận lời mời, thu hồi thành viên và gán vai trò.
@@ -130,7 +138,7 @@ Các chiều so sánh:
 #### Yêu cầu phi chức năng
 
 - Không cho phép đọc, ghi, xóa, tải tệp hoặc nhận thông báo chéo tenant.
-- Cùng một API nghiệp vụ hoạt động trên cả Pool và Silo.
+- Cùng một API nghiệp vụ lõi hoạt động trên cả ba placement.
 - Cấp phát có tính idempotent và có thể thử lại.
 - Giới hạn tải theo tenant/tier.
 - Mọi request và background job đều truy vết được theo tenant.
@@ -148,7 +156,7 @@ Các chiều so sánh:
   - Bộ lọc truy vấn toàn cục của framework/ORM.
   - PostgreSQL RLS kết hợp ngữ cảnh tenant.
 - So sánh dựa trên khả năng chống bỏ sót điều kiện tenant, kiểm thử, hiệu năng, độ phức tạp migration, nguy cơ bypass và mức phụ thuộc công nghệ.
-- Thiết kế nhánh Silo theo database-per-tenant, không triển khai full-stack-per-tenant.
+- Thiết kế nhánh Schema-per-tenant theo schema/role riêng và nhánh Silo theo database-per-tenant; không triển khai full-stack-per-tenant.
 - Xác định thành phần dùng chung và thành phần tách riêng bằng sơ đồ control plane/application plane.
 - Ghi mọi lựa chọn quan trọng bằng ADR và liên kết về bằng chứng nghiên cứu.
 
@@ -181,10 +189,10 @@ Không chọn framework theo cảm tính. Thực hiện như sau:
 - Tách:
   - **Control plane:** người dùng, tenant, membership, tier, thanh toán, placement, tuyến subdomain và trạng thái cấp phát.
   - **Application plane:** dự án, Kanban, công việc, bình luận, tài nguyên và thông báo.
-- Thiết kế ERD riêng cho control database, pooled database và silo database.
-- Thiết kế sequence diagram cho đăng nhập, đổi tenant, payment callback, provisioning, truy vấn Pool/Silo, tải tệp và gửi thông báo.
+- Thiết kế ERD riêng cho control database, pooled database và cấu trúc dùng chung trong schema/database riêng.
+- Thiết kế sequence diagram cho đăng nhập, đổi tenant, payment callback, provisioning, truy vấn ba placement, tải tệp và gửi thông báo.
 - Thiết kế pool kết nối CSDL có giới hạn để số tenant Silo không làm cạn kết nối trên VPS.
-- Thiết kế migration chung và cách theo dõi phiên bản schema của từng database Silo.
+- Thiết kế migration chung và cách theo dõi phiên bản của Pool, từng schema tenant và từng database Silo.
 - Thiết kế backup, restore, health check và xử lý tenant provisioning thất bại.
 - Thiết kế reverse proxy, wildcard DNS, TLS và ánh xạ subdomain mà không phải tạo thủ công từng DNS record.
 - Thiết kế kho tệp dùng chung với namespace/prefix tenant, quota và URL tải có thời hạn.
@@ -197,11 +205,11 @@ Không chọn framework theo cảm tính. Thực hiện như sau:
 - Xây dựng xác thực và phát hành token theo tenant đang chọn.
 - Middleware xác minh token, subdomain, trạng thái tenant và membership.
 - Tenant context trở thành dữ liệu bắt buộc xuyên suốt request, log, metric và job nền.
-- Xây dựng abstraction chọn nguồn dữ liệu Pool hoặc Silo.
+- Xây dựng abstraction chọn đúng database, schema và runtime credential cho cả ba placement.
 - Không nhận `tenant_id` trong payload nghiệp vụ làm nguồn phân quyền.
 - Xây control plane và các trạng thái tenant, thanh toán, provisioning.
-- Xây quy trình tạo database, tài khoản CSDL, quyền tối thiểu và migration cho tenant Silo.
-- Xây cơ chế tạo tenant logic cho Pool.
+- Xây quy trình tạo schema/database, tài khoản CSDL, quyền tối thiểu và migration cho tenant Schema/Silo.
+- Xây cơ chế tạo tenant logic cho Pool và metadata placement chung trong control plane.
 - Xây retry, idempotency, timeout và rollback cho provisioning.
 - Xây rate limiting theo tenant/tier và chính sách phản hồi khi vượt giới hạn.
 
@@ -209,7 +217,7 @@ Không chọn framework theo cảm tính. Thực hiện như sau:
 
 ### 2.9. Phát triển nghiệp vụ ứng dụng
 
-Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và được kiểm thử ngay trên cả Pool lẫn Silo:
+Phát triển theo lát cắt dọc; nghiệp vụ lõi phải chạy và được kiểm thử trên cả ba placement, còn module mở rộng theo đúng ma trận capability:
 
 1. Tài khoản, tenant và membership.
 2. Dự án và phân quyền cấp dự án.
@@ -239,10 +247,10 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 ### 2.11. Thực nghiệm kỹ thuật
 
 - Chạy pilot trên đúng cấu hình VPS.
-- Từ pilot, khóa SLO về p95, tỷ lệ lỗi, throughput, thời gian cấp phát Pool/Silo và giới hạn tài nguyên trước thí nghiệm chính.
+- Từ pilot, khóa SLO về p95, tỷ lệ lỗi, throughput, thời gian cấp phát của ba placement và giới hạn tài nguyên trước thí nghiệm chính.
 - Giữ điều kiện tải, bộ dữ liệu và kịch bản giống nhau giữa các lần đo.
 - Lặp mỗi kịch bản đủ số lần, ghi median/p95 và độ biến thiên.
-- So sánh Pool và Silo để mô tả đặc tính của khung Bridge; không biến so sánh này thành câu hỏi nghiên cứu trung tâm.
+- So sánh ba placement để mô tả đặc tính của khung Bridge; đo chi phí module/tùy biến trong lượt riêng để tránh nhiễu.
 - Thử nghiệm noisy neighbor bằng cách tạo tải lớn từ một tenant và quan sát ảnh hưởng đến tenant khác trước/sau rate limiting.
 - Công bố cấu hình VPS, phiên bản phần mềm, dữ liệu seed và tham số tải để kết quả có thể tái lập.
 
@@ -272,15 +280,108 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 - Hoàn thiện báo cáo tổng quan, tài liệu giải pháp, đặc tả kiến trúc, báo cáo kiểm thử và báo cáo khoa học.
 - Chuẩn bị bản tin, báo cáo tóm tắt và video tối đa hai phút.
 - Bàn giao mã nguồn, migration, cấu hình mẫu, script triển khai, test, script thí nghiệm và hướng dẫn tái lập; loại bỏ toàn bộ secrets.
-- Chuẩn bị demo bao gồm một tenant Pool, một tenant Silo, tấn công chéo bị từ chối, provisioning tự động và quan sát theo tenant.
+- Chuẩn bị demo gồm tenant ở cả ba placement, tấn công chéo bị từ chối, provisioning tự động, capability/tùy biến và quan sát theo tenant.
 
-## 3. Giao diện và mô hình dữ liệu kiến trúc bắt buộc
+## 3. Giai đoạn mở rộng Bridge và tùy biến tenant
+
+Đây là **phần mở rộng phạm vi nghiên cứu và triển khai** sau checkpoint P-App hai placement. APP-01–APP-06 và các biên bản cũ được giữ nguyên như lịch sử; không ghi kết quả của phần mở rộng vào biên bản P-App. Mã mới được hoàn thiện trên local trước khi tiếp tục provider, VPS, P2 measurement, pilot hoặc thực nghiệm.
+
+**Trạng thái 2026-09-08:** EXT-01–EXT-06 đã hoàn tất local theo
+[`EXTENSION-CHECKLIST.md`](../docs/app/EXTENSION-CHECKLIST.md) và
+[`extension-local-2026-09-08.md`](../docs/testing/extension-local-2026-09-08.md). Trạng thái này đóng
+phần triển khai local, không xác nhận phạm vi học thuật mở rộng, Cổng B/E hay điều kiện nghiệm thu cuối.
+
+### 3.1. Ma trận placement và capability
+
+| Placement | Mô hình CSDL | Capability tối đa có thể cấp |
+|---|---|---|
+| `POOL` | Shared Database, Shared Schema | `BRANDING` |
+| `SCHEMA_PER_TENANT` | Shared Database, Separate Schema | `BRANDING`, `CUSTOM_DATA` |
+| `SILO_DATABASE` | Separate Database | `BRANDING`, `CUSTOM_DATA`, `APPROVALS`, `AUTOMATION` |
+
+- Quản trị hệ thống cấp hoặc thu hồi từng capability trong giới hạn placement. Gói giá không quyết định capability ở phiên bản đầu.
+- Owner/Admin của tenant quản lý branding và bật/tắt module đã được cấp. Manager quản lý bảng/field, quy trình duyệt và automation trong project mình; quyền tenant không tự cấp quyền đọc nội dung project.
+- Không cung cấp SQL tùy ý, plugin chứa mã thực thi, thay đổi bảng lõi hay bản triển khai riêng cho tenant.
+- Tenant mới mặc định có Branding. Tenant hiện hữu nhận giao diện mặc định và không tự bật capability mới.
+
+### 3.2. Checklist mở rộng theo lát cắt
+
+Trạng thái và bằng chứng đóng mốc được ghi riêng tại [`docs/app/EXTENSION-CHECKLIST.md`](../docs/app/EXTENSION-CHECKLIST.md); mỗi mốc chỉ hoàn tất local khi backend, OpenAPI, frontend và kiểm tra tương ứng cùng đạt.
+
+| Mốc | Nội dung | Điều kiện đóng |
+|---|---|---|
+| EXT-01 | Placement Schema-per-tenant | Onboarding đến `ACTIVE`, nghiệp vụ lõi và isolation chạy đúng trên ba placement; hai schema tenant chung database không truy cập chéo kể cả truy vấn ghi rõ schema |
+| EXT-02 | Capability và Branding | System Admin cấp/thu hồi; Owner/Admin bật/tắt và cấu hình; UI hiển thị theo capability; server chặn gọi API trực tiếp |
+| EXT-03 | Bảng/field mở rộng | UI → API → job DDL → CRUD dữ liệu hoạt động trên Schema/Silo; lỗi và retry không báo thành công giả; dữ liệu giữ nguyên khi xóa mềm/nâng cấp lõi |
+| EXT-04 | Phê duyệt nhiều bước | Snapshot, ANY/ALL, chặn mọi đường hoàn thành, thay đổi nội dung làm mất hiệu lực và quyết định đồng thời đều đúng |
+| EXT-05 | Tự động hóa hữu hạn | Trigger/action, retry, chống trùng, kiểm quyền lúc worker chạy và tương tác với phê duyệt đều đúng |
+| EXT-06 | Tích hợp và đóng checkpoint | Full regression, nâng cấp tenant cũ, OpenAPI/generated types, tài liệu, ma trận quyền và biên bản local đồng bộ |
+
+### 3.3. Placement Schema-per-tenant
+
+- Control plane lưu `SCHEMA_PER_TENANT` và `schema_name`; một application database dùng chung chứa schema riêng của từng tenant.
+- Server sinh tên schema/role từ định danh tenant. Runtime role chỉ có DML trong schema của tenant; provisioner/worker có quyền DDL và migration.
+- Resolver chọn database, schema và credential từ placement đã xác thực. Executor đặt ngữ cảnh tenant và `search_path` trong transaction, sau đó trả connection không còn ngữ cảnh tenant.
+- `search_path` chỉ giúp định tuyến, không phải hàng rào bảo mật. Quyền PostgreSQL, tenant context, RLS và kiểm thử truy vấn ghi rõ schema cùng tạo hàng rào cô lập.
+- Flyway có lịch sử riêng theo schema/database. Nâng cấp giữ dữ liệu Pool/Silo hiện hữu; rollback schema chỉ dọn schema/role của tenant lỗi.
+- Provisioning vẫn dùng lease, retry, rollback và audit; lỗi một schema không chặn hay thay đổi tenant khác.
+
+### 3.4. Capability và Branding
+
+- Control database lưu grant/enabled/version và audit theo `tenant_id`. API và background job đều kiểm tra capability hiện hành; frontend chỉ dùng dữ liệu này để trình bày và không thay thế kiểm quyền server.
+- Branding gồm màu chính, màu nhấn và logo PNG/JPEG/WebP trong namespace tenant; không nhận HTML/CSS/JavaScript. Giao diện tài khoản trung tâm giữ branding chung.
+- Thu hồi `CUSTOM_DATA` chặn thay đổi cấu trúc và dữ liệu nhưng giữ dữ liệu hiện hữu đọc được theo quyền project. Thu hồi `AUTOMATION` chặn lượt chạy mới và giữ lịch sử.
+- Chỉ tắt/thu hồi `APPROVALS` khi không còn lượt đang chờ và mọi workflow bắt buộc đã được Manager tắt có audit.
+
+### 3.5. Bảng nghiệp vụ và field Task mở rộng
+
+- Định nghĩa thuộc project. Bảng mới có CRUD riêng; field Task xuất hiện trong chi tiết Task. Dữ liệu được lưu bằng bảng/cột SQL thực trong schema/database tenant nhưng không `ALTER` bảng `tasks` lõi.
+- Kiểu v1 gồm text, number, boolean, date và single-select. Tên vật lý sinh từ ID; tên hiển thị do Manager đặt. Không đổi kiểu sau khi tạo.
+- Có thể sửa nhãn, thứ tự, lựa chọn và cờ bắt buộc khi dữ liệu hiện hữu hợp lệ. Xóa định nghĩa/field/bản ghi là xóa mềm; v1 không có UI `DROP` phá hủy dữ liệu.
+- Manager quản lý cấu trúc và xóa bản ghi; Manager/Member nhập dữ liệu; Viewer chỉ đọc.
+- Worker thực thi DDL theo job có version, transaction và khóa tenant. API chỉ dùng version đã áp dụng thành công; lỗi giữ cấu trúc cũ và cho retry. Lịch sử DDL tùy biến tách khỏi Flyway lõi.
+
+### 3.6. Phê duyệt nhiều bước
+
+- Manager cấu hình workflow theo board, cột hoàn thành và các bước tuần tự; mỗi bước có nhóm Manager/Member hoạt động và chế độ `ANY` hoặc `ALL`.
+- Khi gửi, lưu snapshot workflow, người duyệt và nội dung Task; loại người gửi khỏi nhóm. Bước không còn người duyệt làm yêu cầu gửi bị từ chối.
+- `ANY` đạt khi một người đồng ý; `ALL` đạt khi tất cả người hợp lệ đồng ý; một từ chối kết thúc lượt. Chỉ bước hiện hành nhận quyết định và optimistic version xử lý đồng thời.
+- Backend chặn tạo, sửa, kéo/thả và batch move vào cột hoàn thành nếu chưa có lượt duyệt hiện hành đã đạt. Thay đổi tiêu đề, mô tả, hạn, người được giao hoặc custom field làm lượt hiện hành mất hiệu lực.
+- Mất membership/quyền thì không thể duyệt. Manager có thể thay người ở bước chưa hoàn tất có audit. Sửa workflow chỉ áp dụng lượt gửi sau; lịch sử và notification event được giữ.
+
+### 3.7. Tự động hóa hữu hạn
+
+- Manager tạo rule gồm đúng một trigger và một action. Trigger: Task được tạo, đổi cột, lượt duyệt kết thúc được duyệt hoặc bị từ chối; có thể giới hạn board/cột phù hợp.
+- Action: gán một thành viên đang hoạt động hoặc tạo thông báo trong ứng dụng cho nhóm người nhận. Không tự di chuyển Task, thực thi mã hoặc kích hoạt dây chuyền từ event do automation sinh.
+- Outbox event và rule tạo khóa chống trùng; execution lưu phiên bản rule, attempts và kết quả. Worker kiểm lại capability, trạng thái module/project và người nhận khi chạy.
+- Gán người tuân thủ quy tắc làm mất hiệu lực phê duyệt; gán cùng người hiện tại là no-op. Rule không sửa tại chỗ: tạo bản thay thế rồi tắt rule cũ.
+
+### 3.8. API, giao diện và kiểm thử đóng mốc
+
+- Giữ endpoint lõi; bổ sung API capability/branding, custom metadata/CRUD/job, approval workflow/run/history và automation rule/execution. Không trả schema, role hoặc credential vật lý cho người dùng nghiệp vụ.
+- Frontend dựng form từ metadata hữu hạn; không sinh endpoint hoặc mã ứng dụng riêng cho từng bảng. OpenAPI và TypeScript sinh tự động phải đồng bộ trong từng lát cắt.
+- Ma trận kiểm thử bao phủ ba placement, ít nhất hai tenant schema cùng database, host/token, IDOR, quyền project, file, notification, job, explicit-schema SQL và connection tái sử dụng sau commit/rollback.
+- Có fault injection provisioning/migration/rollback, nâng cấp Pool/Silo cũ, DDL job lỗi, xóa mềm/phục hồi, capability direct-API guard, branding isolation, ANY/ALL/concurrency/invalidation và automation idempotency/retry/no-chain.
+- Chỉ biên bản local mới được tạo từ các test này; không dùng chúng làm số liệu SLO, pilot, trải nghiệm người dùng hay kết quả nghiên cứu chính thức.
+
+### 3.9. Đường tiếp tục đến nghiệm thu
+
+1. **Đã hoàn tất local ngày 2026-09-08:** đóng EXT-01–EXT-06 và cập nhật tồn đọng thực tế.
+2. Hoàn thiện scheduler nhắc hạn, email/Web Push thật, payment sandbox và môi trường Internet.
+3. Chốt môi trường chạy: VPS thuê hoặc máy cá nhân tự host đều phải được ghi cấu hình, public reachability, DNS/TLS, uptime, backup và điều kiện vận hành trước pilot. Thời hạn chính thức lấy từ thuyết minh được duyệt.
+4. Giữ artifact P2 cũ; đăng ký protocol bổ sung trước phép đo mới và không sửa ngược bằng chứng để hợp với kiến trúc mở rộng.
+5. Thực nghiệm ba placement với cùng nghiệp vụ, seed và capability; chạy thêm tải hỗn hợp. Đo chi phí module/tùy biến ở lượt riêng để không gộp ảnh hưởng tính năng vào khác biệt bố trí CSDL.
+6. Hoàn thiện ma trận cam kết → yêu cầu → tính năng → test/số đo → sản phẩm, rồi bàn giao ứng dụng Internet, báo cáo, bản tin, tóm tắt, video và bộ tái lập.
+
+Việc cập nhật kế hoạch không tự mở lại provider, VPS, P2 measurement, pilot hoặc thực nghiệm đang tạm hoãn.
+
+## 4. Giao diện và mô hình dữ liệu kiến trúc bắt buộc
 
 ### Các hợp đồng lõi
 
 - `TenantContext`: `user_id`, `tenant_id`, `tier`, `placement`, vai trò, subdomain, request/correlation ID.
-- `TenantPlacement`: tối thiểu `POOL` và `SILO_DATABASE`.
-- `TenantDataSourceResolver`: nhận tenant context và trả đúng kết nối; mã nghiệp vụ không tự chọn connection.
+- `TenantPlacement`: `POOL`, `SCHEMA_PER_TENANT` và `SILO_DATABASE`.
+- `TenantDataSourceResolver`: nhận tenant context và trả đúng database/schema/credential; mã nghiệp vụ không tự chọn connection.
 - `PaymentProvider`: tạo phiên thanh toán, xác minh callback/webhook và truy vấn trạng thái.
 - `ProvisioningService`: nhận yêu cầu idempotent, cấp phát, migration, rollback và trả trạng thái.
 - `ResourceStorage`: lưu, tải, xóa và tạo URL có thời hạn trong namespace tenant.
@@ -295,22 +396,26 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 - `Resource`, `TaskResource`.
 - `Notification`, `NotificationPreference`, `PushSubscription`.
 - `AuditEvent`, `OutboxEvent`.
+- `TenantCapability`, `TenantBranding`, `TenantConfigEvent`.
+- `CustomDefinition`, `CustomField`, `CustomizationSchemaJob`, bản ghi dữ liệu mở rộng.
+- `ApprovalWorkflow`, `ApprovalRun`, snapshot bước/người duyệt.
+- `AutomationRule`, `AutomationExecution`.
 
 ### Quy tắc giao diện
 
 - API nghiệp vụ lấy tenant từ context đã xác thực; không tin `tenant_id` do client gửi.
 - Token tenant A dùng trên subdomain tenant B phải bị từ chối trước khi vào service nghiệp vụ.
 - Background job và notification phải mang tenant context rõ ràng.
-- Cùng endpoint, DTO và quy tắc nghiệp vụ được dùng cho Pool và Silo.
+- Cùng endpoint, DTO và quy tắc nghiệp vụ lõi được dùng cho cả ba placement.
 - Callback thanh toán chỉ kích hoạt provisioning sau khi được xác minh phía máy chủ và xử lý idempotent.
 
-## 4. Kế hoạch kiểm thử và tiêu chí hoàn tất
+## 5. Kế hoạch kiểm thử và tiêu chí hoàn tất
 
 ### Kiểm thử chức năng
 
 - Toàn bộ luồng tài khoản, tenant, dự án, Kanban, công việc con, bình luận, tài nguyên và thông báo.
 - Ma trận quyền tenant và quyền dự án.
-- Các chức năng chạy tương đương trên Pool và Silo.
+- Nghiệp vụ lõi chạy tương đương trên cả ba placement; capability mở rộng đúng giới hạn placement.
 - Kiểm thử optimistic locking khi hai người cùng cập nhật công việc.
 
 ### Kiểm thử cô lập và bảo mật
@@ -341,21 +446,21 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 
 - 3–5 tenant, mỗi tenant 10–20 tài khoản hoạt động đồng thời.
 - Tải đọc bảng, tạo/cập nhật công việc, tải tài nguyên và gửi thông báo.
-- So sánh p50/p95, throughput, tỷ lệ lỗi và tài nguyên Pool/Silo.
+- So sánh p50/p95, throughput, tỷ lệ lỗi và tài nguyên của cả ba placement.
 - Một tenant tạo tải vượt mức; tenant khác vẫn được phục vụ theo SLO đã khóa sau pilot.
 - Rate limiter phân biệt đúng tenant và tier.
 
 ### Điều kiện hoàn tất toàn đề tài
 
 - Các câu hỏi nghiên cứu đều có phương pháp và bằng chứng trả lời.
-- Chức năng cốt lõi hoạt động trên cả Pool và Silo.
+- Chức năng cốt lõi hoạt động trên cả ba placement; capability hoạt động đúng ma trận đã khóa.
 - Không phát hiện truy cập chéo trong ma trận kiểm thử tự động.
 - Provisioning có thể retry, rollback và audit.
 - Bản triển khai đáp ứng SLO được khóa sau pilot.
 - Thực nghiệm và khảo sát có dữ liệu ẩn danh, phương pháp và giới hạn rõ ràng.
 - Một người khác có thể dựng lại môi trường từ bộ mã nguồn và hướng dẫn bàn giao.
 
-## 5. Chỉnh sửa thuyết minh, sản phẩm và giả định
+## 6. Chỉnh sửa thuyết minh, sản phẩm và giả định
 
 ### Chỉnh sửa đề xuất cho thuyết minh
 
@@ -366,6 +471,7 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 - **Mục 14:** bổ sung tổng quan có cấu trúc, threat modeling, kiểm thử tự động chống truy cập chéo, pilot khóa SLO và đánh giá SUS.
 - **Mục 15:** mở rộng sáu đầu việc hiện tại thành các nhóm nghiên cứu–phân tích–thiết kế–spike–phát triển–thực nghiệm nêu trong kế hoạch.
 - **Mục 16:** giữ các sản phẩm nghiệm thu chính, nhưng mô tả bộ mã nguồn, đặc tả kiến trúc và bằng chứng kiểm thử là thành phần bàn giao kèm ứng dụng.
+- **Phụ lục đề xuất mở rộng:** mô tả placement Schema-per-tenant và ba nhóm tùy biến theo ma trận capability; không trình bày là phạm vi đã được duyệt nếu chưa có xác nhận học thuật.
 - Rà soát lại năm, DOI và độ tin cậy của tài liệu tham khảo; không thay đổi tên hoặc bản chất đề tài.
 
 ### Sản phẩm nghiên cứu và minh chứng
@@ -385,10 +491,9 @@ Phát triển theo lát cắt dọc; mỗi chức năng phải chạy và đư�
 ### Giả định và giới hạn
 
 - Nhóm sẽ chuẩn bị VPS, domain, wildcard DNS và chứng chỉ TLS.
-- Pool dùng shared database/shared schema; cơ chế cô lập cụ thể được chọn qua spike.
-- Silo dùng database-per-tenant nhưng chia sẻ application stack và object storage.
+- Pool dùng Shared Database, Shared Schema; Schema-per-tenant dùng Shared Database, Separate Schema; Silo dùng Separate Database. Cả ba chia sẻ application stack và object storage.
 - Kho tệp dùng namespace tenant và kiểm tra quyền trước khi cấp URL tải.
-- Không chuyển tenant giữa Pool và Silo sau onboarding.
+- Không chuyển tenant giữa các placement sau onboarding trong đợt mở rộng này.
 - Không giao dịch tiền thật.
 - Không triển khai mobile, autoscaling, Kubernetes, full-stack silo, báo cáo nâng cao hoặc đồng bộ thời gian thực phức tạp.
 - Điểm SUS chỉ được báo cáo mô tả; không dùng làm điều kiện nghiệm thu.

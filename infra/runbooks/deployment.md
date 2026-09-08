@@ -1,6 +1,8 @@
-# Runbook triển khai VPS
+# Runbook triển khai single-node trên VPS hoặc máy tự host
 
 Compose trong repo là baseline local/single-node, không phải cấu hình production đã được chứng nhận.
+
+Máy laptop/cá nhân của nhóm có thể dùng làm host thử nghiệm nếu chạy Linux hoặc máy ảo Linux ổn định và đáp ứng cùng contract triển khai như VPS. Trước pilot phải ghi rõ CPU/RAM/ổ đĩa, hệ điều hành, đường truyền, public IP hoặc cơ chế tunnel/port-forward, domain/wildcard DNS, TLS, thời gian máy hoạt động, nguồn điện, backup ngoài máy và người chịu trách nhiệm vận hành. Nếu mạng dùng CGNAT, IP thay đổi, nhà mạng chặn cổng hoặc máy không thể hoạt động liên tục thì không được coi là môi trường Internet ổn định cho pilot/ nghiệm thu cho đến khi có giải pháp được kiểm chứng. Lựa chọn VPS thuê hay máy tự host phải được khóa trong manifest trước khi thu số đo.
 
 ## Chuẩn bị
 
@@ -14,11 +16,11 @@ Compose trong repo là baseline local/single-node, không phải cấu hình pro
 
 1. Chụp backup và kiểm tra restore point.
 2. Pull image theo digest và ghi release manifest.
-3. Chạy control migration bằng role migration riêng; chạy application-plane migration bằng provisioner trên Pool và từng Silo. Dừng nếu bất kỳ database nào không validate.
+3. Chạy control migration bằng role migration riêng; chạy application-plane migration bằng provisioner trên Pool, từng schema tenant và từng database Silo. Dừng nếu bất kỳ schema/database nào không validate.
 4. Khởi động worker, xác minh outbox/provisioning backlog không tăng bất thường.
 5. Khởi động API và web, sau đó chuyển reverse proxy khi readiness đạt.
 6. Chạy smoke, host–token mismatch, RLS role check và một callback thanh toán trùng trong sandbox/fake provider.
-7. Theo dõi error ratio, p95 quan sát, connection pool, CPU và RAM. Không áp SLO p95 cho đến khi pilot trên cùng cấu hình VPS hoàn tất.
+7. Theo dõi error ratio, p95 quan sát, connection pool, CPU và RAM. Không áp SLO p95 cho đến khi pilot trên đúng cấu hình host đã khóa hoàn tất.
 
 ## Rollback
 

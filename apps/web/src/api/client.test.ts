@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { setApiAccessToken } from './client';
-import { projectsApi } from './endpoints';
+import { request, setApiAccessToken } from './client';
+import { approvalsApi, projectsApi } from './endpoints';
 
 describe('typed API client', () => {
   beforeEach(() => {
@@ -36,5 +36,12 @@ describe('typed API client', () => {
     });
     expect(String(options.body)).not.toContain('tenantId');
     expect(options.credentials).toBe('include');
+  });
+
+  it('treats an empty successful response as a nullable result', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 200 })));
+
+    await expect(approvalsApi.workflow('board-1')).resolves.toBeNull();
+    await expect(request<void>('/health', { method: 'POST' })).resolves.toBeNull();
   });
 });

@@ -11,7 +11,7 @@
 
 ## Trạng thái baseline
 
-- Đã chấp nhận modular monolith, hai process API/worker và Bridge placement.
+- Đã chấp nhận modular monolith, hai process API/worker, Bridge ba placement tại ADR-0008 và chính sách capability tại ADR-0009 cho triển khai local.
+- Phần schema-per-tenant và tùy biến là mở rộng sau checkpoint P-App; việc chấp nhận học thuật vẫn phải được xác nhận riêng.
 - Chưa chấp nhận cơ chế isolation Pool, payment provider thật và storage backend; các mục này phải qua spike.
 - Sơ đồ mô tả thiết kế cần hiện thực/kiểm chứng, không phải bằng chứng hệ thống đã chạy.
-

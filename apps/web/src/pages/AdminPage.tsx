@@ -12,17 +12,20 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   InputAdornment,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -65,6 +68,23 @@ export function AdminPage() {
     queryKey: ['admin', 'tenant', detailTenantId],
     queryFn: () => adminApi.tenant(detailTenantId!),
     enabled: detailTenantId !== null,
+  });
+  const capabilityQuery = useQuery({
+    queryKey: ['admin', 'tenant-capabilities', detailTenantId],
+    queryFn: () => adminApi.capabilities(detailTenantId!),
+    enabled: detailTenantId !== null,
+  });
+  const setCapability = useMutation({
+    mutationFn: ({ capability, granted, version }: {
+      capability: 'BRANDING' | 'CUSTOM_DATA' | 'APPROVALS' | 'AUTOMATION';
+      granted: boolean;
+      version: number;
+    }) => adminApi.setCapability(detailTenantId!, capability, granted, version),
+    onSuccess: async () => {
+      setFeedback('Đã cập nhật quyền capability của tenant.');
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'tenant-capabilities', detailTenantId] });
+    },
+    onError: (cause) => setFeedback(errorMessage(cause)),
   });
   const retry = useMutation({
     mutationFn: adminApi.retryProvisioning,
@@ -180,6 +200,7 @@ export function AdminPage() {
             >
               <MenuItem value="">Tất cả</MenuItem>
               <MenuItem value="POOL">Pool</MenuItem>
+              <MenuItem value="SCHEMA_PER_TENANT">Schema riêng</MenuItem>
               <MenuItem value="SILO_DATABASE">Silo database</MenuItem>
             </Select>
           </FormControl>
@@ -341,6 +362,34 @@ export function AdminPage() {
                     )}
                   </Stack>
                 ) : <Typography color="text.secondary">Chưa có tác vụ provisioning.</Typography>}
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>Capability theo placement</Typography>
+                {capabilityQuery.isLoading ? <SectionLoader /> : capabilityQuery.isError ? (
+                  <ErrorState message={errorMessage(capabilityQuery.error)} onRetry={() => void capabilityQuery.refetch()} />
+                ) : (
+                  <Stack spacing={1}>
+                    {(capabilityQuery.data ?? []).map((item) => (
+                      <Box key={item.capability} display="flex" justifyContent="space-between" alignItems="center" gap={2}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography fontWeight={700}>{item.capability}</Typography>
+                          <Chip size="small" label={item.supported ? 'Được placement hỗ trợ' : 'Ngoài giới hạn'} />
+                          {item.granted && !item.enabled && <Chip size="small" color="warning" label="Tenant đang tắt" />}
+                        </Stack>
+                        <FormControlLabel
+                          label={item.granted ? 'Đã cấp' : 'Chưa cấp'}
+                          control={<Switch checked={item.granted} />}
+                          disabled={!item.supported || setCapability.isPending}
+                          onChange={(_, granted) => setCapability.mutate({
+                            capability: item.capability,
+                            granted,
+                            version: item.version,
+                          })}
+                        />
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
               </Box>
               <Box>
                 <Typography variant="subtitle2" gutterBottom>Lịch sử chuyển trạng thái</Typography>

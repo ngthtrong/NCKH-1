@@ -13,6 +13,8 @@ const api = vi.hoisted(() => ({
   retryProvisioning: vi.fn(),
   resourceDeadLetters: vi.fn(),
   requeueResourceDeadLetter: vi.fn(),
+  capabilities: vi.fn(),
+  setCapability: vi.fn(),
 }));
 const auth = vi.hoisted(() => ({ logout: vi.fn() }));
 
@@ -75,6 +77,11 @@ describe('AdminPage', () => {
         createdAt: '2026-09-01T00:03:00Z',
       }],
     });
+    api.capabilities.mockResolvedValue([
+      { capability: 'BRANDING', supported: true, granted: true, enabled: true, version: 1 },
+      { capability: 'CUSTOM_DATA', supported: false, granted: false, enabled: false, version: 0 },
+    ]);
+    api.setCapability.mockResolvedValue([]);
   });
 
   it('shows payment and provisioning transition detail for a tenant', async () => {
@@ -100,5 +107,21 @@ describe('AdminPage', () => {
     await user.click(screen.getByRole('option', { name: 'Pool' }));
 
     await waitFor(() => expect(api.tenants).toHaveBeenCalledWith(0, '', 'ACTIVE', 'POOL'));
+  });
+
+  it('updates only a capability supported by the tenant placement', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('Alpha workspace');
+    await user.click(screen.getByRole('button', { name: 'Chi tiết' }));
+
+    const branding = await screen.findByRole('switch', { name: 'Đã cấp' });
+    const unsupported = screen.getByRole('switch', { name: 'Chưa cấp' });
+    expect(unsupported).toBeDisabled();
+    await user.click(branding);
+
+    await waitFor(() => expect(api.setCapability).toHaveBeenCalledWith(
+      tenant.id, 'BRANDING', false, 1,
+    ));
   });
 });

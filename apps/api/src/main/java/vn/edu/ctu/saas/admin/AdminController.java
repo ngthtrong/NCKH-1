@@ -5,13 +5,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vn.edu.ctu.saas.tenant.TenantPlacement;
 import vn.edu.ctu.saas.tenant.TenantStatus;
+import vn.edu.ctu.saas.customization.TenantCapability;
+import vn.edu.ctu.saas.customization.TenantCapabilityService;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -19,11 +23,33 @@ import vn.edu.ctu.saas.tenant.TenantStatus;
 public class AdminController {
     private final AdminService service;
     private final ResourceOutboxAdminService resourceOutboxService;
+    private final TenantCapabilityService capabilityService;
 
-    public AdminController(AdminService service, ResourceOutboxAdminService resourceOutboxService) {
+    public AdminController(
+            AdminService service,
+            ResourceOutboxAdminService resourceOutboxService,
+            TenantCapabilityService capabilityService) {
         this.service = service;
         this.resourceOutboxService = resourceOutboxService;
+        this.capabilityService = capabilityService;
     }
+
+    @GetMapping("/tenants/{tenantId}/capabilities")
+    public java.util.List<TenantCapabilityService.CapabilityView> capabilities(@PathVariable UUID tenantId) {
+        return capabilityService.list(tenantId);
+    }
+
+    @PatchMapping("/tenants/{tenantId}/capabilities/{capability}")
+    public java.util.List<TenantCapabilityService.CapabilityView> setCapability(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID tenantId,
+            @PathVariable TenantCapability capability,
+            @RequestBody UpdateCapabilityRequest request) {
+        return capabilityService.setGrant(
+                UUID.fromString(jwt.getSubject()), tenantId, capability, request.granted(), request.version());
+    }
+
+    public record UpdateCapabilityRequest(boolean granted, long version) {}
 
     @GetMapping("/tenants")
     public AdminService.PageView<AdminService.AdminTenantView> tenants(

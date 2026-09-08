@@ -141,6 +141,7 @@ class ProvisioningJobCoordinatorIntegrationTest {
         TenantPlacementEntity prepared = transactions.execute(
                 ignored -> placements.findByTenantId(tenantId).orElseThrow());
         prepared.setDatabaseName("pool_db");
+        prepared.setSchemaName("tenant_schema");
         prepared.setSchemaVersion("1");
 
         assertThat(coordinator.completeSuccessfully(claim, prepared, Instant.now())).isTrue();
@@ -151,9 +152,10 @@ class ProvisioningJobCoordinatorIntegrationTest {
         assertThat(completed.getLeaseToken()).isNull();
         assertThat(completed.getLeaseExpiresAt()).isNull();
         assertThat(loadTenant().getStatus()).isEqualTo(TenantStatus.ACTIVE);
-        String schemaVersion = transactions.execute(
-                ignored -> placements.findByTenantId(tenantId).orElseThrow().getSchemaVersion());
-        assertThat(schemaVersion).isEqualTo("1");
+        TenantPlacementEntity persisted = transactions.execute(
+                ignored -> placements.findByTenantId(tenantId).orElseThrow());
+        assertThat(persisted.getSchemaName()).isEqualTo("tenant_schema");
+        assertThat(persisted.getSchemaVersion()).isEqualTo("1");
     }
 
     @Test

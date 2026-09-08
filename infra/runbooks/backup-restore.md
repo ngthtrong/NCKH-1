@@ -4,7 +4,7 @@ Runbook này mô tả quy trình logic, phù hợp môi trường nghiên cứu 
 
 ## Phạm vi phải sao lưu
 
-- PostgreSQL: `control_db`, `pool_db` và mọi database Silo được control plane tham chiếu.
+- PostgreSQL: `control_db`, `pool_db`, shared schema database và mọi database Silo được control plane tham chiếu.
 - MinIO: toàn bộ bucket tài nguyên và metadata phiên bản nếu bật versioning.
 - Cấu hình triển khai: image digest, migration version và tên secret; không đưa giá trị secret vào backup manifest.
 - Manifest backup: thời gian UTC, commit, danh sách database/bucket, checksum và trạng thái ứng dụng.
@@ -12,7 +12,7 @@ Runbook này mô tả quy trình logic, phù hợp môi trường nghiên cứu 
 ## Backup nhất quán
 
 1. Chuyển hệ thống sang maintenance/read-only và đợi transaction đang chạy kết thúc.
-2. Lấy danh sách Silo từ control plane. Không suy ra chỉ từ prefix database vì route trong control plane là nguồn sự thật.
+2. Lấy danh sách schema tenant và database Silo từ control plane. Không suy ra chỉ từ prefix vì metadata placement trong control plane là nguồn sự thật.
 3. Tạo custom-format dump cho từng database bằng PostgreSQL version bằng hoặc mới hơn server:
 
    ```bash
@@ -20,7 +20,7 @@ Runbook này mô tả quy trình logic, phù hợp môi trường nghiên cứu 
      pg_dump --username "$POSTGRES_ADMIN_USER" --format=custom --no-owner --dbname control_db > control_db.dump
    ```
 
-   Lặp lại cho `pool_db` và từng Silo đã xác minh. File dump phải nằm trong thư mục backup riêng, không nằm trong Git.
+   Lặp lại cho `pool_db`, shared schema database và từng Silo đã xác minh. File dump phải nằm trong thư mục backup riêng, không nằm trong Git.
 
 4. Dùng MinIO Client với credential backup chỉ đọc để mirror bucket sang kho backup đã mã hóa. Không dùng application access key cho backup production.
 5. Tạo SHA-256 checksum, ghi version PostgreSQL/MinIO, image digest và thời điểm bắt đầu/kết thúc.
@@ -29,7 +29,7 @@ Runbook này mô tả quy trình logic, phù hợp môi trường nghiên cứu 
 ## Restore vào môi trường sạch
 
 1. Cô lập target, tạo database/role bằng credential quản trị; không restore đè lên môi trường đang phục vụ.
-2. Restore control plane trước, rồi pooled database, sau đó từng Silo:
+2. Restore control plane trước, rồi pooled database, shared schema database, sau đó từng Silo:
 
    ```bash
    docker compose --env-file infra/.env -f infra/compose.yaml exec -T postgres \

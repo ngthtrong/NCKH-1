@@ -920,6 +920,390 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/tenants/{tenantId}/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTenantCapabilitiesAsSystemAdmin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/tenants/{tenantId}/capabilities/{capability}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["setTenantCapabilityGrant"];
+        trace?: never;
+    };
+    "/tenant-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTenantSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenant-settings/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["enableTenantCapability"];
+        trace?: never;
+    };
+    "/tenant-settings/branding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateTenantBranding"];
+        trace?: never;
+    };
+    "/tenant-settings/branding/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["uploadTenantLogo"];
+        delete: operations["deleteTenantLogo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-definitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCustomDefinitions"];
+        put?: never;
+        post: operations["createCustomDefinition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteCustomDefinition"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restoreCustomDefinition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createCustomField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/fields/{fieldId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteCustomField"];
+        options?: never;
+        head?: never;
+        patch: operations["updateCustomField"];
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/fields/{fieldId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restoreCustomField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/custom-schema-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCustomSchemaJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCustomRecords"];
+        put?: never;
+        post: operations["createCustomRecord"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/custom-definitions/{definitionId}/records/{recordId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateCustomRecord"];
+        post?: never;
+        delete: operations["deleteCustomRecord"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{taskId}/custom-values": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTaskCustomValues"];
+        put: operations["updateTaskCustomValues"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/boards/{boardId}/approval-workflow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getApprovalWorkflow"];
+        put: operations["saveApprovalWorkflow"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{taskId}/approval-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTaskApprovalRuns"];
+        put?: never;
+        post: operations["submitTaskForApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval-runs/{runId}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["decideApprovalRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval-runs/{runId}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["withdrawApprovalRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approval-runs/{runId}/steps/{position}/approvers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["replaceApprovalRunApprover"];
+        trace?: never;
+    };
+    "/projects/{projectId}/automation-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAutomationRules"];
+        put?: never;
+        post: operations["createAutomationRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-rules/{ruleId}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["disableAutomationRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/automation-executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAutomationExecutions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -939,7 +1323,7 @@ export interface components {
         /** @enum {string} */
         TenantTier: "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
         /** @enum {string} */
-        TenantPlacement: "POOL" | "SILO_DATABASE";
+        TenantPlacement: "POOL" | "SCHEMA_PER_TENANT" | "SILO_DATABASE";
         /** @enum {string} */
         TenantStatus: "PENDING_PAYMENT" | "PROVISIONING" | "ACTIVE" | "FAILED" | "SUSPENDED";
         /** @enum {string} */
@@ -1392,6 +1776,250 @@ export interface components {
             totalItems: number;
             totalPages: number;
         };
+        /** @enum {string} */
+        TenantCapability: "BRANDING" | "CUSTOM_DATA" | "APPROVALS" | "AUTOMATION";
+        CapabilityView: {
+            capability: components["schemas"]["TenantCapability"];
+            supported: boolean;
+            granted: boolean;
+            enabled: boolean;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateCapabilityGrantRequest: {
+            granted: boolean;
+            /** Format: int64 */
+            version: number;
+        };
+        EnableCapabilityRequest: {
+            capability: components["schemas"]["TenantCapability"];
+            enabled: boolean;
+            /** Format: int64 */
+            version: number;
+        };
+        BrandingView: {
+            primaryColor: string;
+            accentColor: string;
+            /** Format: uri */
+            logoUrl?: string | null;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateBrandingRequest: {
+            primaryColor: string;
+            accentColor: string;
+            /** Format: int64 */
+            version: number;
+        };
+        TenantSettingsView: {
+            capabilities: components["schemas"]["CapabilityView"][];
+            branding: components["schemas"]["BrandingView"];
+        };
+        /** @enum {string} */
+        CustomDefinitionKind: "TASK" | "ENTITY";
+        /** @enum {string} */
+        CustomFieldType: "TEXT" | "NUMBER" | "BOOLEAN" | "DATE" | "SINGLE_SELECT";
+        CustomFieldView: {
+            id: components["schemas"]["UUID"];
+            displayName: string;
+            dataType: components["schemas"]["CustomFieldType"];
+            options: string[];
+            required: boolean;
+            position: number;
+            /** @enum {string} */
+            status: "PENDING" | "ACTIVE" | "FAILED";
+            /** Format: int64 */
+            version: number;
+            lastError?: string | null;
+        };
+        CustomDefinitionView: {
+            id: components["schemas"]["UUID"];
+            projectId: components["schemas"]["UUID"];
+            kind: components["schemas"]["CustomDefinitionKind"];
+            displayName: string;
+            /** @enum {string} */
+            status: "PENDING" | "ACTIVE" | "FAILED";
+            /** Format: int64 */
+            version: number;
+            lastError?: string | null;
+            fields: components["schemas"]["CustomFieldView"][];
+        };
+        CreateCustomDefinitionRequest: {
+            kind: components["schemas"]["CustomDefinitionKind"];
+            displayName: string;
+        };
+        CreateCustomFieldRequest: {
+            displayName: string;
+            dataType: components["schemas"]["CustomFieldType"];
+            required: boolean;
+            position: number;
+            options?: string[];
+        };
+        UpdateCustomFieldRequest: {
+            displayName: string;
+            required: boolean;
+            position: number;
+            options?: string[];
+            /** Format: int64 */
+            version: number;
+        };
+        CustomValuesRequest: {
+            values: {
+                [key: string]: unknown;
+            };
+        };
+        VersionedCustomValuesRequest: components["schemas"]["CustomValuesRequest"] & {
+            /** Format: int64 */
+            version: number;
+        };
+        CustomRecordView: {
+            id: components["schemas"]["UUID"];
+            /** Format: int64 */
+            version: number;
+            values: {
+                [key: string]: unknown;
+            };
+        };
+        TaskCustomValuesView: {
+            definition?: components["schemas"]["CustomDefinitionView"] | null;
+            values: {
+                [key: string]: unknown;
+            };
+            /** Format: int64 */
+            version: number;
+        };
+        CustomSchemaJobView: {
+            id: components["schemas"]["UUID"];
+            definitionId: components["schemas"]["UUID"];
+            fieldId?: components["schemas"]["UUID"] | null;
+            /** @enum {string} */
+            operation: "CREATE_DEFINITION" | "ADD_FIELD";
+            /** Format: int64 */
+            targetVersion: number;
+            /** @enum {string} */
+            status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED";
+            attempts: number;
+            lastError?: string | null;
+            createdAt: components["schemas"]["Instant"];
+            updatedAt: components["schemas"]["Instant"];
+        };
+        /** @enum {string} */
+        ApprovalMode: "ANY" | "ALL";
+        /** @enum {string} */
+        ApprovalDecision: "APPROVED" | "REJECTED";
+        ApprovalWorkflowStepView: {
+            id: components["schemas"]["UUID"];
+            name: string;
+            position: number;
+            mode: components["schemas"]["ApprovalMode"];
+            approverIds: components["schemas"]["UUID"][];
+        };
+        ApprovalWorkflowView: {
+            id: components["schemas"]["UUID"];
+            projectId: components["schemas"]["UUID"];
+            boardId: components["schemas"]["UUID"];
+            completionColumnId: components["schemas"]["UUID"];
+            name: string;
+            enabled: boolean;
+            /** Format: int64 */
+            version: number;
+            steps: components["schemas"]["ApprovalWorkflowStepView"][];
+        };
+        SaveApprovalWorkflowRequest: {
+            completionColumnId: components["schemas"]["UUID"];
+            name: string;
+            enabled: boolean;
+            /** Format: int64 */
+            version: number;
+            steps: {
+                name: string;
+                mode: components["schemas"]["ApprovalMode"];
+                approverIds: components["schemas"]["UUID"][];
+            }[];
+        };
+        ApprovalApproverView: {
+            userId: components["schemas"]["UUID"];
+            /** @enum {string|null} */
+            decision?: "APPROVED" | "REJECTED" | null;
+            decidedAt?: components["schemas"]["Instant"] | null;
+        };
+        ApprovalRunStepView: {
+            id: components["schemas"]["UUID"];
+            position: number;
+            name: string;
+            mode: components["schemas"]["ApprovalMode"];
+            /** @enum {string} */
+            status: "WAITING" | "PENDING" | "APPROVED" | "REJECTED";
+            approvers: components["schemas"]["ApprovalApproverView"][];
+        };
+        ApprovalRunView: {
+            id: components["schemas"]["UUID"];
+            workflowId: components["schemas"]["UUID"];
+            taskId: components["schemas"]["UUID"];
+            submittedBy: components["schemas"]["UUID"];
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED" | "WITHDRAWN" | "INVALIDATED";
+            currentStep: number;
+            /** Format: int64 */
+            version: number;
+            createdAt: components["schemas"]["Instant"];
+            completedAt?: components["schemas"]["Instant"] | null;
+            steps: components["schemas"]["ApprovalRunStepView"][];
+        };
+        ApprovalDecisionRequest: {
+            decision: components["schemas"]["ApprovalDecision"];
+            /** Format: int64 */
+            version: number;
+        };
+        VersionRequest: {
+            /** Format: int64 */
+            version: number;
+        };
+        ReplaceApproverRequest: {
+            oldUserId: components["schemas"]["UUID"];
+            newUserId: components["schemas"]["UUID"];
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {string} */
+        AutomationTriggerType: "TASK_CREATED" | "TASK_MOVED" | "APPROVAL_APPROVED" | "APPROVAL_REJECTED";
+        /** @enum {string} */
+        AutomationActionType: "ASSIGN_USER" | "NOTIFY_USERS";
+        CreateAutomationRuleRequest: {
+            name: string;
+            triggerType: components["schemas"]["AutomationTriggerType"];
+            triggerBoardId?: components["schemas"]["UUID"] | null;
+            triggerColumnId?: components["schemas"]["UUID"] | null;
+            actionType: components["schemas"]["AutomationActionType"];
+            actionUserIds: components["schemas"]["UUID"][];
+        };
+        AutomationRuleView: {
+            id: components["schemas"]["UUID"];
+            projectId: components["schemas"]["UUID"];
+            name: string;
+            triggerType: components["schemas"]["AutomationTriggerType"];
+            triggerBoardId?: components["schemas"]["UUID"] | null;
+            triggerColumnId?: components["schemas"]["UUID"] | null;
+            actionType: components["schemas"]["AutomationActionType"];
+            actionUserIds: components["schemas"]["UUID"][];
+            enabled: boolean;
+            /** Format: int64 */
+            version: number;
+            createdAt: components["schemas"]["Instant"];
+        };
+        AutomationExecutionView: {
+            id: components["schemas"]["UUID"];
+            ruleId: components["schemas"]["UUID"];
+            sourceEventId: components["schemas"]["UUID"];
+            /** Format: int64 */
+            ruleVersion: number;
+            /** @enum {string} */
+            status: "RUNNING" | "SUCCEEDED" | "FAILED" | "SKIPPED";
+            attempts: number;
+            errorCode?: string | null;
+            createdAt: components["schemas"]["Instant"];
+            updatedAt: components["schemas"]["Instant"];
+        };
         ResourceDeadLetterView: {
             id: components["schemas"]["UUID"];
             tenantId: components["schemas"]["UUID"];
@@ -1435,6 +2063,12 @@ export interface components {
         TaskId: components["schemas"]["UUID"];
         ResourceId: components["schemas"]["UUID"];
         PaymentId: components["schemas"]["UUID"];
+        DefinitionId: components["schemas"]["UUID"];
+        FieldId: components["schemas"]["UUID"];
+        RecordId: components["schemas"]["UUID"];
+        ApprovalRunId: components["schemas"]["UUID"];
+        AutomationRuleId: components["schemas"]["UUID"];
+        VersionQuery: number;
     };
     requestBodies: never;
     headers: never;
@@ -3204,6 +3838,837 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listTenantCapabilitiesAsSystemAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Placement-constrained capability grants and tenant enablement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CapabilityView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    setTenantCapabilityGrant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: components["parameters"]["TenantId"];
+                capability: components["schemas"]["TenantCapability"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCapabilityGrantRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated capability matrix */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CapabilityView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    getTenantSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective capability and branding settings for the active tenant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantSettingsView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    enableTenantCapability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnableCapabilityRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated tenant capability settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CapabilityView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateTenantBranding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBrandingRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated branding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandingView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    uploadTenantLogo: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Branding with tenant-namespaced logo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandingView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteTenantLogo: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Branding reset without a logo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandingView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listCustomDefinitions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active custom Task/entity definitions; remains readable after capability revocation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createCustomDefinition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCustomDefinitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Pending definition queued for controlled DDL */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteCustomDefinition: {
+        parameters: {
+            query: {
+                version: components["parameters"]["VersionQuery"];
+            };
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Definition soft-deleted; physical data retained */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    restoreCustomDefinition: {
+        parameters: {
+            query: {
+                version: components["parameters"]["VersionQuery"];
+            };
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createCustomField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCustomFieldRequest"];
+            };
+        };
+        responses: {
+            /** @description Pending field queued for controlled DDL */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteCustomField: {
+        parameters: {
+            query: {
+                version: components["parameters"]["VersionQuery"];
+            };
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+                fieldId: components["parameters"]["FieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Field metadata soft-deleted; physical column and values retained */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateCustomField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+                fieldId: components["parameters"]["FieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCustomFieldRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated mutable field metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    restoreCustomField: {
+        parameters: {
+            query: {
+                version: components["parameters"]["VersionQuery"];
+            };
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+                fieldId: components["parameters"]["FieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored field metadata and retained physical values */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomDefinitionView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listCustomSchemaJobs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Controlled DDL job status and retry evidence */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomSchemaJobView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listCustomRecords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project-authorized records */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRecordView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createCustomRecord: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomValuesRequest"];
+            };
+        };
+        responses: {
+            /** @description Created custom entity record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRecordView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateCustomRecord: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+                recordId: components["parameters"]["RecordId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedCustomValuesRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated custom entity record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRecordView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteCustomRecord: {
+        parameters: {
+            query: {
+                version: components["parameters"]["VersionQuery"];
+            };
+            header?: never;
+            path: {
+                definitionId: components["parameters"]["DefinitionId"];
+                recordId: components["parameters"]["RecordId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Record soft-deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    getTaskCustomValues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Task custom-field metadata and values */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCustomValuesView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateTaskCustomValues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionedCustomValuesRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated Task custom values; pending approval is invalidated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCustomValuesView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    getApprovalWorkflow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Board approval workflow or null */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalWorkflowView"] | null;
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    saveApprovalWorkflow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                boardId: components["parameters"]["BoardId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveApprovalWorkflowRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved workflow; changes affect future submissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalWorkflowView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listTaskApprovalRuns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Immutable approval history and the current run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRunView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    submitTaskForApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submitted run with workflow, approver, and Task snapshots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRunView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    decideApprovalRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                runId: components["parameters"]["ApprovalRunId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Versioned approval decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRunView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    withdrawApprovalRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                runId: components["parameters"]["ApprovalRunId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionRequest"];
+            };
+        };
+        responses: {
+            /** @description Withdrawn run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRunView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    replaceApprovalRunApprover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                runId: components["parameters"]["ApprovalRunId"];
+                position: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceApproverRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated future/current unfinished step snapshot with audit */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRunView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listAutomationRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Project rules including disabled history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationRuleView"][];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    createAutomationRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAutomationRuleRequest"];
+            };
+        };
+        responses: {
+            /** @description New immutable rule version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationRuleView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    disableAutomationRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ruleId: components["parameters"]["AutomationRuleId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionRequest"];
+            };
+        };
+        responses: {
+            /** @description Disabled rule retained for execution history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationRuleView"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    listAutomationExecutions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Idempotent execution history with retry results */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationExecutionView"][];
+                };
             };
             default: components["responses"]["Error"];
         };

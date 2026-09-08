@@ -9,12 +9,14 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
+import vn.edu.ctu.saas.customization.ApprovalService;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
 import vn.edu.ctu.saas.tenant.ProjectRole;
@@ -408,6 +410,7 @@ public class ProjectApplicationService {
             requireProjectRole(jdbc, context, projectId, ProjectRole.MEMBER);
             requireActiveProject(jdbc, context, projectId);
             requireColumn(jdbc, context, boardId, request.columnId());
+            ApprovalService.assertCreateColumnAllowed(jdbc, context, boardId, request.columnId());
             if (request.parentTaskId() != null) requireTopLevelParent(jdbc, context, boardId, request.parentTaskId());
             requireAssignableUser(jdbc, context, projectId, request.assigneeUserId());
             UUID taskId = UUID.randomUUID();
@@ -442,6 +445,16 @@ public class ProjectApplicationService {
             requireActiveProject(jdbc, context, existing.projectId());
             requireColumn(jdbc, context, existing.boardId(), request.columnId());
             requireAssignableUser(jdbc, context, existing.projectId(), request.assigneeUserId());
+            boolean protectedContentChanged = !existing.title().equals(request.title().trim())
+                    || !Objects.equals(existing.description(), request.description())
+                    || !Objects.equals(existing.assigneeUserId(), request.assigneeUserId())
+                    || !Objects.equals(existing.dueAt(), request.dueAt());
+            if (protectedContentChanged) {
+                ApprovalService.assertEditableOutsideCompletion(
+                        jdbc, context, taskId, existing.columnId());
+                ApprovalService.invalidatePending(jdbc, context, taskId, "TASK_CONTENT_CHANGED", objectMapper);
+            }
+            ApprovalService.assertCompletionMoveAllowed(jdbc, context, taskId, request.columnId());
             BigDecimal position = request.position() == null ? existing.position() : request.position();
             int updated = jdbc.update("""
                     UPDATE tasks SET board_column_id=?,title=?,description=?,assignee_user_id=?,due_at=?,position=?,
@@ -464,6 +477,7 @@ public class ProjectApplicationService {
             requireProjectRole(jdbc, context, existing.projectId(), ProjectRole.MEMBER);
             requireActiveProject(jdbc, context, existing.projectId());
             requireColumn(jdbc, context, boardId, request.targetColumnId());
+            ApprovalService.assertCompletionMoveAllowed(jdbc, context, taskId, request.targetColumnId());
             int updated = jdbc.update("""
                     UPDATE tasks SET board_column_id=?,position=?,version=version+1,updated_at=now()
                     WHERE tenant_id=? AND board_id=? AND id=? AND version=?
@@ -490,6 +504,7 @@ public class ProjectApplicationService {
                 TaskView existing = findTask(jdbc, context, item.taskId());
                 if (!existing.boardId().equals(boardId)) throw new NotFoundException("Task not found in board");
                 requireColumn(jdbc, context, boardId, item.targetColumnId());
+                ApprovalService.assertCompletionMoveAllowed(jdbc, context, item.taskId(), item.targetColumnId());
                 int updated = jdbc.update("""
                         UPDATE tasks SET board_column_id=?,position=?,version=version+1,updated_at=now()
                         WHERE tenant_id=? AND board_id=? AND id=? AND deleted_at IS NULL AND version=?

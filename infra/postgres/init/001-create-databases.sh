@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-for required_name in CONTROL_DB_NAME CONTROL_DB_USER CONTROL_DB_PASSWORD POOL_DB_NAME POOL_DB_USER POOL_DB_PASSWORD PROVISIONER_DB_USER PROVISIONER_DB_PASSWORD MIGRATION_DB_USER MIGRATION_DB_PASSWORD; do
+for required_name in CONTROL_DB_NAME CONTROL_DB_USER CONTROL_DB_PASSWORD POOL_DB_NAME POOL_DB_USER POOL_DB_PASSWORD SCHEMA_DB_NAME PROVISIONER_DB_USER PROVISIONER_DB_PASSWORD MIGRATION_DB_USER MIGRATION_DB_PASSWORD; do
   eval "required_value=\${$required_name:-}"
   if [ -z "$required_value" ]; then
     echo "Missing required environment variable: $required_name" >&2
@@ -9,7 +9,7 @@ for required_name in CONTROL_DB_NAME CONTROL_DB_USER CONTROL_DB_PASSWORD POOL_DB
   fi
 done
 
-for identifier_name in CONTROL_DB_NAME CONTROL_DB_USER POOL_DB_NAME POOL_DB_USER PROVISIONER_DB_USER MIGRATION_DB_USER; do
+for identifier_name in CONTROL_DB_NAME CONTROL_DB_USER POOL_DB_NAME POOL_DB_USER SCHEMA_DB_NAME PROVISIONER_DB_USER MIGRATION_DB_USER; do
   eval "identifier_value=\${$identifier_name}"
   case "$identifier_value" in
     *[!A-Za-z0-9_]* | [0-9]* | "")
@@ -26,6 +26,7 @@ psql --set ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname postgres \
   --set pool_db="$POOL_DB_NAME" \
   --set pool_user="$POOL_DB_USER" \
   --set pool_password="$POOL_DB_PASSWORD" \
+  --set schema_db="$SCHEMA_DB_NAME" \
   --set provisioner_user="$PROVISIONER_DB_USER" \
   --set provisioner_password="$PROVISIONER_DB_PASSWORD" \
   --set migration_user="$MIGRATION_DB_USER" \
@@ -56,8 +57,12 @@ WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'control_db') \gexe
 SELECT format('CREATE DATABASE %I OWNER %I', :'pool_db', :'provisioner_user')
 WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'pool_db') \gexec
 
+SELECT format('CREATE DATABASE %I OWNER %I', :'schema_db', :'provisioner_user')
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'schema_db') \gexec
+
 SELECT format('REVOKE ALL ON DATABASE %I FROM PUBLIC', :'control_db') \gexec
 SELECT format('REVOKE ALL ON DATABASE %I FROM PUBLIC', :'pool_db') \gexec
+SELECT format('REVOKE ALL ON DATABASE %I FROM PUBLIC', :'schema_db') \gexec
 SELECT format('GRANT CONNECT ON DATABASE %I TO %I', :'control_db', :'control_user') \gexec
 SELECT format('GRANT CONNECT ON DATABASE %I TO %I', :'control_db', :'migration_user') \gexec
 SELECT format('GRANT CONNECT ON DATABASE %I TO %I', :'pool_db', :'pool_user') \gexec
@@ -94,4 +99,7 @@ SELECT format(
   'ALTER DEFAULT PRIVILEGES FOR ROLE %I IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO %I',
   :'provisioner_user', :'pool_user'
 ) \gexec
+
+\connect :schema_db
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
 EOSQL

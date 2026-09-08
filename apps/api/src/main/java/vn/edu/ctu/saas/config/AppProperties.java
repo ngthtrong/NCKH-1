@@ -17,8 +17,9 @@ public record AppProperties(
 
     public record Jwt(String secret, String issuer, Duration accessTtl, Duration globalTtl, Duration refreshTtl) {}
 
-    public record Datasource(Pool pool, Silo silo) {
+    public record Datasource(Pool pool, Schema schema, Silo silo) {
         public record Pool(String jdbcUrl, String username, String password, int maximumPoolSize) {}
+        public record Schema(String jdbcUrl, int maximumPoolSize, Duration idleTimeout, int globalConnectionCap) {}
         public record Silo(int maximumPoolSize, Duration idleTimeout, int globalConnectionCap) {}
     }
 

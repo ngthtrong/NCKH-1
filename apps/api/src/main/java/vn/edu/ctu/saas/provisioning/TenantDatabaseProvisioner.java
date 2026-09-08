@@ -19,7 +19,7 @@ import vn.edu.ctu.saas.tenant.TenantPlacement;
 
 @Component
 public class TenantDatabaseProvisioner {
-    public static final String LATEST_APPLICATION_SCHEMA_VERSION = "7";
+    public static final String LATEST_APPLICATION_SCHEMA_VERSION = "8";
 
     private final AppProperties properties;
     private final PlacementSecretCipher cipher;
@@ -49,21 +49,32 @@ public class TenantDatabaseProvisioner {
     public void prepare(TenantEntity tenant, TenantPlacementEntity placement) {
         if (placement.getPlacementType() == TenantPlacement.POOL) {
             setOrVerifyDatabaseName(placement, databaseName(properties.datasource().pool().jdbcUrl()));
+            setOrVerifySchemaName(placement, "public");
             return;
         }
 
         String suffix = tenant.getId().toString().replace("-", "");
-        String database = identifier("tenant_" + suffix);
-        String runtimeRole = identifier("tenant_" + suffix.substring(0, 20) + "_app");
-        JdbcEndpoint endpoint = endpoint(properties.provisioning().adminUrl());
+        boolean schemaPlacement = placement.getPlacementType() == TenantPlacement.SCHEMA_PER_TENANT;
+        String database = schemaPlacement
+                ? databaseName(properties.datasource().schema().jdbcUrl())
+                : identifier("tenant_" + suffix);
+        String runtimeRole = identifier(schemaPlacement
+                ? "tenant_" + suffix + "_app"
+                : "tenant_" + suffix.substring(0, 20) + "_app");
+        String schemaName = schemaPlacement ? identifier("tenant_" + suffix) : "public";
+        JdbcEndpoint endpoint = endpoint(schemaPlacement
+                ? properties.datasource().schema().jdbcUrl()
+                : properties.provisioning().adminUrl());
         setOrVerify(placement.getDatabaseHost(), endpoint.host(), "database host");
         setOrVerify(placement.getDatabasePort(), endpoint.port(), "database port");
         setOrVerify(placement.getDatabaseName(), database, "database name");
         setOrVerify(placement.getDatabaseUsername(), runtimeRole, "database username");
+        setOrVerify(placement.getSchemaName(), schemaName, "schema name");
         placement.setDatabaseHost(endpoint.host());
         placement.setDatabasePort(endpoint.port());
         placement.setDatabaseName(database);
         placement.setDatabaseUsername(runtimeRole);
+        placement.setSchemaName(schemaName);
         if (placement.getEncryptedPassword() == null) {
             placement.setEncryptedPassword(cipher.encrypt(randomPassword()));
         } else {
@@ -80,22 +91,52 @@ public class TenantDatabaseProvisioner {
         String database = identifier(placement.getDatabaseName());
         String runtimeRole = identifier(placement.getDatabaseUsername());
         String runtimePassword = runtimePassword(placement);
-        createRoleAndDatabase(database, runtimeRole, runtimePassword);
+        if (placement.getPlacementType() == TenantPlacement.SCHEMA_PER_TENANT) {
+            createSharedDatabase(database);
+            createRole(runtimeRole, runtimePassword);
+            createSchema(database, identifier(placement.getSchemaName()), runtimeRole);
+        } else {
+            createRoleAndDatabase(database, runtimeRole, runtimePassword);
+        }
         checkpoint.reached(ProvisioningStage.DATABASE_READY, tenant, placement);
         String tenantUrl = withDatabase(properties.provisioning().adminUrl(), database);
         String schemaVersion = migrate(
-                tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+                tenantUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword(),
+                identifier(placement.getSchemaName()));
         checkpoint.reached(ProvisioningStage.APPLICATION_MIGRATED, tenant, placement);
-        grantRuntime(tenantUrl, runtimeRole);
+        grantRuntime(tenantUrl, runtimeRole, identifier(placement.getSchemaName()));
         placement.setSchemaVersion(schemaVersion);
         checkpoint.reached(ProvisioningStage.READY_TO_FINALIZE, tenant, placement);
     }
 
     public void rollback(TenantEntity tenant, TenantPlacementEntity placement) {
-        if (placement.getPlacementType() != TenantPlacement.SILO_DATABASE) return;
+        if (placement.getPlacementType() == TenantPlacement.POOL) return;
         String suffix = tenant.getId().toString().replace("-", "");
-        String database = identifier("tenant_" + suffix);
-        String runtimeRole = identifier("tenant_" + suffix.substring(0, 20) + "_app");
+        String database = placement.getPlacementType() == TenantPlacement.SCHEMA_PER_TENANT
+                ? databaseName(properties.datasource().schema().jdbcUrl())
+                : identifier("tenant_" + suffix);
+        String runtimeRole = identifier(placement.getPlacementType() == TenantPlacement.SCHEMA_PER_TENANT
+                ? "tenant_" + suffix + "_app"
+                : "tenant_" + suffix.substring(0, 20) + "_app");
+        if (placement.getPlacementType() == TenantPlacement.SCHEMA_PER_TENANT) {
+            String schemaName = identifier("tenant_" + suffix);
+            try (Connection connection = DriverManager.getConnection(
+                    withDatabase(properties.provisioning().adminUrl(), database),
+                    properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+             Statement statement = connection.createStatement()) {
+                statement.execute("DROP SCHEMA IF EXISTS " + schemaName + " CASCADE");
+                statement.execute("DROP OWNED BY " + runtimeRole);
+            } catch (SQLException exception) {
+                throw new IllegalStateException("Failed to roll back tenant schema: " + exception.getMessage(), exception);
+            }
+            try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
+                statement.execute("REVOKE ALL ON DATABASE " + database + " FROM " + runtimeRole);
+            } catch (SQLException exception) {
+                throw new IllegalStateException("Failed to revoke tenant schema database access", exception);
+            }
+            dropRole(runtimeRole);
+            return;
+        }
         try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
             connection.setAutoCommit(true);
             statement.execute("DROP DATABASE IF EXISTS " + database + " WITH (FORCE)");
@@ -110,14 +151,17 @@ public class TenantDatabaseProvisioner {
         AppProperties.Datasource.Pool pool = properties.datasource().pool();
         String adminUrl = withDatabase(properties.provisioning().adminUrl(), databaseName(pool.jdbcUrl()));
         String schemaVersion = migrate(
-                adminUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
-        grantRuntime(adminUrl, identifier(pool.username()));
+                adminUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword(), "public");
+        grantRuntime(adminUrl, identifier(pool.username()), "public");
         return schemaVersion;
     }
 
-    private String migrate(String url, String username, String password) {
+    private String migrate(String url, String username, String password, String schemaName) {
         Flyway flyway = Flyway.configure()
                 .dataSource(url, username, password)
+                .defaultSchema(schemaName)
+                .schemas(schemaName)
+                .createSchemas(false)
                 .locations("classpath:db/migration/application")
                 .validateMigrationNaming(true)
                 .load();
@@ -130,6 +174,53 @@ public class TenantDatabaseProvisioner {
             throw new IllegalStateException("Unexpected application schema version " + schemaVersion);
         }
         return schemaVersion;
+    }
+
+    private void createRole(String runtimeRole, String password) {
+        try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(true);
+            if (!roleExists(connection, runtimeRole)) {
+                statement.execute("CREATE ROLE " + runtimeRole + " LOGIN PASSWORD '" + password
+                        + "' NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS");
+            } else {
+                statement.execute("ALTER ROLE " + runtimeRole + " PASSWORD '" + password + "'");
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to create tenant runtime role", exception);
+        }
+    }
+
+    private void createSharedDatabase(String database) {
+        try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(true);
+            if (!databaseExists(connection, database)) {
+                statement.execute("CREATE DATABASE " + database + " OWNER "
+                        + identifier(properties.provisioning().adminUsername()));
+            }
+            statement.execute("REVOKE ALL ON DATABASE " + database + " FROM PUBLIC");
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to prepare shared schema database", exception);
+        }
+    }
+
+    private void createSchema(String database, String schemaName, String runtimeRole) {
+        String databaseUrl = withDatabase(properties.provisioning().adminUrl(), database);
+        try (Connection connection = DriverManager.getConnection(
+                databaseUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
+             Statement statement = connection.createStatement()) {
+            statement.execute("REVOKE ALL ON SCHEMA public FROM PUBLIC");
+            statement.execute("CREATE SCHEMA IF NOT EXISTS " + schemaName
+                    + " AUTHORIZATION " + identifier(properties.provisioning().adminUsername()));
+            statement.execute("REVOKE ALL ON SCHEMA " + schemaName + " FROM PUBLIC");
+            statement.execute("GRANT USAGE ON SCHEMA " + schemaName + " TO " + runtimeRole);
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to create tenant schema", exception);
+        }
+        try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("GRANT CONNECT ON DATABASE " + database + " TO " + runtimeRole);
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to grant tenant schema database access", exception);
+        }
     }
 
     private void createRoleAndDatabase(String database, String runtimeRole, String password) {
@@ -159,16 +250,25 @@ public class TenantDatabaseProvisioner {
         }
     }
 
-    private void grantRuntime(String databaseUrl, String runtimeRole) {
+    private void grantRuntime(String databaseUrl, String runtimeRole, String schemaName) {
         try (Connection connection = DriverManager.getConnection(
                 databaseUrl, properties.provisioning().adminUsername(), properties.provisioning().adminPassword());
              Statement statement = connection.createStatement()) {
-            statement.execute("GRANT USAGE ON SCHEMA public TO " + runtimeRole);
-            statement.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO " + runtimeRole);
-            statement.execute("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO " + runtimeRole);
-            statement.execute("ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO " + runtimeRole);
+            statement.execute("GRANT USAGE ON SCHEMA " + schemaName + " TO " + runtimeRole);
+            statement.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA " + schemaName + " TO " + runtimeRole);
+            statement.execute("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA " + schemaName + " TO " + runtimeRole);
+            statement.execute("ALTER DEFAULT PRIVILEGES IN SCHEMA " + schemaName
+                    + " GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO " + runtimeRole);
         } catch (SQLException exception) {
             throw new IllegalStateException("Failed to grant tenant runtime privileges", exception);
+        }
+    }
+
+    private void dropRole(String runtimeRole) {
+        try (Connection connection = adminConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("DROP ROLE IF EXISTS " + runtimeRole);
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to drop tenant runtime role", exception);
         }
     }
 
@@ -210,6 +310,11 @@ public class TenantDatabaseProvisioner {
     private void setOrVerifyDatabaseName(TenantPlacementEntity placement, String expected) {
         setOrVerify(placement.getDatabaseName(), expected, "database name");
         placement.setDatabaseName(expected);
+    }
+
+    private void setOrVerifySchemaName(TenantPlacementEntity placement, String expected) {
+        setOrVerify(placement.getSchemaName(), expected, "schema name");
+        placement.setSchemaName(expected);
     }
 
     private void setOrVerify(Object current, Object expected, String field) {

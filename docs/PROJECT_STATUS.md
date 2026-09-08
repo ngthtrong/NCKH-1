@@ -1,29 +1,45 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-09-01 14:33 (UTC)
+**Cập nhật:** 2026-09-08 (UTC)
 **Nhánh đang làm:** `main`
 **Checkpoint mã nguồn P-App:** `c226676` (`p-app`)
-**Trạng thái Git khi bắt đầu cập nhật tài liệu:** `main`, `origin/main` và `origin/HEAD` cùng trỏ tới
-`c226676`; working tree sạch. Sau lần cập nhật này, thay đổi chưa commit dự kiến chỉ là
-`docs/PROJECT_STATUS.md`; phiên sau vẫn phải tự kiểm tra lại.
-**Trạng thái:** P0 và các ưu tiên hardening P1 đã hoàn tất local trong phạm vi biên bản. P2 đã có
-protocol/evidence gate, guarded Project CRUD 3 ứng viên × Pool/Silo và guard-omission matrix local;
-matrix ghi 6 leak cho explicit/Hibernate trên Pool, RLS chặn 3/3 đường omission, nhưng chưa có hồ sơ
-loại checksum-backed, raw measurement, score hoặc ADR được chấp nhận. Theo quyết định của nhóm ngày
-2026-09-01, ưu tiên chuyển sang hoàn thiện `apps/api` và `apps/web` với đầy đủ tính năng chính cùng các
-luồng nghiệp vụ cơ bản. Checklist P-App đã khóa; APP-01 đến APP-06 đã hoàn tất trên stack local và full
-regression giữ nguyên các baseline tối thiểu. Triển khai VPS, tích hợp provider thật, spike/đo chính
-thức, kiểm thử nghiệm thu diện rộng, thực nghiệm và đánh giá người dùng vẫn tạm dừng cho đến quyết định
-tiếp theo của nhóm. Tại thời điểm ghi checkpoint, Compose local có chín service dài hạn đang chạy;
-API/web/PostgreSQL/Mailpit healthy và `http://accounts.localhost:8080` trả HTTP `200`. Đây chỉ là trạng
-thái runtime tức thời, không được giả định còn nguyên ở phiên sau.
+**Nền commit hiện tại:** `7b6a635`; phần EXT đang là working tree chưa commit và phải được review trước
+khi tạo commit. Bốn file tài liệu có diff từ trước cùng hai tài liệu Word chưa theo dõi đã được bảo toàn.
+**Trạng thái hiện tại:** APP-01–APP-06 giữ nguyên là checkpoint local của phiên bản hai placement.
+EXT-01–EXT-06 đã hoàn tất local ngày 2026-09-08 cho Bridge ba placement và tùy biến hữu hạn; biên bản
+ở [`docs/testing/extension-local-2026-09-08.md`](testing/extension-local-2026-09-08.md). Provider thật,
+VPS/Internet, P2 measurement, pilot, SLO, thực nghiệm và đánh giá người dùng vẫn tạm dừng và chưa phải
+bằng chứng nghiệm thu.
 
-Tài liệu này là điểm bắt đầu cho phiên làm việc tiếp theo. Nó phân biệt rõ mã đã hiện thực, kiểm tra đã chạy, phần mới chỉ là khung và phần bắt buộc phải chờ dữ liệu/hạ tầng thật.
+## 0. Checkpoint mở rộng hiện tại
+
+| Mốc | Kết quả local | Bằng chứng chính |
+|---|---|---|
+| EXT-01 | **Hoàn tất** | `SCHEMA_PER_TENANT`, schema/role riêng, Flyway V8, isolation hai tenant và runtime ba placement |
+| EXT-02 | **Hoàn tất** | Capability matrix phía server, audit/version, branding và UI Tenant/System Admin |
+| EXT-03 | **Hoàn tất** | Job DDL, bảng/cột SQL hữu hạn, entity/Task field CRUD, soft delete và metadata form |
+| EXT-04 | **Hoàn tất** | Workflow nhiều bước ANY/ALL, snapshot/version, completion guard và invalidation |
+| EXT-05 | **Hoàn tất** | Trigger/action hữu hạn, outbox, idempotency/retry, capability recheck và history |
+| EXT-06 | **Hoàn tất local** | 96/96 backend, 16/16 frontend, build/contract, 3/3 Playwright, hai smoke và Compose upgrade pass |
+
+Control plane hiện ở migration V6; application plane ở V8. Runtime cuối có `pool-demo`, `schema-demo`
+và `silo-demo` cùng `ACTIVE`; Pool/Silo hiện hữu được nâng cấp trên volume cũ, không tạo lại database.
+Trong lúc xác minh đã sửa ba lỗi: binding record datasource, bỏ sót `schema_name` khi copy placement và
+payload smoke automation sai contract. Toàn bộ chuỗi kiểm tra liên quan được chạy lại sau khi sửa.
+
+Các phần từ mục 1 đến mục 8 bên dưới lưu chi tiết checkpoint P-App và lịch sử P0–P2. Khi có khác biệt
+về tổng test, số placement, migration hoặc lệnh tiếp tục, mục 0 và biên bản EXT ngày 2026-09-08 là trạng
+thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, SLO hay số liệu nghiên cứu.
 
 ## 1. Nguồn sự thật và nguyên tắc bảo toàn
 
 - Thuyết minh chính: [`resource/thuyetMinhSaasMultiTenancy.md`](../resource/thuyetMinhSaasMultiTenancy.md).
 - Kế hoạch thực hiện: [`resource/plan.md`](../resource/plan.md).
+- Thuật ngữ CSDL thống nhất ngày 2026-09-07: **Pool = Shared Database, Shared Schema**;
+  **Schema-per-tenant (`SCHEMA_PER_TENANT`) = Shared Database, Separate Schema**; **Silo
+  (`SILO_DATABASE`) = Separate Database**. Ánh xạ áp dụng cho application plane; control database vẫn
+  dùng chung. Bridge là hệ thống kết hợp cả ba placement. Xem
+  [`resource/chuan_hoa_thuat_ngu.md`](../resource/chuan_hoa_thuat_ngu.md).
 - Không khôi phục hai file người dùng đang chủ động xóa: `resource/important.md` và `resource/thuyet_minh_SaaS.md`.
 - `draft.md` không còn tồn tại tại checkpoint; nếu người dùng tạo lại file này thì không được ghi đè khi chưa kiểm tra nội dung.
 - Phần P1 local đã được commit tại `71b8092`; protocol/evidence gate, isolation harness và hai biên bản
@@ -72,7 +88,7 @@ triển khai, kiểm thử nghiệm thu diện rộng, P2 measurement hay thực
 - Java 21, Spring Boot 4.1.1, Maven Wrapper, Flyway, JPA/JDBC, Security, Actuator/Micrometer và Testcontainers.
 - Hai profile dùng chung mã: API không có quyền tạo database; worker/provisioner nhận credential đặc quyền riêng.
 - Control plane cho user, tenant, membership, tier, placement, route, payment, provisioning và refresh/session state.
-- Application plane dùng chung schema cho Pool và Silo; mọi bảng nghiệp vụ có `tenant_id` và Pool bật `FORCE ROW LEVEL SECURITY`.
+- Application plane dùng cùng cấu trúc bảng và bộ migration cho Pool và Silo. Pool dùng chung database/schema/bảng giữa các tenant; Silo tạo bộ bảng riêng trong database của từng tenant. Mọi bảng nghiệp vụ có `tenant_id` và Pool bật `FORCE ROW LEVEL SECURITY`.
 - Có `TenantContext`, host–token validation, membership-version invalidation, tenant-bound JWT/refresh flow và đối chiếu trạng thái tenant.
 - Có resolver Pool/Silo, Hikari pool cho Silo, giới hạn connection ban đầu và mã hóa placement secret.
 - Fake payment provider, kiểm tra amount/currency/return URL, webhook signature/replay/payload hash và khóa advisory theo transaction để idempotency vẫn đúng khi tạo payment đồng thời.
@@ -329,7 +345,7 @@ luồng trước khi chuyển sang luồng kế tiếp:
 6. QA dữ liệu, sinh lại bảng/biểu đồ, rồi mới viết kết luận cho từng câu hỏi nghiên cứu.
 7. Nhóm nghiên cứu thực hiện user study/SUS; repo chỉ nhận dữ liệu đã ẩn danh hoặc tổng hợp.
 
-## 7. Lệnh phục hồi và kiểm tra từ checkpoint P-App
+## 7. Lệnh phục hồi và kiểm tra từ checkpoint EXT
 
 Kiểm tra trạng thái trước khi làm:
 
@@ -340,9 +356,9 @@ git rev-parse --short HEAD
 git log -1 --oneline --decorate
 ```
 
-Tại checkpoint mã nguồn, `HEAD` kỳ vọng là `c226676`; không reset hoặc ghi đè nếu working tree có thay
-đổi mới. Các lệnh dưới đây bảo vệ baseline khi sửa tiếp ứng dụng; chúng không phải lượt kiểm thử nghiệm
-thu hay thực nghiệm chính. Backend cần Docker hoạt động để test RLS không bị skip:
+Nền commit đang là `7b6a635`, còn phần EXT chưa commit; không reset hoặc ghi đè working tree. Các lệnh
+dưới đây bảo vệ baseline khi sửa tiếp ứng dụng; chúng không phải lượt kiểm thử nghiệm thu hay thực
+nghiệm chính. Backend cần Docker hoạt động để Testcontainers không bị skip:
 
 ```bash
 cd apps/api
@@ -362,7 +378,7 @@ npm run test:e2e:install
 E2E_ENV_FILE=../../infra/.env npm run test:e2e
 ```
 
-Local stack chỉ khởi động khi cần phát triển/kiểm tra luồng Pool/Silo. Stack đang chạy tại thời điểm
+Local stack chỉ khởi động khi cần phát triển/kiểm tra luồng cả ba placement. Stack đang chạy tại thời điểm
 checkpoint nhưng phiên sau phải kiểm tra hoặc chạy lại script thay vì giả định:
 
 ```bash
@@ -371,10 +387,11 @@ scripts/validate-infra.sh
 scripts/dev-up.sh
 ```
 
-Smoke P-App local có fixture kỹ thuật tự cleanup:
+Hai smoke local có fixture kỹ thuật tự cleanup:
 
 ```bash
 node scripts/verify-p-app-workflow.mjs
+node scripts/verify-extension-workflow.mjs
 ```
 
 Các lệnh fault injection, P2 và workload dưới đây **vẫn tạm dừng**; chỉ chạy lại khi nhóm có quyết định
@@ -393,16 +410,13 @@ Các workload nghiệp vụ cần token tenant thật trong environment; xem `ex
 
 Có thể dùng nguyên văn:
 
-> Đọc `docs/PROJECT_STATUS.md`, `resource/plan.md`, `resource/thuyetMinhSaasMultiTenancy.md`, SRS,
-> OpenAPI và checklist P-App; kiểm tra working tree trước khi sửa. Checkpoint mã nguồn hiện tại là
-> `c226676` (`p-app`): APP-01 đến APP-06 đã hoàn tất local, OpenAPI đã đồng bộ và regression gần nhất đạt
-> 88 backend test, 11 frontend unit test cùng đúng 2 Playwright E2E Pool/Silo. Không làm lại các lát cắt
-> đã đóng nếu không có lỗi hoặc yêu cầu mới. Theo quyết định ngày 2026-09-01, VPS, provider thật, P2
-> measurement, kiểm thử nghiệm thu diện rộng và thực nghiệm vẫn tạm dừng cho đến quyết định riêng của
-> nhóm; P-App hoàn tất không tự động mở lại các giai đoạn đó. Không khôi phục `resource/important.md` hay
-> `resource/thuyet_minh_SaaS.md`, không tạo `draft.md`, không tạo dữ liệu nghiên cứu giả và không biến
-> artifact P2 thành kết quả chính thức. Khi sửa ứng dụng, giữ đầy đủ test hiện có tại checkpoint; 58
-> backend và 5 frontend test ban đầu vẫn là baseline lịch sử tối thiểu, được bổ sung test mới và không cố
-> định tổng test ở các con số cũ.
+> Đọc `docs/PROJECT_STATUS.md`, `docs/app/EXTENSION-CHECKLIST.md`, biên bản EXT ngày 2026-09-08,
+> `resource/plan.md`, thuyết minh, SRS và OpenAPI; kiểm tra working tree trước khi sửa. APP-01–APP-06 là
+> checkpoint lịch sử tại `c226676`. EXT-01–EXT-06 đã hoàn tất local trên working tree nền `7b6a635` với
+> Bridge ba placement, bốn capability, 96 backend test, 16 frontend unit test và 3 Playwright E2E.
+> Không làm lại lát cắt đã đóng nếu không có lỗi hoặc yêu cầu mới. Provider thật, VPS/Internet, P2
+> measurement, pilot, SLO, thực nghiệm và nghiệm thu diện rộng vẫn tạm dừng; không biến test local thành
+> bằng chứng nghiên cứu. Bảo toàn các diff hiện hữu và hai file Word chưa theo dõi; không khôi phục
+> `resource/important.md`, `resource/thuyet_minh_SaaS.md` hay tạo `draft.md`.
 
 Sau mỗi mốc đáng kể, cập nhật ngày, bảng tiến độ, kết quả test và danh sách nợ kỹ thuật trong chính tài liệu này.

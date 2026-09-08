@@ -1,6 +1,6 @@
 # Hạ tầng chạy local
 
-Thư mục này chứa hạ tầng tái lập cho ứng dụng nghiên cứu. Một PostgreSQL instance chứa `control_db`, `pool_db` và các database Silo do worker cấp phát; API không nhận credential có quyền `CREATEDB`.
+Thư mục này chứa hạ tầng tái lập cho ứng dụng nghiên cứu. Một PostgreSQL instance chứa `control_db`, `pool_db`, `schema_db` và các database Silo do worker cấp phát; mỗi tenant Schema-per-tenant có schema/runtime role riêng trong `schema_db`. API không nhận credential có quyền `CREATEDB` hoặc DDL tùy biến.
 
 Khởi động từ thư mục gốc:
 
@@ -27,8 +27,9 @@ Xem [local-development.md](runbooks/local-development.md), [backup-restore.md](r
 
 - `control_api`: DML trên control plane, không tạo database/role, không `BYPASSRLS`.
 - `pool_api`: DML trên pooled application plane, không tạo database/role, không `BYPASSRLS`.
+- `tenant_<id>_app` của Schema-per-tenant: chỉ `CONNECT`, `USAGE` và DML trong schema tenant; không có DDL hoặc quyền schema tenant khác.
 - `control_migrator`: DDL trong schema `public` của control database, không tạo database/role.
-- `saas_provisioner`: chỉ có ở worker; được `CREATEDB`/`CREATEROLE` để cấp phát Silo và chạy migration.
+- `saas_provisioner`: chỉ có ở worker; được `CREATEDB`/`CREATEROLE` để cấp phát schema/role/database, chạy migration và DDL tùy biến có kiểm soát.
 - PostgreSQL superuser chỉ dùng khi khởi tạo/khôi phục và không được truyền vào API hoặc worker.
 
 Thay đổi các role hoặc grant phải đi kèm kiểm thử chứng minh application role không phải superuser, không có `BYPASSRLS`, và RLS trên bảng pooled vẫn ở trạng thái `FORCE ROW LEVEL SECURITY`.

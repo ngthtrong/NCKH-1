@@ -39,12 +39,38 @@ Tài liệu này chuẩn hóa việc dịch thuật và sử dụng các thuật
 | Thuật ngữ Tiếng Anh | Thuật ngữ Tiếng Việt | Chú thích & Ngữ cảnh áp dụng |
 | :--- | :--- | :--- |
 | **Data Isolation** | Cô lập dữ liệu / Cách ly dữ liệu | Đảm bảo Tenant này không đọc/ghi được dữ liệu Tenant khác. |
-| **Shared Database, Shared Schema** | Dùng chung CSDL, dùng chung Lược đồ | Các Tenant lưu chung một CSDL và chung các bảng. |
-| **Shared Database, Separate Schema** | Dùng chung CSDL, Lược đồ riêng | Các Tenant chung CSDL nhưng bảng/schema vật lý tách biệt. |
-| **Separate Database** | Cơ sở dữ liệu riêng biệt | Mỗi Tenant sở hữu một database vật lý riêng. |
+| **Shared Database, Shared Schema** | Chung CSDL, chung lược đồ | Các tenant dùng chung database, chung schema và chung các bảng; dữ liệu được phân biệt theo tenant, thường bằng `tenant_id`. |
+| **Shared Database, Separate Schema** | Chung CSDL, riêng lược đồ | Các tenant dùng chung database nhưng mỗi tenant có schema riêng; mỗi schema chứa bộ bảng riêng của tenant đó. |
+| **Separate Database** | Riêng CSDL | Mỗi tenant dùng một database riêng; các database có thể nằm trên cùng hoặc khác máy chủ vật lý. Không yêu cầu máy chủ hay tiến trình hệ quản trị CSDL riêng. |
 | **Discriminator Column** | Cột phân biệt / Cột định danh | Cột chứa ID định danh của Tenant (thường là `TenantID` hoặc `tenant_id`) trong bảng CSDL dùng chung. |
 | **Global Query Filter** | Bộ lọc truy vấn toàn cục | Cơ chế tự động thêm điều kiện lọc theo `TenantID` vào mọi câu lệnh truy vấn dữ liệu từ Backend. |
 | **Database Migration** | Di chuyển/Cập nhật lược đồ CSDL | Quá trình đồng bộ cấu trúc bảng khi có thay đổi mã nguồn. |
+
+#### Ánh xạ placement trong đề tài
+
+Ba mô hình trên phân loại cách bố trí dữ liệu theo database, schema và bảng; không phân loại theo máy chủ vật lý. Dùng chính tả tiếng Anh **Separate**, không dùng `Seperate`.
+
+| Placement trong hệ thống | Mô hình CSDL tương ứng | Cách hiện thực |
+| :--- | :--- | :--- |
+| **Pool** (`POOL`) | **Shared Database, Shared Schema** | Tenant dùng chung nguồn kết nối, database, schema và các bảng nghiệp vụ; dùng `tenant_id` và RLS để cô lập dữ liệu. |
+| **Schema-per-tenant** (`SCHEMA_PER_TENANT`) | **Shared Database, Separate Schema** | Tenant dùng chung database nhưng có schema, bộ bảng và runtime role riêng; provisioner tạo tên vật lý từ định danh tenant. |
+| **Silo** (`SILO_DATABASE`) | **Separate Database** | Provisioner tạo database riêng cho mỗi tenant; resolver chọn kết nối theo database của tenant. |
+
+Trong đề tài mở rộng, **Bridge** chỉ việc một hệ thống hỗ trợ đồng thời cả ba placement nêu trên, không phải mô hình thứ tư trong phân loại CSDL này. Ánh xạ này áp dụng cho dữ liệu nghiệp vụ (application plane); danh tính, membership, capability và metadata cấp phát vẫn nằm trong control database dùng chung. Silo hiện tại không đồng nghĩa tách toàn bộ ứng dụng, kho tệp hoặc máy chủ.
+
+Ba placement dùng chung mã ứng dụng và bộ migration lõi không có nghĩa dùng chung các bảng thực tế: Schema-per-tenant có bộ bảng trong schema riêng, còn Silo có bộ bảng trong database riêng. Khi dùng tên placement trong tài liệu, phải hiểu theo ánh xạ ở trên, không suy từ tên gọi ra mức tách máy chủ vật lý.
+
+#### Tùy biến và capability
+
+| Thuật ngữ | Nghĩa dùng trong đề tài |
+| :--- | :--- |
+| **Capability** | Khả năng do Quản trị hệ thống cấp hoặc thu hồi cho từng tenant trong giới hạn placement; gói giá không tự quyết định capability ở phiên bản đầu. |
+| **Branding** (`BRANDING`) | Tùy chỉnh màu chính, màu nhấn và logo an toàn theo tenant; không nhận HTML, CSS hoặc JavaScript tùy ý. |
+| **Custom data** (`CUSTOM_DATA`) | Field mở rộng của Task và bảng nghiệp vụ động thuộc project, dùng kiểu dữ liệu hữu hạn và DDL do worker kiểm soát. |
+| **Approvals** (`APPROVALS`) | Quy trình phê duyệt nhiều bước theo board, với nhóm duyệt `ANY` hoặc `ALL`. |
+| **Automation** (`AUTOMATION`) | Quy tắc hữu hạn một trigger–một action; không thực thi mã hoặc SQL do người dùng cung cấp. |
+
+Giới hạn cấp capability là cộng dồn theo placement: `POOL` chỉ có Branding; `SCHEMA_PER_TENANT` có Branding và Custom data; `SILO_DATABASE` có cả bốn capability. Từ **tùy biến tối đa** ở mức Silo chỉ mức khả năng cao nhất trong phạm vi bốn capability này, không có nghĩa tenant được cài plugin thực thi, sửa bảng lõi, nhập SQL tùy ý hoặc có bản triển khai ứng dụng riêng.
 
 ### 2.3. Nghiệp Vụ Quản Lý Công Việc & Kanban
 

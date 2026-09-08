@@ -353,3 +353,37 @@ TRƯỜNG CNTT-TT | CÁN BỘ HƯỚNG DẪN | CHỦ NHIỆM ĐỀ TÀI
 TL. HIỆU TRƯỞNG
 
 TRƯỞNG PHÒNG KHOA HỌC, CÔNG NGHỆ VÀ ĐỔI MỚI SÁNG TẠO
+
+## Phụ lục đề xuất mở rộng phạm vi — chờ phê duyệt học thuật
+
+> [!CAUTION]
+> Nội dung dưới đây là đề xuất kỹ thuật của nhóm ngày 2026-09-07 để đối chiếu với thuyết minh gốc. Phụ lục chưa thay thế hồ sơ đã duyệt, chưa xác nhận thay đổi thời hạn hoặc tiêu chí nghiệm thu và không được trình bày như một cam kết đã được cơ quan quản lý đề tài phê duyệt.
+
+### A.1. Nội dung đề xuất bổ sung
+
+Mở rộng khung kiến trúc Bridge để cùng một ứng dụng API, worker và frontend hỗ trợ ba cách bố trí dữ liệu nghiệp vụ:
+
+1. **Chung CSDL, chung lược đồ (Shared Database, Shared Schema)** — placement `POOL`: nhiều tenant dùng chung database, schema và bảng; dữ liệu được phân biệt bằng `tenant_id` và chính sách cô lập.
+2. **Chung CSDL, riêng lược đồ (Shared Database, Separate Schema)** — placement `SCHEMA_PER_TENANT`: nhiều tenant dùng chung database, nhưng mỗi tenant có schema, bộ bảng và runtime role riêng.
+3. **Riêng CSDL (Separate Database)** — placement `SILO_DATABASE`: mỗi tenant dùng database riêng; database có thể nằm cùng hoặc khác máy chủ vật lý.
+
+Trong đề xuất này, **Bridge** là hệ thống kết hợp cả ba placement. Bridge không phải một mức bố trí dữ liệu thứ tư. Placement được chọn khi onboarding và không chuyển tenant đã có dữ liệu giữa các placement trong phạm vi đợt mở rộng.
+
+### A.2. Ba mức tùy biến đề xuất
+
+| Mức | Placement phù hợp | Phạm vi tùy biến tối đa |
+|---|---|---|
+| Tùy biến giao diện | `POOL`, `SCHEMA_PER_TENANT`, `SILO_DATABASE` | Màu chính, màu nhấn và logo theo tenant (`BRANDING`) |
+| Tùy biến dữ liệu nghiệp vụ | `SCHEMA_PER_TENANT`, `SILO_DATABASE` | Field mở rộng cho Task và bảng nghiệp vụ mới theo project (`CUSTOM_DATA`) |
+| Tùy biến quy trình | `SILO_DATABASE` | Phê duyệt nhiều bước (`APPROVALS`) và tự động hóa hữu hạn (`AUTOMATION`) |
+
+Quản trị hệ thống cấp hoặc thu hồi từng capability trong giới hạn placement; gói giá không quyết định capability ở phiên bản đầu. Owner/Admin của tenant quản lý branding và trạng thái module đã được cấp. Manager cấu hình dữ liệu, quy trình và automation trong project mình. Phạm vi không bao gồm SQL tùy ý, plugin chứa mã thực thi, thay đổi cấu trúc lõi hay bản triển khai ứng dụng riêng cho tenant.
+
+### A.3. Phương pháp kiểm chứng bổ sung được đề xuất
+
+- Kiểm thử cùng nghiệp vụ lõi trên cả ba placement; với Schema-per-tenant phải có ít nhất hai tenant trong cùng database và thử truy cập chéo bằng tên schema đầy đủ.
+- Kiểm thử provisioning, migration, retry và rollback sao cho lỗi một schema/database không đổi tenant khác.
+- Kiểm thử capability ở backend bằng gọi API trực tiếp; kiểm thử branding, bảng/field, phê duyệt và automation không rò rỉ hoặc vượt quyền tenant/project.
+- Khi thực nghiệm, giữ cùng nghiệp vụ, seed và cấu hình capability để so sánh placement. Đo chi phí của tùy biến/module ở lượt riêng.
+
+Các kiểm tra local chỉ là bằng chứng kỹ thuật phát triển. Việc chấp nhận phụ lục, thời hạn thực hiện, môi trường Internet, pilot, SLO, thực nghiệm người dùng và sản phẩm nghiệm thu vẫn phải theo quyết định học thuật chính thức.

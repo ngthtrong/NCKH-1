@@ -1,6 +1,9 @@
 
 # Kế hoạch triển khai toàn bộ đề tài SaaS đa thuê bao
 
+> [!NOTE]
+> Tài liệu này ghi kế hoạch baseline hai placement trước checkpoint P-App. Phần mở rộng ba placement và tùy biến ngày 2026-09-07 được điều khiển bởi [`plan.md`](./plan.md) và [`docs/app/EXTENSION-CHECKLIST.md`](../docs/app/EXTENSION-CHECKLIST.md); các câu Pool/Silo bên dưới được giữ làm lịch sử, không dùng làm trạng thái triển khai hiện tại.
+
 ## 1. Mục tiêu và phạm vi hỗ trợ
 
 Triển khai toàn bộ nội dung trong [plan.md](/home/ngthtrong/NCKH-1/resource/plan.md) dựa trên [thuyetMinhSaasMultiTenancy.md](/home/ngthtrong/NCKH-1/resource/thuyetMinhSaasMultiTenancy.md), theo các cổng nghiệm thu thay vì hạn ngày cố định.

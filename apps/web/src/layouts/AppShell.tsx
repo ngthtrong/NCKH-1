@@ -9,6 +9,7 @@ import {
   Menu as MenuIcon,
   NotificationsNone,
   SpaceDashboardOutlined,
+  TuneOutlined,
 } from '@mui/icons-material';
 import {
   AppBar,
@@ -31,10 +32,11 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState, type MouseEvent } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { notificationsApi } from '../api/endpoints';
+import { notificationsApi, tenantSettingsApi } from '../api/endpoints';
 import { useAuth } from '../auth/AuthContext';
 
 const drawerWidth = 252;
@@ -45,6 +47,7 @@ const primaryNavigation = [
   { label: 'Bảng công việc', to: '/kanban', icon: <SpaceDashboardOutlined /> },
   { label: 'Thành viên', to: '/members', icon: <GroupsOutlined /> },
   { label: 'Tài nguyên', to: '/resources', icon: <FolderOutlined /> },
+  { label: 'Mở rộng nghiệp vụ', to: '/customization', icon: <TuneOutlined /> },
 ];
 
 function initials(name: string): string {
@@ -73,6 +76,28 @@ export function AppShell() {
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
+  const { data: tenantSettings } = useQuery({
+    queryKey: ['tenant-settings'],
+    queryFn: tenantSettingsApi.get,
+  });
+  const brandingEnabled = tenantSettings?.capabilities.some(
+    (item) => item.capability === 'BRANDING' && item.supported && item.granted && item.enabled,
+  );
+  const activeBranding = brandingEnabled ? tenantSettings?.branding : undefined;
+  const tenantTheme = useMemo(() => {
+    if (!activeBranding) return theme;
+    return createTheme({
+      ...theme,
+      palette: {
+        ...theme.palette,
+        primary: { ...theme.palette.primary, main: activeBranding.primaryColor },
+        secondary: { ...theme.palette.secondary, main: activeBranding.accentColor },
+      },
+    });
+  }, [activeBranding, theme]);
+  const hasBusinessExtensions = tenantSettings?.capabilities.some(
+    (item) => item.capability !== 'BRANDING' && item.supported,
+  ) ?? false;
   const unread = useMemo(
     () => notifications.reduce((count, item) => count + (item.readAt ? 0 : 1), 0),
     [notifications],
@@ -84,7 +109,13 @@ export function AppShell() {
   const drawer = (
     <Box className="app-drawer">
       <Box className="brand brand--drawer">
-        <Box className="brand__symbol">T</Box>
+        <Box
+          className="brand__symbol"
+          component={activeBranding?.logoUrl ? 'img' : 'div'}
+          src={activeBranding?.logoUrl ?? undefined}
+          alt={activeBranding?.logoUrl ? `${tenant?.name ?? 'Tenant'} logo` : undefined}
+          sx={{ backgroundColor: activeBranding?.primaryColor }}
+        >{activeBranding?.logoUrl ? null : 'T'}</Box>
         <Box>
           <Typography className="brand__name">TenantFlow</Typography>
           <Typography className="brand__caption">Project workspace</Typography>
@@ -110,7 +141,9 @@ export function AppShell() {
       </Box>
       <Typography className="nav-label">Không gian làm việc</Typography>
       <List className="app-nav">
-        {primaryNavigation.map((item) => (
+        {primaryNavigation
+          .filter((item) => item.to !== '/customization' || hasBusinessExtensions)
+          .map((item) => (
           <ListItemButton
             key={item.to}
             component={NavLink}
@@ -125,7 +158,7 @@ export function AppShell() {
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.label} />
           </ListItemButton>
-        ))}
+          ))}
         <ListItemButton
           component={NavLink}
           to="/notifications"
@@ -145,14 +178,25 @@ export function AppShell() {
           <Typography className="nav-label">Quản trị</Typography>
           <List className="app-nav">
             {canAdministerTenant && tenant && (
-              <ListItemButton
-                component={NavLink}
-                to={`/onboarding?tenant=${tenant.id}`}
-                onClick={closeDrawer}
-              >
-                <ListItemIcon><AdminPanelSettingsOutlined /></ListItemIcon>
-                <ListItemText primary="Trạng thái workspace" />
-              </ListItemButton>
+              <>
+                <ListItemButton
+                  component={NavLink}
+                  to="/settings"
+                  onClick={closeDrawer}
+                  className={location.pathname.startsWith('/settings') ? 'active' : ''}
+                >
+                  <ListItemIcon><TuneOutlined /></ListItemIcon>
+                  <ListItemText primary="Tùy chỉnh tenant" />
+                </ListItemButton>
+                <ListItemButton
+                  component={NavLink}
+                  to={`/onboarding?tenant=${tenant.id}`}
+                  onClick={closeDrawer}
+                >
+                  <ListItemIcon><AdminPanelSettingsOutlined /></ListItemIcon>
+                  <ListItemText primary="Trạng thái workspace" />
+                </ListItemButton>
+              </>
             )}
             {canAdministerSystem && (
               <ListItemButton
@@ -173,13 +217,18 @@ export function AppShell() {
           Dữ liệu được cô lập theo tenant
         </Typography>
         <Box className="isolation-indicator">
-          <span /> {tenant?.placement === 'SILO_DATABASE' ? 'Cơ sở dữ liệu riêng' : 'Cơ sở dữ liệu dùng chung'}
+          <span /> {tenant?.placement === 'SILO_DATABASE'
+            ? 'Cơ sở dữ liệu riêng'
+            : tenant?.placement === 'SCHEMA_PER_TENANT'
+              ? 'Schema riêng trong CSDL chung'
+              : 'Schema và bảng dùng chung'}
         </Box>
       </Box>
     </Box>
   );
 
   return (
+    <ThemeProvider theme={tenantTheme}>
     <Box className="app-frame">
       <AppBar position="fixed" color="inherit" elevation={0} className="app-topbar">
         <Toolbar>
@@ -245,5 +294,6 @@ export function AppShell() {
         <Outlet />
       </Box>
     </Box>
+    </ThemeProvider>
   );
 }

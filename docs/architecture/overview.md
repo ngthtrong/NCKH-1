@@ -5,7 +5,7 @@
 Thứ tự ưu tiên:
 
 1. Không truy cập chéo tenant ở API, database, storage, notification hoặc job nền.
-2. Một contract nghiệp vụ chạy giống nhau trên Pool và database-per-tenant Silo.
+2. Một contract nghiệp vụ chạy giống nhau trên Pool, schema-per-tenant và database-per-tenant Silo.
 3. Provisioning có thể retry/rollback và không tạo tài nguyên trùng.
 4. Hệ thống quan sát được theo tenant trên một VPS có connection/resource budget hữu hạn.
 5. Mã có thể sửa đổi và môi trường/thí nghiệm có thể tái lập.
@@ -17,7 +17,7 @@ Hệ thống là modular monolith triển khai thành hai process dùng chung mo
 - **API process:** phục vụ REST/UI, xác thực, authorization và business transaction. Credential không có quyền tạo/drop database/role.
 - **Worker process:** poll outbox/job, gửi notification và thực hiện provisioning bằng credential đặc quyền riêng; quyền được tách theo adapter/job.
 
-Control plane dùng `control_db`; application plane dùng `pooled_db` cho tenant `POOL` hoặc `tenant_<opaque-id>` cho tenant `SILO_DATABASE`. Compute, identity, object storage, reverse proxy và observability vẫn dùng chung; do đó Silo trong đề tài là database-only, không phải full-stack isolation.
+Control plane dùng `control_db`; application plane dùng `pooled_db` cho `POOL`, một `schema_db` với schema/role riêng cho `SCHEMA_PER_TENANT`, hoặc `tenant_<opaque-id>` cho `SILO_DATABASE`. Compute, identity, object storage, reverse proxy và observability vẫn dùng chung; do đó Silo trong đề tài là database-only, không phải full-stack isolation.
 
 ## 3. Module và dependency rule
 
@@ -42,7 +42,7 @@ TenantContext {
   userId: UUID
   tenantId: UUID
   tier: String
-  placement: POOL | SILO_DATABASE
+  placement: POOL | SCHEMA_PER_TENANT | SILO_DATABASE
   tenantRole: OWNER | ADMIN | MEMBER
   subdomain: String
   membershipVersion: long
@@ -70,7 +70,7 @@ Thứ tự bắt buộc trước business service:
 4. So khớp route tenant với claim `tid`; kiểm tenant `ACTIVE`.
 5. Đọc membership hiện tại và membership version; tạo `TenantContext`.
 6. Rate limit theo tenant+tier, sau đó controller chuyển command vào application service.
-7. `TenantDataSourceResolver` chọn Pool/Silo; transaction manager đặt database tenant context nếu cơ chế Pool cần. Trong transaction đó, authorization policy đọc `ProjectMembership` hiện tại trước mutation/query nội dung.
+7. `TenantDataSourceResolver` chọn Pool/Schema/Silo. Transaction đặt `app.tenant_id` và `search_path` cục bộ; PostgreSQL role mới là biên chống truy cập chéo schema. Authorization policy đọc `ProjectMembership` hiện tại trước mutation/query nội dung.
 8. `finally` luôn xóa thread/MDC/database session context trước khi connection/thread được tái sử dụng.
 
 Lookup auth/control dùng control datasource; business query dùng application datasource. Không mở một transaction bao trùm hai database.
@@ -78,13 +78,19 @@ Lookup auth/control dùng control datasource; business query dùng application d
 ## 6. Dữ liệu và transaction
 
 - Control plane chứa user, tenant, membership, tier, route, payment và provisioning.
-- Pool/Silo có cùng Flyway application migrations và cùng schema version policy.
+- Cả ba placement có cùng Flyway application migrations và cùng schema version policy; schema-per-tenant có Flyway history riêng trong schema của tenant.
 - Mọi application table có `tenant_id`; Silo giữ discriminator để cùng entity/query/test và defense-in-depth.
 - Business aggregate mutation + `outbox_event` nằm trong cùng local transaction.
 - Control jobs được poll từ `control_db`. Application outbox poller lấy danh sách active placement từ control plane, quét `pooled_db` một lần và các Silo theo round-robin có bounded concurrency; không giữ pool mở cho mọi Silo chỉ để poll. Event được claim bằng lease/locking cục bộ trong database chứa event.
 - Worker ghi attempt/delivery idempotently. Delivery bên ngoài là at-least-once; consumer/provider operation cần dedupe key.
 - Không dùng foreign key xuyên database. ID control-plane được kiểm trước khi ghi application DB; audit/correlation nối hai phía.
 - Optimistic locking trên task bằng `version`; stale update trả 409.
+
+### Capability và dữ liệu tùy chỉnh
+
+Placement và capability là hai quyết định độc lập. Control plane lưu grant/enable/version/audit theo tenant; request và worker đều kiểm tra trạng thái hiện hành. Pool chỉ hỗ trợ Branding, Schema thêm Custom Data, Silo thêm Approvals và Automation.
+
+Metadata bảng/field nằm trong application schema, còn bảng/cột nghiệp vụ thực tế do worker đặc quyền tạo bằng tên vật lý sinh từ UUID. Runtime role chỉ DML. Phê duyệt lưu snapshot workflow/approver/Task và khóa version. Automation dùng outbox, giữ một trigger/một action và unique execution theo event/rule.
 
 ## 7. Datasource và connection budget
 
@@ -94,10 +100,11 @@ Khởi tạo ban đầu, chưa phải kết quả tối ưu:
 | --- | ---: |
 | Control API/worker tổng cấu hình baseline | 5 |
 | Pooled application DB | 10 |
-| Mỗi active Silo pool | 2 |
-| Global cap mục tiêu ban đầu | 25 |
+| Mỗi active Schema/Silo pool | 2 |
+| Global cap Schema | 20 |
+| Global cap Silo | 25 |
 
-Silo pools được tạo lazy, registry keyed bằng opaque tenant ID, health/schema version được kiểm khi mở và đóng sau idle timeout. Resolver không nhận JDBC URL từ request. Connection credential/reference được lấy từ control-plane secret configuration; không ghi plaintext trong log/audit. Khi cap đạt, resolver fail nhanh/có queue policy thay vì tạo vô hạn.
+Schema/Silo pools được tạo lazy, registry keyed bằng opaque tenant ID và tách connection cap theo placement; health/schema version được kiểm khi mở và đóng sau idle timeout. Resolver không nhận JDBC URL từ request. Connection credential/reference được lấy từ control-plane secret configuration; không ghi plaintext trong log/audit.
 
 ## 8. Auth/session
 
@@ -119,7 +126,7 @@ VALIDATE -> RESERVE_ROUTE -> CREATE_PLACEMENT -> APPLY_MIGRATIONS
          -> SEED_TENANT -> HEALTH_CHECK -> ACTIVATE_ROUTE -> SUCCEEDED
 ```
 
-Pool `CREATE_PLACEMENT` đăng ký logical placement; Silo tạo database/role. Step lưu attempt và external resource ID. Compensating rollback chỉ xóa resource được job tạo, chưa chứa user data và ownership marker khớp. Nếu không chứng minh an toàn, job dừng để manual intervention, không “dọn” mù.
+Pool `CREATE_PLACEMENT` đăng ký logical placement; Schema tạo schema/role trong database dùng chung; Silo tạo database/role. Step lưu attempt và external resource ID. Compensating rollback chỉ xóa resource được job tạo, chưa chứa user data và ownership marker khớp. Nếu không chứng minh an toàn, job dừng để manual intervention, không “dọn” mù.
 
 Tenant transition:
 
@@ -152,6 +159,7 @@ Notification event không chứa dữ liệu quá mức; worker resolve recipien
 | --- | --- |
 | Control DB unavailable | Không resolve tenant/session mới; fail closed, readiness false |
 | Silo DB unavailable | Chỉ tenant đó lỗi; pool/tenant khác tiếp tục nếu resource budget cho phép |
+| Schema database unavailable | Các tenant schema-per-tenant lỗi; Pool/Silo có thể tiếp tục nếu resource budget cho phép |
 | Pool DB unavailable | Tenant Pool lỗi; Silo có thể tiếp tục qua shared API nếu thread/connection không cạn |
 | Worker crash | Job/outbox lease hết hạn và retry idempotent |
 | Provider timeout | Giữ pending/retry; không tự coi payment/delivery thành công |

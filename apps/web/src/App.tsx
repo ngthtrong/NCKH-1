@@ -38,6 +38,12 @@ const ResourcesPage = lazy(() =>
 const NotificationsPage = lazy(() =>
   import('./pages/NotificationsPage').then((module) => ({ default: module.NotificationsPage })),
 );
+const TenantSettingsPage = lazy(() =>
+  import('./pages/TenantSettingsPage').then((module) => ({ default: module.TenantSettingsPage })),
+);
+const CustomizationPage = lazy(() =>
+  import('./pages/CustomizationPage').then((module) => ({ default: module.CustomizationPage })),
+);
 const AdminPage = lazy(() =>
   import('./pages/AdminPage').then((module) => ({ default: module.AdminPage })),
 );
@@ -66,6 +72,8 @@ export function App() {
             <Route path="/members" element={<MembersPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/settings" element={<TenantSettingsPage />} />
+            <Route path="/customization" element={<CustomizationPage />} />
           </Route>
         </Route>
         <Route element={<RequireAuth systemAdministrator />}>

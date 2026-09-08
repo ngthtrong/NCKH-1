@@ -230,6 +230,7 @@ public class ProvisioningJobCoordinator {
         target.setDatabasePort(source.getDatabasePort());
         target.setDatabaseName(source.getDatabaseName());
         target.setDatabaseUsername(source.getDatabaseUsername());
+        target.setSchemaName(source.getSchemaName());
         target.setEncryptedPassword(source.getEncryptedPassword());
         target.setSchemaVersion(source.getSchemaVersion());
     }
