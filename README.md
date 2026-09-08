@@ -23,6 +23,9 @@ scripts/dev-up.sh
 
 Script sẽ tạo `infra/.env` từ mẫu chuẩn [infra/.env.example](infra/.env.example) nếu file chưa tồn tại, kiểm tra Compose, build và khởi động stack. Các giá trị `change-me` chỉ dùng trên máy local cô lập.
 
+Hướng dẫn từng bước, tài khoản demo, luồng kiểm thử và xử lý lỗi nằm tại
+[docs/RUN_APPLICATION.md](docs/RUN_APPLICATION.md).
+
 Sau khi health check thành công:
 
 - Trang đăng nhập: `http://accounts.localhost:8080`

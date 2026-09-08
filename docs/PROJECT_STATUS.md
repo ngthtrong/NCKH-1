@@ -35,6 +35,7 @@ thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, S
 
 - Thuyết minh chính: [`resource/thuyetMinhSaasMultiTenancy.md`](../resource/thuyetMinhSaasMultiTenancy.md).
 - Kế hoạch thực hiện: [`resource/plan.md`](../resource/plan.md).
+- Hướng dẫn khởi chạy và kiểm thử local: [`docs/RUN_APPLICATION.md`](RUN_APPLICATION.md).
 - Thuật ngữ CSDL thống nhất ngày 2026-09-07: **Pool = Shared Database, Shared Schema**;
   **Schema-per-tenant (`SCHEMA_PER_TENANT`) = Shared Database, Separate Schema**; **Silo
   (`SILO_DATABASE`) = Separate Database**. Ánh xạ áp dụng cho application plane; control database vẫn

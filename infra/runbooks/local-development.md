@@ -1,5 +1,9 @@
 # Runbook môi trường local
 
+Hướng dẫn dành cho người mới, gồm tài khoản demo và luồng kiểm thử thủ công, nằm tại
+[`docs/RUN_APPLICATION.md`](../../docs/RUN_APPLICATION.md). Runbook này giữ các thao tác vận hành ngắn
+gọn cho người đã biết cấu trúc stack.
+
 ## Điều kiện
 
 - Docker Engine và Docker Compose v2.
