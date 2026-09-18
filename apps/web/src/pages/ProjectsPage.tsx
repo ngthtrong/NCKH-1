@@ -5,6 +5,7 @@ import {
   EditOutlined,
   GroupsOutlined,
   OpenInNew,
+  SearchOutlined,
   UnarchiveOutlined,
 } from '@mui/icons-material';
 import {
@@ -18,6 +19,7 @@ import {
   DialogTitle,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Paper,
@@ -35,7 +37,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { membersApi, projectsApi } from '../api/endpoints';
 import type { Member, ProjectRole, ProjectSummary, UUID } from '../api/types';
@@ -51,6 +53,9 @@ const roleLabels: Record<ProjectRole, string> = {
 
 export function ProjectsPage() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('q') ?? '';
+  const statusFilter = searchParams.get('status') === 'ARCHIVED' ? 'ARCHIVED' : searchParams.get('status') === 'ACTIVE' ? 'ACTIVE' : 'ALL';
   const [feedback, setFeedback] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<ProjectSummary | null>(null);
@@ -77,6 +82,13 @@ export function ProjectsPage() {
     const refreshed = projects.data?.find((project) => project.id === managedProject.id);
     if (refreshed) setManagedProject(refreshed);
   }, [projects.data, managedProject?.id]);
+
+  useEffect(() => {
+    const managedProjectId = searchParams.get('manage');
+    if (!managedProjectId || !projects.data) return;
+    const target = projects.data.find((project) => project.id === managedProjectId);
+    if (target) setManagedProject(target);
+  }, [projects.data, searchParams]);
 
   const refreshProjects = async () => {
     await Promise.all([
@@ -155,6 +167,30 @@ export function ProjectsPage() {
       (member) => member.status === 'ACTIVE' && !assigned.has(member.user.id),
     );
   }, [projectMembers.data, tenantMembers.data]);
+  const visibleProjects = useMemo(() => {
+    const normalizedSearch = search.trim().toLocaleLowerCase('vi');
+    return (projects.data ?? []).filter((project) => {
+      const matchesStatus = statusFilter === 'ALL' || project.status === statusFilter;
+      const matchesSearch = !normalizedSearch || [project.name, project.description ?? '']
+        .some((value) => value.toLocaleLowerCase('vi').includes(normalizedSearch));
+      return matchesStatus && matchesSearch;
+    });
+  }, [projects.data, search, statusFilter]);
+
+  const setFilter = (key: 'q' | 'status', value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value && value !== 'ALL') next.set(key, value);
+    else next.delete(key);
+    setSearchParams(next, { replace: true });
+  };
+  const closeMemberManager = () => {
+    setManagedProject(null);
+    if (searchParams.has('manage')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('manage');
+      setSearchParams(next, { replace: true });
+    }
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -204,6 +240,39 @@ export function ProjectsPage() {
         </Alert>
       )}
       <Paper className="panel" variant="outlined">
+        {Boolean(projects.data?.length) && (
+          <Box className="project-filter-bar">
+            <TextField
+              size="small"
+              value={search}
+              onChange={(event) => setFilter('q', event.target.value)}
+              placeholder="Tìm theo tên hoặc mô tả"
+              inputProps={{ 'aria-label': 'Tìm dự án' }}
+              sx={{ flex: 1, minWidth: 0 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start"><SearchOutlined fontSize="small" /></InputAdornment>
+                ),
+              }}
+            />
+            <FormControl size="small" sx={{ minWidth: { xs: 0, sm: 180 } }}>
+              <InputLabel id="project-status-filter-label">Trạng thái</InputLabel>
+              <Select
+                labelId="project-status-filter-label"
+                label="Trạng thái"
+                value={statusFilter}
+                onChange={(event) => setFilter('status', event.target.value)}
+              >
+                <MenuItem value="ALL">Tất cả dự án</MenuItem>
+                <MenuItem value="ACTIVE">Đang hoạt động</MenuItem>
+                <MenuItem value="ARCHIVED">Đã lưu trữ</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="body2" color="text.secondary" whiteSpace="nowrap">
+              {visibleProjects.length}/{projects.data?.length ?? 0} dự án
+            </Typography>
+          </Box>
+        )}
         {projects.isLoading ? (
           <SectionLoader />
         ) : projects.isError ? (
@@ -214,9 +283,20 @@ export function ProjectsPage() {
             description="Tạo dự án đầu tiên để nhận một bảng Kanban mặc định."
             action={<Button onClick={openCreate}>Tạo dự án</Button>}
           />
+        ) : !visibleProjects.length ? (
+          <EmptyState
+            title="Không tìm thấy dự án"
+            description="Thử từ khóa khác hoặc mở rộng bộ lọc trạng thái."
+            action={<Button onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.delete('q');
+              next.delete('status');
+              setSearchParams(next, { replace: true });
+            }}>Xóa bộ lọc</Button>}
+          />
         ) : (
-          <TableContainer>
-            <Table className="data-table">
+          <TableContainer className="projects-table-wrap">
+            <Table className="data-table projects-table">
               <TableHead>
                 <TableRow>
                   <TableCell>Dự án</TableCell>
@@ -228,35 +308,35 @@ export function ProjectsPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {projects.data.map((project) => {
+                {visibleProjects.map((project) => {
                   const canManage = project.role === 'MANAGER';
                   const active = project.status === 'ACTIVE';
                   return (
                     <TableRow key={project.id} hover>
-                      <TableCell>
+                      <TableCell className="project-title-cell">
                         <Stack direction="row" alignItems="center" gap={1.25}>
                           <Avatar variant="rounded">{project.name.slice(0, 1).toUpperCase()}</Avatar>
                           <Box>
-                            <Typography fontWeight={700}>{project.name}</Typography>
+                            <Link to={`/projects/${project.id}`} className="project-name-link">
+                              <Typography fontWeight={700}>{project.name}</Typography>
+                            </Link>
                             <Typography variant="body2" color="text.secondary">
                               {project.description || 'Không có mô tả'}
                             </Typography>
                           </Box>
                         </Stack>
                       </TableCell>
-                      <TableCell><StatusChip status={project.status} /></TableCell>
-                      <TableCell>{roleLabels[project.role]}</TableCell>
-                      <TableCell>{project.memberCount}</TableCell>
-                      <TableCell>{project.completedTaskCount}/{project.taskCount}</TableCell>
-                      <TableCell align="right">
+                      <TableCell data-label="Trạng thái"><StatusChip status={project.status} /></TableCell>
+                      <TableCell data-label="Vai trò">{roleLabels[project.role]}</TableCell>
+                      <TableCell data-label="Thành viên">{project.memberCount}</TableCell>
+                      <TableCell data-label="Công việc">{project.completedTaskCount}/{project.taskCount}</TableCell>
+                      <TableCell className="project-actions-cell" align="right">
                         <Stack direction="row" justifyContent="flex-end">
-                          {active && project.boardId && (
-                            <Tooltip title="Mở bảng">
-                              <IconButton component={Link} to={`/kanban/${project.boardId}`} aria-label={`Mở ${project.name}`}>
+                          <Tooltip title="Mở tổng quan dự án">
+                            <IconButton component={Link} to={`/projects/${project.id}`} aria-label={`Mở ${project.name}`}>
                                 <OpenInNew />
-                              </IconButton>
-                            </Tooltip>
-                          )}
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title="Thành viên dự án">
                             <IconButton onClick={() => setManagedProject(project)} aria-label={`Thành viên ${project.name}`}>
                               <GroupsOutlined />
@@ -338,7 +418,12 @@ export function ProjectsPage() {
         </Box>
       </Dialog>
 
-      <Dialog open={Boolean(managedProject)} onClose={() => setManagedProject(null)} fullWidth maxWidth="md">
+      <Dialog
+        open={Boolean(managedProject)}
+        onClose={closeMemberManager}
+        fullWidth
+        maxWidth="md"
+      >
         <DialogTitle>Thành viên · {managedProject?.name}</DialogTitle>
         <DialogContent>
           {managedProject?.status === 'ARCHIVED' && (
@@ -459,7 +544,7 @@ export function ProjectsPage() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setManagedProject(null)}>Đóng</Button>
+          <Button onClick={closeMemberManager}>Đóng</Button>
         </DialogActions>
       </Dialog>
     </Box>

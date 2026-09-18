@@ -8,8 +8,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Optional;
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -34,17 +36,21 @@ class TenantManagementServiceSecurityTest {
 
     private TenantMembershipRepository memberships;
     private UserAccountRepository users;
+    private TenantJdbcExecutor tenantExecutor;
     private TenantManagementService service;
 
     @BeforeEach
     void setUp() {
         memberships = mock(TenantMembershipRepository.class);
         users = mock(UserAccountRepository.class);
+        tenantExecutor = mock(TenantJdbcExecutor.class);
+        when(tenantExecutor.read(any())).thenReturn(List.of());
         service = new TenantManagementService(
                 mock(TenantRepository.class),
                 mock(TenantPlacementRepository.class),
                 memberships,
-                users);
+                users,
+                tenantExecutor);
     }
 
     @Test
@@ -113,6 +119,23 @@ class TenantManagementServiceSecurityTest {
         assertThat(target.getSecurityVersion()).isEqualTo(12);
         verify(memberships, times(2)).findById(MEMBERSHIP_ID);
         verify(memberships).save(target);
+    }
+
+    @Test
+    void ownerCannotRevokeTheOnlyActiveManagerOfAProject() {
+        UUID projectId = UUID.randomUUID();
+        TenantMembershipEntity target = membership(TENANT_A, TenantRole.MEMBER, true, 11);
+        when(memberships.findById(MEMBERSHIP_ID)).thenReturn(Optional.of(target));
+        when(tenantExecutor.read(any())).thenReturn(List.of(Map.of(
+                "project_id", projectId,
+                "user_id", TARGET_USER)));
+
+        assertThatThrownBy(() -> service.revoke(context(TenantRole.OWNER), MEMBERSHIP_ID))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("another active manager");
+
+        assertThat(target.isActive()).isTrue();
+        verify(memberships, never()).save(target);
     }
 
     @Test

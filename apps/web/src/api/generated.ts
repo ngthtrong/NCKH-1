@@ -1319,6 +1319,8 @@ export interface components {
         /** @enum {string} */
         ProjectRole: "MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
+        TaskPriority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+        /** @enum {string} */
         ProjectStatus: "ACTIVE" | "ARCHIVED" | "DELETED";
         /** @enum {string} */
         TenantTier: "STARTER" | "PROFESSIONAL" | "ENTERPRISE";
@@ -1501,6 +1503,7 @@ export interface components {
             id: components["schemas"]["UUID"];
             name: string;
             position: number;
+            completed: boolean;
         };
         TaskView: {
             id: components["schemas"]["UUID"];
@@ -1510,11 +1513,18 @@ export interface components {
             parentTaskId?: components["schemas"]["UUID"] | null;
             title: string;
             description?: string | null;
+            priority: components["schemas"]["TaskPriority"];
             assigneeUserId?: components["schemas"]["UUID"] | null;
             dueAt?: components["schemas"]["Instant"] | null;
             position: number;
             /** Format: int64 */
             version: number;
+            /** Format: int64 */
+            subtaskCount: number;
+            /** Format: int64 */
+            completedSubtaskCount: number;
+            /** Format: int64 */
+            commentCount: number;
             createdAt: components["schemas"]["Instant"];
             updatedAt: components["schemas"]["Instant"];
         };
@@ -1545,6 +1555,7 @@ export interface components {
         };
         CreateColumnRequest: {
             name: string;
+            completed: boolean;
             /** Format: int64 */
             version: number;
         };
@@ -1559,6 +1570,7 @@ export interface components {
             parentTaskId?: components["schemas"]["UUID"] | null;
             title: string;
             description?: string | null;
+            priority: components["schemas"]["TaskPriority"];
             assigneeUserId?: components["schemas"]["UUID"] | null;
             dueAt?: components["schemas"]["Instant"] | null;
             position?: number | null;
@@ -1567,6 +1579,7 @@ export interface components {
             columnId: components["schemas"]["UUID"];
             title: string;
             description?: string | null;
+            priority: components["schemas"]["TaskPriority"];
             assigneeUserId?: components["schemas"]["UUID"] | null;
             dueAt?: components["schemas"]["Instant"] | null;
             position?: number | null;

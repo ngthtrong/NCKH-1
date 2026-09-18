@@ -3,9 +3,16 @@ import type { ApiProblem } from './types';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
 let accessToken: string | null = null;
+let sessionRefreshHandler: (() => Promise<string | null>) | null = null;
+let refreshInFlight: Promise<string | null> | null = null;
 
 export function setApiAccessToken(token: string | null): void {
   accessToken = token;
+}
+
+export function setApiSessionRefreshHandler(handler: (() => Promise<string | null>) | null): void {
+  sessionRefreshHandler = handler;
+  if (!handler) refreshInFlight = null;
 }
 
 export class ApiError extends Error {
@@ -34,7 +41,17 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipAuth?: boolean;
 }
 
-export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function refreshSession(): Promise<string | null> {
+  if (!sessionRefreshHandler) return null;
+  if (!refreshInFlight) {
+    refreshInFlight = sessionRefreshHandler().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+  return refreshInFlight;
+}
+
+export async function request<T>(path: string, options: RequestOptions = {}, retried = false): Promise<T> {
   const { body: rawBody, skipAuth, ...requestInit } = options;
   const headers = new Headers(options.headers);
   const method = options.method?.toUpperCase() ?? 'GET';
@@ -64,6 +81,11 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     body,
     credentials: 'include',
   });
+
+  if (response.status === 401 && accessToken && !skipAuth && !retried && sessionRefreshHandler) {
+    const refreshedToken = await refreshSession();
+    if (refreshedToken) return request<T>(path, options, true);
+  }
 
   if (!response.ok) {
     let problem: ApiProblem | undefined;

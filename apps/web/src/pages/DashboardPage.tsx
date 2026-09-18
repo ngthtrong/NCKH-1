@@ -149,16 +149,14 @@ export function DashboardPage() {
                             {project.memberCount} thành viên
                           </Typography>
                         </Box>
-                        {project.boardId && (
-                          <Button
-                            component={Link}
-                            to={`/kanban/${project.boardId}`}
-                            size="small"
-                            endIcon={<ArrowForward />}
-                          >
-                            Mở
-                          </Button>
-                        )}
+                        <Button
+                          component={Link}
+                          to={`/projects/${project.id}`}
+                          size="small"
+                          endIcon={<ArrowForward />}
+                        >
+                          Xem dự án
+                        </Button>
                       </Box>
                     );
                   })}

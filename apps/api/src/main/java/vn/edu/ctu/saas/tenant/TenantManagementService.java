@@ -3,6 +3,7 @@ package vn.edu.ctu.saas.tenant;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +25,19 @@ public class TenantManagementService {
     private final TenantPlacementRepository placementRepository;
     private final TenantMembershipRepository membershipRepository;
     private final UserAccountRepository userRepository;
+    private final TenantJdbcExecutor tenantJdbcExecutor;
 
     public TenantManagementService(
             TenantRepository tenantRepository,
             TenantPlacementRepository placementRepository,
             TenantMembershipRepository membershipRepository,
-            UserAccountRepository userRepository) {
+            UserAccountRepository userRepository,
+            TenantJdbcExecutor tenantJdbcExecutor) {
         this.tenantRepository = tenantRepository;
         this.placementRepository = placementRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
+        this.tenantJdbcExecutor = tenantJdbcExecutor;
     }
 
     @Transactional
@@ -111,6 +115,9 @@ public class TenantManagementService {
                 && (membership.getRole() != role || membership.isActive() != active)) {
             throw new TenantAccessDeniedException("Only the tenant owner can modify an administrator");
         }
+        if (membership.isActive() && !active) {
+            requireProjectsRetainActiveManager(context, membership.getUserId());
+        }
         if (membership.getRole() != role || membership.isActive() != active) {
             membership.setRole(role);
             membership.setActive(active);
@@ -178,6 +185,33 @@ public class TenantManagementService {
     private void requireAdmin(TenantContext context) {
         if (!context.hasAnyRole(TenantRole.OWNER, TenantRole.ADMIN)) {
             throw new TenantAccessDeniedException("Tenant administrator role is required");
+        }
+    }
+
+    private void requireProjectsRetainActiveManager(TenantContext context, UUID deactivatedUserId) {
+        List<Map<String, Object>> assignments = tenantJdbcExecutor.read(jdbc -> jdbc.queryForList("""
+                SELECT pm.project_id,pm.user_id
+                FROM project_memberships pm
+                JOIN projects p ON p.tenant_id=pm.tenant_id AND p.id=pm.project_id
+                WHERE pm.tenant_id=? AND pm.role='MANAGER' AND p.status<>'DELETED'
+                """, context.tenantId()));
+        List<UUID> affectedProjects = assignments.stream()
+                .filter(row -> deactivatedUserId.equals(row.get("user_id")))
+                .map(row -> (UUID) row.get("project_id"))
+                .distinct()
+                .toList();
+        for (UUID projectId : affectedProjects) {
+            boolean hasOtherActiveManager = assignments.stream()
+                    .filter(row -> projectId.equals(row.get("project_id")))
+                    .map(row -> (UUID) row.get("user_id"))
+                    .filter(userId -> !deactivatedUserId.equals(userId))
+                    .anyMatch(userId -> membershipRepository.findByTenantIdAndUserId(context.tenantId(), userId)
+                            .filter(TenantMembershipEntity::isActive)
+                            .isPresent());
+            if (!hasOtherActiveManager) {
+                throw new ConflictException(
+                        "Assign another active manager to every managed project before revoking this member");
+            }
         }
     }
 

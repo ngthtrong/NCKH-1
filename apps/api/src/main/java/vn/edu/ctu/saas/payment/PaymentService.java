@@ -65,15 +65,18 @@ public class PaymentService {
         String normalizedKey = normalizeIdempotencyKey(idempotencyKey);
         String normalizedCurrency = normalizeCurrency(currency);
         String validatedReturnUrl = validateReturnUrl(returnUrl);
-        if (amountMinor <= 0) throw new IllegalArgumentException("Payment amount must be positive");
         requireOwner(userId, tenantId);
+        TenantEntity tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new NotFoundException("Tenant not found"));
+        long expectedAmount = tierPrice(tenant.getTier());
+        if (amountMinor != expectedAmount || !"VND".equals(normalizedCurrency)) {
+            throw new ConflictException("Payment amount or currency does not match the selected tenant tier");
+        }
         idempotencyLock.acquire(normalizedKey);
         PaymentTransactionEntity payment = paymentRepository.findByIdempotencyKey(normalizedKey).orElse(null);
         if (payment != null) {
             assertSameIdempotentRequest(payment, tenantId, amountMinor, normalizedCurrency, validatedReturnUrl);
         } else {
-            TenantEntity tenant = tenantRepository.findById(tenantId)
-                    .orElseThrow(() -> new NotFoundException("Tenant not found"));
             if (tenant.getStatus() != TenantStatus.PENDING_PAYMENT) {
                 throw new ConflictException("Tenant is not waiting for payment");
             }
@@ -91,6 +94,16 @@ public class PaymentService {
         PaymentProvider.CheckoutSession checkout = provider.createSession(
                 payment.getProviderReference(), payment.getAmountMinor(), payment.getCurrency(), payment.getReturnUrl());
         return new PaymentSessionView(payment.getId(), checkout.provider(), checkout.reference(), checkout.checkoutUrl(), payment.getStatus());
+    }
+
+    private long tierPrice(String tier) {
+        if (tier == null) throw new ConflictException("Tenant tier is unavailable");
+        return switch (tier.toUpperCase(Locale.ROOT)) {
+            case "STARTER" -> 100_000L;
+            case "PROFESSIONAL" -> 300_000L;
+            case "ENTERPRISE" -> 1_000_000L;
+            default -> throw new ConflictException("Tenant tier is unsupported");
+        };
     }
 
     @Transactional

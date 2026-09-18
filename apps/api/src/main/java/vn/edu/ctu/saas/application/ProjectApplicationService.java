@@ -59,18 +59,21 @@ public class ProjectApplicationService {
                         SELECT count(*) FROM tasks t
                         JOIN project_memberships pm ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
                         JOIN board_columns c ON c.tenant_id=t.tenant_id AND c.id=t.board_column_id
+                        JOIN boards b ON b.tenant_id=t.tenant_id AND b.id=t.board_id
                         JOIN projects p ON p.tenant_id=t.tenant_id AND p.id=t.project_id
                         WHERE t.tenant_id=? AND pm.user_id=? AND p.status='ACTIVE' AND t.deleted_at IS NULL
-                          AND lower(c.name) NOT IN ('done','hoàn tất')
+                          AND b.deleted_at IS NULL
+                          AND c.completed=false
                         """, context.tenantId(), context.userId()),
                 count(jdbc, """
                         SELECT count(*) FROM tasks t
                         JOIN project_memberships pm ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
                         JOIN board_columns c ON c.tenant_id=t.tenant_id AND c.id=t.board_column_id
+                        JOIN boards b ON b.tenant_id=t.tenant_id AND b.id=t.board_id
                         JOIN projects p ON p.tenant_id=t.tenant_id AND p.id=t.project_id
                         WHERE t.tenant_id=? AND pm.user_id=? AND t.due_at < now() AND t.deleted_at IS NULL
-                          AND p.status='ACTIVE'
-                          AND lower(c.name) NOT IN ('done','hoàn tất')
+                          AND p.status='ACTIVE' AND b.deleted_at IS NULL
+                          AND c.completed=false
                         """, context.tenantId(), context.userId()),
                 count(jdbc, "SELECT count(*) FROM notifications WHERE tenant_id = ? AND recipient_user_id = ? AND read_at IS NULL",
                         context.tenantId(), context.userId())));
@@ -82,10 +85,12 @@ public class ProjectApplicationService {
             String metrics = """
                     ,(SELECT b.id FROM boards b WHERE b.tenant_id=p.tenant_id AND b.project_id=p.id AND b.deleted_at IS NULL ORDER BY b.created_at LIMIT 1) board_id
                     ,(SELECT count(*) FROM project_memberships pmc WHERE pmc.tenant_id=p.tenant_id AND pmc.project_id=p.id) member_count
-                    ,(SELECT count(*) FROM tasks tc WHERE tc.tenant_id=p.tenant_id AND tc.project_id=p.id AND tc.deleted_at IS NULL) task_count
+                    ,(SELECT count(*) FROM tasks tc JOIN boards bc ON bc.tenant_id=tc.tenant_id AND bc.id=tc.board_id
+                       WHERE tc.tenant_id=p.tenant_id AND tc.project_id=p.id AND tc.deleted_at IS NULL AND bc.deleted_at IS NULL) task_count
                     ,(SELECT count(*) FROM tasks td JOIN board_columns dc ON dc.tenant_id=td.tenant_id AND dc.id=td.board_column_id
+                       JOIN boards bd ON bd.tenant_id=td.tenant_id AND bd.id=td.board_id
                        WHERE td.tenant_id=p.tenant_id AND td.project_id=p.id AND td.deleted_at IS NULL
-                         AND lower(dc.name) IN ('done','hoàn tất')) completed_task_count
+                         AND bd.deleted_at IS NULL AND dc.completed=true) completed_task_count
                     """;
             return jdbc.query("SELECT p.id,p.name,p.description,p.status,p.created_by,p.created_at,p.updated_at,pm.role project_role"
                             + metrics + " FROM projects p JOIN project_memberships pm ON pm.tenant_id=p.tenant_id AND pm.project_id=p.id "
@@ -108,9 +113,9 @@ public class ProjectApplicationService {
                         boardId, context.tenantId(), projectId, "Kanban");
                 String[] columnNames = {"To do", "In progress", "Done"};
                 for (int index = 0; index < columnNames.length; index++) {
-                    jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,?)",
+                    jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)",
                             UUID.randomUUID(), context.tenantId(), boardId, columnNames[index],
-                            BigDecimal.valueOf((index + 1) * 1000L));
+                            BigDecimal.valueOf((index + 1) * 1000L), index == columnNames.length - 1);
                 }
                 auditAndOutbox(jdbc, context, "PROJECT_CREATED", "Project", projectId, Map.of("name", request.name().trim()));
             } catch (DataIntegrityViolationException exception) {
@@ -233,8 +238,9 @@ public class ProjectApplicationService {
                     boardId, context.tenantId(), projectId, request.name().trim());
             String[] names = {"To do", "In progress", "Done"};
             for (int i = 0; i < names.length; i++) {
-                jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,?)",
-                        UUID.randomUUID(), context.tenantId(), boardId, names[i], BigDecimal.valueOf((i + 1) * 1000L));
+                jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)",
+                        UUID.randomUUID(), context.tenantId(), boardId, names[i],
+                        BigDecimal.valueOf((i + 1) * 1000L), i == names.length - 1);
             }
             auditAndOutbox(jdbc, context, "BOARD_CREATED", "Board", boardId, Map.of("projectId", projectId));
             return findBoard(jdbc, context, boardId);
@@ -279,6 +285,12 @@ public class ProjectApplicationService {
             UUID projectId = boardProject(jdbc, context, boardId);
             requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
             requireActiveProject(jdbc, context, projectId);
+            long remainingTasks = count(jdbc,
+                    "SELECT count(*) FROM tasks WHERE tenant_id=? AND board_id=? AND deleted_at IS NULL",
+                    context.tenantId(), boardId);
+            if (remainingTasks > 0) {
+                throw new ConflictException("Move or delete all tasks before deleting this board");
+            }
             int deleted = jdbc.update("""
                     UPDATE boards SET deleted_at=now(),updated_at=now()
                     WHERE tenant_id=? AND id=? AND deleted_at IS NULL
@@ -308,12 +320,13 @@ public class ProjectApplicationService {
             UUID projectId = boardProject(jdbc, context, boardId);
             requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
             requireActiveProject(jdbc, context, projectId);
+            requireCompletionFlagCompatible(jdbc, context, boardId, null, request.completed());
             advanceBoardVersion(jdbc, context, boardId, request.version());
             UUID columnId = UUID.randomUUID();
             try {
-                jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,?)",
+                jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)",
                         columnId, context.tenantId(), boardId, request.name().trim(),
-                        nextColumnPosition(jdbc, context, boardId));
+                        nextColumnPosition(jdbc, context, boardId), request.completed());
             } catch (DataIntegrityViolationException exception) {
                 throw new ConflictException("Board column name already exists");
             }
@@ -330,12 +343,13 @@ public class ProjectApplicationService {
             requireProjectRole(jdbc, context, projectId, ProjectRole.MANAGER);
             requireActiveProject(jdbc, context, projectId);
             requireColumn(jdbc, context, boardId, columnId);
+            requireCompletionFlagCompatible(jdbc, context, boardId, columnId, request.completed());
             advanceBoardVersion(jdbc, context, boardId, request.version());
             try {
                 jdbc.update("""
-                        UPDATE board_columns SET name=?,updated_at=now()
+                        UPDATE board_columns SET name=?,completed=?,updated_at=now()
                         WHERE tenant_id=? AND board_id=? AND id=?
-                        """, request.name().trim(), context.tenantId(), boardId, columnId);
+                        """, request.name().trim(), request.completed(), context.tenantId(), boardId, columnId);
             } catch (DataIntegrityViolationException exception) {
                 throw new ConflictException("Board column name already exists");
             }
@@ -417,11 +431,11 @@ public class ProjectApplicationService {
             BigDecimal position = request.position() == null ? nextTaskPosition(jdbc, context, request.columnId()) : request.position();
             jdbc.update("""
                     INSERT INTO tasks(id,tenant_id,project_id,board_id,board_column_id,parent_task_id,title,description,
-                                      assignee_user_id,due_at,position,created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+                                      priority,assignee_user_id,due_at,position,created_by)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
                     """, taskId, context.tenantId(), projectId, boardId, request.columnId(), request.parentTaskId(),
-                    request.title().trim(), request.description(), request.assigneeUserId(), timestamp(request.dueAt()),
-                    position, context.userId());
+                    request.title().trim(), request.description(), request.priority().name(), request.assigneeUserId(),
+                    timestamp(request.dueAt()), position, context.userId());
             auditAndOutbox(jdbc, context, "TASK_CREATED", "Task", taskId,
                     Map.of("boardId", boardId, "title", request.title().trim()));
             return findTask(jdbc, context, taskId);
@@ -447,6 +461,7 @@ public class ProjectApplicationService {
             requireAssignableUser(jdbc, context, existing.projectId(), request.assigneeUserId());
             boolean protectedContentChanged = !existing.title().equals(request.title().trim())
                     || !Objects.equals(existing.description(), request.description())
+                    || existing.priority() != request.priority()
                     || !Objects.equals(existing.assigneeUserId(), request.assigneeUserId())
                     || !Objects.equals(existing.dueAt(), request.dueAt());
             if (protectedContentChanged) {
@@ -457,11 +472,12 @@ public class ProjectApplicationService {
             ApprovalService.assertCompletionMoveAllowed(jdbc, context, taskId, request.columnId());
             BigDecimal position = request.position() == null ? existing.position() : request.position();
             int updated = jdbc.update("""
-                    UPDATE tasks SET board_column_id=?,title=?,description=?,assignee_user_id=?,due_at=?,position=?,
+                    UPDATE tasks SET board_column_id=?,title=?,description=?,priority=?,assignee_user_id=?,due_at=?,position=?,
                                      version=version+1,updated_at=now()
                     WHERE tenant_id=? AND id=? AND version=?
-                    """, request.columnId(), request.title().trim(), request.description(), request.assigneeUserId(),
-                    timestamp(request.dueAt()), position, context.tenantId(), taskId, request.version());
+                    """, request.columnId(), request.title().trim(), request.description(), request.priority().name(),
+                    request.assigneeUserId(), timestamp(request.dueAt()), position,
+                    context.tenantId(), taskId, request.version());
             if (updated == 0) throw staleTaskConflict(jdbc, context, taskId);
             auditAndOutbox(jdbc, context, "TASK_UPDATED", "Task", taskId,
                     Map.of("columnId", request.columnId(), "version", request.version() + 1));
@@ -511,9 +527,10 @@ public class ProjectApplicationService {
                         """, item.targetColumnId(), item.targetPosition(), context.tenantId(), boardId,
                         item.taskId(), item.version());
                 if (updated == 0) throw staleTaskConflict(jdbc, context, item.taskId());
+                auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", item.taskId(),
+                        Map.of("columnId", item.targetColumnId(), "position", item.targetPosition(),
+                                "version", item.version() + 1));
             }
-            auditAndOutbox(jdbc, context, "TASKS_REORDERED", "Board", boardId,
-                    Map.of("taskIds", request.items().stream().map(ReorderTaskItem::taskId).toList()));
             return findBoard(jdbc, context, boardId);
         });
     }
@@ -605,12 +622,25 @@ public class ProjectApplicationService {
                 context.tenantId(), boardId);
         if (header == null) throw new NotFoundException("Board not found");
         List<ColumnView> columns = jdbc.query(
-                "SELECT id,name,position FROM board_columns WHERE tenant_id=? AND board_id=? ORDER BY position",
-                (rs, rowNum) -> new ColumnView(rs.getObject("id", UUID.class), rs.getString("name"), rs.getBigDecimal("position")),
+                "SELECT id,name,position,completed FROM board_columns WHERE tenant_id=? AND board_id=? ORDER BY position",
+                (rs, rowNum) -> new ColumnView(
+                        rs.getObject("id", UUID.class), rs.getString("name"),
+                        rs.getBigDecimal("position"), rs.getBoolean("completed")),
                 context.tenantId(), boardId);
-        List<TaskView> tasks = jdbc.query(
-                "SELECT * FROM tasks WHERE tenant_id=? AND board_id=? AND deleted_at IS NULL ORDER BY board_column_id,position",
-                this::taskRow, context.tenantId(), boardId);
+        List<TaskView> tasks = jdbc.query("""
+                SELECT t.*,
+                       (SELECT count(*) FROM tasks st
+                        WHERE st.tenant_id=t.tenant_id AND st.parent_task_id=t.id AND st.deleted_at IS NULL) subtask_count,
+                       (SELECT count(*) FROM tasks st
+                        JOIN board_columns sc ON sc.tenant_id=st.tenant_id AND sc.id=st.board_column_id
+                        WHERE st.tenant_id=t.tenant_id AND st.parent_task_id=t.id
+                          AND st.deleted_at IS NULL AND sc.completed=true) completed_subtask_count,
+                       (SELECT count(*) FROM comments c
+                        WHERE c.tenant_id=t.tenant_id AND c.task_id=t.id AND c.deleted_at IS NULL) comment_count
+                FROM tasks t
+                WHERE t.tenant_id=? AND t.board_id=? AND t.deleted_at IS NULL
+                ORDER BY t.board_column_id,t.position
+                """, this::taskRow, context.tenantId(), boardId);
         return new BoardView(header.id(), header.projectId(), header.name(), header.version(), columns, tasks);
     }
 
@@ -621,10 +651,12 @@ public class ProjectApplicationService {
                        pm.role project_role,
                        (SELECT b.id FROM boards b WHERE b.tenant_id=p.tenant_id AND b.project_id=p.id AND b.deleted_at IS NULL ORDER BY b.created_at LIMIT 1) board_id,
                        (SELECT count(*) FROM project_memberships pmc WHERE pmc.tenant_id=p.tenant_id AND pmc.project_id=p.id) member_count,
-                       (SELECT count(*) FROM tasks tc WHERE tc.tenant_id=p.tenant_id AND tc.project_id=p.id AND tc.deleted_at IS NULL) task_count,
+                       (SELECT count(*) FROM tasks tc JOIN boards bc ON bc.tenant_id=tc.tenant_id AND bc.id=tc.board_id
+                        WHERE tc.tenant_id=p.tenant_id AND tc.project_id=p.id AND tc.deleted_at IS NULL AND bc.deleted_at IS NULL) task_count,
                        (SELECT count(*) FROM tasks td JOIN board_columns dc ON dc.tenant_id=td.tenant_id AND dc.id=td.board_column_id
+                        JOIN boards bd ON bd.tenant_id=td.tenant_id AND bd.id=td.board_id
                         WHERE td.tenant_id=p.tenant_id AND td.project_id=p.id AND td.deleted_at IS NULL
-                          AND lower(dc.name) IN ('done','hoàn tất')) completed_task_count
+                          AND bd.deleted_at IS NULL AND dc.completed=true) completed_task_count
                 FROM projects p JOIN project_memberships pm
                   ON pm.tenant_id=p.tenant_id AND pm.project_id=p.id AND pm.user_id=?
                 WHERE p.tenant_id=? AND p.id=? AND p.status<>'DELETED'
@@ -635,9 +667,19 @@ public class ProjectApplicationService {
     }
 
     private TaskView findTask(JdbcTemplate jdbc, TenantContext context, UUID taskId) {
-        List<TaskView> tasks = jdbc.query(
-                "SELECT * FROM tasks WHERE tenant_id=? AND id=? AND deleted_at IS NULL",
-                this::taskRow, context.tenantId(), taskId);
+        List<TaskView> tasks = jdbc.query("""
+                SELECT t.*,
+                       (SELECT count(*) FROM tasks st
+                        WHERE st.tenant_id=t.tenant_id AND st.parent_task_id=t.id AND st.deleted_at IS NULL) subtask_count,
+                       (SELECT count(*) FROM tasks st
+                        JOIN board_columns sc ON sc.tenant_id=st.tenant_id AND sc.id=st.board_column_id
+                        WHERE st.tenant_id=t.tenant_id AND st.parent_task_id=t.id
+                          AND st.deleted_at IS NULL AND sc.completed=true) completed_subtask_count,
+                       (SELECT count(*) FROM comments c
+                        WHERE c.tenant_id=t.tenant_id AND c.task_id=t.id AND c.deleted_at IS NULL) comment_count
+                FROM tasks t
+                WHERE t.tenant_id=? AND t.id=? AND t.deleted_at IS NULL
+                """, this::taskRow, context.tenantId(), taskId);
         if (tasks.isEmpty()) throw new NotFoundException("Task not found");
         return tasks.getFirst();
     }
@@ -692,8 +734,10 @@ public class ProjectApplicationService {
                 rs.getObject("id", UUID.class), rs.getObject("project_id", UUID.class),
                 rs.getObject("board_id", UUID.class), rs.getObject("board_column_id", UUID.class),
                 rs.getObject("parent_task_id", UUID.class), rs.getString("title"), rs.getString("description"),
-                rs.getObject("assignee_user_id", UUID.class), dueAt == null ? null : dueAt.toInstant(),
+                TaskPriority.valueOf(rs.getString("priority")), rs.getObject("assignee_user_id", UUID.class),
+                dueAt == null ? null : dueAt.toInstant(),
                 rs.getBigDecimal("position"), rs.getLong("version"),
+                rs.getLong("subtask_count"), rs.getLong("completed_subtask_count"), rs.getLong("comment_count"),
                 rs.getTimestamp("created_at").toInstant(), rs.getTimestamp("updated_at").toInstant());
     }
 
@@ -714,6 +758,21 @@ public class ProjectApplicationService {
                 """,
                 context.tenantId(), boardId, columnId);
         if (count == 0) throw new NotFoundException("Board column not found");
+    }
+
+    private void requireCompletionFlagCompatible(
+            JdbcTemplate jdbc, TenantContext context, UUID boardId, UUID columnId, boolean completed) {
+        UUID approvalCompletionColumn = jdbc.query("""
+                SELECT completion_column_id FROM approval_workflows
+                WHERE tenant_id=? AND board_id=? AND enabled=true
+                """, rs -> rs.next() ? rs.getObject(1, UUID.class) : null,
+                context.tenantId(), boardId);
+        if (approvalCompletionColumn == null) return;
+        if ((approvalCompletionColumn.equals(columnId) && !completed)
+                || (!approvalCompletionColumn.equals(columnId) && completed)) {
+            throw new ConflictException(
+                    "Completion columns must match the enabled approval workflow for this board");
+        }
     }
 
     private void requireTopLevelParent(JdbcTemplate jdbc, TenantContext context, UUID boardId, UUID parentId) {
@@ -792,11 +851,16 @@ public class ProjectApplicationService {
     }
 
     private void requireAnotherManager(JdbcTemplate jdbc, TenantContext context, UUID projectId, UUID excludedUserId) {
-        long count = count(jdbc, """
-                SELECT count(*) FROM project_memberships
+        List<UUID> otherManagerIds = jdbc.query("""
+                SELECT user_id FROM project_memberships
                 WHERE tenant_id=? AND project_id=? AND role='MANAGER' AND user_id<>?
-                """, context.tenantId(), projectId, excludedUserId);
-        if (count == 0) throw new ConflictException("A project must retain at least one manager");
+                """, (rs, rowNum) -> rs.getObject(1, UUID.class),
+                context.tenantId(), projectId, excludedUserId);
+        boolean hasActiveManager = otherManagerIds.stream().anyMatch(userId -> tenantMembershipRepository
+                .findByTenantIdAndUserId(context.tenantId(), userId)
+                .filter(TenantMembershipEntity::isActive)
+                .isPresent());
+        if (!hasActiveManager) throw new ConflictException("A project must retain at least one active manager");
     }
 
     private void requireAssignableUser(

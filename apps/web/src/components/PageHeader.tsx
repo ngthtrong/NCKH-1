@@ -2,11 +2,13 @@ import { Box, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 export function PageHeader({
+  breadcrumbs,
   eyebrow,
   title,
   description,
   actions,
 }: {
+  breadcrumbs?: ReactNode;
   eyebrow?: string;
   title: string;
   description?: string;
@@ -21,6 +23,7 @@ export function PageHeader({
       className="page-header"
     >
       <Box>
+        {breadcrumbs && <Box className="page-breadcrumbs">{breadcrumbs}</Box>}
         {eyebrow && <Typography className="eyebrow">{eyebrow}</Typography>}
         <Typography component="h1" variant="h4">
           {title}

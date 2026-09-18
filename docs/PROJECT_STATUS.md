@@ -1,10 +1,10 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-09-08 (UTC)
+**Cập nhật:** 2026-09-18 (UTC+7)
 **Nhánh đang làm:** `main`
 **Checkpoint mã nguồn P-App:** `c226676` (`p-app`)
-**Nền commit hiện tại:** `7b6a635`; phần EXT đang là working tree chưa commit và phải được review trước
-khi tạo commit. Bốn file tài liệu có diff từ trước cùng hai tài liệu Word chưa theo dõi đã được bảo toàn.
+**Nền commit hiện tại:** `22a9ee4` (`guide run`). EXT-01–EXT-06 đã được commit tại `34a5463`
+(`p-app add bridge`); working tree sạch trước lần cập nhật tài liệu này.
 **Trạng thái hiện tại:** APP-01–APP-06 giữ nguyên là checkpoint local của phiên bản hai placement.
 EXT-01–EXT-06 đã hoàn tất local ngày 2026-09-08 cho Bridge ba placement và tùy biến hữu hạn; biên bản
 ở [`docs/testing/extension-local-2026-09-08.md`](testing/extension-local-2026-09-08.md). Provider thật,
@@ -15,14 +15,14 @@ bằng chứng nghiệm thu.
 
 | Mốc | Kết quả local | Bằng chứng chính |
 |---|---|---|
-| EXT-01 | **Hoàn tất** | `SCHEMA_PER_TENANT`, schema/role riêng, Flyway V8, isolation hai tenant và runtime ba placement |
+| EXT-01 | **Hoàn tất** | `SCHEMA_PER_TENANT`, schema/role riêng, Flyway V10, isolation hai tenant và runtime ba placement |
 | EXT-02 | **Hoàn tất** | Capability matrix phía server, audit/version, branding và UI Tenant/System Admin |
 | EXT-03 | **Hoàn tất** | Job DDL, bảng/cột SQL hữu hạn, entity/Task field CRUD, soft delete và metadata form |
 | EXT-04 | **Hoàn tất** | Workflow nhiều bước ANY/ALL, snapshot/version, completion guard và invalidation |
 | EXT-05 | **Hoàn tất** | Trigger/action hữu hạn, outbox, idempotency/retry, capability recheck và history |
 | EXT-06 | **Hoàn tất local** | 96/96 backend, 16/16 frontend, build/contract, 3/3 Playwright, hai smoke và Compose upgrade pass |
 
-Control plane hiện ở migration V6; application plane ở V8. Runtime cuối có `pool-demo`, `schema-demo`
+Control plane hiện ở migration V6; application plane ở V10. Runtime cuối có `pool-demo`, `schema-demo`
 và `silo-demo` cùng `ACTIVE`; Pool/Silo hiện hữu được nâng cấp trên volume cũ, không tạo lại database.
 Trong lúc xác minh đã sửa ba lỗi: binding record datasource, bỏ sót `schema_name` khi copy placement và
 payload smoke automation sai contract. Toàn bộ chuỗi kiểm tra liên quan được chạy lại sau khi sửa.
@@ -30,6 +30,30 @@ payload smoke automation sai contract. Toàn bộ chuỗi kiểm tra liên quan 
 Các phần từ mục 1 đến mục 8 bên dưới lưu chi tiết checkpoint P-App và lịch sử P0–P2. Khi có khác biệt
 về tổng test, số placement, migration hoặc lệnh tiếp tục, mục 0 và biên bản EXT ngày 2026-09-08 là trạng
 thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, SLO hay số liệu nghiên cứu.
+
+### Hardening ứng dụng ngày 2026-09-18
+
+- API client tự làm mới tenant session theo cơ chế single-flight khi access token hết hạn, chạy lại đúng
+  một lần và xóa cache nghiệp vụ khi phiên không thể khôi phục.
+- Giá onboarding được kiểm tra lại từ tier tại server; payload giá/tiền tệ từ trình duyệt không còn là
+  nguồn quyết định.
+- Không cho xóa board còn task; thống kê bỏ qua board đã xóa. Thu hồi tenant member bị chặn nếu làm một
+  project không còn Manager đang hoạt động.
+- Application migration V9 thêm thuộc tính completion cho column. Thống kê hoàn tất không còn phụ thuộc
+  tên `Done`/`Hoàn tất`; Manager cấu hình trực tiếp trong UI và có thể đổi tên cột mà không làm sai số liệu.
+- Batch drag/drop phát `TASK_MOVED` theo từng task để automation nhận đúng sự kiện; trường hạn công việc
+  dùng giờ địa phương đúng khi mở lại form.
+- Application migration V10 lưu mức ưu tiên task và thêm chỉ mục cho quan hệ subtask. Kanban lấy priority,
+  số subtask, số subtask hoàn tất và số bình luận từ dữ liệu backend thay vì gán số minh họa ở trình duyệt.
+- Onboarding mặc định Starter/Pool và đưa gói/kiến trúc vào phần nâng cao; phân biệt rõ gói, placement và
+  capability. Polling dừng ở trạng thái cuối, payment lỗi có lần thử mới với idempotency key riêng.
+- Phần nâng cao so sánh trực tiếp Pool, Schema-per-tenant và Silo theo biên dữ liệu, chi phí vận hành và
+  trường hợp sử dụng; không gắn nhãn mô hình tối ưu trước khi có phép đo cùng workload.
+- UI thành viên bám đúng quyền Owner/Admin; chuyển ownership kết thúc phiên cũ. Điều hướng đăng nhập giữ
+  nguyên query/hash và bộ chọn dự án tùy biến không còn bị URL cũ ghi đè.
+- Xác minh mới: frontend lint/API contract/build pass; 22 frontend test pass khi chạy theo hai nhóm;
+  backend package pass và các test `PaymentServiceTest`, `TenantManagementServiceSecurityTest`,
+  `ProjectAuthorizationIntegrationTest` pass, gồm Flyway V1–V10 trên PostgreSQL Testcontainers.
 
 ## 1. Nguồn sự thật và nguyên tắc bảo toàn
 
@@ -113,9 +137,10 @@ triển khai, kiểm thử nghiệm thu diện rộng, P2 measurement hay thực
 - Audit, admin APIs, rate limiting theo tenant/tier và nhãn quan sát `tenant_id`, `tenant_tier`,
   `tenant_placement`. System Admin có filter tenant và detail payment/provisioning transition history;
   retry vẫn bị state machine backend giới hạn.
-- Năm migration control (`V1`–`V5`) và bảy migration application (`V1`–`V7`) dùng chung cho Pool/Silo.
+- Sáu migration control (`V1`–`V6`) và mười migration application (`V1`–`V10`) dùng chung cho Pool,
+  Schema-per-tenant và Silo.
   Worker profile nâng application schema của placement `ACTIVE` còn cũ và cập nhật `schema_version` sau
-  khi Flyway thành công; marker schema mới nhất là V7.
+  khi Flyway thành công; marker schema mới nhất là V10.
 - Integration/unit test đã bổ sung cho project lifecycle/role/IDOR, board/task/comment, notification,
   resource link/soft-delete, membership, payment concurrency, admin detail/filter/retry guard, MinIO
   deletion và provisioning claim/lease/force-kill recovery.
@@ -160,6 +185,21 @@ triển khai, kiểm thử nghiệm thu diện rộng, P2 measurement hay thực
 - `experiments/results` và `experiments/derived` bị ignore; analyzer dừng nếu không có run hợp lệ thay vì sinh dữ liệu mẫu.
 
 ## 4. Bằng chứng kiểm tra đã có
+
+### Lần kiểm tra khôi phục local — 2026-09-16
+
+- Tạo `infra/.env` từ mẫu local (file bị Git ignore) và đổi riêng `POSTGRES_PORT` thành `15432` vì
+  `5432` đang bị tiến trình khác chiếm; kết nối nội bộ Docker vẫn dùng `postgres:5432`.
+- Compose khởi động thành công: PostgreSQL, API và web đều `healthy`; endpoint gateway
+  `accounts.localhost:8080/actuator/health/readiness` trả `{"status":"UP"}`. Worker, Caddy,
+  Prometheus, Grafana, MinIO và Mailpit đều đang chạy.
+- `node scripts/verify-p-app-workflow.mjs` và `node scripts/verify-extension-workflow.mjs` đều pass.
+- `npm run api:generate`, `npm run api:check` và `npm run lint` pass. File TypeScript sinh lại không
+  tạo diff nội dung.
+- Maven Wrapper Windows dừng trước Maven với `Cannot index into a null array` / `Cannot start maven
+  from wrapper`; máy không có Maven cài toàn cục. Vitest bị runner Windows ngắt trước khi kết thúc và
+  để lại worker Node, nên không ghi nhận là kết quả test pass/fail. Hai hạng mục này cần chạy lại trong
+  terminal/CI có process management ổn định; không suy diễn từ biên bản ngày 2026-09-08.
 
 Biên bản chi tiết, môi trường và ranh giới kết luận nằm tại [P0 verification 2026-08-26](testing/p0-verification-2026-08-26.md), [P1 verification 2026-08-26](testing/p1-verification-2026-08-26.md), [P1 continuation verification 2026-08-27](testing/p1-verification-2026-08-27.md), [P1 verification lượt 2](testing/p1-verification-2026-08-27-part-2.md), [P1 file/worker/MinIO verification 2026-08-31](testing/p1-verification-2026-08-31.md), [P1 rollback recovery verification 2026-08-31](testing/p1-verification-2026-08-31-part-2.md), [P2 preparation 2026-08-31](testing/p2-preparation-2026-08-31.md), [P2 isolation harness 2026-08-31](testing/p2-preparation-2026-08-31-part-2.md), [P2 guard-omission/evidence gate 2026-08-31](testing/p2-preparation-2026-08-31-part-3.md), [APP-01 onboarding 2026-09-01](testing/p-app-onboarding-2026-09-01.md), [APP-02 invitation 2026-09-01](testing/p-app-invitation-2026-09-01.md) và [APP-03–APP-06 core workflow 2026-09-01](testing/p-app-core-workflow-2026-09-01.md). Các kết quả dưới đây là kiểm tra kỹ thuật, không phải kết quả thực nghiệm nghiên cứu.
 
@@ -357,9 +397,10 @@ git rev-parse --short HEAD
 git log -1 --oneline --decorate
 ```
 
-Nền commit đang là `7b6a635`, còn phần EXT chưa commit; không reset hoặc ghi đè working tree. Các lệnh
-dưới đây bảo vệ baseline khi sửa tiếp ứng dụng; chúng không phải lượt kiểm thử nghiệm thu hay thực
-nghiệm chính. Backend cần Docker hoạt động để Testcontainers không bị skip:
+Nền commit hiện tại là `22a9ee4`; EXT đã được commit tại `34a5463`. Vẫn phải kiểm tra working tree trước
+khi sửa và không reset hoặc ghi đè thay đổi của người dùng. Các lệnh dưới đây bảo vệ baseline khi sửa
+tiếp ứng dụng; chúng không phải lượt kiểm thử nghiệm thu hay thực nghiệm chính. Backend cần Docker hoạt
+động để Testcontainers không bị skip:
 
 ```bash
 cd apps/api

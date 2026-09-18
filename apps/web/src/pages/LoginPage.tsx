@@ -27,6 +27,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const notice = (location.state as { notice?: string } | null)?.notice;
 
   useEffect(() => {
     if (status === 'authenticated' && session) {
@@ -98,6 +99,11 @@ export function LoginPage() {
           <Typography color="text.secondary" mt={1} mb={3}>
             Đăng nhập để tiếp tục vào không gian làm việc.
           </Typography>
+          {notice && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {notice}
+            </Alert>
+          )}
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -144,9 +150,9 @@ export function LoginPage() {
                   }
                   label={<Typography variant="body2">Hiện mật khẩu</Typography>}
                 />
-                <Link component="button" type="button" underline="hover" variant="body2">
-                  Quên mật khẩu?
-                </Link>
+                <Typography variant="caption" color="text.secondary">
+                  Khôi phục mật khẩu chưa có trong bản local
+                </Typography>
               </Stack>
               <Button
                 type="submit"

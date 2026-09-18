@@ -26,6 +26,18 @@ import { useAuth } from '../auth/AuthContext';
 import { EmptyState } from '../components/AsyncState';
 import { StatusChip } from '../components/StatusChip';
 
+const placementLabels: Record<TenantSummary['placement'], string> = {
+  POOL: 'Hạ tầng dùng chung',
+  SCHEMA_PER_TENANT: 'Lược đồ riêng',
+  SILO_DATABASE: 'CSDL riêng',
+};
+
+const roleLabels: Record<TenantSummary['role'], string> = {
+  OWNER: 'Chủ sở hữu',
+  ADMIN: 'Quản trị viên',
+  MEMBER: 'Thành viên',
+};
+
 export function TenantSelectionPage() {
   const { session, tenants, selectTenant, reloadTenants, logout } = useAuth();
   const navigate = useNavigate();
@@ -108,12 +120,12 @@ export function TenantSelectionPage() {
                     {tenant.host ?? `${tenant.slug}.localhost`}
                   </Typography>
                   <Stack direction="row" gap={1} mt={2} flexWrap="wrap">
-                    <Chip size="small" label={tenant.role} />
+                    <Chip size="small" label={roleLabels[tenant.role]} />
                     <Chip
                       size="small"
                       variant="outlined"
                       icon={<StorageOutlined />}
-                      label={`${tenant.placement} · ${tenant.tier}`}
+                      label={`${placementLabels[tenant.placement]} · ${tenant.tier}`}
                     />
                   </Stack>
                   {canOpen ? (
@@ -127,7 +139,8 @@ export function TenantSelectionPage() {
                     >
                       {openingSlug === tenant.slug ? 'Đang chuyển hướng…' : 'Mở không gian'}
                     </Button>
-                  ) : tenant.role === 'OWNER' || tenant.role === 'ADMIN' ? (
+                  ) : ['PENDING_PAYMENT', 'PROVISIONING', 'FAILED'].includes(tenant.status) &&
+                    (tenant.role === 'OWNER' || tenant.role === 'ADMIN') ? (
                     <Button
                       fullWidth
                       variant="outlined"
@@ -137,7 +150,9 @@ export function TenantSelectionPage() {
                       Tiếp tục onboarding
                     </Button>
                   ) : (
-                    <Button fullWidth disabled sx={{ mt: 2.5 }}>Chưa thể truy cập</Button>
+                    <Button fullWidth disabled sx={{ mt: 2.5 }}>
+                      {tenant.status === 'SUSPENDED' ? 'Workspace đã tạm ngưng' : 'Chưa thể truy cập'}
+                    </Button>
                   )}
                 </Paper>
               );

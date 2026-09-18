@@ -18,7 +18,13 @@ export function RequireAuth({
 
   if (status === 'loading') return <FullPageLoader label="Đang khôi phục phiên làm việc…" />;
   if (status === 'anonymous' || !session) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `${location.pathname}${location.search}${location.hash}` }}
+        replace
+      />
+    );
   }
   if (tenant && !session.activeTenant) return <Navigate to="/select-tenant" replace />;
   if (

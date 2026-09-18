@@ -179,7 +179,7 @@ class ProjectAuthorizationIntegrationTest {
         assertThatThrownBy(() -> service.addComment(TASK_A, new CreateCommentRequest("Viewer comment")))
                 .isInstanceOf(TenantAccessDeniedException.class);
         assertThatThrownBy(() -> service.createColumn(
-                BOARD_A, new CreateColumnRequest("Viewer column", 0L)))
+                BOARD_A, new CreateColumnRequest("Viewer column", false, 0L)))
                 .isInstanceOf(TenantAccessDeniedException.class);
         assertThat(resourceService.list()).extracting(ResourceService.ResourceView::id)
                 .containsExactly(RESOURCE_A);
@@ -237,7 +237,7 @@ class ProjectAuthorizationIntegrationTest {
         ApplicationDtos.ProjectView project = service.updateProject(
                 PROJECT_A, new UpdateProjectRequest("Renamed by manager", "Updated"));
         ApplicationDtos.BoardView withColumn = service.createColumn(
-                BOARD_A, new CreateColumnRequest("Review", 0L));
+                BOARD_A, new CreateColumnRequest("Review", false, 0L));
         UUID reviewColumnId = withColumn.columns().stream()
                 .filter(column -> column.name().equals("Review"))
                 .findFirst()
@@ -246,12 +246,15 @@ class ProjectAuthorizationIntegrationTest {
 
         assertThat(withColumn.version()).isEqualTo(1);
         assertThatThrownBy(() -> service.createColumn(
-                BOARD_A, new CreateColumnRequest("Stale", 0L)))
+                BOARD_A, new CreateColumnRequest("Stale", false, 0L)))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("Board columns were updated by another user");
 
         ApplicationDtos.BoardView renamed = service.updateColumn(
-                BOARD_A, reviewColumnId, new UpdateColumnRequest("Verification", 1L));
+                BOARD_A, reviewColumnId, new UpdateColumnRequest("Verification", true, 1L));
+        assertThat(renamed.columns()).filteredOn(column -> column.id().equals(reviewColumnId))
+                .extracting(ApplicationDtos.ColumnView::completed)
+                .containsExactly(true);
         ApplicationDtos.BoardView reordered = service.reorderColumns(
                 BOARD_A, new ReorderColumnsRequest(java.util.List.of(reviewColumnId, COLUMN_A), renamed.version()));
         assertThat(reordered.columns()).extracting(ApplicationDtos.ColumnView::id)
@@ -319,7 +322,8 @@ class ProjectAuthorizationIntegrationTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Board not found");
         assertThatThrownBy(() -> service.updateTask(
-                TASK_B, new UpdateTaskRequest(COLUMN_B, "Tampered", null, null, null, BigDecimal.ONE, 0)))
+                TASK_B, new UpdateTaskRequest(
+                        COLUMN_B, "Tampered", null, TaskPriority.MEDIUM, null, null, BigDecimal.ONE, 0)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Task not found");
         assertThatThrownBy(() -> service.updateProject(
@@ -327,7 +331,7 @@ class ProjectAuthorizationIntegrationTest {
                 .isInstanceOf(TenantAccessDeniedException.class)
                 .hasMessage("Insufficient project role");
         assertThatThrownBy(() -> service.updateColumn(
-                BOARD_A, COLUMN_B, new UpdateColumnRequest("Tampered", 0L)))
+                BOARD_A, COLUMN_B, new UpdateColumnRequest("Tampered", false, 0L)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Board column not found");
         assertThat(resourceService.list()).extracting(ResourceService.ResourceView::id)
@@ -466,14 +470,54 @@ class ProjectAuthorizationIntegrationTest {
     }
 
     @Test
+    void managerCannotDeleteBoardThatStillContainsTasks() {
+        useContext(MANAGER, TenantRole.MEMBER);
+
+        assertThatThrownBy(() -> service.deleteBoard(BOARD_A))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("Move or delete all tasks before deleting this board");
+
+        assertThat(count(
+                "SELECT count(*) FROM boards WHERE tenant_id=? AND id=? AND deleted_at IS NULL",
+                TENANT_A, BOARD_A)).isOne();
+    }
+
+    @Test
+    void taskViewReturnsPersistedPriorityAndRealRelatedCounts() {
+        useContext(MANAGER, TenantRole.MEMBER);
+        ApplicationDtos.BoardView boardWithDone = service.createColumn(
+                BOARD_A, new CreateColumnRequest("Completed", true, 0L));
+        UUID completedColumnId = boardWithDone.columns().stream()
+                .filter(ApplicationDtos.ColumnView::completed)
+                .findFirst()
+                .orElseThrow()
+                .id();
+
+        useContext(MEMBER, TenantRole.MEMBER);
+        ApplicationDtos.TaskView parent = service.createTask(BOARD_A, new CreateTaskRequest(
+                COLUMN_A, null, "Measured parent", null, TaskPriority.HIGH, null, null, null));
+        ApplicationDtos.TaskView child = service.createTask(BOARD_A, new CreateTaskRequest(
+                COLUMN_A, parent.id(), "Measured child", null, TaskPriority.LOW, null, null, null));
+        service.moveTask(BOARD_A, child.id(), new ApplicationDtos.MoveTaskRequest(
+                completedColumnId, BigDecimal.valueOf(1000), child.version()));
+        service.addComment(parent.id(), new CreateCommentRequest("Counted comment"));
+
+        ApplicationDtos.TaskView refreshed = service.getTask(parent.id());
+        assertThat(refreshed.priority()).isEqualTo(TaskPriority.HIGH);
+        assertThat(refreshed.subtaskCount()).isOne();
+        assertThat(refreshed.completedSubtaskCount()).isOne();
+        assertThat(refreshed.commentCount()).isOne();
+    }
+
+    @Test
     void taskBatchReorderIsAtomicAndManagerSoftDeleteIncludesOneLevelSubtasks() {
         useContext(MEMBER, TenantRole.MEMBER);
         ApplicationDtos.TaskView parent = service.createTask(BOARD_A, createTask("Parent task"));
         ApplicationDtos.TaskView child = service.createTask(BOARD_A, new CreateTaskRequest(
-                COLUMN_A, parent.id(), "Child task", null, null, null, null));
+                COLUMN_A, parent.id(), "Child task", null, TaskPriority.MEDIUM, null, null, null));
 
         assertThatThrownBy(() -> service.createTask(BOARD_A, new CreateTaskRequest(
-                COLUMN_A, child.id(), "Grandchild", null, null, null, null)))
+                COLUMN_A, child.id(), "Grandchild", null, TaskPriority.MEDIUM, null, null, null)))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("Subtasks can only have a top-level parent in the same board");
         ApplicationDtos.BoardView reordered = service.reorderTasks(BOARD_A, new ReorderTasksRequest(java.util.List.of(
@@ -648,7 +692,7 @@ class ProjectAuthorizationIntegrationTest {
     }
 
     private CreateTaskRequest createTask(String title) {
-        return new CreateTaskRequest(COLUMN_A, null, title, null, null, null, null);
+        return new CreateTaskRequest(COLUMN_A, null, title, null, TaskPriority.MEDIUM, null, null, null);
     }
 
     private void useContext(UUID userId, TenantRole tenantRole) {

@@ -79,7 +79,7 @@ export interface CreateProjectRequest {
 export type UpdateProjectRequest = ApiSchemas['UpdateProjectRequest'];
 export type ProjectMember = ApiSchemas['ProjectMemberView'];
 
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+export type TaskPriority = ApiSchemas['TaskPriority'];
 
 export interface TaskCard {
   id: UUID;
@@ -101,6 +101,7 @@ export interface BoardColumn {
   id: UUID;
   name: string;
   position: number;
+  completed: boolean;
   taskLimit?: number;
   tasks: TaskCard[];
 }
@@ -133,6 +134,7 @@ export interface UpdateTaskRequest {
   columnId: UUID;
   title: string;
   description?: string;
+  priority: TaskPriority;
   assigneeId?: UUID;
   dueDate?: string;
   position?: number;
