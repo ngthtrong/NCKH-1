@@ -4,4 +4,3 @@ ALTER TABLE board_columns
 UPDATE board_columns
 SET completed = true
 WHERE lower(trim(name)) IN ('done', 'hoàn tất');
-

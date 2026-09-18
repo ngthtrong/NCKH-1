@@ -1,9 +1,9 @@
 # Báo cáo sẵn sàng trước nghiên cứu
 
-**Ngày chuẩn bị:** 2026-09-18 (UTC+7)  
-**Đối tượng:** Nhóm nghiên cứu  
-**Nhánh hiện tại:** `main`  
-**HEAD hiện tại:** `22a9ee4`  
+**Ngày chuẩn bị:** 2026-09-18 (UTC+7)
+**Đối tượng:** Nhóm nghiên cứu
+**Nhánh ứng viên:** `an_upgrade_features`
+**Nền `main`:** `22a9ee4`
 **Trạng thái quyết định đề xuất:** **GO cho báo cáo nhóm và pilot; NO-GO cho thu dữ liệu chính thức cho đến khi khóa protocol và phiên bản.**
 
 ## 1. Kết luận điều hành
@@ -96,4 +96,3 @@ Không dùng số đo development, ảnh dashboard hoặc thời gian quan sát 
 - Hướng dẫn thực nghiệm: [`../../experiments/README.md`](../../experiments/README.md)
 - Hướng dẫn chạy app: [`../RUN_APPLICATION.md`](../RUN_APPLICATION.md)
 - Báo cáo kiểm chứng mở rộng: [`../testing/extension-local-2026-09-08.md`](../testing/extension-local-2026-09-08.md)
-
