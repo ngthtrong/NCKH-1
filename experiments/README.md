@@ -18,6 +18,9 @@ export TENANT_B_TOKEN='...'
 
 ## Chạy
 
+Mặc định mọi lượt chạy trong quá trình làm app được phân loại là `development` và không đủ điều kiện
+đưa vào phân tích kết quả cuối:
+
 ```bash
 scripts/run-experiment.sh smoke
 scripts/run-experiment.sh baseline
@@ -27,23 +30,43 @@ scripts/run-experiment.sh noisy-neighbor before
 scripts/run-experiment.sh noisy-neighbor after
 ```
 
+Khi cần kiểm tra protocol trên môi trường pilot, đặt `RUN_CLASS=pilot`. Chỉ tạo lượt thực nghiệm chính
+thức sau khi protocol đã được phê duyệt, source tree sạch và có mã protocol cụ thể:
+
+```bash
+RUN_CLASS=pilot scripts/run-experiment.sh baseline
+RUN_CLASS=experiment EXPERIMENT_PROTOCOL_ID='protocol-v1' scripts/run-experiment.sh baseline
+```
+
+Lệnh thứ hai fail-closed nếu working tree còn thay đổi hoặc thiếu `EXPERIMENT_PROTOCOL_ID`.
+
 Các giá trị mặc định là cấu hình khởi đầu, không phải SLO hay kết quả. Có thể đặt `BASELINE_VUS`, `LOAD_RATE`, `AGGRESSOR_RATE`, `VICTIM_RATE`, duration tương ứng và `SEED`. Chỉ đặt `SLO_P95_MS` sau khi pilot trên đúng VPS khóa ngưỡng; nếu chưa đặt, k6 chỉ kiểm tra tính đúng/status và vẫn ghi p95 quan sát.
 
 `before` và `after` là nhãn của hai deployment/configuration riêng. Không đổi rate limit giữa chừng trong cùng run. Mỗi tổ hợp kịch bản–placement–biến thể phải lặp ít nhất ba lần với cùng commit, image digest, target và workload; nên chạy xen kẽ thứ tự để giảm bias do thời gian.
 
 Mỗi run tạo:
 
-- `manifest.json`: commit, môi trường, phần cứng, version tool/image, workload và artifact paths; không chứa secret.
+- `manifest.json`: `run_class`, điều kiện dùng cho phân tích cuối, protocol, commit, môi trường, phần cứng,
+  version tool/image, workload và artifact paths; không chứa secret.
 - `summary.json`: summary do k6 sinh.
 - `raw-metrics.json`: từng sample do k6 sinh.
 - `resource-metrics.json`: CPU, RAM và Hikari connection được truy vấn từ Prometheus đúng khoảng thời gian run. Nếu Prometheus không khả dụng, run vẫn giữ lại nhưng QA đánh dấu thiếu bằng chứng tài nguyên.
 
-Schema nằm trong `experiments/schemas/`. `data_kind=measured` chỉ được tạo khi script thực sự gọi k6.
+Schema nằm trong `experiments/schemas/`. `data_kind=measured` chỉ được tạo khi script thực sự gọi k6;
+nhãn `measured` không đồng nghĩa với đủ điều kiện đưa vào kết quả cuối.
 
 ## Phân tích tái lập
 
 ```bash
 scripts/analyze-experiments.sh
+```
+
+Lệnh trên mặc định chỉ đọc `run_class=experiment`. Muốn xem số đo phục vụ phát triển hoặc pilot,
+phải yêu cầu tường minh và báo cáo vẫn giữ cảnh báo không được dùng làm kết luận cuối:
+
+```bash
+RUN_CLASS=development scripts/analyze-experiments.sh
+RUN_CLASS=pilot scripts/analyze-experiments.sh
 ```
 
 Công cụ dùng Python standard library, chuẩn hóa toàn bộ metric vào `observations.csv`, tạo `comparison.csv`, `qa.json`, `report.md` và biểu đồ SVG từ số đo thật. QA kiểm tra run thiếu, timestamp, trùng ID, số lần lặp, target/workload không đồng nhất và gắn cờ ngoại lệ bằng Tukey IQR; ngoại lệ không bị tự động xóa.

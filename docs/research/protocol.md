@@ -76,6 +76,19 @@ Một tài liệu học thuật được chọn khi đáp ứng tất cả đi�
 - Mỗi run có manifest: commit, image digest, Java/Node/PostgreSQL/k6 version, VPS CPU/RAM, seed, tenant count, VU, duration, placement và rate-limit policy.
 - SLO chỉ được khóa sau pilot đúng cấu hình VPS; trước đó mọi threshold hiệu năng là `PENDING_DATA`.
 
+### 4.1 Phân loại lượt đo trong vòng đời phát triển
+
+| `run_class` | Mục đích | Được dùng trong kết quả cuối |
+|---|---|---|
+| `development` | Phát hiện regression, hoàn thiện metric và công cụ | Không |
+| `pilot` | Kiểm tra protocol, workload và ước lượng độ biến thiên | Không |
+| `experiment` | Thực nghiệm theo protocol đã khóa | Có, sau QA |
+
+Pipeline mặc định tạo `development`. Lượt `experiment` phải có working tree sạch, mã protocol và
+`eligible_for_final_analysis=true`; công cụ phân tích kết quả cuối bỏ qua development/pilot. Không đổi
+nhãn một lượt đã chạy để hợp thức hóa số liệu cũ. Quan sát development có thể giải thích việc chọn
+metric hoặc điều chỉnh phương pháp, nhưng không được dùng để kết luận placement nào tối ưu.
+
 ## 5. Đánh giá người dùng và đạo đức
 
 - Nhóm nghiên cứu trực tiếp xin phê duyệt cần thiết, tuyển 30–60 người thuộc 3–5 nhóm và lấy đồng thuận trước khi thu dữ liệu.
