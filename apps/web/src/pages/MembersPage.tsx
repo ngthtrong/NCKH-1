@@ -1,11 +1,9 @@
-import {
-  Add,
-  ContentCopy,
-  DeleteOutline,
-  MailOutline,
-  Search,
-  SwapHoriz,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import MailOutline from '@mui/icons-material/MailOutline';
+import Search from '@mui/icons-material/Search';
+import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import {
   Alert,
   Avatar,

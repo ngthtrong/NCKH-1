@@ -1652,6 +1652,7 @@ export interface components {
             eventType: string;
             title: string;
             body: string;
+            actionUrl?: string | null;
             readAt?: components["schemas"]["Instant"] | null;
             createdAt: components["schemas"]["Instant"];
         };

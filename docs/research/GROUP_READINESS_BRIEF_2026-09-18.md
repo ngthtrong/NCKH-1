@@ -22,17 +22,18 @@ Chưa được dùng các kiểm tra local để tuyên bố placement nào tố
 | Nghiệp vụ | Sẵn sàng local | Project, nhiều board, Kanban, task, priority, subtask, comment, hạn công việc và thành viên |
 | Phân quyền | Sẵn sàng local | Owner/Admin/Manager/Member/Viewer, invariant Manager, invitation và chuyển ownership |
 | Tùy biến | Sẵn sàng local | Branding, custom data, approval nhiều bước và automation hữu hạn |
-| Tài nguyên và thông báo | Sẵn sàng local | File/link, quota, liên kết task, in-app/email; Web Push thật phụ thuộc VAPID |
+| Tài nguyên và thông báo | Sẵn sàng local | File/link, quota, liên kết task, nhắc due/overdue qua in-app/email; Web Push thật phụ thuộc VAPID |
 | Quản trị hệ thống | Sẵn sàng local | Lọc tenant, payment/provisioning history, retry có guard và cleanup dead letter |
 
 ## 3. Bằng chứng kỹ thuật mới nhất
 
 - API và web ở trạng thái `healthy`; worker đang chạy.
 - `http://accounts.localhost:8080/login` trả HTTP 200.
-- Application schema V10 đã được worker nâng thành công cho các tenant đang hoạt động thuộc Pool, Schema-per-tenant và Silo.
+- Application schema V12 chứa sổ nhắc deadline idempotent, đích điều hướng notification và hàng đợi retry email; worker đã nâng thành công cả sáu tenant đang hoạt động thuộc Pool, Schema-per-tenant và Silo trên runtime local hiện tại.
 - Frontend lint, kiểm tra OpenAPI contract và production build đều đạt.
 - 22/22 frontend test đạt khi chạy tuần tự theo hai nhóm.
-- Integration test `ProjectAuthorizationIntegrationTest` đạt trên PostgreSQL Testcontainers với Flyway V1–V10.
+- 106/106 backend test đạt; `ProjectAuthorizationIntegrationTest` và `DeadlineReminderIntegrationTest` chạy trên PostgreSQL Testcontainers với Flyway V1–V12.
+- Scheduler chỉ xếp lịch task active/chưa hoàn tất, không gửi lặp, không đọc tenant khác và loại sự kiện cũ nếu deadline đổi trước lúc dispatch.
 - Priority của task và các bộ đếm subtask/comment trên Kanban là dữ liệu backend thật, không còn là số minh họa phía trình duyệt.
 
 Đây là bằng chứng sẵn sàng kỹ thuật local, không phải dữ liệu kết quả nghiên cứu.
@@ -44,7 +45,7 @@ Chưa được dùng các kiểm tra local để tuyên bố placement nào tố
 3. **Onboarding (3 phút):** chỉ ra gói khác placement; mở “Tùy chọn nâng cao” và so sánh Pool, Schema-per-tenant, Silo. Nhấn mạnh Pool là mặc định demo, không phải kết luận tối ưu.
 4. **Nghiệp vụ (4 phút):** mở project và Kanban; tạo task có priority, subtask và comment; chuyển subtask sang cột hoàn tất để bộ đếm cập nhật.
 5. **Phân quyền và tùy biến (2 phút):** trình bày vai trò project/tenant, approval hoặc automation và cơ chế capability.
-6. **Bằng chứng vận hành (2 phút):** trình bày health, migration V10, test/build và bộ công cụ k6/manifest.
+6. **Bằng chứng vận hành (2 phút):** trình bày health, migration V12, test/build và bộ công cụ k6/manifest.
 7. **Xin quyết định (1 phút):** chốt câu hỏi, workload, môi trường, metric, số lần lặp, pilot và ngày khóa phiên bản.
 
 Không dùng số đo development, ảnh dashboard hoặc thời gian quan sát thủ công để kết luận hiệu năng trong buổi trình bày.

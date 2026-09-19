@@ -57,8 +57,8 @@ class SchemaPerTenantIsolationIntegrationTest {
         assertThat(placementA.getDatabaseName()).isEqualTo("schema_shared");
         assertThat(placementB.getDatabaseName()).isEqualTo("schema_shared");
         assertThat(placementA.getSchemaName()).isNotEqualTo(placementB.getSchemaName());
-        assertThat(placementA.getSchemaVersion()).isEqualTo("10");
-        assertThat(placementB.getSchemaVersion()).isEqualTo("10");
+        assertThat(placementA.getSchemaVersion()).isEqualTo("12");
+        assertThat(placementB.getSchemaVersion()).isEqualTo("12");
 
         TenantJdbcExecutor executor = executor(cipher, placementA, placementB);
         use(tenantA);

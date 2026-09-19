@@ -1,11 +1,9 @@
-import {
-  ArrowForward,
-  BusinessOutlined,
-  StorageOutlined,
-  Logout,
-  Refresh,
-  Add,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
+import Logout from '@mui/icons-material/Logout';
+import Refresh from '@mui/icons-material/Refresh';
+import StorageOutlined from '@mui/icons-material/StorageOutlined';
 import {
   Alert,
   Avatar,

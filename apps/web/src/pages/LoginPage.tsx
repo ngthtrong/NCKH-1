@@ -1,4 +1,6 @@
-import { ArrowForward, LockOutlined, VerifiedUserOutlined } from '@mui/icons-material';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import VerifiedUserOutlined from '@mui/icons-material/VerifiedUserOutlined';
 import {
   Alert,
   Box,

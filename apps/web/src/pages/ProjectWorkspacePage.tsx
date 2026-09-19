@@ -1,13 +1,11 @@
-import {
-  ArrowBack,
-  ArrowForward,
-  CheckCircleOutline,
-  FolderOutlined,
-  GroupsOutlined,
-  SpaceDashboardOutlined,
-  TuneOutlined,
-  ViewKanbanOutlined,
-} from '@mui/icons-material';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import FolderOutlined from '@mui/icons-material/FolderOutlined';
+import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
+import SpaceDashboardOutlined from '@mui/icons-material/SpaceDashboardOutlined';
+import TuneOutlined from '@mui/icons-material/TuneOutlined';
+import ViewKanbanOutlined from '@mui/icons-material/ViewKanbanOutlined';
 import {
   Avatar,
   Box,

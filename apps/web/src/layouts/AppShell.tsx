@@ -1,16 +1,14 @@
-import {
-  AdminPanelSettingsOutlined,
-  DashboardOutlined,
-  FolderOutlined,
-  WorkspacesOutlined,
-  GroupsOutlined,
-  KeyboardArrowDown,
-  Logout,
-  Menu as MenuIcon,
-  NotificationsNone,
-  SpaceDashboardOutlined,
-  TuneOutlined,
-} from '@mui/icons-material';
+import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
+import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
+import FolderOutlined from '@mui/icons-material/FolderOutlined';
+import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Logout from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsNone from '@mui/icons-material/NotificationsNone';
+import SpaceDashboardOutlined from '@mui/icons-material/SpaceDashboardOutlined';
+import TuneOutlined from '@mui/icons-material/TuneOutlined';
+import WorkspacesOutlined from '@mui/icons-material/WorkspacesOutlined';
 import {
   AppBar,
   Avatar,

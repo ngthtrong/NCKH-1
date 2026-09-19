@@ -158,7 +158,7 @@ public class OutboxWorker {
                 resourceDeletionHandler.handle(event);
             } else {
                 if (automationEventHandler != null) automationEventHandler.handle(event);
-                Set<UUID> recipientUserIds = projectRecipientUserIds(event);
+                Set<UUID> recipientUserIds = recipientUserIds(event);
                 for (TenantMembershipEntity membership : memberships) {
                     if (membership.getUserId().equals(event.actorUserId())) continue;
                     if (!recipientUserIds.contains(membership.getUserId())) continue;
@@ -222,6 +222,65 @@ public class OutboxWorker {
                 (rs, rowNum) -> rs.getObject(1, UUID.class), context.tenantId(), projectId)));
     }
 
+    private Set<UUID> recipientUserIds(TenantEvent event) {
+        if ("TASK_DUE_SOON".equals(event.eventType()) || "TASK_OVERDUE".equals(event.eventType())) {
+            return validDeadlineRecipient(event);
+        }
+        if ("TASK_ASSIGNED".equals(event.eventType())
+                || ("TASK_CREATED".equals(event.eventType())
+                    && payloadUuid(event, "recipientUserId") != null)) {
+            return validTaskRecipient(event);
+        }
+        return projectRecipientUserIds(event);
+    }
+
+    private Set<UUID> validTaskRecipient(TenantEvent event) {
+        UUID recipientUserId = payloadUuid(event, "recipientUserId");
+        if (recipientUserId == null) return Set.of();
+        TenantContext context = TenantContextHolder.getRequired();
+        boolean stillAssigned = executor.read(jdbc -> Boolean.TRUE.equals(jdbc.query("""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM tasks t
+                    JOIN projects p ON p.tenant_id=t.tenant_id AND p.id=t.project_id
+                    JOIN boards b ON b.tenant_id=t.tenant_id AND b.id=t.board_id
+                    JOIN project_memberships pm
+                      ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
+                     AND pm.user_id=t.assignee_user_id
+                    WHERE t.tenant_id=? AND t.id=?
+                      AND t.deleted_at IS NULL AND b.deleted_at IS NULL
+                      AND p.status='ACTIVE' AND t.assignee_user_id=?
+                )
+                """, rs -> rs.next() && rs.getBoolean(1), context.tenantId(), event.aggregateId(),
+                recipientUserId)));
+        return stillAssigned ? Set.of(recipientUserId) : Set.of();
+    }
+
+    private Set<UUID> validDeadlineRecipient(TenantEvent event) {
+        UUID recipientUserId = payloadUuid(event, "recipientUserId");
+        Instant dueAt = payloadInstant(event, "dueAt");
+        if (recipientUserId == null || dueAt == null) return Set.of();
+        TenantContext context = TenantContextHolder.getRequired();
+        boolean stillEligible = executor.read(jdbc -> Boolean.TRUE.equals(jdbc.query("""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM tasks t
+                    JOIN projects p ON p.tenant_id=t.tenant_id AND p.id=t.project_id
+                    JOIN boards b ON b.tenant_id=t.tenant_id AND b.id=t.board_id
+                    JOIN board_columns c ON c.tenant_id=t.tenant_id AND c.id=t.board_column_id
+                    JOIN project_memberships pm
+                      ON pm.tenant_id=t.tenant_id AND pm.project_id=t.project_id
+                     AND pm.user_id=t.assignee_user_id
+                    WHERE t.tenant_id=? AND t.id=?
+                      AND t.deleted_at IS NULL AND b.deleted_at IS NULL
+                      AND p.status='ACTIVE' AND c.completed=FALSE
+                      AND t.assignee_user_id=? AND t.due_at=?
+                )
+                """, rs -> rs.next() && rs.getBoolean(1), context.tenantId(), event.aggregateId(),
+                recipientUserId, Timestamp.from(dueAt))));
+        return stillEligible ? Set.of(recipientUserId) : Set.of();
+    }
+
     private UUID resolveProjectId(TenantEvent event) {
         TenantContext context = TenantContextHolder.getRequired();
         return executor.read(jdbc -> switch (event.aggregateType()) {
@@ -241,6 +300,12 @@ public class OutboxWorker {
             case "Task" -> jdbc.query(
                     "SELECT project_id FROM tasks WHERE tenant_id=? AND id=?",
                     rs -> rs.next() ? rs.getObject(1, UUID.class) : payloadUuid(event, "projectId"),
+                    context.tenantId(), event.aggregateId());
+            case "Comment" -> jdbc.query("""
+                    SELECT t.project_id FROM comments c
+                    JOIN tasks t ON t.tenant_id=c.tenant_id AND t.id=c.task_id
+                    WHERE c.tenant_id=? AND c.id=?
+                    """, rs -> rs.next() ? rs.getObject(1, UUID.class) : payloadUuid(event, "projectId"),
                     context.tenantId(), event.aggregateId());
             default -> null;
         });
@@ -263,6 +328,17 @@ public class OutboxWorker {
             return value.isMissingNode() || value.isNull() || value.asText().isBlank()
                     ? null
                     : UUID.fromString(value.asText());
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException("Invalid tenant event payload", exception);
+        }
+    }
+
+    private Instant payloadInstant(TenantEvent event, String field) {
+        try {
+            JsonNode value = objectMapper.readTree(event.payloadJson()).path(field);
+            return value.isMissingNode() || value.isNull() || value.asText().isBlank()
+                    ? null
+                    : Instant.parse(value.asText());
         } catch (RuntimeException exception) {
             throw new IllegalArgumentException("Invalid tenant event payload", exception);
         }

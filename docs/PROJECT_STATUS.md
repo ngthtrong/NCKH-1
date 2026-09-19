@@ -1,10 +1,10 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-09-18 (UTC+7)
-**Nhánh đang làm:** `main`
+**Cập nhật:** 2026-09-19 (UTC+7)
+**Nhánh đang làm:** `an_upgrade_features`
 **Checkpoint mã nguồn P-App:** `c226676` (`p-app`)
 **Nền commit hiện tại:** `22a9ee4` (`guide run`). EXT-01–EXT-06 đã được commit tại `34a5463`
-(`p-app add bridge`); working tree sạch trước lần cập nhật tài liệu này.
+(`p-app add bridge`); các thay đổi V11/V12 hiện còn trong working tree để kiểm tra trước khi push.
 **Trạng thái hiện tại:** APP-01–APP-06 giữ nguyên là checkpoint local của phiên bản hai placement.
 EXT-01–EXT-06 đã hoàn tất local ngày 2026-09-08 cho Bridge ba placement và tùy biến hữu hạn; biên bản
 ở [`docs/testing/extension-local-2026-09-08.md`](testing/extension-local-2026-09-08.md). Provider thật,
@@ -15,14 +15,14 @@ bằng chứng nghiệm thu.
 
 | Mốc | Kết quả local | Bằng chứng chính |
 |---|---|---|
-| EXT-01 | **Hoàn tất** | `SCHEMA_PER_TENANT`, schema/role riêng, Flyway V10, isolation hai tenant và runtime ba placement |
+| EXT-01 | **Hoàn tất** | `SCHEMA_PER_TENANT`, schema/role riêng, Flyway V12, isolation hai tenant và runtime ba placement |
 | EXT-02 | **Hoàn tất** | Capability matrix phía server, audit/version, branding và UI Tenant/System Admin |
 | EXT-03 | **Hoàn tất** | Job DDL, bảng/cột SQL hữu hạn, entity/Task field CRUD, soft delete và metadata form |
 | EXT-04 | **Hoàn tất** | Workflow nhiều bước ANY/ALL, snapshot/version, completion guard và invalidation |
 | EXT-05 | **Hoàn tất** | Trigger/action hữu hạn, outbox, idempotency/retry, capability recheck và history |
-| EXT-06 | **Hoàn tất local** | 96/96 backend, 16/16 frontend, build/contract, 3/3 Playwright, hai smoke và Compose upgrade pass |
+| EXT-06 | **Hoàn tất local** | 106/106 backend, 22/22 frontend, build/contract, 3/3 Playwright, hai smoke và Compose upgrade pass |
 
-Control plane hiện ở migration V6; application plane ở V10. Runtime cuối có `pool-demo`, `schema-demo`
+Control plane hiện ở migration V6; application plane ở V12. Runtime cuối có `pool-demo`, `schema-demo`
 và `silo-demo` cùng `ACTIVE`; Pool/Silo hiện hữu được nâng cấp trên volume cũ, không tạo lại database.
 Trong lúc xác minh đã sửa ba lỗi: binding record datasource, bỏ sót `schema_name` khi copy placement và
 payload smoke automation sai contract. Toàn bộ chuỗi kiểm tra liên quan được chạy lại sau khi sửa.
@@ -45,6 +45,12 @@ thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, S
   dùng giờ địa phương đúng khi mở lại form.
 - Application migration V10 lưu mức ưu tiên task và thêm chỉ mục cho quan hệ subtask. Kanban lấy priority,
   số subtask, số subtask hoàn tất và số bình luận từ dữ liệu backend thay vì gán số minh họa ở trình duyệt.
+- Application migration V11 lưu sổ chống trùng cho nhắc hạn. Worker tạo sự kiện sắp đến hạn/quá hạn,
+  kiểm tra lại deadline, assignee, membership, trạng thái task/column/project trước khi gửi và chỉ phát
+  đến đúng người được giao qua in-app/email theo preference.
+- Application migration V12 thêm đích điều hướng cho notification và hàng đợi email retry độc lập. Sự kiện
+  giao task chỉ gửi đúng assignee hiện tại; email thử tối đa năm lần, tôn trọng preference mới nhất và không
+  làm lỗi SMTP chặn xử lý outbox nghiệp vụ.
 - Onboarding mặc định Starter/Pool và đưa gói/kiến trúc vào phần nâng cao; phân biệt rõ gói, placement và
   capability. Polling dừng ở trạng thái cuối, payment lỗi có lần thử mới với idempotency key riêng.
 - Phần nâng cao so sánh trực tiếp Pool, Schema-per-tenant và Silo theo biên dữ liệu, chi phí vận hành và
@@ -53,7 +59,8 @@ thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, S
   nguyên query/hash và bộ chọn dự án tùy biến không còn bị URL cũ ghi đè.
 - Xác minh mới: frontend lint/API contract/build pass; 22 frontend test pass khi chạy theo hai nhóm;
   backend package pass và các test `PaymentServiceTest`, `TenantManagementServiceSecurityTest`,
-  `ProjectAuthorizationIntegrationTest` pass, gồm Flyway V1–V10 trên PostgreSQL Testcontainers.
+  `ProjectAuthorizationIntegrationTest` và `DeadlineReminderIntegrationTest` pass, gồm Flyway V1–V12
+  trên PostgreSQL Testcontainers.
 
 ## 1. Nguồn sự thật và nguyên tắc bảo toàn
 
@@ -132,15 +139,17 @@ triển khai, kiểm thử nghiệm thu diện rộng, P2 measurement hay thực
   project. File dùng signed URL và outbox cleanup idempotent; link không tạo object/cleanup giả; metadata
   được soft-delete và quota chỉ tính resource active.
 - In-app notification, SMTP/Mailpit adapter, preference và push-subscription lifecycle/idempotency đã nối
-  UI. Worker dispatch các event nghiệp vụ project/task/comment đến active project member; Web Push thật
-  vẫn ghi `VAPID_NOT_CONFIGURED`, không báo giả là đã gửi.
+  UI. Worker dispatch event nghiệp vụ đến active project member và tự tạo nhắc sắp đến hạn/quá hạn đúng
+  assignee; sự kiện stale bị loại trước khi gửi. Notification mở đúng project/task; email retry tối đa năm
+  lần trong hàng đợi riêng và tôn trọng opt-out trước lúc gửi. Web Push thật vẫn ghi `VAPID_NOT_CONFIGURED`,
+  không báo giả là đã gửi.
 - Audit, admin APIs, rate limiting theo tenant/tier và nhãn quan sát `tenant_id`, `tenant_tier`,
   `tenant_placement`. System Admin có filter tenant và detail payment/provisioning transition history;
   retry vẫn bị state machine backend giới hạn.
-- Sáu migration control (`V1`–`V6`) và mười migration application (`V1`–`V10`) dùng chung cho Pool,
+- Sáu migration control (`V1`–`V6`) và mười hai migration application (`V1`–`V12`) dùng chung cho Pool,
   Schema-per-tenant và Silo.
   Worker profile nâng application schema của placement `ACTIVE` còn cũ và cập nhật `schema_version` sau
-  khi Flyway thành công; marker schema mới nhất là V10.
+  khi Flyway thành công; marker schema mới nhất là V12.
 - Integration/unit test đã bổ sung cho project lifecycle/role/IDOR, board/task/comment, notification,
   resource link/soft-delete, membership, payment concurrency, admin detail/filter/retry guard, MinIO
   deletion và provisioning claim/lease/force-kill recovery.
@@ -296,9 +305,9 @@ suy luận là đã nghiệm thu production.
 5. **Resource — APP-05 hoàn tất local:** file/link, quan hệ nhiều task, attach/detach, quota và soft-delete
    đã nối UI/API. Provider storage khác và kiểm chứng production vẫn để sau.
 6. **Notification — APP-05 hoàn tất local:** list/read, preference và subscription lifecycle đã nối UI;
-   in-app bắt buộc và worker xử lý event project/task/comment theo project membership. VAPID delivery thật,
-   push trình duyệt tự động, notification due/overdue theo scheduler production và email invitation thật
-   chưa nằm trong lát cắt local này.
+   in-app bắt buộc, worker xử lý event theo project membership và scheduler due/overdue chống trùng,
+   loại sự kiện stale, gửi đúng assignee qua in-app/email, điều hướng tới task và retry SMTP hữu hạn.
+   VAPID delivery thật, push trình duyệt tự động và email invitation thật chưa nằm trong lát cắt local này.
 7. **Payment, provisioning và admin UX — APP-06 hoàn tất local:** Owner/Admin xem onboarding đúng quyền;
    System Admin filter/detail payment/provisioning/transition và retry hợp lệ. Billing dashboard production,
    suspend/delete tenant và VPS operations để sau.

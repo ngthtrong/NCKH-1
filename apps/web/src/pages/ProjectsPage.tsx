@@ -1,13 +1,11 @@
-import {
-  Add,
-  ArchiveOutlined,
-  DeleteOutline,
-  EditOutlined,
-  GroupsOutlined,
-  OpenInNew,
-  SearchOutlined,
-  UnarchiveOutlined,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArchiveOutlined from '@mui/icons-material/ArchiveOutlined';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import EditOutlined from '@mui/icons-material/EditOutlined';
+import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
+import OpenInNew from '@mui/icons-material/OpenInNew';
+import SearchOutlined from '@mui/icons-material/SearchOutlined';
+import UnarchiveOutlined from '@mui/icons-material/UnarchiveOutlined';
 import {
   Alert,
   Avatar,

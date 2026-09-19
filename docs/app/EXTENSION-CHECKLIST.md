@@ -93,7 +93,8 @@
 
 ## 9. Công việc sau checkpoint local
 
-1. Hoàn thiện scheduler nhắc hạn, email/Web Push thật, payment sandbox và môi trường Internet.
+1. Scheduler nhắc hạn, điều hướng notification và retry email đã hoàn tất local; còn cấu hình SMTP/Web Push
+   thật, payment sandbox và môi trường Internet.
 2. Chốt VPS thuê hoặc máy cá nhân tự host bằng cấu hình và điều kiện vận hành cụ thể trước pilot.
 3. Đăng ký protocol bổ sung rồi mới đo ba placement; tách lượt đo chi phí module/tùy biến.
 4. Chạy pilot, khóa SLO, thực nghiệm/noisy-neighbor, đánh giá người dùng và hoàn thiện hồ sơ nghiệm thu.

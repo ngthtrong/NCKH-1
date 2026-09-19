@@ -1,11 +1,9 @@
-import {
-  AttachFile,
-  DeleteOutline,
-  DownloadOutlined,
-  InsertDriveFileOutlined,
-  LinkOutlined,
-  Upload,
-} from '@mui/icons-material';
+import AttachFile from '@mui/icons-material/AttachFile';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
+import InsertDriveFileOutlined from '@mui/icons-material/InsertDriveFileOutlined';
+import LinkOutlined from '@mui/icons-material/LinkOutlined';
+import Upload from '@mui/icons-material/Upload';
 import {
   Alert,
   Box,

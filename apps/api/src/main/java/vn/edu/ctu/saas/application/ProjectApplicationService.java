@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -436,9 +437,10 @@ public class ProjectApplicationService {
                     """, taskId, context.tenantId(), projectId, boardId, request.columnId(), request.parentTaskId(),
                     request.title().trim(), request.description(), request.priority().name(), request.assigneeUserId(),
                     timestamp(request.dueAt()), position, context.userId());
+            TaskView createdTask = findTask(jdbc, context, taskId);
             auditAndOutbox(jdbc, context, "TASK_CREATED", "Task", taskId,
-                    Map.of("boardId", boardId, "title", request.title().trim()));
-            return findTask(jdbc, context, taskId);
+                    taskEventPayload(createdTask));
+            return createdTask;
         });
     }
 
@@ -479,9 +481,15 @@ public class ProjectApplicationService {
                     request.assigneeUserId(), timestamp(request.dueAt()), position,
                     context.tenantId(), taskId, request.version());
             if (updated == 0) throw staleTaskConflict(jdbc, context, taskId);
-            auditAndOutbox(jdbc, context, "TASK_UPDATED", "Task", taskId,
-                    Map.of("columnId", request.columnId(), "version", request.version() + 1));
-            return findTask(jdbc, context, taskId);
+            TaskView updatedTask = findTask(jdbc, context, taskId);
+            Map<String, Object> payload = taskEventPayload(updatedTask);
+            payload.put("version", updatedTask.version());
+            String eventType = !Objects.equals(existing.assigneeUserId(), updatedTask.assigneeUserId())
+                    && updatedTask.assigneeUserId() != null
+                    ? "TASK_ASSIGNED"
+                    : "TASK_UPDATED";
+            auditAndOutbox(jdbc, context, eventType, "Task", taskId, payload);
+            return updatedTask;
         });
     }
 
@@ -499,10 +507,12 @@ public class ProjectApplicationService {
                     WHERE tenant_id=? AND board_id=? AND id=? AND version=?
                     """, request.targetColumnId(), request.targetPosition(), context.tenantId(), boardId, taskId, request.version());
             if (updated == 0) throw staleTaskConflict(jdbc, context, taskId);
-            auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", taskId,
-                    Map.of("columnId", request.targetColumnId(), "position", request.targetPosition(),
-                            "version", request.version() + 1));
-            return findTask(jdbc, context, taskId);
+            TaskView movedTask = findTask(jdbc, context, taskId);
+            Map<String, Object> payload = taskEventPayload(movedTask);
+            payload.put("position", movedTask.position());
+            payload.put("version", movedTask.version());
+            auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", taskId, payload);
+            return movedTask;
         });
     }
 
@@ -527,9 +537,11 @@ public class ProjectApplicationService {
                         """, item.targetColumnId(), item.targetPosition(), context.tenantId(), boardId,
                         item.taskId(), item.version());
                 if (updated == 0) throw staleTaskConflict(jdbc, context, item.taskId());
-                auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", item.taskId(),
-                        Map.of("columnId", item.targetColumnId(), "position", item.targetPosition(),
-                                "version", item.version() + 1));
+                TaskView movedTask = findTask(jdbc, context, item.taskId());
+                Map<String, Object> payload = taskEventPayload(movedTask);
+                payload.put("position", movedTask.position());
+                payload.put("version", movedTask.version());
+                auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", item.taskId(), payload);
             }
             return findBoard(jdbc, context, boardId);
         });
@@ -547,7 +559,8 @@ public class ProjectApplicationService {
                     """, context.tenantId(), taskId, taskId);
             if (deleted == 0) throw new NotFoundException("Task not found");
             auditAndOutbox(jdbc, context, "TASK_DELETED", "Task", taskId,
-                    Map.of("projectId", existing.projectId()));
+                    Map.of("projectId", existing.projectId(), "boardId", existing.boardId(),
+                            "title", existing.title()));
         });
     }
 
@@ -575,7 +588,9 @@ public class ProjectApplicationService {
             UUID id = UUID.randomUUID();
             jdbc.update("INSERT INTO comments(id,tenant_id,task_id,author_user_id,body) VALUES (?,?,?,?,?)",
                     id, context.tenantId(), taskId, context.userId(), request.body().trim());
-            auditAndOutbox(jdbc, context, "COMMENT_CREATED", "Task", taskId, Map.of("commentId", id));
+            auditAndOutbox(jdbc, context, "COMMENT_CREATED", "Task", taskId,
+                    Map.of("commentId", id, "projectId", task.projectId(), "boardId", task.boardId(),
+                            "taskTitle", task.title()));
             return jdbc.queryForObject(
                     "SELECT id,task_id,author_user_id,body,created_at FROM comments WHERE tenant_id=? AND id=?",
                     (rs, rowNum) -> new CommentView(
@@ -589,12 +604,15 @@ public class ProjectApplicationService {
         TenantContext context = TenantContextHolder.getRequired();
         return executor.write(jdbc -> {
             CommentHeader comment = requireCommentMutation(jdbc, context, commentId);
+            TaskView task = findTask(jdbc, context, comment.taskId());
             jdbc.update("""
                     UPDATE comments SET body=?,updated_at=now()
                     WHERE tenant_id=? AND id=? AND deleted_at IS NULL
                     """, request.body().trim(), context.tenantId(), commentId);
             auditAndOutbox(jdbc, context, "COMMENT_UPDATED", "Comment", commentId,
-                    Map.of("taskId", comment.taskId(), "moderated", !comment.authorUserId().equals(context.userId())));
+                    Map.of("taskId", comment.taskId(), "projectId", task.projectId(),
+                            "boardId", task.boardId(), "taskTitle", task.title(),
+                            "moderated", !comment.authorUserId().equals(context.userId())));
             return findComment(jdbc, context, commentId);
         });
     }
@@ -603,13 +621,16 @@ public class ProjectApplicationService {
         TenantContext context = TenantContextHolder.getRequired();
         executor.writeWithoutResult(jdbc -> {
             CommentHeader comment = requireCommentMutation(jdbc, context, commentId);
+            TaskView task = findTask(jdbc, context, comment.taskId());
             int deleted = jdbc.update("""
                     UPDATE comments SET deleted_at=now(),updated_at=now()
                     WHERE tenant_id=? AND id=? AND deleted_at IS NULL
                     """, context.tenantId(), commentId);
             if (deleted == 0) throw new NotFoundException("Comment not found");
             auditAndOutbox(jdbc, context, "COMMENT_DELETED", "Comment", commentId,
-                    Map.of("taskId", comment.taskId(), "moderated", !comment.authorUserId().equals(context.userId())));
+                    Map.of("taskId", comment.taskId(), "projectId", task.projectId(),
+                            "boardId", task.boardId(), "taskTitle", task.title(),
+                            "moderated", !comment.authorUserId().equals(context.userId())));
         });
     }
 
@@ -893,6 +914,18 @@ public class ProjectApplicationService {
 
     private Timestamp timestamp(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private Map<String, Object> taskEventPayload(TaskView task) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("projectId", task.projectId());
+        payload.put("boardId", task.boardId());
+        payload.put("columnId", task.columnId());
+        payload.put("title", task.title());
+        if (task.assigneeUserId() != null) {
+            payload.put("recipientUserId", task.assigneeUserId());
+        }
+        return payload;
     }
 
     private void auditAndOutbox(

@@ -1,10 +1,8 @@
-import {
-  Add,
-  DeleteOutline,
-  PlayArrowOutlined,
-  RestoreOutlined,
-  SettingsSuggestOutlined,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
+import RestoreOutlined from '@mui/icons-material/RestoreOutlined';
+import SettingsSuggestOutlined from '@mui/icons-material/SettingsSuggestOutlined';
 import {
   Alert,
   Box,

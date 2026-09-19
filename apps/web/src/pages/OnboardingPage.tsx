@@ -1,11 +1,9 @@
-import {
-  ArrowForward,
-  BusinessOutlined,
-  CheckCircleOutline,
-  CreditCardOutlined,
-  ExpandMore,
-  Refresh,
-} from '@mui/icons-material';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import CreditCardOutlined from '@mui/icons-material/CreditCardOutlined';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Refresh from '@mui/icons-material/Refresh';
 import {
   Accordion,
   AccordionDetails,

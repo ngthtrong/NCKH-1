@@ -1,13 +1,11 @@
-import {
-  ArrowBack,
-  BusinessOutlined,
-  StorageOutlined,
-  ErrorOutline,
-  Logout,
-  Refresh,
-  Search,
-  Visibility,
-} from '@mui/icons-material';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
+import ErrorOutline from '@mui/icons-material/ErrorOutline';
+import Logout from '@mui/icons-material/Logout';
+import Refresh from '@mui/icons-material/Refresh';
+import Search from '@mui/icons-material/Search';
+import StorageOutlined from '@mui/icons-material/StorageOutlined';
+import Visibility from '@mui/icons-material/Visibility';
 import {
   Alert,
   Box,

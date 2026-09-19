@@ -18,20 +18,18 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  Add,
-  AttachFile,
-  ArrowBack,
-  ArrowForward,
-  CalendarTodayOutlined,
-  ChatBubbleOutline,
-  DeleteOutline,
-  DownloadOutlined,
-  DragIndicator,
-  EditOutlined,
-  ForumOutlined,
-  TaskAlt,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import AttachFile from '@mui/icons-material/AttachFile';
+import CalendarTodayOutlined from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
+import DragIndicator from '@mui/icons-material/DragIndicator';
+import EditOutlined from '@mui/icons-material/EditOutlined';
+import ForumOutlined from '@mui/icons-material/ForumOutlined';
+import TaskAlt from '@mui/icons-material/TaskAlt';
 import {
   Alert,
   Avatar,
@@ -60,7 +58,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { approvalsApi, boardsApi, customDataApi, membersApi, projectsApi, resourcesApi, tenantSettingsApi } from '../api/endpoints';
 import type { Board, BoardColumn, Comment, ProjectRole, TaskCard, TaskPriority, UUID } from '../api/types';
@@ -282,6 +280,7 @@ function KanbanColumn({
 export function KanbanPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { session } = useAuth();
   const [board, setBoard] = useState<Board | null>(null);
@@ -333,6 +332,18 @@ export function KanbanPage() {
   useEffect(() => {
     if (!boardId) setBoard(null);
   }, [boardId]);
+  useEffect(() => {
+    const requestedTaskId = searchParams.get('task');
+    if (!board || !requestedTaskId) return;
+    if (board.columns.some((column) => column.tasks.some((task) => task.id === requestedTaskId))) {
+      setSelectedTaskId(requestedTaskId);
+    } else {
+      setSnackbar('Công việc trong thông báo không còn khả dụng.');
+    }
+    const next = new URLSearchParams(searchParams);
+    next.delete('task');
+    setSearchParams(next, { replace: true });
+  }, [board, searchParams, setSearchParams]);
 
   const selectedProject = projects.data?.find((project) => project.id === selectedProjectId);
   const needProjectPeople = Boolean(taskDialogColumn || selectedTaskId);

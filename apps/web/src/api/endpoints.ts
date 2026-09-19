@@ -145,7 +145,7 @@ function mapResource(item: RawResource): ResourceItem {
 function notificationType(eventType: string): NotificationItem['type'] {
   if (eventType.startsWith('TASK_')) return 'TASK';
   if (eventType.startsWith('COMMENT_')) return 'COMMENT';
-  if (eventType.startsWith('MEMBERSHIP_')) return 'MEMBERSHIP';
+  if (eventType.includes('MEMBERSHIP')) return 'MEMBERSHIP';
   return 'SYSTEM';
 }
 
@@ -401,6 +401,7 @@ export const notificationsApi = {
       title: item.title,
       message: item.body,
       type: notificationType(item.eventType),
+      actionUrl: item.actionUrl ?? undefined,
       readAt: item.readAt ?? undefined,
       createdAt: item.createdAt,
     })),

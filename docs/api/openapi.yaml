@@ -2068,6 +2068,7 @@ components:
         eventType: {type: string}
         title: {type: string}
         body: {type: string}
+        actionUrl: {anyOf: [{type: string, pattern: '^/'}, {type: 'null'}]}
         readAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
         createdAt: {$ref: '#/components/schemas/Instant'}
     NotificationPreferences:

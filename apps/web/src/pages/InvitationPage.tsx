@@ -1,9 +1,7 @@
-import {
-  ArrowForward,
-  CheckCircleOutline,
-  GroupAddOutlined,
-  Login,
-} from '@mui/icons-material';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import GroupAddOutlined from '@mui/icons-material/GroupAddOutlined';
+import Login from '@mui/icons-material/Login';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom';

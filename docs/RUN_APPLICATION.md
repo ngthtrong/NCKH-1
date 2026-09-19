@@ -122,7 +122,14 @@ tra theo vai trò trong từng project.
 3. Ở Schema-per-tenant, bật Custom Data, tạo bảng nghiệp vụ hoặc field Task và nhập dữ liệu.
 4. Ở Silo, bật Approval/Automation, cấu hình workflow, gửi Task để duyệt và xem lịch sử execution.
 5. Đăng nhập tài khoản member để kiểm tra vai trò project, notification và các thao tác bị giới hạn.
-6. Mở Mailpit để xem email local; email này không được gửi ra Internet.
+6. Tạo task có người được giao và deadline trong 24 giờ (hoặc đã quá hạn), chờ worker quét rồi kiểm tra
+   thông báo in-app của đúng assignee. Bấm thông báo để mở thẳng task tương ứng.
+7. Mở Mailpit để xem email local; email này không được gửi ra Internet. Worker email tách khỏi outbox nghiệp
+   vụ, thử tối đa năm lần và tôn trọng preference mới nhất trước lúc gửi.
+
+Khoảng nhắc/quét có thể chỉnh bằng `DEADLINE_REMINDER_LEAD`, `DEADLINE_REMINDER_POLL_INTERVAL` và
+`NOTIFICATION_DELIVERY_POLL_INTERVAL` trong `infra/.env`. Khi đổi domain/port, đặt
+`PUBLIC_TENANT_URL_TEMPLATE` với đúng một `%s` cho tenant slug để link trong email trỏ đúng ứng dụng.
 
 ## 8. Kiểm tra health và log
 
