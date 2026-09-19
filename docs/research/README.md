@@ -6,6 +6,7 @@ Thư mục này là nguồn làm việc cho các đầu ra nghiên cứu của �
 
 | Tài liệu | Mục đích | Trạng thái ban đầu |
 | --- | --- | --- |
+| [GROUP_RESEARCH_EXECUTION_GUIDE.md](GROUP_RESEARCH_EXECUTION_GUIDE.md) | Kịch bản nhóm phê duyệt protocol, chạy pilot/experiment, QA dữ liệu và đánh giá người dùng | Bản nháp để nhóm duyệt trước khi thu số liệu chính thức |
 | [GROUP_READINESS_BRIEF_2026-09-18.md](GROUP_READINESS_BRIEF_2026-09-18.md) | Báo cáo sẵn sàng, kịch bản demo và quyết định cần chốt trước nghiên cứu | GO cho báo cáo nhóm/pilot; chưa cho phép thu dữ liệu chính thức |
 | [protocol.md](protocol.md) | Giao thức nghiên cứu, dữ liệu, đạo đức và quản lý thay đổi | Đã thiết lập; chờ nhóm khóa ngày tìm kiếm |
 | [traceability-matrix.md](traceability-matrix.md) | Truy vết câu hỏi → phương pháp → bằng chứng → sản phẩm | Đã thiết lập; cập nhật suốt đề tài |
