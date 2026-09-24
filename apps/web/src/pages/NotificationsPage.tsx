@@ -1,12 +1,10 @@
-import {
-  Check,
-  CommentOutlined,
-  DeleteOutline,
-  GroupAddOutlined,
-  NotificationsOutlined,
-  SettingsOutlined,
-  TaskAltOutlined,
-} from '@mui/icons-material';
+import Check from '@mui/icons-material/Check';
+import CommentOutlined from '@mui/icons-material/CommentOutlined';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import GroupAddOutlined from '@mui/icons-material/GroupAddOutlined';
+import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
+import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
+import TaskAltOutlined from '@mui/icons-material/TaskAltOutlined';
 import {
   Alert,
   Box,

@@ -26,6 +26,9 @@ const DashboardPage = lazy(() =>
 const ProjectsPage = lazy(() =>
   import('./pages/ProjectsPage').then((module) => ({ default: module.ProjectsPage })),
 );
+const ProjectWorkspacePage = lazy(() =>
+  import('./pages/ProjectWorkspacePage').then((module) => ({ default: module.ProjectWorkspacePage })),
+);
 const KanbanPage = lazy(() =>
   import('./pages/KanbanPage').then((module) => ({ default: module.KanbanPage })),
 );
@@ -67,6 +70,7 @@ export function App() {
           <Route element={<AppShell />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:projectId" element={<ProjectWorkspacePage />} />
             <Route path="/kanban" element={<KanbanPage />} />
             <Route path="/kanban/:boardId" element={<KanbanPage />} />
             <Route path="/members" element={<MembersPage />} />

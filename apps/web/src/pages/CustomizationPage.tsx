@@ -1,10 +1,8 @@
-import {
-  Add,
-  DeleteOutline,
-  PlayArrowOutlined,
-  RestoreOutlined,
-  SettingsSuggestOutlined,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
+import RestoreOutlined from '@mui/icons-material/RestoreOutlined';
+import SettingsSuggestOutlined from '@mui/icons-material/SettingsSuggestOutlined';
 import {
   Alert,
   Box,
@@ -28,7 +26,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   approvalsApi,
   automationApi,
@@ -91,8 +90,11 @@ function FieldInput({ field, value, onChange }: {
 
 export function CustomizationPage() {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const requestedProjectId = searchParams.get('project') as UUID | null;
+  const appliedRequestedProject = useRef(false);
   const [tab, setTab] = useState(0);
-  const [projectId, setProjectId] = useState<UUID | ''>('');
+  const [projectId, setProjectId] = useState<UUID | ''>(requestedProjectId ?? '');
   const [boardId, setBoardId] = useState<UUID | ''>('');
   const [definitionId, setDefinitionId] = useState<UUID | ''>('');
   const [error, setError] = useState('');
@@ -125,8 +127,16 @@ export function CustomizationPage() {
   });
 
   useEffect(() => {
-    if (!projectId && projects.data?.[0]) setProjectId(projects.data[0].id);
-  }, [projectId, projects.data]);
+    if (!projects.data) return;
+    if (!appliedRequestedProject.current) {
+      appliedRequestedProject.current = true;
+      if (requestedProjectId && projects.data.some((project) => project.id === requestedProjectId)) {
+        setProjectId(requestedProjectId);
+        return;
+      }
+    }
+    setProjectId((current) => current || projects.data[0]?.id || '');
+  }, [projects.data, requestedProjectId]);
   useEffect(() => {
     setBoardId(boards.data?.[0]?.id ?? '');
   }, [projectId, boards.data]);
@@ -146,16 +156,16 @@ export function CustomizationPage() {
     settings.data?.capabilities.find((item) => item.capability === name);
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3} className="customization-page">
       <PageHeader
-        eyebrow="Bridge customization"
-        title="Mở rộng nghiệp vụ"
-        description="Cấu hình dữ liệu, phê duyệt và tự động hóa trong giới hạn placement và capability đã cấp."
+        eyebrow="Công cụ dự án"
+        title="Tùy biến dự án"
+        description="Cấu hình dữ liệu, quy trình phê duyệt và tự động hóa cho dự án được chọn."
       />
       {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
       {projects.isError && <Alert severity="error">{errorMessage(projects.error)}</Alert>}
       {settings.isError && <Alert severity="error">{errorMessage(settings.error)}</Alert>}
-      <FormControl size="small" sx={{ maxWidth: 420 }}>
+      <FormControl size="small" sx={{ width: '100%', maxWidth: 420 }}>
         <InputLabel>Dự án</InputLabel>
         <Select value={projectId} label="Dự án" onChange={(event) => setProjectId(event.target.value as UUID)}>
           {(projects.data ?? []).map((project) => <MenuItem key={project.id} value={project.id}>{project.name}</MenuItem>)}

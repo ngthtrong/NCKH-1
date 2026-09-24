@@ -14,12 +14,15 @@ from analyze_results import parse_metric_name, run_analysis  # noqa: E402
 
 
 class AnalyzeResultsTest(unittest.TestCase):
-    def write_synthetic_unit_fixture(self, root: Path) -> None:
+    def write_synthetic_unit_fixture(self, root: Path, run_class: str = "experiment") -> None:
         run_directory = root / "synthetic-unit-fixture"
         run_directory.mkdir(parents=True)
         manifest = {
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "data_kind": "measured",
+            "run_class": run_class,
+            "eligible_for_final_analysis": run_class == "experiment",
+            "protocol_id": "synthetic-unit-protocol" if run_class == "experiment" else None,
             "run_id": "synthetic-unit-fixture",
             "status": "succeeded",
             "started_at_utc": "2026-01-01T00:00:00Z",
@@ -84,6 +87,25 @@ class AnalyzeResultsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
             self.assertEqual(run_analysis(root / "missing", root / "output"), 2)
+
+    def test_development_runs_are_excluded_from_final_analysis(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            input_root = root / "input"
+            self.write_synthetic_unit_fixture(input_root, run_class="development")
+
+            self.assertEqual(run_analysis(input_root, root / "formal-output"), 2)
+            self.assertEqual(
+                run_analysis(
+                    input_root,
+                    root / "development-output",
+                    minimum_replicates=1,
+                    run_class="development",
+                ),
+                0,
+            )
+            report = (root / "development-output" / "report.md").read_text(encoding="utf-8")
+            self.assertIn("không đủ điều kiện", report)
 
 
 if __name__ == "__main__":

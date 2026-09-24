@@ -146,21 +146,32 @@ def start_manifest(args: argparse.Namespace) -> int:
     if not RUN_ID_PATTERN.fullmatch(args.run_id):
         raise ValueError("run-id must contain only letters, digits, dots, underscores, or hyphens")
 
+    source = git_metadata()
+    protocol_id = os.environ.get("EXPERIMENT_PROTOCOL_ID") or None
+    if args.run_class == "experiment":
+        if source["git_dirty"] is not False:
+            raise ValueError("experiment runs require a clean Git worktree")
+        if protocol_id is None:
+            raise ValueError("experiment runs require EXPERIMENT_PROTOCOL_ID")
+
     workload = {
         key.lower(): os.environ[key]
         for key in WORKLOAD_ENVIRONMENT_KEYS
         if os.environ.get(key) not in (None, "")
     }
     payload: dict[str, Any] = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "data_kind": "measured",
+        "run_class": args.run_class,
+        "eligible_for_final_analysis": args.run_class == "experiment",
+        "protocol_id": protocol_id,
         "run_id": args.run_id,
         "status": "running",
         "started_at_utc": utc_now(),
         "finished_at_utc": None,
         "scenario": args.scenario,
         "rate_limit_variant": args.variant,
-        "source": git_metadata(),
+        "source": source,
         "target": {
             "environment_label": os.environ.get("EXPERIMENT_ENVIRONMENT", "local"),
             "base_url": sanitize_url(os.environ.get("BASE_URL", "http://127.0.0.1:8080")),
@@ -216,6 +227,11 @@ def parser() -> argparse.ArgumentParser:
         "--scenario",
         choices=("smoke", "baseline", "load", "stress", "noisy-neighbor"),
         required=True,
+    )
+    start.add_argument(
+        "--run-class",
+        choices=("development", "pilot", "experiment"),
+        default="development",
     )
     start.add_argument("--variant", choices=("not-applicable", "before", "after"), required=True)
     start.add_argument("--script", required=True)

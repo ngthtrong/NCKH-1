@@ -90,6 +90,7 @@ function mapBoard(raw: RawBoard): Board {
       id: column.id,
       name: column.name,
       position: Number(column.position),
+      completed: column.completed,
       tasks: raw.tasks
         .filter((task) => task.columnId === column.id)
         .map((task) => ({
@@ -98,16 +99,16 @@ function mapBoard(raw: RawBoard): Board {
           parentTaskId: task.parentTaskId ?? undefined,
           title: task.title,
           description: task.description ?? undefined,
-          priority: 'MEDIUM',
+          priority: task.priority,
           assignee: task.assigneeUserId
             ? { id: task.assigneeUserId, email: '', displayName: 'Thành viên', platformRoles: [] }
             : undefined,
           dueDate: task.dueAt ?? undefined,
           position: Number(task.position),
           version: task.version,
-          subtaskCount: raw.tasks.filter((candidate) => candidate.parentTaskId === task.id).length,
-          completedSubtaskCount: 0,
-          commentCount: 0,
+          subtaskCount: task.subtaskCount,
+          completedSubtaskCount: task.completedSubtaskCount,
+          commentCount: task.commentCount,
         })),
     })),
   };
@@ -144,7 +145,7 @@ function mapResource(item: RawResource): ResourceItem {
 function notificationType(eventType: string): NotificationItem['type'] {
   if (eventType.startsWith('TASK_')) return 'TASK';
   if (eventType.startsWith('COMMENT_')) return 'COMMENT';
-  if (eventType.startsWith('MEMBERSHIP_')) return 'MEMBERSHIP';
+  if (eventType.includes('MEMBERSHIP')) return 'MEMBERSHIP';
   return 'SYSTEM';
 }
 
@@ -175,10 +176,14 @@ export const tenantsApi = {
 };
 
 export const paymentsApi = {
-  createSession: (tenantId: UUID, payload: ApiSchemas['CreatePaymentRequest']) =>
+  createSession: (
+    tenantId: UUID,
+    payload: ApiSchemas['CreatePaymentRequest'],
+    idempotencyKey: string,
+  ) =>
     request<PaymentSession>(`/tenants/${tenantId}/payment-session`, {
       method: 'POST',
-      headers: { 'Idempotency-Key': `onboarding-${tenantId}` },
+      headers: { 'Idempotency-Key': idempotencyKey },
       body: payload,
     }),
   completeFake: (tenantId: UUID, paymentId: UUID) =>
@@ -278,6 +283,7 @@ export const boardsApi = {
         parentTaskId: payload.parentTaskId,
         title: payload.title,
         description: payload.description,
+        priority: payload.priority,
         assigneeUserId: payload.assigneeId,
         dueAt: payload.dueDate,
       },
@@ -296,6 +302,7 @@ export const boardsApi = {
         columnId: payload.columnId,
         title: payload.title,
         description: payload.description,
+        priority: payload.priority,
         assigneeUserId: payload.assigneeId,
         dueAt: payload.dueDate,
         position: payload.position,
@@ -394,6 +401,7 @@ export const notificationsApi = {
       title: item.title,
       message: item.body,
       type: notificationType(item.eventType),
+      actionUrl: item.actionUrl ?? undefined,
       readAt: item.readAt ?? undefined,
       createdAt: item.createdAt,
     })),

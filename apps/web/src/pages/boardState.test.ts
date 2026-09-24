@@ -12,6 +12,7 @@ const board: Board = {
       id: 'todo',
       name: 'To do',
       position: 0,
+      completed: false,
       tasks: [
         {
           id: 'task-1',
@@ -37,7 +38,7 @@ const board: Board = {
         },
       ],
     },
-    { id: 'doing', name: 'Doing', position: 1, taskLimit: 2, tasks: [] },
+    { id: 'doing', name: 'Doing', position: 1, completed: false, taskLimit: 2, tasks: [] },
   ],
 };
 

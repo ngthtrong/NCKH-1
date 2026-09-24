@@ -44,16 +44,18 @@ public final class ApplicationDtos {
             List<ColumnView> columns,
             List<TaskView> tasks) {}
     public record BoardSummaryView(UUID id, UUID projectId, String name, long version, Instant createdAt) {}
-    public record ColumnView(UUID id, String name, BigDecimal position) {}
+    public record ColumnView(UUID id, String name, BigDecimal position, boolean completed) {}
     public record CreateBoardRequest(@NotBlank @Size(max = 160) String name) {}
     public record UpdateBoardRequest(
             @NotBlank @Size(max = 160) String name,
             @NotNull @PositiveOrZero Long version) {}
     public record CreateColumnRequest(
             @NotBlank @Size(max = 120) String name,
+            @NotNull Boolean completed,
             @NotNull @PositiveOrZero Long version) {}
     public record UpdateColumnRequest(
             @NotBlank @Size(max = 120) String name,
+            @NotNull Boolean completed,
             @NotNull @PositiveOrZero Long version) {}
     public record ReorderColumnsRequest(
             @NotEmpty List<@NotNull UUID> columnIds,
@@ -67,10 +69,14 @@ public final class ApplicationDtos {
             UUID parentTaskId,
             String title,
             String description,
+            TaskPriority priority,
             UUID assigneeUserId,
             Instant dueAt,
             BigDecimal position,
             long version,
+            long subtaskCount,
+            long completedSubtaskCount,
+            long commentCount,
             Instant createdAt,
             Instant updatedAt) {}
     public record CreateTaskRequest(
@@ -78,6 +84,7 @@ public final class ApplicationDtos {
             UUID parentTaskId,
             @NotBlank @Size(max = 240) String title,
             @Size(max = 10000) String description,
+            @NotNull TaskPriority priority,
             UUID assigneeUserId,
             Instant dueAt,
             BigDecimal position) {}
@@ -85,6 +92,7 @@ public final class ApplicationDtos {
             @NotNull UUID columnId,
             @NotBlank @Size(max = 240) String title,
             @Size(max = 10000) String description,
+            @NotNull TaskPriority priority,
             UUID assigneeUserId,
             Instant dueAt,
             BigDecimal position,

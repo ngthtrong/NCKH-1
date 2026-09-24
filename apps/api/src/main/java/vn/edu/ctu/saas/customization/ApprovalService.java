@@ -108,6 +108,12 @@ public class ApprovalService {
                             UUID.randomUUID(), context.tenantId(), stepId, approver);
                 }
             }
+            if (enabled) {
+                jdbc.update("""
+                        UPDATE board_columns SET completed=(id=?),updated_at=now()
+                        WHERE tenant_id=? AND board_id=?
+                        """, completionColumnId, context.tenantId(), boardId);
+            }
             auditAndOutbox(jdbc, context, "APPROVAL_WORKFLOW_SAVED", "ApprovalWorkflow", workflowId,
                     Map.of("boardId", boardId, "version", newVersion));
             return workflowWithSteps(jdbc, context, workflowBases(jdbc, context, boardId).getFirst());

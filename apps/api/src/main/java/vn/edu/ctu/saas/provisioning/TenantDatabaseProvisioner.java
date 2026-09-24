@@ -19,7 +19,7 @@ import vn.edu.ctu.saas.tenant.TenantPlacement;
 
 @Component
 public class TenantDatabaseProvisioner {
-    public static final String LATEST_APPLICATION_SCHEMA_VERSION = "8";
+    public static final String LATEST_APPLICATION_SCHEMA_VERSION = "12";
 
     private final AppProperties properties;
     private final PlacementSecretCipher cipher;

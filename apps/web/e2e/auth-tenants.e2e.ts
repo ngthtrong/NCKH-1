@@ -8,6 +8,12 @@ import {
 
 type Placement = 'POOL' | 'SCHEMA_PER_TENANT' | 'SILO_DATABASE';
 
+const placementLabels: Record<Placement, string> = {
+  POOL: 'Hạ tầng dùng chung',
+  SCHEMA_PER_TENANT: 'Lược đồ riêng',
+  SILO_DATABASE: 'CSDL riêng',
+};
+
 interface TenantCase {
   label: string;
   slug: string;
@@ -32,6 +38,7 @@ interface Credentials {
 interface ProjectView {
   id: string;
   name: string;
+  status: 'ACTIVE' | 'ARCHIVED';
   role: 'MANAGER' | 'MEMBER' | 'VIEWER';
   boardId: string | null;
 }
@@ -45,6 +52,7 @@ interface BoardColumnView {
   id: string;
   name: string;
   position: number;
+  completed: boolean;
 }
 
 interface TaskView {
@@ -65,6 +73,7 @@ interface NotificationView {
   id: string;
   eventType: string;
   body: string;
+  actionUrl: string | null;
   readAt: string | null;
 }
 
@@ -182,7 +191,7 @@ async function loginAndSelectTenant(
 
   const tenantCard = page.locator('.tenant-card').filter({ hasText: tenant.slug });
   await expect(tenantCard, `Tenant ${tenant.slug} must be present in the account selector`).toHaveCount(1);
-  await expect(tenantCard).toContainText(tenant.placement);
+  await expect(tenantCard).toContainText(placementLabels[tenant.placement]);
 
   const exchangeResponsePromise = page.waitForResponse(
     (response) =>
@@ -401,7 +410,7 @@ test.describe('tenant authentication and host binding', () => {
         const createdBoard = await expectJson<BoardView>(
           await tenantApi(request, tenant, managerToken, `/boards/${initialBoard.id}/columns`, {
             method: 'POST',
-            data: { name: managerColumnName, version: initialBoard.version },
+            data: { name: managerColumnName, completed: false, version: initialBoard.version },
           }),
           201,
           'Manager creates a board column',
@@ -443,7 +452,11 @@ test.describe('tenant authentication and host binding', () => {
             `/boards/${initialBoard.id}/columns/${managerColumn!.id}`,
             {
               method: 'PATCH',
-              data: { name: renamedColumnName, version: boardAfterConflict.version },
+              data: {
+                name: renamedColumnName,
+                completed: managerColumn!.completed,
+                version: boardAfterConflict.version,
+              },
             },
           ),
           200,
@@ -493,12 +506,14 @@ test.describe('tenant authentication and host binding', () => {
             data: {
               columnId: reorderedBoard.columns.find((column) => column.id !== managerColumn!.id)!.id,
               title: `${artifactPrefix} member task`,
+              priority: 'MEDIUM',
             },
           }),
           201,
           'Member creates a task',
         );
         createdTaskId = memberTask.id;
+        const expectedTaskActionUrl = `/kanban/${initialBoard.id}?task=${createdTaskId}`;
         await expectStatus(
           await tenantApi(
             request,
@@ -521,7 +536,7 @@ test.describe('tenant authentication and host binding', () => {
           deliveredNotification = notifications.find(
             (notification) =>
               notification.eventType === 'TASK_CREATED' &&
-              notification.body.includes(createdTaskId!),
+              notification.actionUrl === expectedTaskActionUrl,
           );
           return deliveredNotification !== undefined;
         }, {
@@ -534,7 +549,7 @@ test.describe('tenant authentication and host binding', () => {
           'Foreign tenant notification list',
         );
         expect(
-          foreignNotifications.some((notification) => notification.body.includes(createdTaskId!)),
+          foreignNotifications.some((notification) => notification.actionUrl === expectedTaskActionUrl),
           'The task event must not be delivered to the same user in another tenant',
         ).toBe(false);
         expect(deliveredNotification).toBeDefined();
@@ -590,6 +605,7 @@ test.describe('tenant authentication and host binding', () => {
             data: {
               columnId: viewerBoard.columns[0].id,
               title: `${artifactPrefix} viewer task`,
+              priority: 'MEDIUM',
             },
           }),
           403,
@@ -611,17 +627,37 @@ test.describe('tenant authentication and host binding', () => {
           200,
           'Viewer downloads a resource attached to an authorized project',
         );
-        await expectStatus(
-          await uploadTenantResource(
-            request,
-            tenant,
-            memberToken,
-            `viewer-denied-${resourceName}`,
-            'must not be stored',
-          ),
-          403,
-          'Viewer resource upload',
+        const viewerProjects = await expectJson<ProjectView[]>(
+          await tenantApi(request, tenant, memberToken, '/projects'),
+          200,
+          'Viewer project list used to evaluate tenant-wide upload permission',
         );
+        const canUploadTenantResource = viewerProjects.some(
+          (candidate) => candidate.status === 'ACTIVE' && candidate.role !== 'VIEWER',
+        );
+        const viewerUploadResponse = await uploadTenantResource(
+          request,
+          tenant,
+          memberToken,
+          `viewer-policy-${resourceName}`,
+          'tenant-wide upload policy',
+        );
+        if (canUploadTenantResource) {
+          const viewerUploadedResource = await expectJson<ResourceView>(
+            viewerUploadResponse,
+            200,
+            'Member of another active project can upload a tenant resource',
+          );
+          await expectStatus(
+            await tenantApi(request, tenant, memberToken, `/resources/${viewerUploadedResource.id}`, {
+              method: 'DELETE',
+            }),
+            200,
+            'Uploader removes its unlinked policy-check resource',
+          );
+        } else {
+          await expectStatus(viewerUploadResponse, 403, 'Viewer-only user cannot upload resources');
+        }
         await expectStatus(
           await tenantApi(request, tenant, memberToken, `/resources/${createdResourceId}`, {
             method: 'DELETE',
@@ -873,11 +909,11 @@ async function assertColumnMutationsForbidden(
   const operations = [
     tenantApi(request, tenant, accessToken, `/boards/${board.id}/columns`, {
       method: 'POST',
-      data: { name: deniedColumnName, version: board.version },
+      data: { name: deniedColumnName, completed: false, version: board.version },
     }),
     tenantApi(request, tenant, accessToken, `/boards/${board.id}/columns/${targetColumnId}`, {
       method: 'PATCH',
-      data: { name: deniedColumnName, version: board.version },
+      data: { name: deniedColumnName, completed: false, version: board.version },
     }),
     tenantApi(request, tenant, accessToken, `/boards/${board.id}/columns/order`, {
       method: 'PUT',

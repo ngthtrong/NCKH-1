@@ -64,6 +64,7 @@ class PaymentServiceTest {
         UUID userId = UUID.randomUUID();
         UUID requestedTenant = UUID.randomUUID();
         ownerMembership(userId, requestedTenant);
+        tenant(requestedTenant, "STARTER");
 
         PaymentTransactionEntity existing = payment(UUID.randomUUID(), UUID.randomUUID(), PaymentStatus.PENDING);
         existing.setIdempotencyKey("payment-key-001");
@@ -77,6 +78,23 @@ class PaymentServiceTest {
                 "http://alpha.localhost:8080/payment"))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("different payment request");
+        verify(provider, never()).createSession(any(), anyLong(), any(), any());
+    }
+
+    @Test
+    void rejectsClientPriceThatDoesNotMatchTenantTier() {
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        ownerMembership(userId, tenantId);
+        tenant(tenantId, "PROFESSIONAL");
+
+        assertThatThrownBy(() -> service.createSession(
+                userId, tenantId, "payment-key-003", 100_000, "VND",
+                "http://alpha.localhost:8080/payment"))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("selected tenant tier");
+
+        verify(payments, never()).save(any());
         verify(provider, never()).createSession(any(), anyLong(), any(), any());
     }
 
@@ -235,6 +253,15 @@ class PaymentServiceTest {
         membership.setRole(TenantRole.OWNER);
         membership.setActive(true);
         when(memberships.findByTenantIdAndUserId(tenantId, userId)).thenReturn(Optional.of(membership));
+    }
+
+    private TenantEntity tenant(UUID tenantId, String tier) {
+        TenantEntity tenant = new TenantEntity();
+        tenant.setId(tenantId);
+        tenant.setTier(tier);
+        tenant.setStatus(TenantStatus.PENDING_PAYMENT);
+        when(tenants.findById(tenantId)).thenReturn(Optional.of(tenant));
+        return tenant;
     }
 
     private PaymentTransactionEntity payment(UUID id, UUID tenantId, PaymentStatus status) {

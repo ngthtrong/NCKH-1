@@ -18,22 +18,23 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  Add,
-  ArrowBack,
-  ArrowForward,
-  CalendarTodayOutlined,
-  ChatBubbleOutline,
-  DeleteOutline,
-  DragIndicator,
-  EditOutlined,
-  ForumOutlined,
-  TaskAlt,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import AttachFile from '@mui/icons-material/AttachFile';
+import CalendarTodayOutlined from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
+import DragIndicator from '@mui/icons-material/DragIndicator';
+import EditOutlined from '@mui/icons-material/EditOutlined';
+import ForumOutlined from '@mui/icons-material/ForumOutlined';
+import TaskAlt from '@mui/icons-material/TaskAlt';
 import {
   Alert,
   Avatar,
   Box,
+  Breadcrumbs,
   Button,
   Checkbox,
   Chip,
@@ -46,6 +47,7 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
+  Link,
   MenuItem,
   Paper,
   Select,
@@ -56,9 +58,9 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
-import { approvalsApi, boardsApi, customDataApi, membersApi, projectsApi, tenantSettingsApi } from '../api/endpoints';
+import { approvalsApi, boardsApi, customDataApi, membersApi, projectsApi, resourcesApi, tenantSettingsApi } from '../api/endpoints';
 import type { Board, BoardColumn, Comment, ProjectRole, TaskCard, TaskPriority, UUID } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
@@ -76,6 +78,12 @@ function shortDate(value: string): string {
   return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit' }).format(
     new Date(value),
   );
+}
+
+function localDateTimeValue(value: string): string {
+  const date = new Date(value);
+  const offset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
 function TaskCardView({
@@ -196,6 +204,7 @@ function KanbanColumn({
       <Stack direction="row" alignItems="center" gap={1} className="kanban-column__header">
         <span className="kanban-column__dot" />
         <Typography fontWeight={750}>{column.name}</Typography>
+        {column.completed && <Chip label="Hoàn tất" size="small" color="success" variant="outlined" />}
         <Chip label={column.tasks.length} size="small" />
         <Box flex={1} />
         {column.taskLimit && (
@@ -271,6 +280,7 @@ function KanbanColumn({
 export function KanbanPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { session } = useAuth();
   const [board, setBoard] = useState<Board | null>(null);
@@ -281,11 +291,13 @@ export function KanbanPage() {
   const [taskParentId, setTaskParentId] = useState<UUID | undefined>();
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
+  const [taskPriority, setTaskPriority] = useState<TaskPriority>('MEDIUM');
   const [taskDueAt, setTaskDueAt] = useState('');
   const [taskAssigneeId, setTaskAssigneeId] = useState<UUID | ''>('');
   const [selectedTaskId, setSelectedTaskId] = useState<UUID | null>(null);
   const [detailTitle, setDetailTitle] = useState('');
   const [detailDescription, setDetailDescription] = useState('');
+  const [detailPriority, setDetailPriority] = useState<TaskPriority>('MEDIUM');
   const [detailDueAt, setDetailDueAt] = useState('');
   const [detailAssigneeId, setDetailAssigneeId] = useState<UUID | ''>('');
   const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
@@ -298,6 +310,7 @@ export function KanbanPage() {
     { mode: 'create' } | { mode: 'rename'; column: BoardColumn } | null
   >(null);
   const [columnName, setColumnName] = useState('');
+  const [columnCompleted, setColumnCompleted] = useState(false);
   const [deleteColumnTarget, setDeleteColumnTarget] = useState<BoardColumn | null>(null);
   const projects = useQuery({ queryKey: ['projects'], queryFn: projectsApi.list });
   const projectBoards = useQuery({
@@ -319,6 +332,18 @@ export function KanbanPage() {
   useEffect(() => {
     if (!boardId) setBoard(null);
   }, [boardId]);
+  useEffect(() => {
+    const requestedTaskId = searchParams.get('task');
+    if (!board || !requestedTaskId) return;
+    if (board.columns.some((column) => column.tasks.some((task) => task.id === requestedTaskId))) {
+      setSelectedTaskId(requestedTaskId);
+    } else {
+      setSnackbar('Công việc trong thông báo không còn khả dụng.');
+    }
+    const next = new URLSearchParams(searchParams);
+    next.delete('task');
+    setSearchParams(next, { replace: true });
+  }, [board, searchParams, setSearchParams]);
 
   const selectedProject = projects.data?.find((project) => project.id === selectedProjectId);
   const needProjectPeople = Boolean(taskDialogColumn || selectedTaskId);
@@ -336,6 +361,16 @@ export function KanbanPage() {
     queryKey: ['task-comments', selectedTaskId],
     queryFn: () => boardsApi.comments(selectedTaskId as UUID),
     enabled: Boolean(selectedTaskId),
+  });
+  const resources = useQuery({
+    queryKey: ['resources'],
+    queryFn: resourcesApi.list,
+    enabled: Boolean(selectedTaskId),
+  });
+  const downloadResource = useMutation({
+    mutationFn: resourcesApi.downloadUrl,
+    onSuccess: ({ url }) => window.open(url, '_blank', 'noopener,noreferrer'),
+    onError: (cause) => setSnackbar(errorMessage(cause)),
   });
   const tenantSettings = useQuery({
     queryKey: ['tenant-settings'],
@@ -396,7 +431,7 @@ export function KanbanPage() {
         assigneeId: taskAssigneeId || undefined,
         dueDate: taskDueAt ? new Date(taskDueAt).toISOString() : undefined,
         parentTaskId: taskParentId,
-        priority: 'MEDIUM',
+        priority: taskPriority,
       }),
     onSuccess: (updatedBoard) => {
       setBoard(updatedBoard);
@@ -405,28 +440,35 @@ export function KanbanPage() {
       setTaskParentId(undefined);
       setTaskTitle('');
       setTaskDescription('');
+      setTaskPriority('MEDIUM');
       setTaskDueAt('');
       setTaskAssigneeId('');
     },
     onError: (cause) => setSnackbar(errorMessage(cause)),
   });
   const createColumn = useMutation({
-    mutationFn: ({ name, version }: { name: string; version: number }) =>
-      boardsApi.createColumn(boardId!, { name, version }),
+    mutationFn: ({ name, completed, version }: { name: string; completed: boolean; version: number }) =>
+      boardsApi.createColumn(boardId!, { name, completed, version }),
     onSuccess: (updatedBoard) => {
       acceptBoard(updatedBoard);
       setColumnDialog(null);
       setColumnName('');
+      setColumnCompleted(false);
     },
     onError: handleColumnError,
   });
   const renameColumn = useMutation({
-    mutationFn: ({ columnId, name, version }: { columnId: UUID; name: string; version: number }) =>
-      boardsApi.updateColumn(boardId!, columnId, { name, version }),
+    mutationFn: ({ columnId, name, completed, version }: {
+      columnId: UUID;
+      name: string;
+      completed: boolean;
+      version: number;
+    }) => boardsApi.updateColumn(boardId!, columnId, { name, completed, version }),
     onSuccess: (updatedBoard) => {
       acceptBoard(updatedBoard);
       setColumnDialog(null);
       setColumnName('');
+      setColumnCompleted(false);
     },
     onError: handleColumnError,
   });
@@ -488,6 +530,7 @@ export function KanbanPage() {
         columnId: task.columnId,
         title: detailTitle.trim(),
         description: detailDescription.trim() || undefined,
+        priority: detailPriority,
         assigneeId: detailAssigneeId || undefined,
         dueDate: detailDueAt ? new Date(detailDueAt).toISOString() : undefined,
         position: task.position,
@@ -517,7 +560,10 @@ export function KanbanPage() {
     mutationFn: () => boardsApi.addComment(selectedTaskId as UUID, commentBody.trim()),
     onSuccess: async () => {
       setCommentBody('');
-      await queryClient.invalidateQueries({ queryKey: ['task-comments', selectedTaskId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['task-comments', selectedTaskId] }),
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] }),
+      ]);
     },
     onError: (cause) => setSnackbar(errorMessage(cause)),
   });
@@ -532,7 +578,10 @@ export function KanbanPage() {
   });
   const deleteComment = useMutation({
     mutationFn: boardsApi.deleteComment,
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['task-comments', selectedTaskId] }),
+    onSuccess: () => void Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['task-comments', selectedTaskId] }),
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] }),
+    ]),
     onError: (cause) => setSnackbar(errorMessage(cause)),
   });
   const saveCustomValues = useMutation({
@@ -613,6 +662,8 @@ export function KanbanPage() {
   const canManageColumns = projectActive && selectedProject?.role === 'MANAGER';
   const selectedTask = board?.columns.flatMap((column) => column.tasks)
     .find((task) => task.id === selectedTaskId);
+  const attachedResources = (resources.data?.items ?? [])
+    .filter((resource) => selectedTaskId && resource.taskIds.includes(selectedTaskId));
   const latestApproval = approvalRuns.data?.[0];
   const currentApprovalStep = latestApproval?.steps.find(
     (step) => step.position === latestApproval.currentStep && step.status === 'PENDING',
@@ -636,6 +687,7 @@ export function KanbanPage() {
 
   const openCreateColumn = () => {
     setColumnName('');
+    setColumnCompleted(false);
     setColumnDialog({ mode: 'create' });
   };
 
@@ -644,6 +696,7 @@ export function KanbanPage() {
     setTaskParentId(parentTaskId);
     setTaskTitle('');
     setTaskDescription('');
+    setTaskPriority('MEDIUM');
     setTaskDueAt('');
     setTaskAssigneeId('');
   };
@@ -655,7 +708,8 @@ export function KanbanPage() {
     setSelectedTaskId(taskId);
     setDetailTitle(task.title);
     setDetailDescription(task.description ?? '');
-    setDetailDueAt(task.dueDate?.slice(0, 16) ?? '');
+    setDetailPriority(task.priority);
+    setDetailDueAt(task.dueDate ? localDateTimeValue(task.dueDate) : '');
     setDetailAssigneeId(task.assignee?.id ?? '');
   };
 
@@ -677,6 +731,7 @@ export function KanbanPage() {
 
   const openRenameColumn = (column: BoardColumn) => {
     setColumnName(column.name);
+    setColumnCompleted(column.completed);
     setColumnDialog({ mode: 'rename', column });
   };
 
@@ -684,11 +739,12 @@ export function KanbanPage() {
     event.preventDefault();
     if (!board || !columnDialog || !columnName.trim()) return;
     if (columnDialog.mode === 'create') {
-      createColumn.mutate({ name: columnName.trim(), version: board.version });
+      createColumn.mutate({ name: columnName.trim(), completed: columnCompleted, version: board.version });
     } else {
       renameColumn.mutate({
         columnId: columnDialog.column.id,
         name: columnName.trim(),
+        completed: columnCompleted,
         version: board.version,
       });
     }
@@ -708,6 +764,15 @@ export function KanbanPage() {
   return (
     <Box className="page-container page-container--wide">
       <PageHeader
+        breadcrumbs={selectedProject ? (
+          <Breadcrumbs aria-label="Điều hướng bảng Kanban">
+            <Link component={RouterLink} to="/projects" underline="hover" color="inherit">Dự án</Link>
+            <Link component={RouterLink} to={`/projects/${selectedProject.id}`} underline="hover" color="inherit">
+              {selectedProject.name}
+            </Link>
+            <Typography color="text.primary">{board?.name ?? 'Bảng công việc'}</Typography>
+          </Breadcrumbs>
+        ) : undefined}
         eyebrow="Kanban"
         title={board?.name ?? 'Bảng công việc'}
         description="Kéo thả thẻ để cập nhật trạng thái. Giới hạn WIP được kiểm tra trước khi lưu."
@@ -778,7 +843,13 @@ export function KanbanPage() {
                   color="error"
                   disabled={deleteBoard.isPending}
                   onClick={() => {
-                    if (window.confirm(`Xóa mềm bảng “${board.name}”?`)) deleteBoard.mutate();
+                    if (
+                      window.confirm(
+                        `Xóa bảng “${board.name}”? Bạn chỉ có thể xóa khi bảng không còn công việc.`,
+                      )
+                    ) {
+                      deleteBoard.mutate();
+                    }
                   }}
                 >
                   <DeleteOutline />
@@ -863,6 +934,19 @@ export function KanbanPage() {
                 onChange={(event) => setTaskDueAt(event.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
+              <FormControl size="small">
+                <InputLabel id="task-priority-label">Mức ưu tiên</InputLabel>
+                <Select
+                  labelId="task-priority-label"
+                  label="Mức ưu tiên"
+                  value={taskPriority}
+                  onChange={(event) => setTaskPriority(event.target.value as TaskPriority)}
+                >
+                  {(Object.keys(priorityLabel) as TaskPriority[]).map((priority) => (
+                    <MenuItem key={priority} value={priority}>{priorityLabel[priority]}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <FormControl size="small">
                 <InputLabel id="task-assignee-label">Người thực hiện</InputLabel>
                 <Select
@@ -964,6 +1048,19 @@ export function KanbanPage() {
                   </Select>
                 </FormControl>
               </Stack>
+              <FormControl fullWidth disabled={!canEditTasks}>
+                <InputLabel id="detail-priority-label">Mức ưu tiên</InputLabel>
+                <Select
+                  labelId="detail-priority-label"
+                  label="Mức ưu tiên"
+                  value={detailPriority}
+                  onChange={(event) => setDetailPriority(event.target.value as TaskPriority)}
+                >
+                  {(Object.keys(priorityLabel) as TaskPriority[]).map((priority) => (
+                    <MenuItem key={priority} value={priority}>{priorityLabel[priority]}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               {canEditTasks && (
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   <Button
@@ -1000,6 +1097,63 @@ export function KanbanPage() {
                   )}
                 </Stack>
               )}
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} mb={1.5}>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    <AttachFile color="action" />
+                    <Box>
+                      <Typography variant="h6">Tài nguyên</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {attachedResources.length} file hoặc liên kết đã gắn
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  <Button
+                    component={RouterLink}
+                    to={`/resources?task=${selectedTask.id}`}
+                    size="small"
+                  >
+                    Mở kho
+                  </Button>
+                </Stack>
+                {resources.isLoading ? (
+                  <SectionLoader />
+                ) : resources.isError ? (
+                  <ErrorState message={errorMessage(resources.error)} onRetry={() => void resources.refetch()} />
+                ) : attachedResources.length === 0 ? (
+                  <Typography color="text.secondary" variant="body2">
+                    Chưa có tài nguyên. Mở kho để gắn file hoặc liên kết vào công việc.
+                  </Typography>
+                ) : (
+                  <Stack spacing={0.75}>
+                    {attachedResources.map((resource) => (
+                      <Stack
+                        key={resource.id}
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        gap={2}
+                        className="task-resource-row"
+                      >
+                        <Box minWidth={0}>
+                          <Typography fontWeight={700} noWrap>{resource.fileName}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {resource.kind === 'LINK' ? 'Liên kết' : resource.contentType}
+                          </Typography>
+                        </Box>
+                        <Button
+                          size="small"
+                          startIcon={<DownloadOutlined />}
+                          disabled={downloadResource.isPending}
+                          onClick={() => downloadResource.mutate(resource.id)}
+                        >
+                          {resource.kind === 'LINK' ? 'Mở' : 'Tải'}
+                        </Button>
+                      </Stack>
+                    ))}
+                  </Stack>
+                )}
+              </Paper>
               {customCapability?.supported && taskCustom.data?.definition && (
                 <Paper variant="outlined" sx={{ p: 2 }}>
                   <Typography variant="h6" gutterBottom>Field mở rộng</Typography>
@@ -1205,6 +1359,15 @@ export function KanbanPage() {
               fullWidth
               margin="dense"
               inputProps={{ maxLength: 120 }}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={columnCompleted}
+                  onChange={(event) => setColumnCompleted(event.target.checked)}
+                />
+              }
+              label="Công việc trong cột này được tính là đã hoàn tất"
             />
           </DialogContent>
           <DialogActions>

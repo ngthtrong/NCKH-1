@@ -1,11 +1,9 @@
-import {
-  Add,
-  ContentCopy,
-  DeleteOutline,
-  MailOutline,
-  Search,
-  SwapHoriz,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import MailOutline from '@mui/icons-material/MailOutline';
+import Search from '@mui/icons-material/Search';
+import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import {
   Alert,
   Avatar,
@@ -35,6 +33,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { membersApi } from '../api/endpoints';
 import type { InvitationCreatedView, Member, TenantRole } from '../api/types';
@@ -51,7 +50,8 @@ const tenantRoleLabel: Record<TenantRole, string> = {
 
 export function MembersPage() {
   const queryClient = useQueryClient();
-  const { session } = useAuth();
+  const navigate = useNavigate();
+  const { session, logout } = useAuth();
   const canManage = ['OWNER', 'ADMIN'].includes(session?.activeTenant?.role ?? 'MEMBER');
   const isOwner = session?.activeTenant?.role === 'OWNER';
   const [search, setSearch] = useState('');
@@ -101,8 +101,15 @@ export function MembersPage() {
   });
   const transferOwnership = useMutation({
     mutationFn: membersApi.transferOwnership,
-    onSuccess: () => {
-      setFeedback('Đã chuyển ownership. Phiên tenant hiện tại đã hết hiệu lực; hãy đăng nhập lại.');
+    onSuccess: async () => {
+      try {
+        await logout();
+      } finally {
+        navigate('/login', {
+          replace: true,
+          state: { notice: 'Đã chuyển quyền chủ sở hữu. Vui lòng đăng nhập lại để nhận quyền mới.' },
+        });
+      }
     },
     onError: (cause) => setFeedback(errorMessage(cause)),
   });
@@ -140,6 +147,16 @@ export function MembersPage() {
     ? new URL(createdInvitation.acceptancePath, window.location.origin).toString()
     : null;
 
+  const copyInvitation = async () => {
+    if (!invitationUrl) return;
+    try {
+      await navigator.clipboard.writeText(invitationUrl);
+      setFeedback('Đã sao chép liên kết lời mời.');
+    } catch {
+      setFeedback('Không thể sao chép tự động. Hãy chọn và sao chép liên kết thủ công.');
+    }
+  };
+
   return (
     <Box className="page-container">
       <PageHeader
@@ -168,7 +185,7 @@ export function MembersPage() {
               color="inherit"
               size="small"
               startIcon={<ContentCopy />}
-              onClick={() => void navigator.clipboard.writeText(invitationUrl)}
+              onClick={() => void copyInvitation()}
             >
               Sao chép
             </Button>
@@ -281,7 +298,9 @@ export function MembersPage() {
                       </Stack>
                     </TableCell>
                     <TableCell>
-                      {canManage && member.role !== 'OWNER' ? (
+                      {canManage &&
+                      member.role !== 'OWNER' &&
+                      (isOwner || member.role !== 'ADMIN') ? (
                         <Select
                           size="small"
                           value={member.role}
@@ -329,7 +348,11 @@ export function MembersPage() {
                           color="error"
                           size="small"
                           startIcon={<DeleteOutline />}
-                          disabled={member.role === 'OWNER' || revoke.isPending}
+                          disabled={
+                            member.role === 'OWNER' ||
+                            (!isOwner && member.role === 'ADMIN') ||
+                            revoke.isPending
+                          }
                           onClick={() => removeMember(member)}
                         >
                           Thu hồi

@@ -4,11 +4,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
 import { authApi, tenantsApi } from '../api/endpoints';
-import { ApiError, setApiAccessToken } from '../api/client';
+import { ApiError, setApiAccessToken, setApiSessionRefreshHandler } from '../api/client';
+import { useQueryClient } from '@tanstack/react-query';
 import type { LoginRequest, RegisterRequest, Session, TenantSummary } from '../api/types';
 
 type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
@@ -28,15 +30,37 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [session, setSession] = useState<Session | null>(null);
   const [tenants, setTenants] = useState<TenantSummary[]>([]);
+  const sessionEpoch = useRef(0);
 
   const commitSession = useCallback((next: Session | null) => {
     setSession(next);
     setApiAccessToken(next?.accessToken ?? null);
     setStatus(next ? 'authenticated' : 'anonymous');
   }, []);
+
+  useEffect(() => {
+    setApiSessionRefreshHandler(async () => {
+      const epoch = sessionEpoch.current;
+      try {
+        const next = await authApi.refresh();
+        if (epoch !== sessionEpoch.current) return null;
+        commitSession(next);
+        return next.accessToken;
+      } catch (error) {
+        if (epoch === sessionEpoch.current) {
+          setTenants([]);
+          queryClient.clear();
+          commitSession(null);
+        }
+        throw error;
+      }
+    });
+    return () => setApiSessionRefreshHandler(null);
+  }, [commitSession, queryClient]);
 
   useEffect(() => {
     let active = true;
@@ -71,6 +95,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const login = useCallback(
     async (credentials: LoginRequest) => {
+      sessionEpoch.current += 1;
       const response = await authApi.login(credentials);
       const { tenants: availableTenants, ...nextSession } = response;
       commitSession(nextSession);
@@ -82,6 +107,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const register = useCallback(
     async (details: RegisterRequest) => {
+      sessionEpoch.current += 1;
       const response = await authApi.register(details);
       const { tenants: availableTenants, ...nextSession } = response;
       commitSession(nextSession);
@@ -91,13 +117,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   const logout = useCallback(async () => {
+    sessionEpoch.current += 1;
     try {
       await authApi.logout();
     } finally {
       setTenants([]);
+      queryClient.clear();
       commitSession(null);
     }
-  }, [commitSession]);
+  }, [commitSession, queryClient]);
 
   const selectTenant = useCallback(async (tenant: TenantSummary) => {
     const transfer = await authApi.createTenantTransfer(tenant.slug);
@@ -125,6 +153,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const exchangeTenantCode = useCallback(
     async (code: string) => {
+      sessionEpoch.current += 1;
       const next = await authApi.exchange(code);
       commitSession(next);
       const availableTenants = await tenantsApi.list();

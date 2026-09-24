@@ -1,11 +1,9 @@
-import {
-  AttachFile,
-  DeleteOutline,
-  DownloadOutlined,
-  InsertDriveFileOutlined,
-  LinkOutlined,
-  Upload,
-} from '@mui/icons-material';
+import AttachFile from '@mui/icons-material/AttachFile';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
+import InsertDriveFileOutlined from '@mui/icons-material/InsertDriveFileOutlined';
+import LinkOutlined from '@mui/icons-material/LinkOutlined';
+import Upload from '@mui/icons-material/Upload';
 import {
   Alert,
   Box,
@@ -24,6 +22,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { boardsApi, projectsApi, resourcesApi } from '../api/endpoints';
 import type { ResourceItem } from '../api/types';
@@ -45,6 +44,8 @@ function formatBytes(value: number): string {
 export function ResourcesPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const taskFilter = searchParams.get('task');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkName, setLinkName] = useState('');
@@ -135,6 +136,9 @@ export function ResourcesPage() {
 
   const quota = resources.data?.quota;
   const quotaPercent = quota ? Math.min(100, (quota.usedBytes / quota.limitBytes) * 100) : 0;
+  const visibleResources = taskFilter
+    ? (resources.data?.items ?? []).filter((item) => item.taskIds.includes(taskFilter))
+    : (resources.data?.items ?? []);
   return (
     <Box className="page-container">
       <PageHeader
@@ -163,6 +167,15 @@ export function ResourcesPage() {
           {feedback}
         </Alert>
       )}
+      {taskFilter && (
+        <Alert
+          severity="info"
+          action={<Button size="small" onClick={() => setSearchParams({}, { replace: true })}>Xem tất cả</Button>}
+          sx={{ mb: 2 }}
+        >
+          Đang hiển thị tài nguyên đã gắn với công việc được chọn.
+        </Alert>
+      )}
       {quota && (
         <Paper variant="outlined" className="quota-card">
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={1}>
@@ -187,15 +200,19 @@ export function ResourcesPage() {
           <SectionLoader />
         ) : resources.isError ? (
           <ErrorState message={errorMessage(resources.error)} onRetry={() => void resources.refetch()} />
-        ) : !resources.data?.items.length ? (
+        ) : !visibleResources.length ? (
           <EmptyState
-            title="Chưa có tài nguyên"
-            description="Tải tệp đầu tiên lên để chia sẻ với các công việc trong tenant."
-            action={<Button onClick={() => inputRef.current?.click()}>Chọn tệp</Button>}
+            title={taskFilter ? 'Công việc chưa có tài nguyên' : 'Chưa có tài nguyên'}
+            description={taskFilter
+              ? 'Mở toàn bộ kho tài nguyên để gắn file hoặc liên kết vào công việc này.'
+              : 'Tải tệp đầu tiên lên để chia sẻ với các công việc trong tenant.'}
+            action={taskFilter
+              ? <Button onClick={() => setSearchParams({}, { replace: true })}>Mở toàn bộ kho</Button>
+              : <Button onClick={() => inputRef.current?.click()}>Chọn tệp</Button>}
           />
         ) : (
           <Box className="resource-list">
-            {resources.data.items.map((item) => (
+            {visibleResources.map((item) => (
               <Box className="resource-row" key={item.id}>
                 <Box className="file-icon">
                   {item.kind === 'LINK' ? <LinkOutlined /> : <InsertDriveFileOutlined />}

@@ -4,6 +4,20 @@ set -Eeuo pipefail
 repository_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 scenario="${1:-}"
 variant="${2:-not-applicable}"
+run_class="${RUN_CLASS:-development}"
+
+case "$run_class" in
+  development | pilot | experiment) ;;
+  *)
+    echo "RUN_CLASS must be development, pilot, or experiment." >&2
+    exit 2
+    ;;
+esac
+
+if [[ "$run_class" == "experiment" && -z "${EXPERIMENT_PROTOCOL_ID:-}" ]]; then
+  echo "Formal experiment runs require EXPERIMENT_PROTOCOL_ID and a clean Git worktree." >&2
+  exit 2
+fi
 
 case "$scenario" in
   smoke | baseline | load | stress)
@@ -34,7 +48,7 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 run_id="${RUN_ID:-${scenario}-$(date -u +%Y%m%dT%H%M%S)-$$}"
-run_directory="$repository_root/experiments/results/$run_id"
+run_directory="$repository_root/experiments/results/$run_class/$run_id"
 script_relative="experiments/k6/${scenario}.js"
 script_path="$repository_root/$script_relative"
 manifest_path="$run_directory/manifest.json"
@@ -49,6 +63,7 @@ export RATE_LIMIT_VARIANT="$variant"
 python3 "$repository_root/experiments/analysis/capture_manifest.py" start \
   --output "$manifest_path" \
   --run-id "$run_id" \
+  --run-class "$run_class" \
   --scenario "$scenario" \
   --variant "$variant" \
   --script "$script_relative" \
@@ -89,5 +104,5 @@ if ! python3 "$repository_root/experiments/analysis/export_prometheus.py" \
   echo "Prometheus resource metrics were unavailable; the k6 run remains valid but is incomplete for CPU/RAM/connection comparisons." >&2
 fi
 
-echo "Measured run saved to $run_directory"
+echo "Measured $run_class run saved to $run_directory"
 echo "Analyze completed runs with: scripts/analyze-experiments.sh"

@@ -1,12 +1,10 @@
-import {
-  Add,
-  ArrowForward,
-  CheckCircleOutline,
-  FolderOpenOutlined,
-  PeopleOutline,
-  TrendingDown,
-  TrendingUp,
-} from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import FolderOpenOutlined from '@mui/icons-material/FolderOpenOutlined';
+import PeopleOutline from '@mui/icons-material/PeopleOutline';
+import TrendingDown from '@mui/icons-material/TrendingDown';
+import TrendingUp from '@mui/icons-material/TrendingUp';
 import {
   Avatar,
   Box,
@@ -149,16 +147,14 @@ export function DashboardPage() {
                             {project.memberCount} thành viên
                           </Typography>
                         </Box>
-                        {project.boardId && (
-                          <Button
-                            component={Link}
-                            to={`/kanban/${project.boardId}`}
-                            size="small"
-                            endIcon={<ArrowForward />}
-                          >
-                            Mở
-                          </Button>
-                        )}
+                        <Button
+                          component={Link}
+                          to={`/projects/${project.id}`}
+                          size="small"
+                          endIcon={<ArrowForward />}
+                        >
+                          Xem dự án
+                        </Button>
                       </Box>
                     );
                   })}

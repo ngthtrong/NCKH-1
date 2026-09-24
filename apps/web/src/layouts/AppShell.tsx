@@ -1,16 +1,14 @@
-import {
-  AdminPanelSettingsOutlined,
-  DashboardOutlined,
-  FolderOutlined,
-  WorkspacesOutlined,
-  GroupsOutlined,
-  KeyboardArrowDown,
-  Logout,
-  Menu as MenuIcon,
-  NotificationsNone,
-  SpaceDashboardOutlined,
-  TuneOutlined,
-} from '@mui/icons-material';
+import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
+import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
+import FolderOutlined from '@mui/icons-material/FolderOutlined';
+import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Logout from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsNone from '@mui/icons-material/NotificationsNone';
+import SpaceDashboardOutlined from '@mui/icons-material/SpaceDashboardOutlined';
+import TuneOutlined from '@mui/icons-material/TuneOutlined';
+import WorkspacesOutlined from '@mui/icons-material/WorkspacesOutlined';
 import {
   AppBar,
   Avatar,
@@ -44,10 +42,10 @@ const drawerWidth = 252;
 const primaryNavigation = [
   { label: 'Tổng quan', to: '/dashboard', icon: <DashboardOutlined /> },
   { label: 'Dự án', to: '/projects', icon: <WorkspacesOutlined /> },
-  { label: 'Bảng công việc', to: '/kanban', icon: <SpaceDashboardOutlined /> },
+  { label: 'Kanban', to: '/kanban', icon: <SpaceDashboardOutlined /> },
   { label: 'Thành viên', to: '/members', icon: <GroupsOutlined /> },
   { label: 'Tài nguyên', to: '/resources', icon: <FolderOutlined /> },
-  { label: 'Mở rộng nghiệp vụ', to: '/customization', icon: <TuneOutlined /> },
+  { label: 'Tùy biến dự án', to: '/customization', icon: <TuneOutlined /> },
 ];
 
 function initials(name: string): string {
@@ -186,7 +184,7 @@ export function AppShell() {
                   className={location.pathname.startsWith('/settings') ? 'active' : ''}
                 >
                   <ListItemIcon><TuneOutlined /></ListItemIcon>
-                  <ListItemText primary="Tùy chỉnh tenant" />
+                  <ListItemText primary="Cài đặt workspace" />
                 </ListItemButton>
                 <ListItemButton
                   component={NavLink}
@@ -290,7 +288,15 @@ export function AppShell() {
           {drawer}
         </Drawer>
       </Box>
-      <Box component="main" className="app-content" sx={{ ml: { md: `${drawerWidth}px` } }}>
+      <Box
+        component="main"
+        className="app-content"
+        sx={{
+          ml: { md: `${drawerWidth}px` },
+          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+          minWidth: 0,
+        }}
+      >
         <Outlet />
       </Box>
     </Box>

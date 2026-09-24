@@ -22,6 +22,7 @@ METRIC_PATTERN = re.compile(r"^(?P<name>[^{}]+)(?:\{(?P<tags>[^{}]*)\})?$")
 EXPECTED_METRICS = ("checks", "http_req_duration", "http_req_failed", "http_reqs")
 OBSERVATION_FIELDS = (
     "run_id",
+    "run_class",
     "scenario",
     "rate_limit_variant",
     "metric",
@@ -56,6 +57,10 @@ class RunData:
     @property
     def scenario(self) -> str:
         return str(self.manifest["scenario"])
+
+    @property
+    def run_class(self) -> str:
+        return str(self.manifest["run_class"])
 
     @property
     def variant(self) -> str:
@@ -99,7 +104,9 @@ def statistic_unit(metric: str, statistic: str, contains: str) -> str:
     return "value"
 
 
-def validate_and_load_runs(input_root: Path) -> tuple[list[RunData], list[str], list[str]]:
+def validate_and_load_runs(
+    input_root: Path, selected_run_class: str = "experiment"
+) -> tuple[list[RunData], list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     runs: list[RunData] = []
@@ -124,6 +131,22 @@ def validate_and_load_runs(input_root: Path) -> tuple[list[RunData], list[str], 
             continue
         if manifest.get("status") != "succeeded":
             warnings.append(f"{run_id or manifest_path.name}: bỏ qua run có status={manifest.get('status')}")
+            continue
+        run_class = manifest.get("run_class")
+        if run_class not in {"development", "pilot", "experiment"}:
+            errors.append(f"{run_id}: thiếu hoặc sai run_class")
+            continue
+        if run_class != selected_run_class:
+            warnings.append(
+                f"{run_id}: bỏ qua run_class={run_class}; đang phân tích {selected_run_class}"
+            )
+            continue
+        eligible = manifest.get("eligible_for_final_analysis")
+        if run_class == "experiment" and eligible is not True:
+            errors.append(f"{run_id}: experiment run không đủ điều kiện phân tích cuối")
+            continue
+        if run_class != "experiment" and eligible is not False:
+            errors.append(f"{run_id}: {run_class} run phải có eligible_for_final_analysis=false")
             continue
 
         started = parse_datetime(manifest.get("started_at_utc"))
@@ -181,6 +204,7 @@ def observations_for(runs: Iterable[RunData]) -> list[dict[str, Any]]:
                 observations.append(
                     {
                         "run_id": run.run_id,
+                        "run_class": run.run_class,
                         "scenario": run.scenario,
                         "rate_limit_variant": run.variant,
                         "metric": metric,
@@ -250,6 +274,7 @@ def resource_observations_for(runs: Iterable[RunData]) -> tuple[list[dict[str, A
                     observations.append(
                         {
                             "run_id": run.run_id,
+                            "run_class": run.run_class,
                             "scenario": run.scenario,
                             "rate_limit_variant": run.variant,
                             "metric": metric,
@@ -276,6 +301,7 @@ def comparison_rows(runs: Iterable[RunData], observations: list[dict[str, Any]])
     for run_id, run in run_lookup.items():
         rows_by_run[run_id] = {
             "run_id": run_id,
+            "run_class": run.run_class,
             "scenario": run.scenario,
             "rate_limit_variant": run.variant,
             "environment": run.manifest["target"]["environment_label"],
@@ -369,16 +395,18 @@ def format_value(value: Any, digits: int = 3) -> str:
 
 def write_report(
     path: Path,
+    run_class: str,
     comparisons: list[dict[str, Any]],
     errors: list[str],
     warnings: list[str],
     outliers: list[dict[str, Any]],
 ) -> None:
     lines = [
-        "# Báo cáo thực nghiệm được tái tạo tự động",
+        f"# Báo cáo lượt đo {run_class} được tái tạo tự động",
         "",
-        "> Tệp này chỉ tổng hợp các run có `data_kind=measured` và `status=succeeded`. "
-        "Công cụ không tự điền dữ liệu thiếu và không biến ngưỡng kiểm thử thành kết quả đo.",
+        f"> Tệp này chỉ tổng hợp các run có `run_class={run_class}`, `data_kind=measured` "
+        "và `status=succeeded`. Công cụ không tự điền dữ liệu thiếu và không biến ngưỡng "
+        "kiểm thử thành kết quả đo.",
         "",
         "## Dữ liệu đầu vào",
         "",
@@ -436,6 +464,15 @@ def write_report(
             "",
         ]
     )
+    if run_class != "experiment":
+        lines.extend(
+            [
+                "",
+                "> Kết quả DEVELOPMENT/PILOT chỉ phục vụ phát triển hoặc khóa phương pháp; "
+                "không đủ điều kiện đưa vào phân tích kết quả cuối.",
+                "",
+            ]
+        )
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -484,8 +521,13 @@ def write_p95_chart(path: Path, comparisons: list[dict[str, Any]]) -> bool:
     return True
 
 
-def run_analysis(input_root: Path, output_root: Path, minimum_replicates: int = 3) -> int:
-    runs, load_errors, load_warnings = validate_and_load_runs(input_root)
+def run_analysis(
+    input_root: Path,
+    output_root: Path,
+    minimum_replicates: int = 3,
+    run_class: str = "experiment",
+) -> int:
+    runs, load_errors, load_warnings = validate_and_load_runs(input_root, run_class)
     if not runs:
         for error in load_errors:
             print(f"error: {error}", file=sys.stderr)
@@ -508,6 +550,7 @@ def run_analysis(input_root: Path, output_root: Path, minimum_replicates: int = 
     qa_payload = {
         "schema_version": "1.0.0",
         "input_root": str(input_root),
+        "run_class": run_class,
         "eligible_run_count": len(runs),
         "errors": all_errors,
         "warnings": all_warnings,
@@ -517,10 +560,10 @@ def run_analysis(input_root: Path, output_root: Path, minimum_replicates: int = 
     (output_root / "qa.json").write_text(
         json.dumps(qa_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    write_report(output_root / "report.md", comparisons, all_errors, all_warnings, outliers)
+    write_report(output_root / "report.md", run_class, comparisons, all_errors, all_warnings, outliers)
     write_p95_chart(output_root / "p95-by-run.svg", comparisons)
 
-    print(f"Analyzed {len(runs)} measured run(s) into {output_root}")
+    print(f"Analyzed {len(runs)} measured {run_class} run(s) into {output_root}")
     if all_errors:
         print(f"QA found {len(all_errors)} error(s); inspect qa.json", file=sys.stderr)
         return 1
@@ -532,6 +575,11 @@ def parser() -> argparse.ArgumentParser:
     argument_parser.add_argument("--input", type=Path, default=Path("experiments/results"))
     argument_parser.add_argument("--output", type=Path, default=Path("experiments/derived"))
     argument_parser.add_argument("--minimum-replicates", type=int, default=3)
+    argument_parser.add_argument(
+        "--run-class",
+        choices=("development", "pilot", "experiment"),
+        default="experiment",
+    )
     return argument_parser
 
 
@@ -540,7 +588,7 @@ def main() -> int:
     if args.minimum_replicates < 1:
         print("error: --minimum-replicates must be at least 1", file=sys.stderr)
         return 2
-    return run_analysis(args.input, args.output, args.minimum_replicates)
+    return run_analysis(args.input, args.output, args.minimum_replicates, args.run_class)
 
 
 if __name__ == "__main__":

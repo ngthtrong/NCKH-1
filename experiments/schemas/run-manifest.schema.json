@@ -7,6 +7,9 @@
   "required": [
     "schema_version",
     "data_kind",
+    "run_class",
+    "eligible_for_final_analysis",
+    "protocol_id",
     "run_id",
     "status",
     "started_at_utc",
@@ -21,11 +24,17 @@
     "artifacts"
   ],
   "properties": {
-    "schema_version": { "const": "1.0.0" },
+    "schema_version": { "const": "1.1.0" },
     "data_kind": {
       "const": "measured",
       "description": "The manifest is created only when a real k6 invocation starts. Test fixtures use a separate temporary directory and are never research results."
     },
+    "run_class": {
+      "enum": ["development", "pilot", "experiment"],
+      "description": "Development and pilot runs are engineering evidence only. Only a gated experiment run can enter final analysis."
+    },
+    "eligible_for_final_analysis": { "type": "boolean" },
+    "protocol_id": { "type": ["string", "null"], "minLength": 1 },
     "run_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" },
     "status": { "enum": ["running", "succeeded", "failed", "aborted"] },
     "started_at_utc": { "type": "string", "format": "date-time" },
@@ -93,5 +102,19 @@
       }
     },
     "notes": { "type": "string" }
-  }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "run_class": { "const": "experiment" } } },
+      "then": {
+        "properties": {
+          "eligible_for_final_analysis": { "const": true },
+          "protocol_id": { "type": "string", "minLength": 1 }
+        }
+      },
+      "else": {
+        "properties": { "eligible_for_final_analysis": { "const": false } }
+      }
+    }
+  ]
 }

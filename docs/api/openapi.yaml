@@ -1687,6 +1687,7 @@ components:
     TenantRole: {type: string, enum: [OWNER, ADMIN, MEMBER]}
     InvitationStatus: {type: string, enum: [PENDING, ACCEPTED, REJECTED, REVOKED, EXPIRED]}
     ProjectRole: {type: string, enum: [MANAGER, MEMBER, VIEWER]}
+    TaskPriority: {type: string, enum: [LOW, MEDIUM, HIGH, URGENT]}
     ProjectStatus: {type: string, enum: [ACTIVE, ARCHIVED, DELETED]}
     TenantTier: {type: string, enum: [STARTER, PROFESSIONAL, ENTERPRISE]}
     TenantPlacement: {type: string, enum: [POOL, SCHEMA_PER_TENANT, SILO_DATABASE]}
@@ -1885,14 +1886,15 @@ components:
       properties: {role: {$ref: '#/components/schemas/ProjectRole'}}
     ColumnView:
       type: object
-      required: [id, name, position]
+      required: [id, name, position, completed]
       properties:
         id: {$ref: '#/components/schemas/UUID'}
         name: {type: string}
         position: {type: number}
+        completed: {type: boolean}
     TaskView:
       type: object
-      required: [id, projectId, boardId, columnId, title, position, version, createdAt, updatedAt]
+      required: [id, projectId, boardId, columnId, title, priority, position, version, subtaskCount, completedSubtaskCount, commentCount, createdAt, updatedAt]
       properties:
         id: {$ref: '#/components/schemas/UUID'}
         projectId: {$ref: '#/components/schemas/UUID'}
@@ -1901,10 +1903,14 @@ components:
         parentTaskId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         title: {type: string}
         description: {type: [string, 'null']}
+        priority: {$ref: '#/components/schemas/TaskPriority'}
         assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
         position: {type: number}
         version: {type: integer, format: int64}
+        subtaskCount: {type: integer, format: int64, minimum: 0}
+        completedSubtaskCount: {type: integer, format: int64, minimum: 0}
+        commentCount: {type: integer, format: int64, minimum: 0}
         createdAt: {$ref: '#/components/schemas/Instant'}
         updatedAt: {$ref: '#/components/schemas/Instant'}
     BoardView:
@@ -1938,9 +1944,10 @@ components:
         version: {type: integer, format: int64, minimum: 0}
     CreateColumnRequest:
       type: object
-      required: [name, version]
+      required: [name, completed, version]
       properties:
         name: {type: string, maxLength: 120}
+        completed: {type: boolean}
         version: {type: integer, format: int64, minimum: 0}
     UpdateColumnRequest:
       $ref: '#/components/schemas/CreateColumnRequest'
@@ -1956,22 +1963,24 @@ components:
         version: {type: integer, format: int64, minimum: 0}
     CreateTaskRequest:
       type: object
-      required: [columnId, title]
+      required: [columnId, title, priority]
       properties:
         columnId: {$ref: '#/components/schemas/UUID'}
         parentTaskId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         title: {type: string, maxLength: 240}
         description: {type: [string, 'null'], maxLength: 10000}
+        priority: {$ref: '#/components/schemas/TaskPriority'}
         assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
         position: {type: [number, 'null']}
     UpdateTaskRequest:
       type: object
-      required: [columnId, title, version]
+      required: [columnId, title, priority, version]
       properties:
         columnId: {$ref: '#/components/schemas/UUID'}
         title: {type: string, maxLength: 240}
         description: {type: [string, 'null'], maxLength: 10000}
+        priority: {$ref: '#/components/schemas/TaskPriority'}
         assigneeUserId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         dueAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
         position: {type: [number, 'null']}
@@ -2059,6 +2068,7 @@ components:
         eventType: {type: string}
         title: {type: string}
         body: {type: string}
+        actionUrl: {anyOf: [{type: string, pattern: '^/'}, {type: 'null'}]}
         readAt: {anyOf: [{$ref: '#/components/schemas/Instant'}, {type: 'null'}]}
         createdAt: {$ref: '#/components/schemas/Instant'}
     NotificationPreferences:

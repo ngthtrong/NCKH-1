@@ -1,11 +1,13 @@
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import CreditCardOutlined from '@mui/icons-material/CreditCardOutlined';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Refresh from '@mui/icons-material/Refresh';
 import {
-  ArrowForward,
-  BusinessOutlined,
-  CheckCircleOutline,
-  CreditCardOutlined,
-  Refresh,
-} from '@mui/icons-material';
-import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Button,
@@ -22,7 +24,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { paymentsApi, tenantsApi } from '../api/endpoints';
@@ -39,6 +41,39 @@ const tierPrices: Record<TenantTier, number> = {
   STARTER: 100_000,
   PROFESSIONAL: 300_000,
   ENTERPRISE: 1_000_000,
+};
+
+const tierLabels: Record<TenantTier, string> = {
+  STARTER: 'Starter',
+  PROFESSIONAL: 'Professional',
+  ENTERPRISE: 'Enterprise',
+};
+
+const placementLabels: Record<TenantPlacement, string> = {
+  POOL: 'Dùng chung hạ tầng',
+  SCHEMA_PER_TENANT: 'Lược đồ dữ liệu riêng',
+  SILO_DATABASE: 'Cơ sở dữ liệu riêng',
+};
+
+const placementCharacteristics: Record<
+  TenantPlacement,
+  { boundary: string; operations: string; fit: string }
+> = {
+  POOL: {
+    boundary: 'Chung CSDL và bảng; tách tenant bằng tenant_id và RLS.',
+    operations: 'Ít tài nguyên và thao tác vận hành nhất.',
+    fit: 'Phù hợp để bắt đầu và so sánh baseline.',
+  },
+  SCHEMA_PER_TENANT: {
+    boundary: 'Chung CSDL; mỗi tenant có schema và role riêng.',
+    operations: 'Mức vận hành trung bình.',
+    fit: 'Phù hợp khi cần namespace dữ liệu riêng.',
+  },
+  SILO_DATABASE: {
+    boundary: 'Mỗi tenant có CSDL và role riêng.',
+    operations: 'Tốn tài nguyên và thao tác vận hành nhất.',
+    fit: 'Phù hợp khi cần biên cô lập riêng ở cấp CSDL.',
+  },
 };
 
 function slugFromName(value: string): string {
@@ -73,6 +108,7 @@ export function OnboardingPage() {
   const [loading, setLoading] = useState(Boolean(tenantId));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const paymentAttemptKey = useRef('');
 
   const loadStatus = useCallback(async () => {
     if (!tenantId) return;
@@ -92,9 +128,24 @@ export function OnboardingPage() {
     if (!tenantId) return;
     setLoading(true);
     void loadStatus();
+  }, [loadStatus, tenantId]);
+
+  useEffect(() => {
+    if (
+      !tenantId ||
+      (onboarding && !['PENDING_PAYMENT', 'PROVISIONING'].includes(onboarding.tenant.status))
+    ) {
+      return;
+    }
     const poll = window.setInterval(() => void loadStatus(), 3000);
     return () => window.clearInterval(poll);
-  }, [loadStatus, tenantId]);
+  }, [loadStatus, onboarding, tenantId]);
+
+  useEffect(() => {
+    if (onboarding?.payment && ['FAILED', 'EXPIRED'].includes(onboarding.payment.status)) {
+      paymentAttemptKey.current = '';
+    }
+  }, [onboarding?.payment]);
 
   const price = useMemo(() => tierPrices[tier], [tier]);
 
@@ -119,11 +170,18 @@ export function OnboardingPage() {
     setError(null);
     try {
       const returnUrl = new URL(`/onboarding?tenant=${onboarding.tenant.id}`, window.location.origin);
-      await paymentsApi.createSession(onboarding.tenant.id, {
-        amountMinor: tierPrices[onboarding.tenant.tier],
-        currency: 'VND',
-        returnUrl: returnUrl.toString(),
-      });
+      if (!paymentAttemptKey.current) {
+        paymentAttemptKey.current = `onboarding-${onboarding.tenant.id}-${crypto.randomUUID()}`;
+      }
+      await paymentsApi.createSession(
+        onboarding.tenant.id,
+        {
+          amountMinor: tierPrices[onboarding.tenant.tier],
+          currency: 'VND',
+          returnUrl: returnUrl.toString(),
+        },
+        paymentAttemptKey.current,
+      );
       await loadStatus();
     } catch (cause) {
       setError(errorMessage(cause));
@@ -200,7 +258,7 @@ export function OnboardingPage() {
               <Box>
                 <Typography variant="h6">Thông tin workspace</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Placement được cố định sau onboarding.
+                  Starter và hạ tầng dùng chung đã được chọn sẵn, phù hợp để bắt đầu nhanh.
                 </Typography>
               </Box>
             </Stack>
@@ -227,38 +285,86 @@ export function OnboardingPage() {
                     setSlug(event.target.value.toLowerCase());
                   }}
                 />
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <FormControl fullWidth>
-                    <InputLabel id="tier-label">Gói local</InputLabel>
-                    <Select
-                      labelId="tier-label"
-                      label="Gói local"
-                      value={tier}
-                      onChange={(event) => setTier(event.target.value as TenantTier)}
-                    >
-                      <MenuItem value="STARTER">Starter</MenuItem>
-                      <MenuItem value="PROFESSIONAL">Professional</MenuItem>
-                      <MenuItem value="ENTERPRISE">Enterprise</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl fullWidth>
-                    <InputLabel id="placement-label">Placement</InputLabel>
-                    <Select
-                      labelId="placement-label"
-                      label="Placement"
-                      value={placement}
-                      onChange={(event) => setPlacement(event.target.value as TenantPlacement)}
-                    >
-                      <MenuItem value="POOL">Pool — shared database</MenuItem>
-                      <MenuItem value="SCHEMA_PER_TENANT">Schema — lược đồ riêng</MenuItem>
-                      <MenuItem value="SILO_DATABASE">Silo — database riêng</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Stack>
                 <Alert severity="info">
-                  Giá mô phỏng: {new Intl.NumberFormat('vi-VN').format(price)} VND. Đây không phải bảng
-                  giá thương mại hoặc kết quả nghiên cứu.
+                  Đang dùng {tierLabels[tier]} · {placementLabels[placement]} · giá mô phỏng{' '}
+                  {new Intl.NumberFormat('vi-VN').format(price)} VND. Gói quyết định hạn mức sử dụng;
+                  placement quyết định cách cô lập dữ liệu. Hai lựa chọn này không tự bật thêm tính năng.
                 </Alert>
+                <Accordion disableGutters variant="outlined">
+                  <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Box>
+                      <Typography fontWeight={700}>Tùy chọn nâng cao</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Thay đổi gói hoặc kiến trúc lưu trữ khi bạn thật sự cần.
+                      </Typography>
+                    </Box>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                      <FormControl fullWidth>
+                        <InputLabel id="tier-label">Gói local</InputLabel>
+                        <Select
+                          labelId="tier-label"
+                          label="Gói local"
+                          value={tier}
+                          onChange={(event) => setTier(event.target.value as TenantTier)}
+                        >
+                          <MenuItem value="STARTER">Starter — 100.000 VND</MenuItem>
+                          <MenuItem value="PROFESSIONAL">Professional — 300.000 VND</MenuItem>
+                          <MenuItem value="ENTERPRISE">Enterprise — 1.000.000 VND</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <FormControl fullWidth>
+                        <InputLabel id="placement-label">Kiến trúc dữ liệu</InputLabel>
+                        <Select
+                          labelId="placement-label"
+                          label="Kiến trúc dữ liệu"
+                          value={placement}
+                          onChange={(event) => setPlacement(event.target.value as TenantPlacement)}
+                        >
+                          <MenuItem value="POOL">Dùng chung hạ tầng</MenuItem>
+                          <MenuItem value="SCHEMA_PER_TENANT">Lược đồ dữ liệu riêng</MenuItem>
+                          <MenuItem value="SILO_DATABASE">Cơ sở dữ liệu riêng</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                    <Box mt={2}>
+                      <Typography fontWeight={700}>So sánh ba mô hình</Typography>
+                      <Typography variant="body2" color="text.secondary" mb={1.5}>
+                        Pool là mặc định của bản demo, không phải kết luận mô hình tối ưu. Kết luận chỉ được đưa
+                        ra sau khi đo trên cùng workload và điều kiện triển khai.
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                          gap: 1.5,
+                        }}
+                      >
+                        {(Object.keys(placementCharacteristics) as TenantPlacement[]).map((option) => {
+                          const characteristic = placementCharacteristics[option];
+                          const selected = option === placement;
+                          return (
+                            <Paper
+                              key={option}
+                              variant="outlined"
+                              aria-label={`${placementLabels[option]}${selected ? ' đang chọn' : ''}`}
+                              sx={{ p: 1.5, borderColor: selected ? 'primary.main' : 'divider' }}
+                            >
+                              <Typography fontWeight={700}>{placementLabels[option]}</Typography>
+                              <Typography variant="body2" mt={0.75}>
+                                {characteristic.boundary}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" mt={0.75}>
+                                {characteristic.operations} {characteristic.fit}
+                              </Typography>
+                            </Paper>
+                          );
+                        })}
+                      </Box>
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
                 <Button
                   type="submit"
                   size="large"
@@ -281,7 +387,8 @@ export function OnboardingPage() {
               <Box>
                 <Typography variant="h5">{onboarding.tenant.name}</Typography>
                 <Typography color="text.secondary">
-                  {onboarding.tenant.slug}.localhost · {onboarding.tenant.placement} · {onboarding.tenant.tier}
+                  {onboarding.tenant.slug}.localhost · {placementLabels[onboarding.tenant.placement]} ·{' '}
+                  {tierLabels[onboarding.tenant.tier]}
                 </Typography>
               </Box>
               <StatusChip status={onboarding.tenant.status} />
@@ -290,21 +397,24 @@ export function OnboardingPage() {
             {onboarding.tenant.status === 'PENDING_PAYMENT' && !onboarding.payment && (
               <Stack spacing={2}>
                 <Alert severity="info">
-                  Workspace đã được giữ slug. Tạo phiên checkout idempotent để tiếp tục.
+                  Workspace đã được giữ địa chỉ. Bước thanh toán local dùng dữ liệu mô phỏng.
                 </Alert>
+                {onboarding.tenant.role !== 'OWNER' && (
+                  <Alert severity="warning">Chỉ Owner của workspace có thể thực hiện bước này.</Alert>
+                )}
                 <Button
                   variant="contained"
                   size="large"
                   startIcon={<CreditCardOutlined />}
-                  disabled={submitting}
+                  disabled={submitting || onboarding.tenant.role !== 'OWNER'}
                   onClick={() => void createPayment()}
                 >
-                  {submitting ? 'Đang tạo phiên…' : 'Tạo phiên thanh toán giả'}
+                  {submitting ? 'Đang tạo phiên…' : 'Tiếp tục thanh toán mô phỏng'}
                 </Button>
               </Stack>
             )}
 
-            {onboarding.tenant.status === 'PENDING_PAYMENT' && onboarding.payment && (
+            {onboarding.tenant.status === 'PENDING_PAYMENT' && onboarding.payment?.status === 'PENDING' && (
               <Stack spacing={2}>
                 <Alert severity="warning">
                   Phiên {onboarding.payment.provider} đang chờ xác nhận, số tiền mô phỏng{' '}
@@ -315,7 +425,7 @@ export function OnboardingPage() {
                   variant="contained"
                   size="large"
                   startIcon={<CreditCardOutlined />}
-                  disabled={submitting}
+                  disabled={submitting || onboarding.tenant.role !== 'OWNER'}
                   onClick={() => void completePayment()}
                 >
                   {submitting ? 'Đang xác nhận…' : 'Xác nhận fake payment thành công'}
@@ -323,10 +433,37 @@ export function OnboardingPage() {
               </Stack>
             )}
 
+            {onboarding.tenant.status === 'PENDING_PAYMENT' &&
+              onboarding.payment &&
+              ['FAILED', 'EXPIRED'].includes(onboarding.payment.status) && (
+                <Stack spacing={2}>
+                  <Alert severity="error">
+                    Phiên thanh toán trước không còn sử dụng được. Bạn có thể tạo một lần thử mới.
+                  </Alert>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={<Refresh />}
+                    disabled={submitting || onboarding.tenant.role !== 'OWNER'}
+                    onClick={() => void createPayment()}
+                  >
+                    {submitting ? 'Đang tạo lại…' : 'Tạo lần thanh toán mới'}
+                  </Button>
+                </Stack>
+              )}
+
+            {onboarding.tenant.status === 'PENDING_PAYMENT' &&
+              onboarding.payment?.status === 'SUCCEEDED' && (
+                <Alert severity="info" icon={<CircularProgress size={20} />}>
+                  Thanh toán đã được xác nhận. Đang chờ hệ thống bắt đầu cấp phát workspace.
+                </Alert>
+              )}
+
             {onboarding.tenant.status === 'PROVISIONING' && (
               <Stack spacing={2} alignItems="flex-start">
                 <Alert severity="info" icon={<CircularProgress size={20} />}>
-                  Worker đang cấp phát {onboarding.tenant.placement}. Trang tự làm mới mỗi 3 giây.
+                  Hệ thống đang chuẩn bị {placementLabels[onboarding.tenant.placement]}. Trang tự làm mới
+                  mỗi 3 giây.
                 </Alert>
                 <Typography variant="body2" color="text.secondary">
                   Job: {onboarding.provisioning?.status ?? 'QUEUED'} · lần thử{' '}
