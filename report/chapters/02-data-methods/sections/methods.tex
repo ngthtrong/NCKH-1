@@ -1,60 +1,37 @@
-\par\penalty0
-\section{Mô hình và phương pháp}\label{section:methods-1}
-% Trình bày mô hình và phương pháp; bổ sung nguồn và minh họa khi cần.
+\section{Thiết kế kiểm chứng và thực nghiệm}\label{sec:methods}
+\subsection{Kiểm chứng tính đúng đắn}
+Mỗi tiêu chí có positive và negative case. Với N1, gửi token A đến host B, giữ token sau revoke, suspend tenant và phát sinh exception để kiểm tra cleanup. Với N2, dùng ID của B để đọc\slash ghi\slash xóa ở A, bỏ guard ở native\slash bulk\slash background và kiểm tra connection sau commit\slash rollback. Với Schema-per-tenant, còn cần SQL ghi rõ schema B; search path đúng không đủ thay thế quyền runtime.
 
-\par\penalty0
-\subsection{Phương pháp chính và cách đánh giá}\label{subsection:methods-2}
-% Trình bày phương pháp chính và cách đánh giá; bổ sung nguồn và minh họa khi cần.
+N3 kiểm tra ma trận role theo hành động bằng API trực tiếp, quyền Owner không có project membership và deny không tạo event\slash row. N4 kiểm tra hai client cùng expected version, batch có một item stale, delivery lặp và assignee\slash deadline đổi trước dispatch. N5 kiểm tra callback trùng, claim đồng thời, worker crash sau DDL\slash migration, lease recovery, rollback lỗi và tài nguyên tenant khác không bị dọn.
 
-\par\penalty0
-\subsection{Phương pháp bổ trợ}\label{subsection:methods-3}
-% Trình bày phương pháp bổ trợ; bổ sung nguồn và minh họa khi cần.
+Các tình huống fault injection nêu trên là nội dung hồ sơ hoặc thiết kế đánh giá; trong lượt viết báo cáo không tự chạy lại harness đang tạm dừng. Kiểm chứng tích hợp hiện tại chỉ được coi là đóng khi suite yêu cầu Docker thực thi đầy đủ và report có truy vết phiên bản.
 
-\par\penalty0
-\subsection{Biểu diễn đối tượng nghiên cứu}\label{subsection:methods-4}
-% Trình bày biểu diễn đối tượng nghiên cứu; bổ sung nguồn và minh họa khi cần.
+\subsection{Thiết kế thực nghiệm đề xuất}
+Thiết kế dự kiến sử dụng một VPS có cấu hình cố định, hai mức 3 và 5 tenant, mỗi mức 10 và 20 VU\slash tenant, ít nhất ba run độc lập mỗi tổ hợp. Mỗi run tách warm-up 2 phút và cửa sổ đo 5 phút. Ba placement được chạy riêng với dữ liệu tương đương, xen kẽ thứ tự chạy; capability tùy biến tắt khi so sánh nghiệp vụ lõi. Đây là đề xuất chờ pilot\slash phụ lục protocol, chưa phải tham số đã được duyệt hoặc SLO.
 
-\par\penalty0
-\subsection{Độ tin cậy của dữ liệu quan sát}\label{subsection:methods-5}
-% Trình bày độ tin cậy của dữ liệu quan sát; bổ sung nguồn và minh họa khi cần.
+Nếu xét đủ ba placement, hai mức tenant, hai mức VU và ba lần lặp, thiết kế có 36 run đo. Số lượng này chỉ là hệ quả của thiết kế factorial đề xuất, không phải số run đã thực hiện. Việc chọn quy mô cần kiểm tra lại với tài nguyên VPS và độ biến thiên của pilot.
 
-\par\penalty0
-\subsection{Quan hệ giữa các đối tượng}\label{subsection:methods-6}
-% Trình bày quan hệ giữa các đối tượng; bổ sung nguồn và minh họa khi cần.
+Workload đọc hiện có là \Code{GET /api/v1/projects?size=20}. Workload baseline duy trì số VU cố định cho từng tenant và thời gian chờ một giây giữa thao tác. Đây là điểm xuất phát phù hợp với câu hỏi số VU đồng thời. Workload tải theo constant-arrival-rate dùng trần VU khác, do đó đo một mô hình tải khác; không dùng maxVUs 100 để gọi đó là thí nghiệm 10--20 người dùng đồng thời.
 
-\par\penalty0
-\subsection{Xây dựng cấu trúc phân tích}\label{subsection:methods-7}
-% Trình bày xây dựng cấu trúc phân tích; bổ sung nguồn và minh họa khi cần.
+\subsection{Metric và cách diễn giải}
+Độ trễ p50\slash p95 phải được báo cáo per-tenant và per-run, cùng throughput, số request và error rate. HTTP 429 được tách khỏi lỗi hệ thống vì request bị limiter từ chối là một hành vi cần quan sát. Throughput được định nghĩa theo request hoàn thành trong cửa sổ đo; successful throughput cần ghi riêng khi có nhiều request thất bại. Không cộng hoặc lấy trung bình các p95 rồi gọi đó là p95 gộp.
 
-\par\penalty0
-\subsection{Ràng buộc và điều kiện áp dụng}\label{subsection:methods-8}
-% Trình bày ràng buộc và điều kiện áp dụng; bổ sung nguồn và minh họa khi cần.
+Tài nguyên cần CPU, RSS\slash heap nếu có, RAM của container, connections đang mở hoặc active, pool waiting và trạng thái job nền. Manifest ghi pool size của control plane, API và worker, cùng placement, seed, phiên bản JVM, PostgreSQL, k6, image digest và các dịch vụ cùng chạy. Endpoint list projects còn phụ thuộc số hàng và membership; hai seed có kích thước khác nhau không tạo phép so sánh tương đương.
 
-\par\penalty0
-\subsection{Chi phí tính toán và quy mô dữ liệu}\label{subsection:methods-9}
-% Trình bày chi phí tính toán và quy mô dữ liệu; bổ sung nguồn và minh họa khi cần.
+Workload đọc chỉ hỗ trợ kết luận cho endpoint đọc. Mutation task, batch move, upload và worker yêu cầu workload bổ sung được đăng ký trước. ``20 VU'' là mô hình tải, chưa đồng nghĩa 20 người dùng thật hoặc 20 tài khoản nếu script tái sử dụng token; cách cấp account\slash token cần được khóa và mô tả riêng.
 
-\par\penalty0
-\subsection{Tổng hợp thông tin}\label{subsection:methods-10}
-% Trình bày tổng hợp thông tin; bổ sung nguồn và minh họa khi cần.
+\subsection{Noisy neighbor và phép so sánh cặp}
+Thiết kế cần aggressor và victim, cùng workload và cấu hình giữa hai biến thể limiter tắt\slash bật. Quan sát cả latency, throughput, error\slash 429 và tài nguyên của victim. Tỷ số p95 victim sau\slash trước có thể mô tả mức thay đổi khi mẫu số hợp lệ, nhưng không thay dữ liệu gốc hoặc độ biến thiên giữa các cặp run. Thiết kế này xuất phát từ rủi ro tài nguyên chia sẻ; database riêng vẫn có thể chịu ảnh hưởng ở API, CPU hoặc storage \citep{awsNoisyNeighbor}.
 
-\par\penalty0
-\subsection{Thiết kế đánh giá}\label{subsection:methods-11}
-% Trình bày thiết kế đánh giá; bổ sung nguồn và minh họa khi cần.
+Limiter hiện là in-memory cho một API instance, nên đánh giá multi-instance là câu hỏi khác. Pilot cần tìm tải aggressor gây cạnh tranh nhưng vẫn quan sát được victim; không chọn tải sau khi xem kết quả để ưu ái một placement. Side effect provisioning hoặc SMTP đang chạy trong lúc đo phải được giữ giống nhau hoặc đưa thành biến riêng.
 
-\par\penalty0
-\subsection{Suy luận thống kê và đơn vị phân tích}\label{subsection:methods-12}
-% Trình bày suy luận thống kê và đơn vị phân tích; bổ sung nguồn và minh họa khi cần.
+\subsection{Đơn vị lặp, QA và giới hạn thống kê}
+Các run độc lập cần reset dữ liệu tương đương, xác nhận cache\slash warm-up và giữ thứ tự ngẫu nhiên hoặc xen kẽ đã ghi. Ít nhất ba run là điểm xuất phát để quan sát biến thiên, chưa bảo đảm power cho mọi kiểm định. Khi số run nhỏ, ưu tiên mô tả từng run, median\slash range và paired difference; chỉ dùng khoảng tin cậy hoặc kiểm định sau khi phương pháp và giả định phù hợp đã được khóa.
 
-\par\penalty0
-\subsection{Diễn giải các chỉ số}\label{subsection:methods-13}
-% Trình bày diễn giải các chỉ số; bổ sung nguồn và minh họa khi cần.
+QA kiểm tra checksum, thời gian cửa sổ, protocol ID, commit\slash image, seed, metric tags và dữ liệu thiếu. Kết quả không được đưa vào phân tích cuối nếu \Code{run_class} là development\slash pilot, working tree không đáp ứng protocol hoặc eligible flag chưa hợp lệ. Pipeline hiện có được xem là công cụ hỗ trợ kiểm tra; validator pass không thay review raw data.
 
-\par\penalty0
-\subsection{Quy trình phân tích có thể tái lập}\label{subsection:methods-14}
-% Trình bày quy trình phân tích có thể tái lập; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:experiment-design} tách các biến thay đổi khỏi điều kiện giữ cố định. Cần tách warm-up và số lần lặp độc lập; việc tăng số request trong một run không thay thế lặp run.
+\input{assets/diagrams/experiment-design}
 
-\par\penalty0
-\subsection{Đánh giá sai lệch và hướng cải thiện}\label{subsection:methods-15}
-% Trình bày đánh giá sai lệch và hướng cải thiện; bổ sung nguồn và minh họa khi cần.
-
+\subsection{Đánh giá người dùng và điều kiện thực hiện}
+Protocol hiện có đề cập tác vụ chuẩn, SUS và góp ý. Nhóm cần xác nhận phạm vi, xin phê duyệt cần thiết, tuyển người tham gia và lấy đồng thuận trước khi thu. Báo cáo hiện tại không có điểm SUS hoặc tỷ lệ hoàn thành tác vụ. Dữ liệu chỉ nhận mã ngẫu nhiên\slash đã ẩn danh theo quy trình, và người tham gia được dừng theo điều kiện đồng thuận. Hiệu quả sử dụng và hiệu quả kiến trúc được đánh giá riêng, không lấy sự hài lòng làm chứng cứ rằng không có leak.

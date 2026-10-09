@@ -1,24 +1,40 @@
-\par\penalty0
-\section{Thiết kế mô hình nghiên cứu}\label{section:image-design-1}
-% Trình bày thiết kế mô hình nghiên cứu; bổ sung nguồn và minh họa khi cần.
+\section{Khung bài toán và chuỗi truy vết}\label{sec:research-design}
+\subsection{Đơn vị phân tích và câu hỏi thành phần}
+Đơn vị phân tích kiến trúc là một đường xử lý có tenant: request, transaction, object operation hoặc job. Đơn vị quan sát kỹ thuật là tình huống kiểm tra cùng trạng thái trước\slash sau. Đơn vị thực nghiệm hiệu năng dự kiến là một run độc lập trên cấu hình đã khóa; request trong cùng run không được mặc nhiên coi là các lần lặp độc lập.
 
-\par\penalty0
-\subsection{Cấu trúc mô hình}\label{subsection:image-design-2}
-% Trình bày cấu trúc mô hình; bổ sung nguồn và minh họa khi cần.
+N1 hỏi cách giữ một ngữ cảnh đúng xuyên vòng đời xử lý. N2 hỏi cách bố trí và bảo vệ dữ liệu trên hạ tầng giới hạn. N3 hỏi cách thực thi quyền theo tenant\slash project và khi membership thay đổi. N4 hỏi cách phát hiện cập nhật cũ và xử lý side effect lặp\slash stale. N5 hỏi cách cấp phát có thể phục hồi và chia sẻ tài nguyên có kiểm soát. Các câu hỏi được lấy từ tình huống thất bại cụ thể, không lấy tên công nghệ làm câu hỏi nghiên cứu.
 
-\par\penalty0
-\subsection{Biến đổi dữ liệu và hàm mục tiêu}\label{subsection:image-design-3}
-% Trình bày biến đổi dữ liệu và hàm mục tiêu; bổ sung nguồn và minh họa khi cần.
+\subsection{Quy trình sáu bước}
+Hình~\ref{fig:research-chain} cho thấy cách đi từ tình huống đến mệnh đề có thể kiểm chứng. Khi bằng chứng không đáp ứng tiêu chí, cần bổ sung hiện thực hoặc thiết kế kiểm tra trước khi kết luận.
+\begin{enumerate}
+  \item \textbf{Xác định bài toán:} mô tả tác nhân, tài nguyên, phạm vi tin cậy và tình huống gây sai lệch.
+  \item \textbf{Phương án:} liệt kê ít nhất hai cách giải quyết cùng vấn đề; tách topology dữ liệu khỏi cơ chế enforcement.
+  \item \textbf{Tiêu chí:} ghi điều kiện allow\slash deny, side effect, phục hồi hoặc metric cần đo; không đặt ngưỡng sau khi biết kết quả.
+  \item \textbf{Hiện thực:} đối chiếu component, SQL, migration và vòng đời transaction của checkout; phân biệt thiết kế dự kiến với code đang chạy.
+  \item \textbf{Bằng chứng:} liên kết source\slash test\slash biên bản với ngày, phiên bản, môi trường, kết quả và giới hạn.
+  \item \textbf{Mục báo cáo:} gắn phân tích vào Chương 3, kết quả\slash giới hạn vào Chương 4 và đường kiểm toán vào phụ lục.
+\end{enumerate}
+\input{assets/diagrams/research-chain}
+Lý do lựa chọn được viết giữa bước tiêu chí và hiện thực. ``Đã chọn để cài đặt'' là một quyết định phát triển; ``phù hợp nhất'' là một kết luận so sánh đòi hỏi bằng chứng bổ sung. Một ADR còn Proposed không được chuyển thành Accepted chỉ vì nội dung báo cáo đã hoàn thiện.
 
-\par\penalty0
-\subsection{Tối ưu và lựa chọn cấu hình}\label{subsection:image-design-4}
-% Trình bày tối ưu và lựa chọn cấu hình; bổ sung nguồn và minh họa khi cần.
+\begin{longtable}{@{}P{.09\textwidth}P{.17\textwidth}P{.34\textwidth}P{.30\textwidth}@{}}
+\caption{Truy vết nhóm bài toán tới RQ, tiêu chí, hiện thực và đánh giá}\label{tab:traceability}\\
+\toprule Nhóm & RQ / mục & Phương án và tiêu chí trọng tâm & Hiện thực / bằng chứng \\
+\midrule\endfirsthead
+\toprule Nhóm & RQ / mục & Phương án và tiêu chí trọng tâm & Hiện thực / bằng chứng \\
+\midrule\endhead
+N1 & RQ2\slash 3\slash 4; \ref{sec:n1} & Host\slash path\slash header\slash token; mismatch trước SQL, dọn context khi lỗi & Filter\slash holder\slash executor; \Evidence{E10}; test hiện có, giới hạn ở \ref{sec:coverage} \\
+N2 & RQ2\slash 3\slash 4; \ref{sec:n2} & Ba topology; predicate\slash ORM\slash RLS; đọc\slash ghi\slash xóa chéo và quyền runtime & Resolver\slash migrations; \Evidence{E09}, \Evidence{E11}; chưa có phép đo placement \\
+N3 & RQ1\slash 2\slash 3; \ref{sec:n3} & JWT role\slash server membership\slash ABAC; allow\slash deny, revoke, không side effect & Auth\slash project guard; \Evidence{E12}, \Evidence{E05}; phụ lục quyền \\
+N4 & RQ2\slash 3; \ref{sec:n4} & LWW\slash version\slash locking; direct send\slash outbox\slash broker; conflict, batch, dedupe, stale & Project service\slash outbox\slash reminder; \Evidence{E13}, \Evidence{E06} \\
+N5 & RQ2\slash 3\slash 4; \ref{sec:n5} & Manual\slash synchronous\slash worker; retry, lease, ownership, quota\slash pool\slash limiter & Provisioner\slash storage\slash resolver; \Evidence{E08}, \Evidence{E14}; phép đo ở \ref{sec:measurement-plan} \\
+\bottomrule
+\end{longtable}
 
-\par\penalty0
-\subsection{Tiền xử lý và khả năng triển khai}\label{subsection:image-design-5}
-% Trình bày tiền xử lý và khả năng triển khai; bổ sung nguồn và minh họa khi cần.
+\subsection{Phương pháp so sánh và quy tắc lựa chọn}
+Phân tích định tính xem xét correctness, khả năng kiểm tra, vận hành và độ phức tạp. Điều kiện bảo mật là điều kiện loại: một truy cập chéo thành công không được bù bằng điểm hiệu năng tốt. Các trọng số isolation\slash storage đã đăng ký trong ADR\slash spike plan được giữ cho đợt nghiên cứu tương ứng; báo cáo hiện tại không tạo scorecard mới từ nhận xét chủ quan.
 
-\par\penalty0
-\subsection{Các phương án cải tiến}\label{subsection:image-design-6}
-% Trình bày các phương án cải tiến; bổ sung nguồn và minh họa khi cần.
+So sánh placement yêu cầu cùng phiên bản nghiệp vụ, dữ liệu tương đương và workload. So sánh enforcement Pool là một phép so sánh khác, có deliberate guard omission và kiểm tra runtime role. Không gọi ``RLS so với Silo'' là hai phương án cùng loại: RLS là cơ chế bảo vệ, Silo là topology. Chính sự phân biệt này giúp diễn giải sáu leak trong harness mà không suy rộng sang mọi đường nghiệp vụ.
 
+\subsection{Phạm vi phương pháp đã thực hiện}
+Báo cáo hiện tại đã sử dụng đọc tài liệu, kiểm tra source, đối chiếu tên test và tổng hợp checkpoint. Kiểm tra công cụ xuất bản được thực hiện trên môi trường hiện tại. Tình trạng lượt backend mới được ghi riêng trong \Evidence{E04}; frontend và E2E không được mặc nhiên xem là chạy lại. Workload, fault injection, noisy-neighbor, pilot và thu dữ liệu người dùng vẫn chưa được mở lại.

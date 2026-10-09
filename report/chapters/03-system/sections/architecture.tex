@@ -1,36 +1,23 @@
-\par\penalty0
-\section{Thiết kế tổng thể}\label{section:architecture-1}
-% Trình bày thiết kế tổng thể; bổ sung nguồn và minh họa khi cần.
+\section{Kiến trúc tổng thể Bridge}\label{sec:architecture}
+\subsection{Tổ chức thành phần và hai plane}
+Ứng dụng dùng một backend Spring Boot với profile API và worker. Frontend React gọi cùng OpenAPI cho các placement. API tiếp nhận request và thực thi nghiệp vụ; worker cấp phát, nâng application schema và xử lý tác vụ nền. PostgreSQL giữ control database và application data; MinIO và Mailpit là adapter dịch vụ trong Compose local. Prometheus\slash Grafana hỗ trợ quan sát theo cấu hình hiện có \Evidence{E15}.
 
-\par\penalty0
-\subsection{Các thành phần chính}\label{subsection:architecture-2}
-% Trình bày các thành phần chính; bổ sung nguồn và minh họa khi cần.
+Control plane quản lý account, tenant, membership, tier, placement, route, payment và provisioning. Application plane lưu project, board, task, bình luận, resource, notification và outbox. Hình~\ref{fig:planes} biểu diễn đường truy cập, không phải sơ đồ triển khai đã được nghiệm thu trên Internet.
+\input{assets/diagrams/planes}
 
-\par\penalty0
-\subsection{Phân lớp và tổ chức thành phần}\label{subsection:architecture-3}
-% Trình bày phân lớp và tổ chức thành phần; bổ sung nguồn và minh họa khi cần.
+Một mutation nghiệp vụ dùng một transaction application database qua executor. Các cập nhật account\slash payment\slash job dùng control transaction. Không giả định có ACID transaction xuyên hai plane, storage hoặc SMTP. Workflow cấp phát phối hợp các bước bằng trạng thái, lease và compensation. Thiết kế này giúp ghi rõ điểm có lỗi từng phần thay vì che lỗi bằng một lời gọi ``tạo workspace'' ở giao diện.
 
-\par\penalty0
-\subsection{Lưu trữ và quản lý dữ liệu}\label{subsection:architecture-4}
-% Trình bày lưu trữ và quản lý dữ liệu; bổ sung nguồn và minh họa khi cần.
+\subsection{Mô hình dữ liệu và hợp đồng thống nhất}
+Mỗi bản ghi nghiệp vụ được gắn tenant ID, kể cả ở schema hoặc database riêng. Đây là quy ước hiện thực để giữ cùng SQL, policy, test và audit. Quan hệ project--board--task cùng membership xác định quyền nội dung; quan hệ resource--task cho phép sử dụng lại file\slash link trong cùng tenant. Soft delete giữ bản ghi phục vụ lịch sử và cleanup, nhưng truy vấn hoạt động cần loại các đối tượng đã xóa.
 
-\par\penalty0
-\subsection{Giao diện và trao đổi thông tin}\label{subsection:architecture-5}
-% Trình bày giao diện và trao đổi thông tin; bổ sung nguồn và minh họa khi cần.
+OpenAPI là nguồn hợp đồng; frontend sinh type từ contract. Request nghiệp vụ mang ID tài nguyên và phiên bản mong đợi, còn tenant identity do host\slash token đã xác minh quyết định. Tài liệu và diagram phải theo cùng thuật ngữ Pool\slash Schema-per-tenant\slash Silo database để tránh gọi schema là database hoặc gọi database riêng là full-stack silo.
 
-\par\penalty0
-\subsection{Tổ chức dữ liệu dùng chung}\label{subsection:architecture-6}
-% Trình bày tổ chức dữ liệu dùng chung; bổ sung nguồn và minh họa khi cần.
+\subsection{Placement registry và vòng đời schema}
+Registry lưu placement của tenant và metadata đã cấp phát. Resolver chọn datasource từ tenant context; credential đặc quyền chỉ ở đường provisioner. Application migration V1--V12 dùng cho cấu trúc lõi các placement; control plane có V1--V6 ở checkout. Marker schema trong placement giúp worker bỏ qua outbox khi application schema chưa đạt phiên bản mới nhất \Evidence{E11}, \Evidence{E14}.
 
-\par\penalty0
-\subsection{Thành phần xử lý chính}\label{subsection:architecture-7}
-% Trình bày thành phần xử lý chính; bổ sung nguồn và minh họa khi cần.
+Registry còn cho phép mô tả vận hành thống nhất, nhưng không tự chứng minh migration không lỗi trên mọi phiên bản cũ. Bằng chứng upgrade local được ghi theo checkpoint. Không suy rằng mọi database đang chạy hôm nay đều V12 chỉ từ migration có trong source hoặc trạng thái runtime cũ.
 
-\par\penalty0
-\subsection{Giao diện sử dụng và phản hồi}\label{subsection:architecture-8}
-% Trình bày giao diện sử dụng và phản hồi; bổ sung nguồn và minh họa khi cần.
+\subsection{Quyết định kiến trúc và trạng thái}
+ADR-0007 chấp nhận phiên tenant-bound; ADR-0006 chấp nhận state machine và outbox. ADR-0008 chấp nhận Bridge ba placement cho triển khai local, đồng thời ghi phần phạm vi học thuật chờ xác nhận. ADR-0003\slash 0004\slash 0005 về isolation mechanism, payment và storage vẫn Proposed. Việc RLS, FakePaymentProvider và MinIO xuất hiện trong hệ thống không đồng nghĩa chúng đã thắng so sánh nghiên cứu.
 
-\par\penalty0
-\subsection{Phạm vi nghiên cứu và triển khai}\label{subsection:architecture-9}
-% Trình bày phạm vi nghiên cứu và triển khai; bổ sung nguồn và minh họa khi cần.
-
+Một điểm khác biệt cần ghi là ADR-0006 mô tả round-robin\slash bounded concurrency, còn \Code{OutboxWorker.poll} hiện duyệt các tenant ACTIVE tuần tự bằng stream forEach. Báo cáo mô tả hành vi code là tuần tự; fairness\slash bounded concurrency là thiết kế cần kiểm chứng hoặc bổ sung, không phải tính chất đã xác nhận.

@@ -1,11 +1,16 @@
-\addchap{Kết luận và kiến nghị}\label{chap:chapters-conclusion}
-% Trình bày kết luận và kiến nghị; bổ sung nguồn và minh họa khi cần.
+\addchap{Kết luận và kiến nghị}\label{chap:conclusion}
+\addsec{Kết luận trong phạm vi bằng chứng hiện có}
+Báo cáo đã tổ chức bài toán đa thuê bao thành năm nhóm có truy vết từ tình huống, phương án, tiêu chí tới code, evidence và mục đánh giá. Nguyên mẫu Kanban hiện có account\slash control plane chung, verified tenant context, ba placement application data, quyền tenant\slash project, optimistic version, outbox và workflow provisioning. Các cơ chế được đối chiếu với mã thực thi và hồ sơ kiểm chứng theo phiên bản.
 
-\par\penalty0
-\addsec{Kết luận}\label{addsec:conclusion-2}
-% Trình bày kết luận; bổ sung nguồn và minh họa khi cần.
+Lập luận sơ bộ cho thấy cần nhiều lớp bảo vệ và quản lý vòng đời: host\slash token không thay quyền project; namespace không thay runtime privilege; RLS không bảo vệ object storage; version không giải quyết delivery lặp; claim provisioning không chứng minh nhiều outbox worker an toàn. Các phân biệt này tạo tiêu chí kiểm chứng cụ thể thay cho tuyên bố an toàn hoặc tối ưu chung chung.
 
-\par\penalty0
-\addsec{Kiến nghị}\label{addsec:conclusion-3}
-% Trình bày kiến nghị; bổ sung nguồn và minh họa khi cần.
+Bằng chứng được giữ theo checkpoint, môi trường và số skip. Sáu leak deliberate guard omission của hai ứng viên Pool được báo cáo như hành vi không an toàn; RLS + guard có căn cứ sàng lọc nhưng ADR selection vẫn Proposed. Kết quả unit\slash local không thay dữ liệu hiệu năng, pilot, SUS hoặc vận hành Internet. Bốn RQ có câu trả lời sơ bộ kèm giới hạn và điều kiện bổ sung trong Chương~\ref{chap:evaluation}.
 
+Chưa có cơ sở kết luận placement tối ưu, SLO đã đạt, efficacy limiter hoặc tác động giáo dục. Các bảng cần đo mang trạng thái \PendingData. Các kết luận về hiệu năng và tác động cần được bổ sung bằng dữ liệu theo phương pháp đã mô tả.
+
+\addsec{Kiến nghị và công việc tiếp theo}
+Nhóm cần xác nhận thời hạn\slash phạm vi và phụ lục ba placement, rà tài liệu tham khảo, kiểm tra tích hợp không skip và review hồ sơ loại. Khi mở lại giai đoạn đo, cần khóa cấu hình VPS\slash workload\slash seed, pilot, chạy độc lập, lưu raw metric ngoài Git và sinh bảng\slash biểu đồ từ dữ liệu đã QA.
+
+Các chủ đề kỹ thuật cần đánh giá riêng gồm nhiều API instance với limiter\slash quota, ngân sách connection toàn hệ thống, nhiều outbox worker, policy signed URL và fairness của worker tuần tự. Provider payment\slash SMTP\slash Web Push thật chỉ được kết luận sau contract và môi trường tương ứng. Nếu đánh giá người dùng thuộc phạm vi, chỉ thu sau xác nhận và đồng thuận; không gán điểm SUS hoặc tác động giả định.
+
+Trước bản nộp cuối, cần kiểm tra số trang, bibliography, biểu mẫu và sản phẩm bàn giao. Chữ ký\slash nhận xét và thông tin chưa xác nhận dành cho người có thẩm quyền điền.

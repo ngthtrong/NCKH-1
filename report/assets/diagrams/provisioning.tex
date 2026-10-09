@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=32mm] (queued) at (0,0) {\textbf{Chờ cấp phát}\\QUEUED};
+\node[ramber,text width=32mm] (running) at (4.9,0) {\textbf{Đang thực hiện}\\RUNNING / lease};
+\node[rteal,text width=32mm] (success) at (9.8,0) {\textbf{Thành công}\\SUCCEEDED\\Tenant ACTIVE};
+\node[ramber,text width=32mm] (retry) at (0,-2.8) {\textbf{Thử lại có lịch}\\RETRYABLE\_\\FAILED};
+\node[ramber,text width=32mm] (rollback) at (4.9,-2.8) {\textbf{Compensation}\\Sau hết số lần thử};
+\node[rred,text width=32mm] (failed) at (9.8,-2.8) {\textbf{Đã thu hồi tài nguyên}\\FAILED\_\\ROLLED\_BACK};
+\node[rred,text width=58mm] (manual) at (4.9,-5.1) {\textbf{Dọn lỗi: phục hồi thủ công}\\ROLLBACK\_FAILED / audit};
+\draw[rflow] (queued) -- (running);
+\draw[rflow] (running) -- (success);
+\draw[rfail] (running.south west) -- node[rlabel,sloped,above]{Còn attempt} (retry.north east);
+\draw[rfail] (running) -- node[rlabel,right]{Hết attempt} (rollback);
+\draw[raux] (retry.west) -- ++(-.5,0) -- ++(0,4.15) -| (running.north);
+\node[rlabel] at (2.3,1.35) {Đến lịch thử tiếp theo};
+\draw[rflow] (rollback) -- (failed);
+\draw[rfail] (rollback) -- (manual);
+\node[rnote,text width=125mm] at (4.9,-7) {\textbf{Điều kiện an toàn:} giữ ownership của tài nguyên, kiểm tra lease lúc finalize và không dọn tài nguyên của tenant khác. Trạng thái job khác trạng thái tenant.};
+\end{tikzpicture}
+\caption[Cấp phát, retry và compensation]{Luồng trạng thái cấp phát: finalize chỉ thành công khi lease và các bước chuẩn bị hợp lệ; nhánh lỗi tách retry, compensation và phục hồi thủ công (E14).}\label{fig:provisioning}
+\end{figure}

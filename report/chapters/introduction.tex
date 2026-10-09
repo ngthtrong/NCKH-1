@@ -1,27 +1,38 @@
-\addchap{Mở đầu}\label{chap:chapters-introduction}
-% Trình bày mở đầu; bổ sung nguồn và minh họa khi cần.
+\addchap{Mở đầu}\label{chap:introduction}
+Báo cáo phân tích kiến trúc đa thuê bao và nguyên mẫu Kanban, tổng hợp bằng chứng kiểm chứng kỹ thuật, đồng thời xây dựng phương pháp đánh giá. Kết quả kiểm tra được diễn giải theo ngày, phiên bản và môi trường. Những phép đo chưa có dữ liệu được ghi rõ trạng thái và điều kiện bổ sung ở Chương~\ref{chap:evaluation}.
 
-\par\penalty0
-\addsec{Tổng quan tình hình nghiên cứu trong nước và ngoài nước}\label{addsec:introduction-2}
-% Trình bày tổng quan tình hình nghiên cứu trong nước và ngoài nước; bổ sung nguồn và minh họa khi cần.
+\addsec{Bối cảnh và lý do chọn đề tài}
+Một dịch vụ quản lý công việc cho nhiều lớp học hoặc nhóm nghiên cứu cần phục vụ đồng thời hai yêu cầu: chia sẻ hạ tầng để vận hành thống nhất và giữ phạm vi dữ liệu, quyền của mỗi không gian làm việc. Một người có thể thuộc nhiều nhóm, nhưng khi đang thao tác ở nhóm A, họ không được đọc dữ liệu nhóm B chỉ vì biết mã dự án hoặc mã task. Biên tenant vì vậy phải được xác lập tại request, truy vấn, lưu trữ và tác vụ nền, thay vì chỉ được biểu diễn bằng một màn hình chọn workspace.
 
-\par\penalty0
-\addsec{Lý do chọn đề tài}\label{addsec:introduction-3}
-% Trình bày lý do chọn đề tài; bổ sung nguồn và minh họa khi cần.
+Kanban cung cấp đối tượng nghiệp vụ cụ thể để nghiên cứu ranh giới này: project có thành viên; board có cột; task có trạng thái, người được giao, thời hạn, tài nguyên và lịch sử. Khi hai thành viên cùng sửa task hoặc khi worker gửi nhắc hạn sau một thay đổi, vấn đề không chỉ là quyền đọc mà còn là nhất quán trạng thái và side effect. Ứng dụng được dùng làm nguyên mẫu để kiểm tra kiến trúc trong các tình huống có thể tái lập.
 
-\par\penalty0
-\addsec{Mục tiêu đề tài}\label{addsec:introduction-4}
-% Trình bày mục tiêu đề tài; bổ sung nguồn và minh họa khi cần.
+Nghiên cứu này tập trung vào năm nhóm: định danh và truyền ngữ cảnh; bố trí và cô lập dữ liệu; xác thực và phân quyền; nhất quán và xử lý nền; cấp phát và quản lý tài nguyên. Các hướng tiếp cận được đặt trong cùng API và nghiệp vụ để làm rõ đánh đổi. Việc lựa chọn placement được phân tích theo tiêu chí và bằng chứng; chưa khẳng định một placement tối ưu cho mọi điều kiện.
 
-\par\penalty0
-\addsec{Phương pháp nghiên cứu}\label{addsec:introduction-5}
-% Trình bày phương pháp nghiên cứu; bổ sung nguồn và minh họa khi cần.
+\addsec{Tình hình nghiên cứu và khoảng trống thực hành}
+Các nguồn đã lựa chọn bao gồm nghiên cứu tổng quan, hướng dẫn phương pháp và tài liệu kỹ thuật chính thức. Olabanji và cộng sự lập bản đồ nghiên cứu multi-tenancy trong cloud-native; Narasayya và Chaudhuri khảo sát dịch vụ dữ liệu đám mây, trong đó cô lập hiệu năng và tài nguyên là các vấn đề cần đánh giá \citep{olabanji2023multitenancy,narasayya2021cloud}. Phạm vi của hai công trình rộng hơn nguyên mẫu Kanban này.
 
-\par\penalty0
-\addsec{Đối tượng nghiên cứu}\label{addsec:introduction-6}
-% Trình bày đối tượng nghiên cứu; bổ sung nguồn và minh họa khi cần.
+Khoảng trống được phát biểu ở mức dự án: cần một chuỗi truy vết từ yêu cầu đến lựa chọn kiến trúc, mã thực thi, tình huống kiểm tra và điều kiện đo trên tài nguyên giới hạn. Báo cáo không tuyên bố chưa từng có hệ thống tương tự trong toàn bộ học thuật. Tổng quan hiện là tổng hợp có cấu trúc; nhật ký tìm kiếm của nhóm chưa có đầy đủ export, sàng lọc hai người và extraction cho một systematic mapping hoàn chỉnh.
 
-\par\penalty0
-\addsec{Phạm vi nghiên cứu}\label{addsec:introduction-7}
-% Trình bày phạm vi nghiên cứu; bổ sung nguồn và minh họa khi cần.
+\addsec{Mục tiêu và câu hỏi nghiên cứu}
+Mục tiêu tổng quát là thiết kế, hiện thực và đánh giá một kiến trúc tham chiếu đa thuê bao cho quản lý công việc. Mục tiêu cụ thể gồm xác lập ngữ cảnh tenant có kiểm chứng, bảo vệ dữ liệu và quyền, phát hiện xung đột cập nhật, phục hồi workflow cấp phát và chuẩn bị phép đo có truy vết.
 
+Bốn câu hỏi trong protocol 0.1 được giữ nguyên về ý nghĩa và phạm vi baseline \Evidence{E02}:
+\begin{enumerate}
+  \item \textbf{RQ1:} Ứng dụng quản lý công việc trong môi trường đại học cần các yêu cầu nghiệp vụ và đa thuê bao nào?
+  \item \textbf{RQ2:} Làm thế nào xây dựng khung Bridge kết hợp Pool và Silo nhưng vẫn dùng chung danh tính, cấp phát, mã nghiệp vụ và trải nghiệm vận hành?
+  \item \textbf{RQ3:} Kiến trúc đáp ứng đến mức nào các yêu cầu về cô lập dữ liệu, phân quyền, cấp phát, hiệu năng, kiểm soát noisy neighbor và khả dụng?
+  \item \textbf{RQ4:} Cơ chế và công nghệ nào phù hợp nhất để hiện thực kiến trúc trên một VPS tài nguyên giới hạn?
+\end{enumerate}
+N1--N5 là các câu hỏi thành phần giúp tổ chức lập luận, không thay thế RQ đã đăng ký. Việc thêm Schema-per-tenant vào hiện thực được mô tả là phần mở rộng local; phép đo ba placement phải có phụ lục protocol đăng ký trước.
+
+\addsec{Đối tượng và phạm vi}
+Đối tượng nghiên cứu là các ranh giới tenant trong luồng Kanban, từ phiên đăng nhập đến SQL và worker. Hệ thống hiện có API\slash worker Spring Boot, frontend React, PostgreSQL và các adapter local. Application plane hỗ trợ Pool, Schema-per-tenant và Silo database; control plane dùng chung tài khoản và metadata vận hành.
+
+Phạm vi phân tích bao gồm phân tích mã, hợp đồng OpenAPI, ADR, test và biên bản local. Capability và tùy biến được nhận diện trong phụ lục với trạng thái học thuật chưa xác nhận. Chưa đưa realtime collaboration, autoscaling, full-stack silo, di chuyển tenant có dữ liệu hoặc chứng nhận production vào kết luận.
+
+Thuyết minh mục 5 ghi tháng 5--10\slash 2026, còn mục 13.2 và tiến độ ghi tháng 3--8\slash 2026. Biểu mẫu hiện giữ khoảng thời gian ở mục 5 làm thông tin tham chiếu; thời hạn chính thức vẫn cần đối chiếu hồ sơ đã ký. Tương tự, IEEE được dùng trong báo cáo trong khi quy cách tài liệu tham khảo cuối cần nhóm xác nhận \Evidence{E01}.
+
+\addsec{Phương pháp và tổ chức báo cáo}
+Phương pháp gồm phân tích tài liệu có kiểm chứng, xác lập tình huống và bất biến, so sánh phương án, đối chiếu hiện thực, tổng hợp bằng chứng và thiết kế đánh giá. Một test dùng fixture cung cấp bằng chứng cho hành vi trong tình huống đó; không cung cấp số đo chất lượng dịch vụ trên VPS hoặc đánh giá người dùng.
+
+Chương~\ref{chap:foundations} trình bày khái niệm, tổng quan và yêu cầu. Chương~\ref{chap:methods} xây dựng chuỗi truy vết và phương pháp đánh giá. Chương~\ref{chap:system} phân tích năm nhóm và kiến trúc hiện thực. Chương~\ref{chap:evaluation} tổng hợp bằng chứng, trả lời RQ sơ bộ và mô tả phép đo còn thiếu. Phụ lục tổng hợp bằng chứng, ma trận quyền và giới hạn của phần mở rộng.

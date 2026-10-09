@@ -1,28 +1,38 @@
-\par\penalty0
-\section{Nền tảng khoa học}\label{section:background-1}
-% Trình bày nền tảng khoa học; bổ sung nguồn và minh họa khi cần.
+\section{Khái niệm và mô hình đa thuê bao}\label{sec:concepts}
+\subsection{Tenant, workspace và người dùng}
+Trong mô hình của đề tài, tenant là đơn vị có phạm vi dữ liệu, membership và vận hành riêng; workspace là cách gọi đơn vị ấy ở giao diện. Account là danh tính chung của một người. Quan hệ account--tenant là nhiều--nhiều, còn quyền project được gán ở một phạm vi nhỏ hơn. Một account có vai trò Owner tại A và Member tại B không được mang quyền của A sang phiên B.
 
-\par\penalty0
-\subsection{Khái niệm và thuật ngữ}\label{subsection:background-2}
-% Trình bày khái niệm và thuật ngữ; bổ sung nguồn và minh họa khi cần.
+Đặc điểm đa thuê bao nằm ở việc nhiều workspace sử dụng cùng hệ thống. Cơ chế như host\slash token, RLS hay quota là cách hiện thực đặc điểm đó. Yêu cầu chất lượng là điều kiện cần kiểm chứng, chẳng hạn từ chối truy cập chéo hoặc bảo đảm một lần retry không tạo thêm tài nguyên. Trộn ba tầng này sẽ dẫn tới kết luận thiếu căn cứ: việc có RLS trong migration chưa chứng minh mọi đường dữ liệu đều cô lập.
 
-\par\penalty0
-\subsection{Cơ sở lý thuyết}\label{subsection:background-3}
-% Trình bày cơ sở lý thuyết; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:account-scope} tách danh tính chung khỏi hai phạm vi cấp quyền. Điểm quan trọng là quan hệ thành viên tại workspace không thay thế quan hệ thành viên tại project.
+\input{assets/diagrams/account-scope}
 
-\par\penalty0
-\subsection{Điều kiện và bối cảnh áp dụng}\label{subsection:background-4}
-% Trình bày điều kiện và bối cảnh áp dụng; bổ sung nguồn và minh họa khi cần.
+\subsection{Ba topology dữ liệu và Bridge}
+Thuật ngữ placement chỉ vị trí tổ chức dữ liệu nghiệp vụ, không đồng nghĩa một máy chủ vật lý. Pool dùng chung database, schema và bảng. Schema-per-tenant dùng database chung nhưng schema riêng. Silo database cấp database riêng, trong khi API, worker, storage và host PostgreSQL vẫn có thể dùng chung. Bridge là hệ thống kết hợp các placement sau một hợp đồng ứng dụng. Mô hình compute chung\slash database riêng cũng được tài liệu targeted isolation của AWS phân tích \citep{awsTargetedIsolation}.
 
-\par\penalty0
-\subsection{Các phương pháp nền tảng}\label{subsection:background-5}
-% Trình bày các phương pháp nền tảng; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Phân biệt topology với biên được bảo vệ}\label{tab:topologies}
+\begin{tabularx}{\textwidth}{P{.20\textwidth}XX}
+\toprule Placement & Cấu trúc application data & Biên và phần vẫn chia sẻ \\
+\midrule
+Pool & Chung database\slash schema\slash bảng; mỗi hàng có tenant ID & Cần enforcement theo hàng; cùng database và tài nguyên máy chủ \\
+Schema-per-tenant & Schema và runtime role riêng trong database chung & Namespace cộng quyền schema; vẫn chung database\slash CPU\slash I\slash O \\
+Silo database & Database và runtime role riêng & Biên database; vẫn có thể chung API, worker, storage và host \\
+\bottomrule\end{tabularx}
+\end{table}
+Việc nhiều đơn vị migration và pool xuất hiện ở Schema\slash Silo là hệ quả cấu trúc có thể suy ra từ hiện thực. Mức chi phí thực tế, độ trễ hoặc khả năng chịu tải không thể suy ra chỉ từ bảng này; cần phép đo cùng điều kiện.
 
-\par\penalty0
-\subsection{Đặc điểm và quan hệ giữa các đối tượng}\label{subsection:background-6}
-% Trình bày đặc điểm và quan hệ giữa các đối tượng; bổ sung nguồn và minh họa khi cần.
+\subsection{Cô lập, xác thực và phân quyền}
+Xác thực trả lời ai đang gửi request. Định tuyến tenant xác định workspace và placement. Phân quyền quyết định hành động nào được phép với tài nguyên cụ thể. Nhận diện tenant và quyền người dùng là trách nhiệm riêng; định danh lấy từ request phải được kiểm tra với thông tin phiên trước khi cấp quyền \citep{azureTenantMapping}.
 
-\par\penalty0
-\subsection{Tiêu chí lựa chọn phương pháp}\label{subsection:background-7}
-% Trình bày tiêu chí lựa chọn phương pháp; bổ sung nguồn và minh họa khi cần.
+Trong hiện thực, tenant context kết hợp user ID, tenant ID, slug, tier, placement và mã truy vết. Các guard ứng dụng hạn chế hành động và tập dữ liệu; chính sách database bổ sung enforcement ở đường SQL. Storage guard bảo vệ object key. Worker phải tái lập context từ registry cho từng tenant vì vòng đời job khác vòng đời request \Evidence{E10}--\Evidence{E14}.
 
+\subsection{Kanban và mô hình nghiệp vụ của nguyên mẫu}
+Board của nguyên mẫu thể hiện công việc bằng các cột và task; thao tác di chuyển thay đổi trạng thái. Hệ thống hỗ trợ nhiều board trong project, task có assignee\slash deadline\slash priority, subtask một cấp, bình luận và file\slash link resource. Đây là phạm vi nghiệp vụ được mô tả trong SRS và API, không phải phép đánh giá năng suất làm việc của người dùng \Evidence{E01}, \Evidence{E15}.
+
+Các quan hệ có tác dụng kiểm soát biên: board thuộc project, task thuộc board\slash project, project member có role, resource liên kết nhiều task cùng tenant. Khi nhận task ID, server cần kiểm tra quan hệ sở hữu và membership; kiểm tra hình dạng UUID chỉ bảo đảm cú pháp. Một resource được chia sẻ qua nhiều task cũng không làm mất yêu cầu authorize người tải tại từng project liên quan.
+
+\subsection{Nhất quán giao dịch và workflow nền}
+Một mutation task và việc tạo event có thể nằm trong cùng application transaction. Gửi SMTP hoặc tạo database là side effect bên ngoài transaction ấy. Thiết kế outbox nhằm giải quyết rủi ro hai thao tác ghi dữ liệu\slash phát sự kiện tách rời; consumer vẫn cần xử lý delivery lặp \citep{awsTransactionalOutbox}.
+
+Nguyên mẫu dùng optimistic version để phát hiện client cập nhật từ phiên bản cũ, dùng outbox để chuyển công việc sang worker và dùng state machine để quản lý provisioning. Các cơ chế giải quyết những vấn đề khác nhau: version không thay thế authorization; outbox không chứng minh exactly-once end-to-end; state machine không tự bảo đảm rollback của side effect đã thành công. Tiêu chí của từng cơ chế được tách trong N3--N5.

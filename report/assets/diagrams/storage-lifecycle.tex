@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rhead] at (4.9,1) {UPLOAD: QUYỀN / NAMESPACE / QUOTA};
+\node[rblue,text width=34mm] (guard) at (0,-.3) {\textbf{Kiểm tra đầu vào}\\Tenant / project / quota};
+\node[rblue,text width=34mm] (object) at (4.9,-.3) {\textbf{Lưu object}\\Key theo tenant};
+\node[rteal,text width=34mm] (metadata) at (9.8,-.3) {\textbf{Ghi metadata}\\Liên kết resource};
+\node[rred,text width=47mm] (compensate) at (7.4,-2.2) {\textbf{Nếu metadata lỗi}\\Bù trừ object vừa tạo};
+\draw[rflow] (guard) -- (object);
+\draw[rflow] (object) -- (metadata);
+\draw[rfail] (metadata.south) -- (compensate);
+\node[rhead] at (4.9,-3.5) {XÓA: THAY ĐỔI LOGIC VÀ DỌN VẬT LÝ};
+\node[rblue,text width=34mm] (delete) at (0,-4.8) {\textbf{Xóa mềm}\\Metadata + deletion event};
+\node[rteal,text width=34mm] (worker) at (4.9,-4.8) {\textbf{Worker dọn tệp}\\Kiểm tra phạm vi key};
+\node[ramber,text width=34mm] (retry) at (9.8,-4.8) {\textbf{Lỗi lưu trữ}\\Retry / dead letter\\Requeue có audit};
+\draw[rflow] (delete) -- (worker);
+\draw[rfail] (worker) -- (retry);
+\draw[raux] (retry.south) -- ++(0,-.7) -| (worker.south);
+\node[rnote,text width=125mm] at (4.9,-8) {\textbf{Tài nguyên dạng link:} không có object để dọn. Signed URL đã cấp cần được xét theo thời hạn; revoke membership không mặc nhiên hủy mọi URL còn hiệu lực.};
+\end{tikzpicture}
+\caption[Vòng đời tệp và xử lý xóa]{Vòng đời tệp: upload cần bù trừ khi ghi metadata thất bại; xóa mềm và dọn object được tách qua outbox (E14).}\label{fig:storage-lifecycle}
+\end{figure}

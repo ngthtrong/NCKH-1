@@ -1,35 +1,20 @@
-\chapter{Quy trình tái lập nghiên cứu}\label{chap:appendices-reproducibility}
-% Trình bày quy trình tái lập nghiên cứu; bổ sung nguồn và minh họa khi cần.
+\chapter{Tái lập và kiểm toán bằng chứng}\label{app:evidence}
+\section{Baseline, nguồn và sổ bằng chứng}
+Nguyên mẫu nền được nhận diện bằng phiên bản \BaselineCommit. Mỗi mã E01--E17 liên kết mệnh đề với ngày, phạm vi và giới hạn. Hồ sơ kiểm chứng đi kèm lưu đường dẫn mã, tên test, lệnh thực thi và checksum; phụ lục này trình bày nội dung cần để đánh giá kết luận. Dữ liệu đo thô và dữ liệu người tham gia được quản lý riêng.
+\input{appendices/evidence-register}
 
-\par\penalty0
-\section{Nguồn và phiên bản}\label{section:reproducibility-2}
-% Trình bày nguồn và phiên bản; bổ sung nguồn và minh họa khi cần.
+\section{Điều kiện tái lập xuất bản}
+Nguồn báo cáo sử dụng XeLaTeX, Biber hoặc BibTeX, Poppler và Times New Roman đủ bốn kiểu. Quy trình gồm kiểm tra công cụ, biên dịch đến khi tham chiếu ổn định, kiểm tra PDF và xem trực quan. Báo cáo một mặt, hai mặt, bản tin và tóm tắt Việt--Anh được xuất từ cùng nguồn; hướng dẫn lệnh và vị trí artifact nằm trong hồ sơ xuất bản đi kèm.
 
-\par\penalty0
-\section{Tạo bảng và kiểm tra dữ liệu}\label{section:reproducibility-3}
-% Trình bày tạo bảng và kiểm tra dữ liệu; bổ sung nguồn và minh họa khi cần.
+\section{Tái lập kiểm tra kỹ thuật và điều kiện}
+Backend verification chuẩn dùng Java 21 và Maven wrapper với mục tiêu verify. Frontend cần Node ít nhất 22.12, dependency đúng lockfile, rồi contract\slash lint\slash test\slash build. Testcontainers cần Docker; E2E cần stack và environment đúng. Không giả định môi trường hiện tại có các điều kiện ấy chỉ vì một checkpoint trước đây đã pass.
 
-\par\penalty0
-\section{Tái lập các phép so sánh}\label{section:reproducibility-4}
-% Trình bày tái lập các phép so sánh; bổ sung nguồn và minh họa khi cần.
+Lượt viết này dùng cache Maven sao chép trong thư mục tạm để tránh ghi home read-only. Các lệnh và kết quả thực tế, gồm mục tiêu nào thất bại và test nào skip, được lưu ở biên bản E04. Để đóng baseline cuối cần chạy lại verify và frontend đầy đủ trên môi trường chuẩn, kèm commit, ngày, số test và skipped count.
 
-\par\penalty0
-\section{Tạo hình và kiểm tra phép đo}\label{section:reproducibility-5}
-% Trình bày tạo hình và kiểm tra phép đo; bổ sung nguồn và minh họa khi cần.
+\section{Manifest cho đợt thực nghiệm sau}
+Một manifest tối thiểu ghi run ID\slash class, protocol ID, commit\slash image digest, working-tree state, seed, tenant\slash account\slash project\slash task counts, placement, VU hoặc arrival rate, think time, warm-up\slash cửa sổ đo, pool\slash limiter và phiên bản công cụ. Phần cứng, dịch vụ chạy chung, metric nguồn và checksum phải đi cùng raw artifact. Thông tin token\slash secret không nằm trong manifest.
 
-\par\penalty0
-\section{Tái lập đánh giá thứ nhất}\label{section:reproducibility-6}
-% Trình bày tái lập đánh giá thứ nhất; bổ sung nguồn và minh họa khi cần.
+Kết quả derived được sinh từ raw input đã QA. Một run development\slash pilot không đổi nhãn thành experiment; mọi điều chỉnh protocol phải ghi trước. Các bảng pending trong Chương 4 không được điền tay từ ảnh dashboard hoặc từ một smoke iteration.
 
-\par\penalty0
-\section{Tái lập các đánh giá tiếp theo}\label{section:reproducibility-7}
-% Trình bày tái lập các đánh giá tiếp theo; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\section{Triển khai và kiểm thử}\label{section:reproducibility-8}
-% Trình bày triển khai và kiểm thử; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\section{Các bước cần bổ sung}\label{section:reproducibility-9}
-% Trình bày các bước cần bổ sung; bổ sung nguồn và minh họa khi cần.
-
+\section{Checklist xuất bản và nội dung}
+Checklist gồm đủ Mở đầu\slash bốn chương\slash Kết luận\slash bibliography\slash phụ lục; N1--N5 có đủ chuỗi sáu bước; mỗi RQ có bằng chứng\slash giới hạn\slash công việc bổ sung; citation\slash reference ổn định; bảng dài lặp header; năm sơ đồ đọc được; Times New Roman nhúng và A4. Kiểm tra tự động không thay xem trực quan bìa, mục lục, hình và bibliography. Số trang chính và mức đáp ứng bản cuối được ghi riêng trong biên bản xuất bản.

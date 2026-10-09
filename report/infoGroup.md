@@ -8,7 +8,7 @@ Nguồn đối chiếu: [`resource/thuyetMinhSaasMultiTenancy.md`](../resource/t
 - Tên tiếng Anh: **Development of a Multi-Tenant Task Management Application**.
 - Mã số: **THS2026-67**. Thời gian theo thuyết minh: **6 tháng, 05–10/2026**.
 - Kinh phí dự toán theo thuyết minh, được nhóm xác nhận: **15.000.000 đồng**, do Đại học Cần Thơ cấp; nguồn khác: **0 đồng**. Chưa có số quyết toán.
-- Đơn vị: **Trường Công nghệ Thông tin và Truyền thông, Đại học Cần Thơ**. Đơn vị phối hợp chính: **Không**.
+- Đơn vị: **Trường Công nghệ Thông tin và Truyền thông, Đại học Cần Thơ**. Tên tiếng Anh: **College of Information and Communication Technology, Can Tho University**, theo [trang chính thức của trường](https://www.cit.ctu.edu.vn/encict/). Đơn vị phối hợp chính: **Không**.
 - Cán bộ hướng dẫn: **TS. Ngô Bá Hùng**, MSCB **1124**; email chưa có trong thuyết minh.
 
 ## Thành viên
@@ -21,13 +21,10 @@ Nguồn đối chiếu: [`resource/thuyetMinhSaasMultiTenancy.md`](../resource/t
 | Thành viên | Huỳnh Hồng Ân | B2306657 | DI23V7F1 | 49 |
 | Thành viên | Cao Tường Hưng | B2303873 | DI2396F1 | 49 |
 
-Chủ nhiệm học ngành **Kỹ thuật phần mềm (CLC)**, sinh ngày **21/04/2005** tại **Cần Thơ**, giới tính **Nam**, dân tộc **Kinh**, đang học **năm thứ 4/4,5 năm đào tạo**; số điện thoại và email đã được điền vào `config/metadata.tex` theo thuyết minh. Địa chỉ liên hệ được để trống theo yêu cầu. Người hướng dẫn dùng email **nbhung@ctu.edu.vn** theo xác nhận của nhóm. Nhiệm vụ dự kiến của từng người nằm ở mục 8 của thuyết minh; phần đóng góp thực tế trong `frontmatter/participants.tex` cần nhóm xác nhận trước khi viết.
+Chủ nhiệm học ngành **Kỹ thuật phần mềm (CLC)**, sinh ngày **21/04/2005** tại **Bệnh viện Phụng Hiệp, Cần Thơ**, giới tính **Nam**, dân tộc **Kinh**, đang học **năm thứ 4/4,5 năm đào tạo**; số điện thoại và email đã được điền vào `config/metadata.tex` theo thuyết minh. Địa chỉ liên hệ được nhóm xác nhận: **10, đường Lê Hồng Phong, khu vực 3, phường Ngã Bảy, thành phố Cần Thơ, Việt Nam**. Người hướng dẫn dùng email **nbhung@ctu.edu.vn** theo xác nhận của nhóm. Nhiệm vụ dự kiến của từng người nằm ở mục 8 của thuyết minh; phần đóng góp thực tế trong `frontmatter/participants.tex` cần nhóm xác nhận trước khi viết.
 
-## Thông tin còn cần xác nhận
+## Thông tin đã xác nhận và phần cần bổ sung
 
-Các trường sau còn cần xác nhận trong `config/metadata.tex`:
+Địa điểm và thời điểm trên bìa đã được nhóm xác nhận: **Cần Thơ, tháng 10 năm 2026**. Thời gian thực hiện là tháng 5–10/2026; kinh phí 15.000.000 đồng là dự toán.
 
-- Tên tiếng Anh chính thức của đơn vị.
-- Địa điểm và tháng/năm ký báo cáo. Thời gian thực hiện đã được nhóm xác nhận là tháng 5–10/2026; kinh phí 15.000.000 đồng là dự toán.
-
-Ngoài ra, `frontmatter/principal-investigator.tex` cần xếp loại học tập từng năm nếu nhóm muốn công bố; thành tích từng năm được để trống theo yêu cầu. Ảnh chân dung chỉ thêm khi có ảnh được phép sử dụng. `frontmatter/research-body-vi.tex`, `frontmatter/research-body-en.tex` và bản tin cần kết quả thực tế đã được kiểm chứng; không lấy mục tiêu dự kiến trong thuyết minh làm kết quả hoàn thành. Nhận xét và chữ ký người hướng dẫn phải do người có thẩm quyền cung cấp.
+Trong `frontmatter/principal-investigator.tex`, xếp loại và thành tích từng năm được để trống theo yêu cầu. Ảnh chân dung chỉ thêm khi có ảnh được phép sử dụng. Báo cáo và bản tin được hoàn thiện dần với tên biểu mẫu ổn định, không in banner phiên bản sơ bộ/chưa nghiệm thu. Các kết quả có bằng chứng và giới hạn riêng; số liệu thực nghiệm chưa có ghi `PENDING_DATA`. Nhận xét và chữ ký người hướng dẫn vẫn dành cho người có thẩm quyền.

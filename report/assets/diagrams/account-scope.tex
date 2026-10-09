@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=40mm] (account) at (5,1) {\textbf{Một tài khoản chung}\\Danh tính người dùng};
+\node[rblue,text width=46mm] (a) at (1.6,-1.1) {\textbf{Workspace A}\\Tenant role: Owner};
+\node[rteal,text width=46mm] (b) at (8.4,-1.1) {\textbf{Workspace B}\\Tenant role: Member};
+\node[rbox,text width=46mm] (pa) at (1.6,-3.2) {\textbf{Project A1}\\Chỉ truy cập khi có\\project membership hợp lệ};
+\node[rbox,text width=46mm] (pb) at (8.4,-3.2) {\textbf{Project B1}\\Role project được gán riêng\\Manager / Member / Viewer};
+\draw[raux] (account) -- (a);
+\draw[rflow] (account) -- (b);
+\draw[raux] (a) -- (pa);
+\draw[rflow] (b) -- (pb);
+\node[rnote,text width=125mm] at (5,-5) {\textbf{Điểm cần nhớ:} Owner của tenant không tự có quyền đọc mọi project. Khi đổi workspace, hệ thống phải đổi phiên tenant và xét lại phạm vi quyền.};
+\end{tikzpicture}
+\caption[Danh tính chung và các phạm vi quyền]{Một tài khoản có nhiều tư cách thành viên; quyền được xét riêng trong workspace và project hiện hành (E01, E12).}\label{fig:account-scope}
+\end{figure}

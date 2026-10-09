@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=34mm] (mutation) at (0,0) {\textbf{Cập nhật task}\\Quyền + expected version};
+\node[rblue,text width=34mm] (event) at (4.9,0) {\textbf{Ghi outbox}\\Sự kiện theo tenant};
+\node[rteal,text width=34mm] (commit) at (9.8,0) {\textbf{Commit}\\Hoặc rollback cả hai};
+\begin{scope}[on background layer]
+  \node[rgroup,fill=ReportBlueTint,fit=(mutation)(event)(commit),inner ysep=6mm] (tx) {};
+\end{scope}
+\node[rhead,anchor=south] at (tx.north) {RANH GIỚI GIAO DỊCH};
+\node[rteal,text width=34mm] (worker) at (9.8,-3) {\textbf{Worker đọc event}\\Ngữ cảnh từng tenant};
+\node[ramber,text width=34mm] (check) at (4.9,-3) {\textbf{Kiểm tra lại}\\Stale / thành viên\\Người nhận hiện hành};
+\node[rteal,text width=34mm] (notify) at (0,-3) {\textbf{Thông báo}\\In-app chống trùng\\Email queue riêng};
+\draw[rflow] (mutation) -- (event);
+\draw[rflow] (event) -- (commit);
+\draw[rflow] (commit) -- (worker);
+\draw[rflow] (worker) -- (check);
+\draw[rflow] (check) -- (notify);
+\node[rnote,text width=125mm] at (4.9,-5) {\textbf{Ranh giới delivery:} retry email không chạy lại mutation. Event lặp cần chống trùng; không suy ra exactly-once trên toàn đường SMTP.};
+\end{tikzpicture}
+\caption[Giao dịch và xử lý outbox]{Hai ranh giới của outbox: mutation và event cùng giao dịch; worker xử lý thông báo sau commit, kèm kiểm tra stale và chống trùng (E13).}\label{fig:outbox}
+\end{figure}

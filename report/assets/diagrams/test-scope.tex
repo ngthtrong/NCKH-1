@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=65mm] (all) at (5,1) {\textbf{106 test được phát hiện}\\Tổng của bộ Surefire};
+\node[rteal,text width=45mm] (executed) at (1.6,-1.5) {\textbf{59 test thực thi}\\0 failure / 0 error};
+\node[ramber,text width=45mm] (skip) at (8.4,-1.5) {\textbf{47 test bị bỏ qua}\\Các suite cần Docker};
+\node[rteal,text width=45mm] (supports) at (1.6,-4.1) {\textbf{Có thể kết luận}\\Hành vi của các case\\đã thực thi trong môi trường này};
+\node[rred,text width=45mm] (pending) at (8.4,-4.1) {\textbf{Cần kiểm chứng lại}\\SQL / migration / tích hợp\\trên môi trường có Docker};
+\draw[rflow] (all) -- (executed);
+\draw[raux] (all) -- (skip);
+\draw[rflow] (executed) -- (supports);
+\draw[rfail] (skip) -- (pending);
+\node[rnote,text width=125mm] at (5,-6.8) {\textbf{Giới hạn:} số test không là phần trăm coverage hay số đo hiệu năng. Maven verify, frontend và E2E chưa hoàn tất kiểm chứng mới.};
+\end{tikzpicture}
+\caption[Phạm vi thực thi của lượt backend mới]{Lượt kiểm tra ngày 09/10/2026: 106 test được phát hiện, 59 thực thi và 47 bị bỏ qua do thiếu Docker. Không đổi nhãn skip thành pass (E04).}\label{fig:test-scope}
+\end{figure}

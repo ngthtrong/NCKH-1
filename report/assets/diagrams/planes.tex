@@ -1,0 +1,27 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=40mm] (web) at (6,2) {\textbf{Trình duyệt}\\React / cùng hợp đồng API};
+\node[rblue,text width=40mm] (api) at (3,0) {\textbf{API nghiệp vụ}\\Xác lập tenant và quyền};
+\node[rteal,text width=40mm] (worker) at (9,0) {\textbf{Worker}\\Job, outbox, nhắc hạn};
+\node[rbox,text width=40mm] (control) at (3,-3.3) {\textbf{Dữ liệu điều khiển}\\Tài khoản / tenant / tier\\Thanh toán / cấp phát};
+\node[rteal,text width=40mm] (data) at (9,-3.3) {\textbf{Dữ liệu nghiệp vụ}\\Project / task / outbox\\Pool / Schema / Silo};
+\node[rbox,text width=40mm] (storage) at (3,-6) {\textbf{Lưu trữ tệp}\\Namespace tenant / quota};
+\node[rbox,text width=40mm] (mail) at (9,-6) {\textbf{Gửi thông báo}\\Hàng đợi email / SMTP};
+\begin{scope}[on background layer]
+  \node[rgroup,fit=(control),inner ysep=7mm] (cp) {};
+  \node[rgroup,fit=(data),inner ysep=7mm,fill=ReportTealTint] (ap) {};
+\end{scope}
+\node[rhead,anchor=north west,inner sep=2mm] at (cp.north west) {CONTROL PLANE};
+\node[rhead,anchor=north west,inner sep=2mm] at (ap.north west) {APPLICATION PLANE};
+\draw[rflow] (web) -- (api);
+\draw[raux] (api.south) -- (cp.north);
+\draw[rflow] (api.south east) -- (ap.north west);
+\draw[raux] (worker.south west) -- (cp.north east);
+\draw[rflow] (worker.south) -- (ap.north);
+\draw[raux] (api.west) -- ++(-.6,0) |- (storage.west);
+\draw[rflow] (worker.south west) -- (6,-1.1) -- (6,-6) -- (storage.east);
+\draw[rflow] (worker.east) -- ++(.6,0) |- (mail.east);
+\end{tikzpicture}
+\caption[Kiến trúc hai plane và dịch vụ nền]{Kiến trúc Bridge: hai plane dữ liệu và các dịch vụ hỗ trợ. Các mũi tên biểu diễn quan hệ truy cập chính (E10--E15).}\label{fig:planes}
+\end{figure}

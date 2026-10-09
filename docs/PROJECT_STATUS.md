@@ -1,15 +1,33 @@
 # Điểm khôi phục triển khai đề tài
 
-**Cập nhật:** 2026-09-19 (UTC+7)
-**Nhánh đang làm:** `an_upgrade_features`
+**Cập nhật:** 2026-10-09 (Asia/Taipei, UTC+8)
+**Checkout viết báo cáo:** `main`, nền `e829f73d88beaea24e8cc2e4d71513ce2ee9127e`; thay đổi báo cáo trong working tree.
+**Nhánh checkpoint ứng dụng lịch sử:** `an_upgrade_features`
 **Checkpoint mã nguồn P-App:** `c226676` (`p-app`)
-**Nền commit hiện tại:** `22a9ee4` (`guide run`). EXT-01–EXT-06 đã được commit tại `34a5463`
-(`p-app add bridge`); các thay đổi V11/V12 hiện còn trong working tree để kiểm tra trước khi push.
-**Trạng thái hiện tại:** APP-01–APP-06 giữ nguyên là checkpoint local của phiên bản hai placement.
+**Nền commit checkpoint lịch sử:** `22a9ee4` (`guide run`). EXT-01–EXT-06 đã được commit tại `34a5463`
+(`p-app add bridge`); mô tả V11/V12 còn trong working tree là trạng thái tại checkpoint cũ, không phải checkout hôm nay.
+**Checkpoint ứng dụng lịch sử:** APP-01–APP-06 giữ nguyên là checkpoint local của phiên bản hai placement.
 EXT-01–EXT-06 đã hoàn tất local ngày 2026-09-08 cho Bridge ba placement và tùy biến hữu hạn; biên bản
 ở [`docs/testing/extension-local-2026-09-08.md`](testing/extension-local-2026-09-08.md). Provider thật,
 VPS/Internet, P2 measurement, pilot, SLO, thực nghiệm và đánh giá người dùng vẫn tạm dừng và chưa phải
 bằng chứng nghiệm thu.
+
+## Lượt chỉnh hình thức và hình minh họa — checkpoint 09/10/2026
+
+- Người dùng yêu cầu bỏ banner bản sơ bộ/chưa nghiệm thu, giảm đường dẫn repository trong PDF, vẽ lại và tăng hình giải thích. Đã sửa nguồn và bản PDF chính: 15 hình thay cho 5, phong cách TikZ thống nhất, không còn đường dẫn repo trong phần khoa học/phụ lục/biểu mẫu.
+- `make -C report content` đạt; bản chính tạm thời 73 trang, gồm 46 trang Mở đầu–Kết luận. Đã review 15 hình và xem lại các vùng sửa. Bản hai mặt/các biểu mẫu và `check` đồng bộ mới còn cần hoàn tất; kết quả 70 trang ở mục dưới là trước lượt chỉnh hình thức.
+- **Log tiếp tục phiên sau:** [session-checkpoint-2026-10-09-visual-refresh.md](research/session-checkpoint-2026-10-09-visual-refresh.md). Có trạng thái từng phần, vị trí log/render, các việc còn lại và lệnh tiếp tục.
+- Không sửa mã ứng dụng hay chạy lại nghiên cứu; giữ kết quả E04 cùng skipped count và các giới hạn số đo.
+
+## Báo cáo sơ bộ ngày 2026-10-09
+
+- Theo yêu cầu mới của người dùng, đã triển khai kế hoạch hoàn thiện `report/`; bảo toàn thông tin nhóm và các diff báo cáo có trước. Không sửa mã ứng dụng, API/OpenAPI, migration, ADR Accepted hoặc protocol/biên bản lịch sử; không khôi phục `resource/plan.md`.
+- Đã viết Mở đầu, bốn chương, Kết luận và phụ lục; năm nhóm N1–N5 có tình huống/câu hỏi, phương án, tiêu chí, lý do chọn, hiện thực, evidence và mục đánh giá. Bốn RQ có câu trả lời sơ bộ, giới hạn và điều kiện bổ sung. Có năm sơ đồ cấu trúc TikZ và bibliography nguồn đã đối chiếu.
+- Hồ sơ: [truy vết sáu bước](research/preliminary-report-traceability.md), [sổ bằng chứng](research/preliminary-report-evidence.md), [kiểm chứng nguồn](research/preliminary-report-sources.md), [biên bản kỹ thuật mới](testing/preliminary-report-2026-10-09.md).
+- Backend mới: Maven `test` sau fresh compile đạt **106 tổng / 59 thực thi / 47 skip / 0 failure / 0 error**. Maven và test runtime Java 21.0.12.1; compiler fork javac 25.0.4.1 với release 21. `verify` chưa hoàn tất do thiếu plugin offline; compiler đi kèm runtime 21 báo release 21 không hỗ trợ. Frontend/E2E không chạy lại vì thiếu Node/runtime stack.
+- Doctor, build `all smoke` và `check` đạt. Hai PDF báo cáo có 70 trang, gồm 41 trang Mở đầu–Kết luận; chưa đạt mức 50 trang nội dung của bản tổng kết. Review PDF và checksum được lưu tại [biên bản xuất bản](../report/PRELIMINARY_VALIDATION.md); không dùng build đạt để đánh dấu cổng nghiên cứu.
+- Performance/raw measurements, SUS, placement tối ưu, provider thật/VPS, nhiều outbox worker và efficacy limiter vẫn chưa có bằng chứng cuối. P2/load/noisy-neighbor/fault injection không mở lại. Thời hạn chính thức, phạm vi extension và bibliography bản cuối còn cần xác nhận.
+- Các mục ứng dụng bên dưới là lịch sử kiểm chứng local. Khi số test/migration khác nhau, đọc theo từng ngày và evidence; không ghép EXT V8/96/16 với V12/106/22 hoặc kiểm tra mới 59/47 thành một kết quả.
 
 ## 0. Checkpoint mở rộng hiện tại
 
@@ -65,7 +83,7 @@ thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, S
 ## 1. Nguồn sự thật và nguyên tắc bảo toàn
 
 - Thuyết minh chính: [`resource/thuyetMinhSaasMultiTenancy.md`](../resource/thuyetMinhSaasMultiTenancy.md).
-- Kế hoạch thực hiện: [`resource/plan.md`](../resource/plan.md).
+- Kế hoạch/phương pháp hiện hữu: [protocol](research/protocol.md), [hướng dẫn nghiên cứu](research/GROUP_RESEARCH_EXECUTION_GUIDE.md) và [truy vết báo cáo sơ bộ](research/preliminary-report-traceability.md). `resource/plan.md` không còn trong checkout và không được khôi phục.
 - Hướng dẫn khởi chạy và kiểm thử local: [`docs/RUN_APPLICATION.md`](RUN_APPLICATION.md).
 - Thuật ngữ CSDL thống nhất ngày 2026-09-07: **Pool = Shared Database, Shared Schema**;
   **Schema-per-tenant (`SCHEMA_PER_TENANT`) = Shared Database, Separate Schema**; **Silo
@@ -99,7 +117,7 @@ thái mới hơn. Không dùng kết quả local để tuyên bố Cổng B/E, S
 | C — Kiến trúc và hợp đồng | **Khung chính đã có** | Review tính nhất quán sau khi ADR B được chốt; bổ sung chi tiết nếu spike làm thay đổi quyết định |
 | D — Lát cắt dọc | **APP-01 đến APP-06 hoàn tất local, đã commit tại `c226676`** | Chỉ sửa lỗi/hardening phát hiện trong review và giữ regression; không tự mở rộng sang provider/VPS/P2 |
 | E — Triển khai và thực nghiệm | **Tạm hoãn; local Compose/Testcontainers/k6 smoke đã xác minh, chưa có số đo chính** | Chỉ khi nhóm quyết định mở lại: VPS/domain/TLS, provider thật, pilot, khóa SLO, chạy 3–5 tenant lặp lại, QA dữ liệu, noisy-neighbor và đánh giá người dùng |
-| F — Tổng hợp | **Chưa thực hiện** | Chỉ bắt đầu sau khi có bằng chứng A–E; hoàn thiện báo cáo, bản tin, demo và video |
+| F — Tổng hợp | **Báo cáo sơ bộ đã viết theo yêu cầu 2026-10-09; kết luận/nghiệm thu cuối chưa đóng** | Hoàn tất bằng chứng/phạm vi A–E, review số liệu và hồ sơ nộp; bản sơ bộ không thay các cổng nghiên cứu |
 
 **Kết luận cổng:** chưa đánh dấu Cổng A, B hoặc E là đạt. **Mốc hoàn thiện ứng dụng local đã đạt** theo
 checklist P-App và regression kỹ thuật; mốc này không tự động cho phép hoặc thay thế provider thật,
@@ -457,9 +475,9 @@ scripts/run-experiment.sh smoke
 
 Các workload nghiệp vụ cần token tenant thật trong environment; xem `experiments/README.md`. Không ghi token vào file hoặc manifest.
 
-## 8. Câu lệnh mở đầu cho phiên sau
+## 8. Mẫu mở đầu lịch sử của checkpoint ứng dụng
 
-Có thể dùng nguyên văn:
+Mẫu sau được giữ để truy vết checkpoint cũ; không dùng `resource/plan.md` hoặc nhánh/commit trong mẫu làm hiện trạng của checkout viết báo cáo:
 
 > Đọc `docs/PROJECT_STATUS.md`, `docs/app/EXTENSION-CHECKLIST.md`, biên bản EXT ngày 2026-09-08,
 > `resource/plan.md`, thuyết minh, SRS và OpenAPI; kiểm tra working tree trước khi sửa. APP-01–APP-06 là

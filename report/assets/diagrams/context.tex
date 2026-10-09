@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=75mm] (request) at (0,0) {\textbf{1. Nhận request}\\Host + JWT đã được xác thực};
+\node[ramber,text width=75mm] (binding) at (0,-1.8) {\textbf{2. Đối chiếu tenant}\\Host/token khớp; ACTIVE; membership/version};
+\node[rred,text width=28mm] (reject) at (6.7,-1.8) {\textbf{Từ chối 403}\\Không chạy SQL\\nghiệp vụ};
+\node[rblue,text width=75mm] (context) at (0,-3.6) {\textbf{3. Xác lập ngữ cảnh và quyền}\\User / tenant / project / hành động};
+\node[rteal,text width=75mm] (sql) at (0,-5.4) {\textbf{4. Thực thi giao dịch}\\Chọn datasource; thiết lập phạm vi SQL};
+\node[rteal,text width=75mm] (finish) at (0,-7.2) {\textbf{5. Commit hoặc rollback}\\Trả connection; finally dọn context và MDC};
+\draw[rflow] (request) -- (binding);
+\draw[rflow] (binding) -- (context);
+\draw[rfail] (binding) -- (reject);
+\draw[rflow] (context) -- (sql);
+\draw[rflow] (sql) -- (finish);
+\draw[rfail] (reject.south) |- (finish.east);
+\node[rlabel,anchor=south] at (5.4,-7.2) {Kết thúc request};
+\end{tikzpicture}
+\caption[Vòng đời ngữ cảnh tenant]{Vòng đời request: xác minh ngữ cảnh trước truy cập nghiệp vụ, đóng giao dịch và dọn ngữ cảnh khi kết thúc (E10).}\label{fig:context}
+\end{figure}

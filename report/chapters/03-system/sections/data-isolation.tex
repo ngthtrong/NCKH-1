@@ -1,0 +1,40 @@
+\section{N2 -- Bố trí và cô lập dữ liệu}\label{sec:n2}
+\subsection{Bài toán và hai cấp quyết định}
+Người dùng A biết ID task\slash resource của B; một query native hoặc bulk thiếu tenant predicate; một connection được trả pool sau transaction lỗi. N2 hỏi cách tổ chức dữ liệu và enforcement phù hợp cho Kanban trên hạ tầng giới hạn. Bố trí dữ liệu được quyết định ở cấp topology; predicate\slash ORM\slash RLS được phân tích ở cấp cơ chế. Hai cấp có thể phối hợp thay vì loại trừ nhau.
+
+\subsection{So sánh bố trí dữ liệu}
+Pool tập trung migration và tận dụng cấu trúc bảng chung, nhưng phụ thuộc tenant enforcement ở mọi bảng\slash đường truy cập và chịu cạnh tranh tài nguyên database. Schema-per-tenant có namespace và role riêng, đổi lại nhiều schema\slash migration; database và host vẫn dùng chung. Silo database có biên quản trị\slash backup riêng ở cấp database, đổi lại tăng pool, provisioning và migration theo tenant. Các nhận xét này là phân tích cấu trúc; chưa là số đo chi phí hoặc hiệu năng.
+\input{assets/diagrams/topologies}
+
+Trong Bridge hiện tại, cùng API và migration nghiệp vụ giúp hạn chế khác biệt chức năng khi so sánh. Placement được chốt trong onboarding và không di chuyển khi đã có dữ liệu. Việc chọn placement cho một tenant vì vậy có chi phí vòng đời, không chỉ chi phí một query. Bộ bảng giữ \Code{tenant_id} trên cả ba placement để duy trì contract và các guard chung \Evidence{E11}.
+
+\subsection{So sánh enforcement trong Pool}
+\begin{table}[htbp]
+\centering\caption{Các cơ chế bảo vệ Pool và đường kiểm chứng}\label{tab:n2-enforcement}
+\begin{tabularx}{\textwidth}{P{.24\textwidth}XX}
+\toprule Cơ chế & Lợi ích & Failure mode cần kiểm tra \\
+\midrule
+Predicate tường minh & Điều kiện nhìn thấy ngay trong SQL\slash repository & Query mới, bulk hoặc background bỏ sót điều kiện \\
+Tenant\slash filter của ORM & Tập trung một phần enforcement trong ORM & Native SQL, bulk và đường truy cập ngoài ORM \\
+RLS + application guard & Policy database bổ sung bảo vệ ở đường SQL & Runtime role, owner, context và policy cấu hình sai \\
+\bottomrule\end{tabularx}
+\end{table}
+Đề xuất hiện tại là tiếp tục RLS cộng guard ứng dụng để bảo vệ nhiều lớp. Đây là lựa chọn triển khai có bằng chứng sàng lọc local; ADR-0003 vẫn Proposed vì hồ sơ loại, measurement và scorecard chưa được review đầy đủ. Chưa đề xuất placement nào thắng mọi tiêu chí.
+
+\subsection{Tiêu chí kiểm chứng}
+Đọc\slash ghi\slash xóa ID của B từ A phải bị chặn và trạng thái B giữ nguyên. Native\slash bulk\slash background đều cần negative case. Connection sau commit\slash rollback không mang app.\Code{tenant_id} hoặc \Code{search_path} cũ sang transaction khác. Runtime role không phải superuser hoặc BYPASSRLS; ownership, schema privileges, default privileges và quyền database phải được đối chiếu riêng. Các đường metadata\slash storage cần guard tương ứng vì RLS chỉ tác động SQL của bảng được bảo vệ.
+
+PostgreSQL ghi rõ superuser và BYPASSRLS có thể vượt policy; owner thường vượt nếu không FORCE RLS. \Code{search_path} chỉ chọn namespace và không thay quyền schema \citep{postgresql2026rls,postgresqlSchemas}. Vì vậy policy bật trong migration chưa đủ nếu application credential có quyền vượt biên.
+
+\subsection{Hiện thực resolver và runtime role}
+\Code{DefaultTenantDataSourceResolver} trả datasource Pool chung hoặc tạo\slash cache datasource cô lập theo tenant ID cho Schema\slash Silo. Resolver kiểm tra placement, metadata database\slash credential và schema name hợp lệ. Với Schema-per-tenant, runtime role\slash schema riêng và \Code{search_path} transaction-local chọn đúng namespace. Với Silo, runtime role kết nối database riêng. Tên vật lý và credential đến từ registry đã provision, không lấy từ payload nghiệp vụ.
+
+\Code{TenantDatabaseProvisioner} chuẩn bị tài nguyên bằng credential đặc quyền, áp dụng migration và quyền; API dùng role runtime. Application SQL qua executor vẫn chứa guard tenant ở nhiều query. RLS cộng predicate không phải hai cơ chế thừa nhau: một lớp hỗ trợ authorize quan hệ nghiệp vụ, lớp còn lại hạn chế lỗi bỏ sót query.
+
+\subsection{Bằng chứng sàng lọc và diễn giải đúng}
+Harness guarded contract lịch sử pass 6\slash 6 cho ba cơ chế trên Pool\slash Silo. Khi cố ý bỏ guard ở native\slash bulk\slash background, hồ sơ ghi 18 quan sát: sáu leak của explicit\slash Hibernate Pool, ba RLS Pool được bảo vệ và chín đường Silo được biên database bảo vệ \Evidence{E09}. Harness pass nghĩa là assertion phân loại đúng; sáu leak là hành vi không an toàn của ứng viên, không phải sáu kiểm tra bảo mật đạt.
+
+\Code{RowLevelSecurityTest} kiểm tra policy\slash runtime role; \Code{SchemaPerTenantIsolationIntegrationTest} chứa truy vấn schema khác, rollback và cleanup tenant A giữ B. EXT ghi kết quả schema isolation trên PostgreSQL thật tại mốc 08\slash 09 \Evidence{E05}. Kết quả\slash skip hiện có được giới hạn ở Mục~\ref{sec:coverage}. Không lấy test của owner\slash superuser làm bằng chứng runtime role đã an toàn.
+
+\subsection{Giới hạn và công việc còn thiếu}
+Chưa có phép đo latency\slash RAM\slash connections của các ứng viên còn lại, chưa có hồ sơ loại checksum-backed được review và chưa khóa comparison ba placement trong protocol. Các kiểm tra RLS không bao phủ mọi policy mới nếu thêm bảng, và biên database không giải quyết quyền project hoặc storage. Chi phí migration, restore từng tenant, cache datasource và ảnh hưởng noisy neighbor cần đánh giá riêng trước khi trả lời RQ4 cuối cùng.

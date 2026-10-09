@@ -1,4 +1,4 @@
-# Template báo cáo nghiên cứu khoa học LaTeX
+# Báo cáo nghiên cứu khoa học LaTeX
 
 Bộ template độc lập, giữ bố cục của báo cáo gốc: A4, Times New Roman
 13 bp, giãn dòng 1,3; lề trái 30 mm, phải/trên/dưới 20 mm. Hai bìa giữ
@@ -8,11 +8,36 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
-Nội dung nghiên cứu để trống, chỉ giữ tiêu đề khái quát và comment hướng
-dẫn. Ô trống và placeholder trên biểu mẫu là chủ ý. Thư mục này có thể
-sao chép ra ngoài repository để sử dụng; không cần dữ liệu, mô hình,
-minh chứng hoặc bước xuất số liệu. Không có kiểm tra số trang tối thiểu
-hay kiểm tra hồ sơ nghiệm thu.
+Báo cáo được hoàn thiện dần từ cùng một bộ nguồn LaTeX. Bìa và biểu mẫu dùng
+tên báo cáo ổn định, không in nhãn phiên bản sơ bộ/chưa nghiệm thu. Nền mã
+ứng dụng được đối chiếu là `main`/`e829f73`; hồ sơ kiểm chứng lưu phiên bản,
+nguồn và giới hạn. Báo cáo có Mở đầu, bốn chương, Kết luận, tài liệu tham
+khảo và phụ lục. N1–N5 truy từ bài toán đến phương án, tiêu chí, hiện thực,
+bằng chứng và đánh giá. Các số đo chưa có vẫn ghi `PENDING_DATA`.
+
+Xem `infoGroup.md` để đối chiếu thông tin nhóm.
+Xếp loại và thành tích học tập được để trống theo yêu cầu;
+ảnh và nhận xét người hướng dẫn cần cung cấp riêng. Không có kiểm tra số
+trang tối thiểu hay kiểm tra hồ sơ nghiệm thu.
+
+Hồ sơ hỗ trợ và kiểm chứng:
+
+- [Sổ bằng chứng](../docs/research/preliminary-report-evidence.md).
+- [Ma trận truy vết sáu bước](../docs/research/preliminary-report-traceability.md).
+- [Kiểm chứng nguồn](../docs/research/preliminary-report-sources.md).
+- [Kiểm tra kỹ thuật mới và giới hạn](../docs/testing/preliminary-report-2026-10-09.md).
+- [Biên bản chỉnh hình thức và xuất bản hiện tại](VISUAL_REFRESH_VALIDATION.md).
+- [Checkpoint/log phiên làm việc](../docs/research/session-checkpoint-2026-10-09-visual-refresh.md).
+- [Biên bản trước lượt chỉnh hình thức](PRELIMINARY_VALIDATION.md).
+
+Có **15 hình giải thích** trong `assets/diagrams/`, dùng phong cách chung
+ở `template/diagrams.tex`: màu nhẹ, nhãn theo chức năng, nhóm và nhánh lỗi
+rõ ràng. Mỗi hình có đoạn dẫn/cách đọc trong chương tương ứng. PDF không
+in đường dẫn repo; sổ bằng chứng Markdown giữ nguồn chi tiết. Thời hạn trong thuyết minh còn mâu thuẫn
+05–10/2026 và 03–08/2026. IEEE dùng trong báo cáo; quy cách nộp cuối
+cần xác nhận. Tài liệu hình thức yêu cầu tối thiểu 50 trang nội dung cho
+bản tổng kết, không tính mục lục/bibliography/phụ lục; theo dõi riêng và
+không thêm trang trống để đạt yêu cầu.
 
 ## Cài đặt
 
@@ -43,13 +68,13 @@ Make và Poppler tương ứng. Chạy `make doctor` để kiểm tra thực t�
 Từ repository:
 
 ```bash
-make -C reportTemplate doctor
-make -C reportTemplate all
-make -C reportTemplate smoke
-make -C reportTemplate check
+make -C report doctor
+make -C report all
+make -C report smoke
+make -C report check
 ```
 
-Hoặc vào `reportTemplate/` và bỏ `-C reportTemplate` trong các lệnh.
+Hoặc vào `report/` và bỏ `-C report` trong các lệnh.
 
 | Lệnh Make | PDF được tạo trong thư mục template |
 | --- | --- |

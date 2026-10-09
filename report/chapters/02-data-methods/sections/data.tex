@@ -1,36 +1,34 @@
-\par\penalty0
-\section{Dữ liệu và tiền xử lý}\label{section:data-1}
-% Trình bày dữ liệu và tiền xử lý; bổ sung nguồn và minh họa khi cần.
+\section{Nguồn dữ liệu và quản lý bằng chứng}\label{sec:evidence-method}
+\subsection{Bốn lớp bằng chứng}
+\begin{table}[htbp]
+\centering\caption{Phân loại nguồn và phạm vi mệnh đề được hỗ trợ}\label{tab:evidence-types}
+\begin{tabularx}{\textwidth}{P{.22\textwidth}XX}
+\toprule Loại & Có thể hỗ trợ & Không tự hỗ trợ \\
+\midrule
+Source\slash contract & Component, cấu trúc dữ liệu, thuật toán, đường gọi & Hành vi runtime hoặc hiệu năng đã đạt \\
+Biên bản lịch sử & Kết quả được ghi tại ngày\slash phiên bản\slash môi trường cũ & Kiểm chứng lại checkout hiện tại \\
+Artifact hiện có & Số test, lỗi, skip và thuộc tính được lưu trong artifact & Commit thực thi nếu chưa có provenance \\
+Kiểm tra mới & Kết quả của lệnh thực sự chạy, cùng môi trường hiện tại & Cổng nghiên cứu, benchmark hoặc production ngoài phạm vi lệnh \\
+\bottomrule\end{tabularx}
+\end{table}
+Dữ liệu thực nghiệm chính thức là một lớp riêng còn thiếu trong checkout. Các loại fixture, development và pilot không được đổi nhãn thành experiment. Mệnh đề kết luận theo protocol được gắn MEASURED, INFERRED, LIMITATION hoặc \PendingData; riêng số test là kết quả kiểm tra kỹ thuật, không phải MEASURED performance.
 
-\par\penalty0
-\subsection{Nguồn dữ liệu và vai trò}\label{subsection:data-2}
-% Trình bày nguồn dữ liệu và vai trò; bổ sung nguồn và minh họa khi cần.
+\subsection{Sổ bằng chứng và provenance}
+Mỗi bản ghi gồm evidence ID, mệnh đề, nguồn, ngày, commit nếu xác lập được, môi trường, kết quả, skipped count và giới hạn. Bảng tổng hợp ở Phụ lục~\ref{app:evidence}; hồ sơ kiểm chứng đi kèm lưu nguồn chi tiết để đối chiếu. Mã evidence là đường truy vết, không phải nhãn tự chứng nhận mức tin cậy.
 
-\par\penalty0
-\subsection{Các bộ dữ liệu và phiên bản}\label{subsection:data-3}
-% Trình bày các bộ dữ liệu và phiên bản; bổ sung nguồn và minh họa khi cần.
+Phiên bản nền của nguyên mẫu được nhận diện trong phụ lục. Kết quả XML cũ có mốc sửa tệp ngày 24\slash 09\slash 2026, nhưng mtime không đủ xác nhận ngày chạy hoặc phiên bản. Vì vậy \Evidence{E03} giữ nguồn gốc thực thi chưa xác lập; không ghép artifact với lần kiểm tra hiện tại chỉ vì tổng test trùng biên bản.
 
-\par\penalty0
-\subsection{Làm sạch và tổ chức dữ liệu}\label{subsection:data-4}
-% Trình bày làm sạch và tổ chức dữ liệu; bổ sung nguồn và minh họa khi cần.
+Biên bản EXT 08\slash 09\slash 2026 ghi application V8, 96 backend test, 16 frontend test và 3 E2E. Biên bản nhắc hạn có tên file ngày 18\slash 09 nhưng phần đầu ghi ngày 19\slash 09\slash 2026, V12, 106 backend test và 22 frontend test. Báo cáo hiện tại giữ hai checkpoint riêng và nêu chênh lệch tên file\slash ngày nội dung \Evidence{E05}, \Evidence{E06}.
 
-\par\penalty0
-\subsection{Tiền xử lý và cấu hình}\label{subsection:data-5}
-% Trình bày tiền xử lý và cấu hình; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:evidence-chain} cho thấy nguồn không đi thẳng thành kết luận: phải đối chiếu ngày, môi trường và giới hạn. Biên bản lịch sử hỗ trợ mốc của nó; một lần kiểm tra mới chỉ hỗ trợ các case thực sự được chạy.
+\input{assets/diagrams/evidence-chain}
 
-\par\penalty0
-\subsection{Dữ liệu bổ trợ}\label{subsection:data-6}
-% Trình bày dữ liệu bổ trợ; bổ sung nguồn và minh họa khi cần.
+\subsection{Đối chiếu source và test}
+Đọc source xác định điểm thực thi tenant binding, transaction local settings, role checks, version predicate, enqueue outbox và claim provisioning. Đọc test xác định assertion thật: đọc\slash ghi\slash xóa chéo, trạng thái tenant B giữ nguyên, rollback sau batch fail, revoke token cũ, assignee stale và ownership của tài nguyên. Sự tồn tại của tên test chỉ cho biết có tình huống được thiết kế; kết quả phải lấy từ report của lần chạy tương ứng.
 
-\par\penalty0
-\subsection{Dữ liệu cho nội dung nghiên cứu thứ nhất}\label{subsection:data-7}
-% Trình bày dữ liệu cho nội dung nghiên cứu thứ nhất; bổ sung nguồn và minh họa khi cần.
+Phạm vi được kiểm tra cần ghi cả đường truy cập. Một assertion ORM không bao phủ native SQL; một request case không bao phủ job nền; một role allow không bao phủ deny và revoke; một Pool\slash Silo case không tự bao phủ Schema-per-tenant. Các khoảng trống được đưa vào bảng coverage thay vì suy ra từ tổng số test.
 
-\par\penalty0
-\subsection{Dữ liệu cho các nội dung nghiên cứu tiếp theo}\label{subsection:data-8}
-% Trình bày dữ liệu cho các nội dung nghiên cứu tiếp theo; bổ sung nguồn và minh họa khi cần.
+\subsection{Quản lý dữ liệu và thông tin nhạy cảm}
+Hồ sơ nghiên cứu lưu phương pháp, cấu trúc manifest, liên kết artifact và kết quả tổng hợp. Dữ liệu đo thô, thông tin người tham gia và bí mật truy cập được lưu riêng với quyền truy cập phù hợp. Không đưa token, credential, signed URL đang hiệu lực hoặc dữ liệu nội dung thật vào ví dụ. Các sơ đồ được dựng từ source và tài liệu, mang ý nghĩa cấu trúc, không mang ý nghĩa số đo.
 
-\par\penalty0
-\subsection{Quản lý dữ liệu nghiên cứu}\label{subsection:data-9}
-% Trình bày quản lý dữ liệu nghiên cứu; bổ sung nguồn và minh họa khi cần.
-
+Khi có run mới, cần lưu input bất biến, checksum và metadata môi trường; công cụ phân tích tạo derived output mà không sửa raw input. Run thiếu tệp, sai protocol, thay seed hoặc không đủ metric được gắn cờ và giải thích. Không tự xóa outlier để làm đẹp kết quả; quy tắc loại cần đăng ký trước.

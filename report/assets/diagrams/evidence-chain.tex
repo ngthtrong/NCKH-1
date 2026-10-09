@@ -1,0 +1,17 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=32mm] (code) at (0,0) {\textbf{Mã và hợp đồng}\\Mô tả cơ chế};
+\node[rblue,text width=32mm] (record) at (4.9,0) {\textbf{Biên bản có ngày}\\Kết quả của mốc cũ};
+\node[rteal,text width=32mm] (run) at (9.8,0) {\textbf{Lượt kiểm tra mới}\\Lệnh / môi trường / skip};
+\node[rteal,text width=85mm] (register) at (4.9,-2.1) {\textbf{Đối chiếu và ghi bằng chứng}\\Mệnh đề + nguồn + phiên bản + kết quả + giới hạn};
+\node[rblue,text width=45mm] (claim) at (1.7,-4.3) {\textbf{Kết luận có điều kiện}\\Chỉ trong phạm vi hỗ trợ};
+\node[ramber,text width=45mm] (pending) at (8.1,-4.3) {\textbf{Chưa đủ dữ liệu}\\Ghi điều kiện bổ sung};
+\draw[raux] (code) -- (register);
+\draw[raux] (record) -- (register);
+\draw[rflow] (run) -- (register);
+\draw[rflow] (register) -- (claim);
+\draw[raux] (register) -- (pending);
+\end{tikzpicture}
+\caption[Từ nguồn kiểm tra đến kết luận]{Mỗi kết luận đi kèm nguồn, phạm vi quan sát và giới hạn; dữ liệu thiếu giữ trạng thái chờ bổ sung.}\label{fig:evidence-chain}
+\end{figure}

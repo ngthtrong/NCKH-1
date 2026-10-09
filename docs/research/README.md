@@ -1,11 +1,14 @@
 # Hồ sơ nghiên cứu
 
-Thư mục này là nguồn làm việc cho các đầu ra nghiên cứu của đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**. Bản thuyết minh tại `resource/thuyetMinhSaasMultiTenancy.md` là nguồn phạm vi chính; `resource/plan.md` là kế hoạch thực thi. Nếu hai tài liệu khác nhau, thay đổi phải được ghi vào sổ quyết định trước khi cập nhật đặc tả.
+Thư mục này là nguồn làm việc cho các đầu ra nghiên cứu của đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**. Bản thuyết minh tại `resource/thuyetMinhSaasMultiTenancy.md` là nguồn phạm vi chính; protocol và hướng dẫn nghiên cứu hiện hữu xác định phương pháp. `resource/plan.md` đã mất trong checkout và không được khôi phục. Mọi thay đổi phạm vi phải được ghi qua quản trị nghiên cứu trước khi cập nhật đặc tả.
 
 ## Bản đồ tài liệu
 
 | Tài liệu | Mục đích | Trạng thái ban đầu |
 | --- | --- | --- |
+| [preliminary-report-traceability.md](preliminary-report-traceability.md) | Bài toán → phương án → tiêu chí → hiện thực → bằng chứng → mục báo cáo cho N1–N5 | Hoàn thiện cho bản sơ bộ 09/10/2026; giữ RQ protocol |
+| [preliminary-report-evidence.md](preliminary-report-evidence.md) | Sổ E01–E17 có ngày/phiên bản/skip/giới hạn | Không thay raw research measurements hoặc cổng nghiên cứu |
+| [preliminary-report-sources.md](preliminary-report-sources.md) | Nguồn thực sự dùng trong bibliography và giới hạn truy cập/chất lượng | Kiểm chứng có phạm vi, chưa là systematic mapping hoàn tất |
 | [GROUP_RESEARCH_EXECUTION_GUIDE.md](GROUP_RESEARCH_EXECUTION_GUIDE.md) | Kịch bản nhóm phê duyệt protocol, chạy pilot/experiment, QA dữ liệu và đánh giá người dùng | Bản nháp để nhóm duyệt trước khi thu số liệu chính thức |
 | [GROUP_READINESS_BRIEF_2026-09-18.md](GROUP_READINESS_BRIEF_2026-09-18.md) | Báo cáo sẵn sàng, kịch bản demo và quyết định cần chốt trước nghiên cứu | GO cho báo cáo nhóm/pilot; chưa cho phép thu dữ liệu chính thức |
 | [protocol.md](protocol.md) | Giao thức nghiên cứu, dữ liệu, đạo đức và quản lý thay đổi | Đã thiết lập; chờ nhóm khóa ngày tìm kiếm |
@@ -32,4 +35,3 @@ Thư mục này là nguồn làm việc cho các đầu ra nghiên cứu của �
 - `PENDING_DATA`: chỉ được điền sau khi đo, kiểm thử hoặc khảo sát thật.
 
 Không biến một thiết kế dự kiến thành kết quả nghiên cứu. Các con số p95, throughput, SUS, số người tham gia và tỷ lệ lỗi chỉ được công bố khi có tệp dữ liệu thô và manifest tương ứng.
-

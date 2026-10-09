@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=34mm] (problem) at (0,0) {\textbf{Bài toán}\\Tác nhân / ranh giới\\Tình huống thất bại};
+\node[rblue,text width=34mm] (options) at (4.9,0) {\textbf{Phương án}\\Ít nhất hai cách\\Lợi ích / đánh đổi};
+\node[ramber,text width=34mm] (criteria) at (9.8,0) {\textbf{Tiêu chí}\\Allow / deny / phục hồi\\Metric cần quan sát};
+\node[rteal,text width=34mm] (implementation) at (9.8,-2.8) {\textbf{Hiện thực}\\Thành phần / giao dịch\\Lý do lựa chọn};
+\node[rteal,text width=34mm] (evidence) at (4.9,-2.8) {\textbf{Bằng chứng}\\Ngày / phiên bản / môi trường\\Kết quả / giới hạn};
+\node[rblue,text width=34mm] (section) at (0,-2.8) {\textbf{Mục báo cáo}\\Chương 3: phân tích\\Chương 4: đánh giá};
+\foreach \n/\i in {problem/1,options/2,criteria/3,implementation/4,evidence/5,section/6}
+  \node[rnumber] at (\n.north west) {\i};
+\draw[rflow] (problem) -- (options);
+\draw[rflow] (options) -- (criteria);
+\draw[rflow] (criteria) -- (implementation);
+\draw[rflow] (implementation) -- (evidence);
+\draw[rflow] (evidence) -- (section);
+\draw[rfail] (evidence.south) -- ++(0,-.8) -| (implementation.south);
+\end{tikzpicture}
+\caption[Chuỗi nghiên cứu sáu bước]{Chuỗi sáu bước được áp dụng lặp lại cho N1--N5; nhánh nét đứt biểu diễn việc bổ sung hiện thực khi bằng chứng chưa đáp ứng tiêu chí.}\label{fig:research-chain}
+\end{figure}

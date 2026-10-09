@@ -1,0 +1,225 @@
+{
+  "kind": "local_technical_test_summary",
+  "date": "2026-10-09",
+  "finished_at": "2026-10-09T11:13:19+08:00",
+  "source_commit": "e829f73d88beaea24e8cc2e4d71513ce2ee9127e",
+  "application_diff": "none",
+  "maven": "3.9.11",
+  "maven_and_test_runtime": "Java 21.0.12.1",
+  "compiler": "forked javac 25.0.4.1 --release 21",
+  "goal": "test",
+  "status": "PASS_WITH_DOCKER_SKIPS",
+  "totals": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 47
+  },
+  "executed": 59,
+  "skip_reason": "disabledWithoutDocker is true and Docker is not available",
+  "verify_status": "NOT_COMPLETED_OFFLINE_PLUGIN_MISSING",
+  "frontend_status": "NOT_RUN_NODE_UNAVAILABLE",
+  "suites": [
+    {
+      "class": "vn.edu.ctu.saas.admin.AdminServiceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "8395dd36af409edf8968c93724e732ef363bc11934f7a8d5396a9d244710637b"
+    },
+    {
+      "class": "vn.edu.ctu.saas.application.ProjectAuthorizationIntegrationTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 17,
+      "xml_sha256": "8df90b040448ad6b09d37e51005f06ccc79e8a3e485f184596be179ccb94a445"
+    },
+    {
+      "class": "vn.edu.ctu.saas.auth.AuthServiceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "5ab3a8ef9e7545493dd87c153d59405b8964afbc2301e02947a3c71d79258139"
+    },
+    {
+      "class": "vn.edu.ctu.saas.customization.CustomizationIntegrationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "xml_sha256": "f824010f3f540366131401c8c8bd48e1bd212562c29981dc914886f213c72a34"
+    },
+    {
+      "class": "vn.edu.ctu.saas.customization.TenantCapabilityPlacementTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "93ebe29b55aaa3868e2f341d0985be8b8237b4d7ddf112f94d5043d822ff9495"
+    },
+    {
+      "class": "vn.edu.ctu.saas.isolation.RowLevelSecurityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "xml_sha256": "6d98dd168df5b8540ec52317cff6cf6f4ba3e72dec676be809c0954f9b7be108"
+    },
+    {
+      "class": "vn.edu.ctu.saas.notification.DeadlineReminderIntegrationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "xml_sha256": "b24a77cec176022872d46e2fc405079e1e7c82a142452b8d217e822078437f4d"
+    },
+    {
+      "class": "vn.edu.ctu.saas.payment.FakePaymentProviderTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "fe0e1b6351baa2ad2042a0a5c579cdf34da9554a34b534f250d3de59b84e010d"
+    },
+    {
+      "class": "vn.edu.ctu.saas.payment.OnboardingServiceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "97ff4b181f9dd94ab6ac921ba0c35edbc58e6f8ea565c7abbe6f5ba600539615"
+    },
+    {
+      "class": "vn.edu.ctu.saas.payment.PaymentConcurrencyIntegrationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "xml_sha256": "54df020f1a0377607da72e200ccfcea5c95eaa36e8c1dfad63d2cf8f7aa8682c"
+    },
+    {
+      "class": "vn.edu.ctu.saas.payment.PaymentServiceTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "5651b0b6ca1ea6dc70601df7a8ea9beacc8a67d8aa0802749881e0d20c1ff9dd"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.DefaultProvisioningServiceTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "efb59abec355ec6c1518d27b4e7be266f06c1f640759d26f1783f8600c4582d8"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.PlacementSecretCipherTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "31a8d8488577e19e119d8eb6c23eb7839db00eb723259858a1ede3219a21280a"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.ProvisioningJobClaimerIntegrationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "xml_sha256": "2c8a07deffef149a2628ad00239e147f8e9d363437283ddbb9de0dc2df89190e"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.ProvisioningJobCoordinatorIntegrationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "xml_sha256": "12830db3dec6aebf871dbc9dcf5f8efd7770e40d17081757b911ac2336258a64"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.SchemaPerTenantIsolationIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "xml_sha256": "e8f30114b6a27696a675a84041433f9b4e4205d05a810de21a4a9196ccb10793"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.TenantDatabaseProvisionerFailureInjectionIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "xml_sha256": "03b87f4b0341b697c2af2bc1d3a6f7bbedb69e7a2b1a56bf8ef41f5cee225876"
+    },
+    {
+      "class": "vn.edu.ctu.saas.provisioning.TenantDatabaseProvisionerTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "5628f8fb50fdf8d67622dc85590630f155fe212c342219d896868d8cd6b20874"
+    },
+    {
+      "class": "vn.edu.ctu.saas.security.TenantContextFilterTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "0a007889efaa3ca5ca22cf735fe11ee6761fa3f4b13e5e3875616438c7ea8a00"
+    },
+    {
+      "class": "vn.edu.ctu.saas.security.TenantHostResolverTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "6118979eeca68dd9c0add4a8de65b6a07fbfcb748e24de024670e2b066f2558d"
+    },
+    {
+      "class": "vn.edu.ctu.saas.storage.ResourceDeletionHandlerTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "6262c870bccc524984fb35c9efb78e816329fe827e8ff988ae2e69db702d1aa4"
+    },
+    {
+      "class": "vn.edu.ctu.saas.storage.ResourceDeletionOutboxIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "xml_sha256": "59bcded947f676b990ff6363f131576b7f111b489401ea1e7cb75f0dda2f7406"
+    },
+    {
+      "class": "vn.edu.ctu.saas.tenant.TenantContextHolderTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "55b11df0838e3b4e152d90e6cd6db95f0bd900aa3c7da4b221fcea1bf47e7aa6"
+    },
+    {
+      "class": "vn.edu.ctu.saas.tenant.TenantInvitationServiceTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "f8af4789b5c8bd12f904ed360f9c2446b49c1d73c97c36c2807edb49a9c648e3"
+    },
+    {
+      "class": "vn.edu.ctu.saas.tenant.TenantManagementServiceSecurityTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "3106f39d4495638bef5e7c0374b00405a7e0dc3b1b88fb3784478872d70f6f9d"
+    }
+  ],
+  "log_sha256": "843c852ff5f59694a341e451201f2394f79b6f9a87d875c7851d14f200024979"
+}

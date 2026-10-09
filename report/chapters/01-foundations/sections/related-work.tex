@@ -1,20 +1,33 @@
-\par\penalty0
-\section{Nghiên cứu liên quan và khoảng trống}\label{section:related-work-1}
-% Trình bày nghiên cứu liên quan và khoảng trống; bổ sung nguồn và minh họa khi cần.
+\section{Tổng quan có cấu trúc và cơ sở lựa chọn nguồn}\label{sec:related}
+\subsection{Trạng thái tìm kiếm và sàng lọc}
+Kho nguồn hiện có gồm source register, BibTeX và pilot discovery. Chưa có bộ export đầy đủ từ ACM, IEEE, SpringerLink, ScienceDirect và Google Scholar, chưa hoàn tất sàng lọc hai người hoặc số lượng flow. Vì vậy báo cáo này là tổng quan có cấu trúc, chưa phải systematic mapping đã hoàn thành. Hướng dẫn Petersen được dùng để tổ chức các bước tìm kiếm, lựa chọn, phân tích và trình bày; PRISMA chỉ hỗ trợ minh bạch báo cáo \citep{petersen2015mapping,page2021prisma}.
 
-\par\penalty0
-\subsection{Nghiên cứu trong nước và ngoài nước}\label{subsection:related-work-2}
-% Trình bày nghiên cứu trong nước và ngoài nước; bổ sung nguồn và minh họa khi cần.
+Các nguồn được đọc theo ba lớp. Nguồn học thuật cung cấp khung khái niệm và phương pháp; tài liệu chính thức mô tả cơ chế kỹ thuật; tài liệu sản phẩm hỗ trợ xác định yêu cầu nhưng không cho phép suy ra kiến trúc database không được công bố. Metadata hợp lệ chỉ là điều kiện nhận diện nguồn, không phải đánh giá chất lượng hoặc bằng chứng về hiệu quả của nguyên mẫu.
 
-\par\penalty0
-\subsection{So sánh các hướng tiếp cận}\label{subsection:related-work-3}
-% Trình bày so sánh các hướng tiếp cận; bổ sung nguồn và minh họa khi cần.
+\subsection{Các nghiên cứu nền tảng}
+Olabanji, Fitch và Matthew báo cáo 921 bản ghi ban đầu, chọn 64 công bố giai đoạn 2015--2022 và phân loại nghiên cứu multi-tenancy trong cloud-native \citep{olabanji2023multitenancy}. Kết quả ấy thuộc nghiên cứu của tác giả; không được ghi thành số lượng tìm kiếm của nhóm. Nguồn hữu ích để phát triển từ khóa và chiều phân loại, nhưng không trả lời trực tiếp cách tổ chức quyền project trong Kanban.
 
-\par\penalty0
-\subsection{Định hướng đóng góp}\label{subsection:related-work-4}
-% Trình bày định hướng đóng góp; bổ sung nguồn và minh họa khi cần.
+Narasayya và Chaudhuri khảo sát kiến trúc cloud data services, elasticity, SLA, performance isolation và chi phí \citep{narasayya2021cloud}. Báo cáo dùng nguồn này để xác định các chiều cần đo; chưa vận dụng kết quả của dịch vụ database đám mây làm số đo cho VPS của đề tài.
 
-\par\penalty0
-\subsection{Chuẩn và tài liệu tham chiếu}\label{subsection:related-work-5}
-% Trình bày chuẩn và tài liệu tham chiếu; bổ sung nguồn và minh họa khi cần.
+Pushpan có metadata được đối chiếu, DOI \nolinkurl{10.32628/CSEIT241061151}, trang 1117--1126 \citep{pushpan2024multitenant}. Thuyết minh đang ghi trang khác. Trong báo cáo hiện tại, nguồn này chỉ hỗ trợ nhận diện chủ đề; chất lượng bằng chứng chưa được chấm và không tham gia quyết định chọn công nghệ cuối cùng. Nguồn Kumar thiếu venue\slash DOI\slash bản gốc và hai tài liệu trong nước thiếu metadata chính thức được giữ ngoài lập luận chính.
 
+\begin{table}[htbp]
+\centering\caption{Vai trò và giới hạn của nguồn trong tổng quan}\label{tab:literature}
+\begin{tabularx}{\textwidth}{P{.23\textwidth}XX}
+\toprule Nguồn & Vai trò trong đề tài & Giới hạn suy luận \\
+\midrule
+Olabanji và cộng sự & Điểm xuất phát cho taxonomy và từ khóa & Cloud-native rộng hơn SaaS nghiệp vụ; không thay sàng lọc của nhóm \\
+Narasayya--Chaudhuri & Chiều đánh giá isolation, SLA, tài nguyên & Không có số đo của nguyên mẫu Kanban \\
+Petersen; PRISMA & Tổ chức phương pháp và báo cáo tìm kiếm & Chưa có export\slash flow để xác nhận mapping hoàn tất \\
+Tài liệu PostgreSQL & Điều kiện hoạt động của RLS và schema & Cần đối chiếu runtime role và transaction thực tế \\
+Microsoft\slash AWS & Phương án routing, identity, outbox, chia sẻ tài nguyên & Hướng dẫn kiến trúc, không phải benchmark của hệ thống này \\
+\bottomrule\end{tabularx}
+\end{table}
+
+\subsection{Từ nguồn đến khoảng trống của dự án}
+Tổng quan tạo ra các chiều phân tích: tenant context xuyên tầng; enforcement theo hàng\slash namespace\slash database; quyền có phạm vi; mutation và side effect; giới hạn tài nguyên chia sẻ. Khoảng trống thực hành là chưa có đủ bằng chứng đo trong checkout để đánh giá các chiều này đồng thời trên cùng nghiệp vụ và cấu hình giới hạn. Chương~\ref{chap:system} đặt các phương án vào năm nhóm, thay vì liệt kê công nghệ không gắn tình huống.
+
+Đóng góp sơ bộ có thể đánh giá là một kiến trúc hiện thực cùng chuỗi truy vết và tình huống kiểm chứng. Đóng góp về placement tốt hơn, chi phí thấp hơn hoặc tác động học tập tốt hơn vẫn chờ dữ liệu. Việc có ba placement trên local là khả năng kỹ thuật đã hiện thực, còn so sánh học thuật ba placement cần được đăng ký bổ sung trước khi thu số liệu.
+
+\subsection{Công việc cần hoàn tất cho tổng quan cuối}
+Nhóm cần khóa ngày tìm kiếm, lưu chuỗi truy vấn theo từng cơ sở dữ liệu, khử trùng theo DOI rồi title\slash year, sàng lọc title\slash abstract và full text, lưu lý do loại và giải quyết bất đồng. Extraction cần ghi câu hỏi, phương pháp, môi trường, kết quả, hạn chế và quan hệ với RQ. Số lượng flow được tính từ register và export; không lấy số của bài tổng quan khác làm số của nhóm.

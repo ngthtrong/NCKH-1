@@ -12,7 +12,7 @@
 \newcommand{\CoverHeading}{%
   \MinistryName\\\textbf{\UniversityName}\par
   \vspace{10mm}\includegraphics[width=30mm]{logo-ctu.png}\par
-  \vspace{10mm}{\fontsize{18bp}{22bp}\selectfont\bfseries BÁO CÁO TỔNG KẾT\par}
+  \vspace{10mm}{\fontsize{18bp}{22bp}\selectfont\bfseries BÁO CÁO\par}
   \medskip\textbf{ĐỀ TÀI NGHIÊN CỨU KHOA HỌC CỦA SINH VIÊN}\par}
 \newcommand{\CoverTitle}{%
   {\fontsize{16bp}{20bp}\selectfont\bfseries\ProjectTitle\par}
@@ -57,6 +57,13 @@
 \newcommand{\FormIndented}[1]{\par\begingroup\leftskip=8mm\noindent #1\par\endgroup}
 % Blank fields are intentional in this reusable template.
 \newcommand{\PendingField}[1]{\dotfill}
+% Evidence identifiers link to the audit register in the preliminary report.
+\newcommand{\Evidence}[1]{\hyperref[ev:#1]{\textsf{#1}}}
+\newcommand{\PendingData}{\texttt{PENDING\_DATA}}
+\newcommand{\Repo}[1]{\nolinkurl{#1}}
+\newcommand{\Code}[1]{\nolinkurl{#1}}
+\newcommand{\BaselineCommit}{\texttt{e829f73}}
+\newcommand{\ReportSnapshotDate}{09/10/2026}
 \newcommand{\FormSignature}[2]{%
   \par\noindent\hfill\begin{minipage}{.48\textwidth}\centering
   Ngày \ldots\ tháng \ldots\ năm \ldots\\\textbf{#1}\par\vspace{20mm}\textbf{#2}\par

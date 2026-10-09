@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rhead] at (0,0) {CLIENT A};
+\node[rhead] at (5,0) {SERVER / TASK};
+\node[rhead] at (10,0) {CLIENT B};
+\draw[draw=ReportBorder,line width=.8pt] (0,-.4) -- (0,-5.8);
+\draw[draw=ReportBorder,line width=.8pt] (5,-.4) -- (5,-5.8);
+\draw[draw=ReportBorder,line width=.8pt] (10,-.4) -- (10,-5.8);
+\node[rblue,text width=29mm] at (0,-1) {Đang giữ version 7};
+\node[rteal,text width=29mm] at (5,-1) {Version hiện tại: 7};
+\node[rblue,text width=29mm] at (10,-1) {Đang giữ version 7};
+\draw[rflow] (0,-2.1) -- node[rlabel,above]{Lưu với expectedVersion = 7} (5,-2.1);
+\node[rteal,text width=39mm] at (5,-3) {\textbf{Lưu thành công}\\Version tăng thành 8};
+\draw[raux] (10,-4.2) -- node[rlabel,above]{Lưu với expectedVersion = 7} (5,-4.2);
+\draw[rfail] (5,-5.2) -- node[rlabel,above]{Conflict: không ghi đè version 8} (10,-5.2);
+\node[rnote,text width=125mm] at (5,-7) {\textbf{Phía client:} giữ input đang sửa, tải trạng thái mới và cho người dùng quyết định tiếp. Ví dụ 7/8 chỉ minh họa cơ chế; không phải số đo thực nghiệm.};
+\end{tikzpicture}
+\caption[Hai client và optimistic version]{Minh họa optimistic version: hai client cùng giữ version 7; client lưu sau phải xử lý conflict khi version đã tăng (E13).}\label{fig:version-conflict}
+\end{figure}

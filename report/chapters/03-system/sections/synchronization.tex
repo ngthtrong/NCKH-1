@@ -1,24 +1,44 @@
-\par\penalty0
-\section{Quy trình phối hợp và truy vết}\label{section:synchronization-1}
-% Trình bày quy trình phối hợp và truy vết; bổ sung nguồn và minh họa khi cần.
+\section{N4 -- Nhất quán trạng thái và xử lý nền}\label{sec:n4}
+\subsection{Bài toán và câu hỏi}
+Hai thành viên mở cùng task tại version v, rồi cùng lưu thay đổi. Một batch move chứa nhiều task nhưng một version đã cũ. Sau mutation, event có thể được worker đọc lại; deadline hoặc assignee có thể đổi trước khi notification được gửi. N4 hỏi cách tránh ghi đè âm thầm, giữ batch nguyên tử và bảo đảm side effect vẫn phù hợp trạng thái hiện hành.
 
-\par\penalty0
-\subsection{Định danh và trạng thái}\label{subsection:synchronization-2}
-% Trình bày định danh và trạng thái; bổ sung nguồn và minh họa khi cần.
+Các tình huống được chia thành hai ranh giới: cập nhật trong application transaction và xử lý event sau transaction. Một khóa hoặc version ở task không tự giải quyết delivery lặp; một outbox không tự giải quyết conflict giữa hai client. Thiết kế cần cơ chế riêng và tiêu chí riêng cho từng ranh giới.
 
-\par\penalty0
-\subsection{Tính nhất quán của quy trình}\label{subsection:synchronization-3}
-% Trình bày tính nhất quán của quy trình; bổ sung nguồn và minh họa khi cần.
+\subsection{Phương án cập nhật đồng thời}
+\begin{table}[htbp]
+\centering\caption{So sánh cách xử lý cập nhật đồng thời}\label{tab:n4-concurrency}
+\begin{tabularx}{\textwidth}{P{.24\textwidth}XX}
+\toprule Phương án & Lợi ích & Đánh đổi \\
+\midrule
+Ghi sau cùng thắng & Luồng cập nhật đơn giản & Có thể mất thay đổi mà client không biết \\
+Optimistic version & Phát hiện dữ liệu client đã cũ & Client phải giữ input và xử lý conflict \\
+Pessimistic locking & Điều phối tại transaction & Chờ khóa, transaction dài và nguy cơ deadlock \\
+\bottomrule\end{tabularx}
+\end{table}
+Nguyên mẫu dùng optimistic version cho task\slash board và transaction cho batch. Lựa chọn phù hợp thao tác tương tác có thể tải lại khi conflict, nhưng chưa được benchmark với tần suất cạnh tranh cao. Pessimistic lock vẫn có thể dùng cho invariant hoặc workflow cụ thể; không xem hai cách là bắt buộc loại trừ trong toàn hệ thống.
 
-\par\penalty0
-\subsection{Xử lý phản hồi và ngoại lệ}\label{subsection:synchronization-4}
-% Trình bày xử lý phản hồi và ngoại lệ; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:version-conflict} minh họa hai client cùng đọc một version. Server tăng version sau lần lưu đầu; lần lưu sau với version cũ phải báo conflict để người dùng xử lý trên trạng thái mới.
+\input{assets/diagrams/version-conflict}
 
-\par\penalty0
-\subsection{Bổ sung và cập nhật thông tin}\label{subsection:synchronization-5}
-% Trình bày bổ sung và cập nhật thông tin; bổ sung nguồn và minh họa khi cần.
+\subsection{Phương án chuyển side effect}
+Gửi notification trực tiếp sau mutation có ít thành phần nhưng tạo khoảng lỗi khi dữ liệu đã commit mà delivery thất bại. Gửi trước commit có thể báo một thay đổi sau đó rollback. Transactional outbox ghi event cùng mutation, để worker retry; đổi lại có độ trễ nền, retention và deduplication. Broker có thể hỗ trợ phân phối khi quy mô tăng nhưng thêm thành phần vận hành và vẫn cần giải quyết quan hệ commit--publish.
 
-\par\penalty0
-\subsection{Quy trình sử dụng}\label{subsection:synchronization-6}
-% Trình bày quy trình sử dụng; bổ sung nguồn và minh họa khi cần.
+Lựa chọn hiện tại là PostgreSQL outbox trong cùng application transaction, không thêm broker ở nguyên mẫu. Handler kiểm tra lại tenant, event và recipient trước side effect. In-app\slash email delivery có sổ và key chống trùng theo hiện thực. Không gọi thiết kế này là exactly-once toàn đường SMTP.
 
+\subsection{Tiêu chí kiểm chứng}
+Một expected version cũ phải trả conflict, không ghi đè silent. Khi một item batch thất bại, trạng thái tất cả task và event của batch phải rollback. Một event được dispatch hai lần không tạo notification nghiệp vụ trùng trong phạm vi unique key đã kiểm tra. Nhắc hạn phải loại nếu deadline, assignee, membership hoặc trạng thái task\slash project không còn phù hợp; không gửi cho người nhận cũ chỉ vì họ có mặt trong payload lịch sử.
+
+Tiêu chí delivery cần tách enqueue, in-app persisted, email queued và SMTP sent. Một hàng email PENDING chưa là email đã gửi. Một lần gọi SMTP thành công cũng chưa chứng minh người dùng đã đọc hoặc provider ngoài local có SLA.
+
+\subsection{Hiện thực mutation và outbox}
+\Code{ProjectApplicationService} cập nhật task với điều kiện tenant\slash ID\slash version, tăng version và báo conflict khi không đủ điều kiện. Batch dùng cùng executor transaction, kiểm tra board\slash column và version của từng task; event \Code{TASK_MOVED} được tạo cho từng task trong cùng transaction. Semantic completion của column giúp trạng thái hoàn tất không phụ thuộc tên cột Done hoặc Hoàn tất \Evidence{E13}.
+\input{assets/diagrams/outbox}
+
+\Code{OutboxWorker} duyệt tenant ACTIVE tuần tự, bỏ qua placement chưa có schema version mới nhất, đặt context riêng, đọc event sẵn sàng theo tenant và retry hữu hạn. Code pendingEvents chưa thể được mô tả như một cơ chế claim SKIP LOCKED đa-worker tương đương provisioning. Deduplication trong handler\slash delivery phải được đánh giá trên chính đường side effect, không kế thừa kết luận từ job claimer khác.
+
+\Code{DeadlineReminderService} tạo event due\slash overdue theo điều kiện task\slash column\slash project\slash membership. Application V11 lưu sổ chống trùng, V12 thêm action URL và email delivery retry. Worker kiểm tra lại trạng thái trước dispatch; email có hàng đợi riêng, backoff\slash lease và số lần thử tối đa năm. \Code{NotificationDeliveryWorker} tôn trọng preference hiện hành; lỗi SMTP không phải lý do để xử lý lại toàn bộ mutation Kanban.
+
+\subsection{Bằng chứng và giới hạn}
+Test tích hợp quyền project có tình huống batch reorder nguyên tử và xóa mềm kèm subtask một cấp. Test tích hợp nhắc hạn có case enqueue idempotent, deadline thay đổi, exact assignee, reminder stale và dispatcher tạo in-app\slash email queue chống trùng. Biên bản nhắc hạn ghi 6\slash 6 integration test trên PostgreSQL cùng application V1--V12 \Evidence{E06}; lần test hiện tại skip các case Docker \Evidence{E04}.
+
+Kết luận sơ bộ là code có cơ chế conflict, transaction và kiểm tra stale với hồ sơ local hỗ trợ các case đã ghi. Chưa có kiểm chứng nhiều outbox worker đồng thời, fairness giữa tenant hoặc exactly-once SMTP; chưa có realtime collaboration. Mục~\ref{sec:coverage} tổng hợp bằng chứng, Mục~\ref{sec:threats} thảo luận giới hạn và điều kiện kiểm tra tiếp.

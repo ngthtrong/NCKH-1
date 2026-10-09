@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=31mm] (request) at (0,0) {\textbf{1. Phiên và tenant}\\Host / token\\Trạng thái / thành viên};
+\node[rblue,text width=31mm] (policy) at (4.8,0) {\textbf{2. Quyền nghiệp vụ}\\Project / role\\Quan hệ tài nguyên};
+\node[rteal,text width=31mm] (sql) at (9.6,0) {\textbf{3. Biên dữ liệu}\\Guard SQL / RLS\\Role / placement};
+\node[ramber,text width=31mm] (file) at (4.8,-2.5) {\textbf{Tệp và URL}\\Namespace / ownership\\Quota / thời hạn};
+\node[ramber,text width=31mm] (job) at (9.6,-2.5) {\textbf{Tác vụ nền}\\Context riêng\\Stale / chống trùng};
+\draw[rflow] (request) -- (policy);
+\draw[rflow] (policy) -- (sql);
+\draw[raux] (policy) -- (file);
+\draw[rflow] (sql) -- (job);
+\node[rnote,text width=125mm] at (4.8,-4.4) {\textbf{Biên kiểm chứng:} mỗi lớp cần tình huống từ chối và kiểm tra trạng thái trước--sau. RLS chỉ bảo vệ bảng SQL; tệp và worker cần điều kiện riêng.};
+\end{tikzpicture}
+\caption[Các lớp bảo vệ theo đường truy cập]{Các lớp kiểm soát bổ sung cho nhau trên đường từ request tới dữ liệu và side effect (E10--E14).}\label{fig:trust-boundaries}
+\end{figure}

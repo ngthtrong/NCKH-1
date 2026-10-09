@@ -1,28 +1,30 @@
-\par\penalty0
-\section{Thiết lập thực nghiệm}\label{section:setup-1}
-% Trình bày thiết lập thực nghiệm; bổ sung nguồn và minh họa khi cần.
+\section{Baseline và hồ sơ kiểm chứng}\label{sec:baseline}
+\subsection{Phiên bản mô tả và môi trường viết}
+Phiên bản nguyên mẫu được mô tả có control migration V1--V6 và application migration V1--V12. Đây là trạng thái cấu trúc mã đã đối chiếu, không phải truy vấn trạng thái một hệ thống đang vận hành. Các checkpoint lịch sử và lượt kiểm tra mới được giữ riêng \Evidence{E01}, \Evidence{E04}.
 
-\par\penalty0
-\subsection{Phạm vi các phép đo}\label{subsection:setup-2}
-% Trình bày phạm vi các phép đo; bổ sung nguồn và minh họa khi cần.
+Môi trường xuất bản có Python 3.12.3, XeTeX\slash TeX Live 2023, Biber và Poppler. Doctor xác nhận các package và đủ bốn kiểu Times New Roman. Maven hiện có là 3.9.11. Node.js Linux chưa dùng được; npm từ Windows báo không xác định được Node directory. Docker-dependent suite không có runtime Docker để thực thi trong lượt kiểm tra. Chi tiết backend thực tế và compiler được ghi trong biên bản mới \Evidence{E04}.
 
-\par\penalty0
-\subsection{Môi trường và thời gian đo}\label{subsection:setup-3}
-% Trình bày môi trường và thời gian đo; bổ sung nguồn và minh họa khi cần.
+\subsection{Các checkpoint lịch sử được giữ riêng}
+\begin{longtable}{@{}P{.18\textwidth}P{.34\textwidth}P{.38\textwidth}@{}}
+\caption{Checkpoint kỹ thuật và giới hạn sử dụng}\label{tab:checkpoints}\\
+\toprule Mốc / evidence & Nội dung được ghi trong hồ sơ & Phạm vi kết luận \\
+\midrule\endfirsthead
+\toprule Mốc / evidence & Nội dung được ghi trong hồ sơ & Phạm vi kết luận \\
+\midrule\endhead
+P0 26\slash 08; \Evidence{E07} & Baseline Pool\slash Silo, migration, role\slash RLS và smoke local & Lịch sử khởi chạy; timing smoke không là số đo performance \\
+P1 cuối 08\slash 2026; \Evidence{E08} & Claim\slash lease\slash crash recovery, rollback lỗi, storage cleanup & Tình huống và môi trường local; không tự áp dụng cho production \\
+P2 local 31\slash 08; \Evidence{E09} & Guarded 6\slash 6; 18 guard-omission observations, gồm 6 leak & Sàng lọc ứng viên; measurement\slash scorecard chưa có \\
+EXT 08\slash 09; \Evidence{E05} & Application V8; backend 96\slash 96, skip 0; frontend 16; E2E 3 & Ba placement và tùy biến local tại mốc đó \\
+Nhắc hạn 19\slash 09; \Evidence{E06} & Application V12; backend 106; frontend 22; E2E 3 theo biên bản & File mang tên 18\slash 09; ngày nội dung 19\slash 09; không là lượt chạy hôm nay \\
+\bottomrule\end{longtable}
+Đối chiếu số test hoặc migration theo mốc giúp tránh cộng dồn hoặc thay thế lịch sử. Một test đã pass ở V8 không đủ chứng minh mọi thay đổi V12 đã được chạy trong môi trường hiện tại.
 
-\par\penalty0
-\subsection{Cấu hình và đối chứng thứ nhất}\label{subsection:setup-4}
-% Trình bày cấu hình và đối chứng thứ nhất; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:test-scope} giải thích cách đọc lượt backend mới. Nhánh thực thi và nhánh bị bỏ qua hỗ trợ hai loại kết luận khác nhau; số test tổng không chứng minh tích hợp đã đóng.
+\input{assets/diagrams/test-scope}
 
-\par\penalty0
-\subsection{Thiết lập đánh giá thứ hai}\label{subsection:setup-5}
-% Trình bày thiết lập đánh giá thứ hai; bổ sung nguồn và minh họa khi cần.
+\subsection{Artifact cũ và kiểm tra mới}
+Artifact Surefire có sẵn ghi 106 test, 0 failure\slash error, 47 skip vì Docker không khả dụng: 59 test được thực thi \Evidence{E03}. Commit thực thi chưa được xác lập. Lượt mới biên dịch lại 121 source và 27 test source, rồi mục tiêu test đạt: 106 tổng, 59 thực thi, 47 skip, 0 failure\slash error \Evidence{E04}. Maven và test runtime là Java 21.0.12.1; compiler fork là javac 25.0.4.1 với release 21 vì compiler đi kèm runtime 21 trên máy báo không hỗ trợ release 21. Đây không phải build hoàn toàn bằng JDK 21.
 
-\par\penalty0
-\subsection{Thiết lập đánh giá thứ ba}\label{subsection:setup-6}
-% Trình bày thiết lập đánh giá thứ ba; bổ sung nguồn và minh họa khi cần.
+Mục tiêu verify chưa hoàn tất do thiếu plugin trong cache offline. Frontend\slash E2E chưa chạy lại vì thiếu Node\slash runtime stack. Không nâng nhãn ``test goal đạt'' thành ``verify đạt'', không suy 47 case Docker bị skip là pass và không dùng compiler fallback làm bằng chứng đã đạt môi trường verification chuẩn.
 
-\par\penalty0
-\subsection{Lưu trữ kết quả và phiên bản}\label{subsection:setup-7}
-% Trình bày lưu trữ kết quả và phiên bản; bổ sung nguồn và minh họa khi cần.
-
+Báo cáo và các biểu mẫu được kiểm tra khổ A4, phông nhúng và tính nhất quán tham chiếu. Biên bản xuất bản nằm trong hồ sơ hỗ trợ; kết quả dàn trang không thay bằng chứng nghiên cứu hoặc kiểm chứng ứng dụng.

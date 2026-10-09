@@ -1,0 +1,39 @@
+\section{N3 -- Xác thực và phân quyền \texorpdfstring{tenant\slash project}{tenant/project}}\label{sec:n3}
+\subsection{Bài toán và câu hỏi}
+Owner tenant gọi API đọc project mà họ không tham gia; Member gọi trực tiếp API quản trị; người đã bị revoke vẫn giữ JWT còn hạn. N3 hỏi cách tách danh tính, phiên tenant và quyền theo phạm vi để các thao tác phản ánh membership hiện hành. Sự hiện diện của nút UI không quyết định quyền server.
+
+\subsection{Phương án và đánh đổi}
+\begin{table}[htbp]
+\centering\caption{So sánh nguồn quyết định quyền}\label{tab:n3-options}
+\begin{tabularx}{\textwidth}{P{.23\textwidth}XX}
+\toprule Phương án & Lợi ích & Điều kiện\slash đánh đổi \\
+\midrule
+Role chủ yếu trong JWT & Ít lookup tại request & Quyền cũ tồn tại tới expiry nếu không có invalidation \\
+Membership server hiện hành & Thu hồi và xét quyền theo scope & Lookup và phụ thuộc database; cache cần invalidation \\
+ABAC\slash ReBAC policy & Diễn đạt điều kiện\slash quan hệ phức tạp & Thêm mô hình policy và khối lượng kiểm chứng \\
+\bottomrule\end{tabularx}
+\end{table}
+Ở mức identity, ứng dụng tự quản lý account cho phép nguyên mẫu local hoạt động ít phụ thuộc dịch vụ ngoài. IdP\slash OIDC có thể tập trung federation\slash lifecycle nhưng cần tích hợp tenant mapping và project policy của ứng dụng. Tài liệu Microsoft mô tả các quyết định identity trong hệ thống đa tenant \citep{azureTenantIdentity}. Báo cáo so sánh ở mức kiến trúc; không chuyển hệ thống sang IdP trong công việc này.
+
+\subsection{Tiêu chí và lựa chọn triển khai}
+Tiêu chí là ma trận allow\slash deny theo hành động, direct API không vượt role, Owner thiếu project membership không đọc nội dung, token cũ bị chặn sau membership thay đổi và deny không tạo side effect. Role ở một project không được cấp quyền project khác. Tenant suspended cần bị chặn trước business data; archived project có thể đọc nhưng mutation phải bị từ chối theo invariant riêng.
+
+Lựa chọn là account chung, tenant-bound session, membership hiện hành và RBAC tenant\slash project. Cách này giữ mô hình nghiệp vụ đơn giản và thu hồi quyền theo phiên bản security. ABAC\slash ReBAC chưa cần được triển khai đầy đủ cho tập hành động hiện tại, nhưng một số điều kiện như tác giả comment\slash uploader là policy bổ sung theo đối tượng, không thể chỉ xét cấp role.
+
+Hình~\ref{fig:authorization} thể hiện chuỗi điều kiện cấp quyền. Với một hành động cụ thể, chỉ một điều kiện không thỏa cũng đủ từ chối; phép từ chối cần được xác minh cùng trạng thái dữ liệu và side effect.
+\input{assets/diagrams/authorization}
+
+\subsection{Hiện thực identity và phiên tenant}
+\Code{AuthService} xử lý account login, transfer code và tenant session. Transfer code có scope và vòng đời riêng; frontend exchange để nhận access token tenant và refresh flow. Backend xác minh token bằng security framework; filter kiểm tra lại tenant\slash membership\slash version. Access token giữ trong memory frontend; logic refresh và tenant switching cần bảo toàn ranh giới cache.
+
+Một phiên đã có tenant claim vẫn có thể bị revoke qua membership\slash security version. Điều này tách hiệu lực role hiện hành khỏi thời hạn JWT. Nếu thêm cache membership, thời điểm invalidation sẽ trở thành một phần tiêu chí chứ không được bỏ qua bằng giả định token đã ký là đủ.
+
+\subsection{Hiện thực quyền nội dung}
+\Code{ProjectApplicationService} tìm quan hệ tài nguyên và gọi requireProjectRole trong callback executor trước mutation. Role Manager\slash Member\slash Viewer có phạm vi project; resource service kiểm tra project relation và ownership theo policy. Invariant Manager cuối cùng ngăn một project mất người quản lý do revoke. Các điều kiện này được kiểm tra tại server, còn UI dùng quyền để hiển thị luồng phù hợp.
+
+Quyền hiệu lực với nội dung là giao của tenant ACTIVE, active tenant membership, host\slash token binding và project action policy. Capability mở rộng là điều kiện bổ sung, không thay role. System Admin quản trị metadata vận hành không mặc nhiên đọc mọi project. Ma trận quyền rút gọn và đường truy về policy đầy đủ ở Phụ lục~\ref{app:permissions}.
+
+\subsection{Bằng chứng và giới hạn}
+\Code{ProjectAuthorizationIntegrationTest} có case cross-tenant ID giữ nguyên dữ liệu ngoài phạm vi, deny theo role, project archived, task batch và resource. Security tests kiểm tra membership revoke\slash version; E2E lịch sử có Manager\slash Member\slash Viewer và API trực tiếp \Evidence{E05}, \Evidence{E12}. Coverage được xét theo assertion và lần chạy ở Mục~\ref{sec:coverage}, không theo số nút UI đã có.
+
+Chưa kết luận nguyên mẫu là hệ thống identity production được chứng nhận, chưa có dữ liệu federation\slash SSO hoặc proof cho mọi policy tổ hợp. Để đóng kết luận cần chạy tích hợp hiện tại, rà từng ô permission matrix với route\slash handler và bổ sung negative case khi thêm hành động. Việc từ chối nên được kiểm tra cả mã phản hồi lẫn dữ liệu\slash event trước--sau.

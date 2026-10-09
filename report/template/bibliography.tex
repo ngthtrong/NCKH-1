@@ -8,6 +8,10 @@
 \providecommand{\ReportArticlesDatabase}{bibliography/articles}
 \ifReportBiblatex
   \usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+  \usepackage{xpatch}
+  % Không in ngoặc rỗng khi nguồn online chưa có năm xuất bản xác minh.
+  \xpatchbibdriver{online}{\printtext[parens]{\usebibmacro{date}}}
+    {\iffieldundef{year}{}{\printtext[parens]{\usebibmacro{date}}}}{}{}
   \addbibresource{bibliography/legal.bib}
   \addbibresource{bibliography/books.bib}
   \addbibresource{\ReportArticlesDatabase.bib}

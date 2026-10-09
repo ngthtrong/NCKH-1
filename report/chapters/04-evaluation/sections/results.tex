@@ -1,60 +1,50 @@
-\par\penalty0
-\section{Kết quả và bàn luận}\label{section:results-1}
-% Trình bày kết quả và bàn luận; bổ sung nguồn và minh họa khi cần.
+\section{Bằng chứng theo nhóm và câu trả lời RQ sơ bộ}\label{sec:coverage}
+\subsection{Phạm vi coverage cần được diễn giải}
+Bảng~\ref{tab:coverage} liên kết nhóm với assertion quan trọng. Cột evidence phân biệt source inspection, checkpoint lịch sử và kết quả mới. Số test không là coverage percentage: nhiều assertion ở một test có thể kiểm tra nhiều hành động, trong khi một nhánh chưa có negative case vẫn có thể bị bỏ sót.
 
-\par\penalty0
-\subsection{Kết quả nội dung nghiên cứu thứ nhất}\label{subsection:results-2}
-% Trình bày kết quả nội dung nghiên cứu thứ nhất; bổ sung nguồn và minh họa khi cần.
+\begin{longtable}{@{}P{.08\textwidth}P{.34\textwidth}P{.21\textwidth}P{.27\textwidth}@{}}
+\caption{Coverage, bằng chứng và phần chưa đóng}\label{tab:coverage}\\
+\toprule Nhóm & Tình huống\slash tiêu chí cần truy vết & Bằng chứng hiện có & Giới hạn còn lại \\
+\midrule\endfirsthead
+\toprule Nhóm & Tình huống\slash tiêu chí cần truy vết & Bằng chứng hiện có & Giới hạn còn lại \\
+\midrule\endhead
+N1 & Token A\slash host B; revoke\slash version; tenant suspended; cleanup exception & Filter\slash holder\slash host tests; E10; E04 cho test thực thi & Chưa xác nhận ingress Internet và trusted proxy \\
+N2 & IDOR read\slash write\slash delete; native\slash bulk\slash background; explicit schema B; commit\slash rollback reuse & E09 screening; RLS\slash schema tests; E11; EXT E05 & RLS 4 và schema 1 test Docker bị skip; chưa có measurement \\
+N3 & Role allow\slash deny; Owner thiếu project role; revoke; deny không side effect & Project authorization 17 case; security tests; E12 & 17 integration case bị skip; chưa đóng mọi ô permission matrix hiện tại \\
+N4 & Stale version; batch rollback; duplicate\slash stale event; exact assignee & Source E13; deadline 6 case, E06 & 6 deadline integration case bị skip; multi-worker chưa kiểm chứng \\
+N5 & Duplicate callback; atomic claim; crash\slash lease; compensation; storage dead letter & E08; provision\slash storage source E14 & Integration Docker bị skip; chưa có budget\slash limiter đo thật hay provider Internet \\
+\bottomrule\end{longtable}
 
-\par\penalty0
-\subsection{Độ tin cậy và chính sách xử lý}\label{subsection:results-3}
-% Trình bày độ tin cậy và chính sách xử lý; bổ sung nguồn và minh họa khi cần.
+Hình~\ref{fig:isolation-case} minh họa cách đánh giá một truy cập chéo. Ngoài phản hồi bị từ chối, cần đối chiếu rằng dữ liệu và sự kiện của tenant B không thay đổi; kết quả của đường request không tự bao phủ SQL native hoặc job nền.
+\input{assets/diagrams/isolation-case}
 
-\par\penalty0
-\subsection{Tính nhất quán giữa các phương án}\label{subsection:results-4}
-% Trình bày tính nhất quán giữa các phương án; bổ sung nguồn và minh họa khi cần.
+\subsection{Số test bị bỏ qua và hệ quả}
+Trong 106 test được phát hiện, 47 case cần Docker bị bỏ qua: quyền project 17; tùy biến 3; RLS 4; nhắc hạn 6; thanh toán đồng thời 2; claim cấp phát 4; coordinator 4; cô lập schema 1; rollback cấp phát khi lỗi 1; dọn resource qua outbox 5. Không có failure\slash error trong 59 case thực thi; điều đó chưa đóng các bất biến tích hợp của 47 case bị bỏ qua.
 
-\par\penalty0
-\subsection{Kết quả triển khai và đối chiếu}\label{subsection:results-5}
-% Trình bày kết quả triển khai và đối chiếu; bổ sung nguồn và minh họa khi cần.
+Các test unit\slash security thực thi giúp kiểm tra luật binding, management, payment và adapter trong môi trường không Docker. Chúng không thay policy SQL, migration thật, MinIO thật hoặc crash PostgreSQL thật. Hồ sơ lịch sử vẫn cung cấp bối cảnh cho các tình huống đó, nhưng cần tái kiểm chứng trên phiên bản khóa trước kết luận tích hợp cuối.
 
-\par\penalty0
-\subsection{Đánh giá phương án cải tiến thứ nhất}\label{subsection:results-6}
-% Trình bày đánh giá phương án cải tiến thứ nhất; bổ sung nguồn và minh họa khi cần.
+\subsection{Diễn giải sàng lọc isolation}
+\begin{table}[htbp]
+\centering\caption{Guard-omission observations lịch sử, không phải benchmark}\label{tab:screening}
+\begin{tabularx}{\textwidth}{P{.30\textwidth}P{.14\textwidth}X}
+\toprule Ứng viên\slash placement & Số quan sát & Kết quả ghi trong hồ sơ E09 \\
+\midrule
+Explicit predicate / Pool & 3 & Leak khi bỏ guard ở native, bulk và background \\
+Hibernate mechanism / Pool & 3 & Leak ở cùng ba đường deliberate omission \\
+RLS + guard / Pool & 3 & Được policy bảo vệ trong các case omission \\
+Cả ba ứng viên / Silo & 9 & Biên database bảo vệ trong các case được kiểm tra \\
+\bottomrule\end{tabularx}
+\end{table}
+Điều kiện loại đã đăng ký xem mọi cross-tenant success là hành vi loại. Hai ứng viên application-only vì vậy có dấu hiệu loại ở Pool. Báo cáo hiện tại không tự hoàn tất hồ sơ loại checksum-backed hoặc chấm công nghệ còn lại; trạng thái nghiên cứu P2 measurement vẫn tạm dừng. Chín observation Silo không chứng minh mọi thao tác storage\slash authorization hoặc mọi cấu hình database đều an toàn.
 
-\par\penalty0
-\subsection{Đánh giá phương án cải tiến thứ hai}\label{subsection:results-7}
-% Trình bày đánh giá phương án cải tiến thứ hai; bổ sung nguồn và minh họa khi cần.
+\subsection{RQ1 -- Yêu cầu nào cần cho ứng dụng?}
+\textbf{Trả lời sơ bộ, INFERRED:} hồ sơ yêu cầu và nguyên mẫu cho thấy cần account chung, workspace có scope, tenant\slash project membership, Kanban có version, resource và notification đúng tenant, onboarding có recovery và metric theo tenant. Cơ sở là SRS\slash permission matrix\slash OpenAPI \Evidence{E01}, \Evidence{E15}, cùng các tình huống N1--N5. \textbf{Giới hạn:} chưa có user study\slash extraction khảo sát đầy đủ để xác nhận ưu tiên hoặc mức đáp ứng nhu cầu người dùng. \textbf{Cần bổ sung:} review yêu cầu với nhóm\slash người hướng dẫn và thu dữ liệu người dùng nếu được xác nhận trong phạm vi.
 
-\par\penalty0
-\subsection{Kết quả nội dung nghiên cứu bổ trợ}\label{subsection:results-8}
-% Trình bày kết quả nội dung nghiên cứu bổ trợ; bổ sung nguồn và minh họa khi cần.
+\subsection{RQ2 -- Xây dựng Bridge dùng chung thành phần thế nào?}
+\textbf{Trả lời sơ bộ, INFERRED từ hiện thực:} tách control\slash application plane, giữ cùng API\slash mã nghiệp vụ\slash migration, chọn datasource qua verified tenant context và quản lý provisioning bằng registry\slash state machine. Code đã mở rộng ba placement; baseline RQ Pool\slash Silo vẫn được giữ và extension nhận nhãn phạm vi bổ sung. \textbf{Bằng chứng:} \Evidence{E10}--\Evidence{E15}, EXT \Evidence{E05}. \textbf{Giới hạn:} chưa đóng tích hợp hiện tại vì skip, chưa kiểm chứng di chuyển tenant có dữ liệu hoặc vận hành Internet. \textbf{Cần bổ sung:} suite Docker cùng commit và phụ lục protocol cho ba placement.
 
-\par\penalty0
-\subsection{Kết quả đánh giá cơ sở}\label{subsection:results-9}
-% Trình bày kết quả đánh giá cơ sở; bổ sung nguồn và minh họa khi cần.
+\subsection{RQ3 -- Kiến trúc đáp ứng đến mức nào?}
+\textbf{Trả lời sơ bộ:} source và biên bản hỗ trợ cơ chế binding, isolation, role, conflict, dedupe và recovery trong các case local được ghi. Các kết quả lịch sử không thay lần chạy hiện tại; skip được giữ trong đánh giá. \textbf{Bằng chứng:} \Evidence{E04}--\Evidence{E14}. \textbf{Phần chưa trả lời, \PendingData:} hiệu năng, efficacy noisy-neighbor limiter, khả dụng trên VPS và phạm vi nhiều worker. \textbf{Cần bổ sung:} kiểm chứng tích hợp khóa phiên bản, pilot\slash run độc lập, fault model vận hành và QA metric. Chưa kết luận zero-leak toàn hệ thống hoặc đạt SLO production.
 
-\par\penalty0
-\subsection{Độ nhạy với biến đổi đầu vào}\label{subsection:results-10}
-% Trình bày độ nhạy với biến đổi đầu vào; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\subsection{Mức độ phù hợp với mục tiêu}\label{subsection:results-11}
-% Trình bày mức độ phù hợp với mục tiêu; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\subsection{Tính ổn định và điều kiện thất bại}\label{subsection:results-12}
-% Trình bày tính ổn định và điều kiện thất bại; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\subsection{Ảnh hưởng của kết quả trung gian}\label{subsection:results-13}
-% Trình bày ảnh hưởng của kết quả trung gian; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\subsection{Kết quả toàn bộ quy trình}\label{subsection:results-14}
-% Trình bày kết quả toàn bộ quy trình; bổ sung nguồn và minh họa khi cần.
-
-\par\penalty0
-\subsection{Bàn luận tổng hợp}\label{subsection:results-15}
-% Trình bày bàn luận tổng hợp; bổ sung nguồn và minh họa khi cần.
-
+\subsection{RQ4 -- \texorpdfstring{Cơ chế\slash công nghệ}{Cơ chế/công nghệ} nào phù hợp nhất?}
+\textbf{Trả lời sơ bộ, INFERRED có điều kiện:} host\slash token binding, membership hiện hành, optimistic version, outbox và state machine là lựa chọn hiện thực có lý do kỹ thuật. RLS + guard có căn cứ sàng lọc local cho Pool; adapter tách payment\slash storage để duy trì lựa chọn. \textbf{Bằng chứng:} so sánh N1--N5, ADR và \Evidence{E09}. \textbf{Giới hạn:} chưa có scorecard\slash raw measurement đủ để xác định placement hoặc provider phù hợp nhất trên VPS. \textbf{Cần bổ sung:} hồ sơ loại review, phép đo tài nguyên\slash hiệu năng và ADR được chấp nhận rõ ràng.

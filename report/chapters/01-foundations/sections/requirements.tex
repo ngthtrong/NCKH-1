@@ -1,28 +1,45 @@
-\par\penalty0
-\section{Yêu cầu và tiêu chí đánh giá}\label{section:requirements-1}
-% Trình bày yêu cầu và tiêu chí đánh giá; bổ sung nguồn và minh họa khi cần.
+\section{Yêu cầu, tình huống rủi ro và bất biến}\label{sec:requirements}
+\subsection{Nguồn yêu cầu và vai trò}
+Yêu cầu được truy về thuyết minh, SRS, permission matrix và OpenAPI \Evidence{E01}, \Evidence{E15}. RQ1 hỏi yêu cầu nào cần cho môi trường đại học; hồ sơ hiện hỗ trợ phân tích yêu cầu, chưa hỗ trợ kết luận nhu cầu của một mẫu người dùng đã khảo sát. Các phát biểu về mức hài lòng hoặc hiệu quả giáo dục vì vậy không được rút từ chức năng đã cài đặt.
 
-\par\penalty0
-\subsection{Đối tượng sử dụng và quy trình}\label{subsection:requirements-2}
-% Trình bày đối tượng sử dụng và quy trình; bổ sung nguồn và minh họa khi cần.
+Vai trò hệ thống quản trị metadata vận hành; Owner\slash Admin tenant quản lý workspace và membership; Manager\slash Member\slash Viewer project quản lý hoặc tương tác với nội dung theo quyền. Owner không tự có quyền nội dung mọi project. Một tài khoản có nhiều role được xét trong tenant và project hiện hành, không hợp nhất quyền giữa các tenant.
 
-\par\penalty0
-\subsection{Yêu cầu chức năng}\label{subsection:requirements-3}
-% Trình bày yêu cầu chức năng; bổ sung nguồn và minh họa khi cần.
+\subsection{Phạm vi nghiệp vụ cốt lõi}
+Onboarding gồm đăng ký\slash đăng nhập, chọn tenant, payment local, provisioning và trao đổi phiên vào host tenant. Luồng nghiệp vụ gồm lời mời, project membership, project lifecycle, board\slash column, task và bình luận. Resource có file và link, quota, liên kết task và xóa mềm. Notification gồm in-app, preference, subscription và delivery qua adapter. Mã nguồn có mở rộng hữu hạn, nhưng phần này được trình bày riêng để giữ ranh giới phạm vi.
 
-\par\penalty0
-\subsection{Yêu cầu phi chức năng}\label{subsection:requirements-4}
-% Trình bày yêu cầu phi chức năng; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Nhóm yêu cầu và điều kiện chất lượng}\label{tab:requirements}
+\begin{tabularx}{\textwidth}{P{.15\textwidth}P{.25\textwidth}X}
+\toprule Nhóm & Yêu cầu truy vết & Điều kiện quan sát \\
+\midrule
+N1 & FR-01--06; SEC-01--09 & Host\slash token\slash membership\slash status cùng tenant; context được dọn sau request \\
+N2 & ARC-04; SEC-10--12 & Không đọc\slash ghi\slash xóa chéo ở case kiểm tra; dữ liệu tenant khác giữ nguyên \\
+N3 & FR-20--45; permission matrix & Allow\slash deny theo hành động; revoke có hiệu lực; deny không tạo side effect \\
+N4 & FR-42\slash 45\slash 60--63; DATA-05 & Conflict phiên bản cũ; batch nguyên tử; event lặp\slash stale được xử lý đúng \\
+N5 & FR-50--55\slash 70--78; REL-01--03 & Provisioning phục hồi; rollback đúng ownership; tài nguyên có giới hạn và quan sát \\
+\bottomrule\end{tabularx}
+\end{table}
 
-\par\penalty0
-\subsection{Mục tiêu và thước đo}\label{subsection:requirements-5}
-% Trình bày mục tiêu và thước đo; bổ sung nguồn và minh họa khi cần.
+\subsection{Threat model và ranh giới tin cậy}
+Mô hình xem client là nguồn input cần kiểm tra: Host, ID tài nguyên, expected version, object key và payload có thể bị sửa. Người dùng có thể biết ID của tenant khác hoặc giữ access token sau khi bị revoke. Request và job có thể thất bại giữa các bước; connection và thread có thể được tái sử dụng. Các rủi ro này được kiểm tra bằng negative case, không chỉ bằng luồng UI thuận lợi.
 
-\par\penalty0
-\subsection{Nguyên tắc xử lý thông tin chưa đầy đủ}\label{subsection:requirements-6}
-% Trình bày nguyên tắc xử lý thông tin chưa đầy đủ; bổ sung nguồn và minh họa khi cần.
+Các ranh giới cần bảo vệ gồm trình duyệt--API, API--control database, executor--application placement, ứng dụng--object storage và worker--dịch vụ ngoài transaction. Credential đặc quyền của provisioner được tách khỏi API. Hệ thống nguyên mẫu chưa có bằng chứng nghiệm thu cấu hình proxy\slash DNS\slash TLS công khai; mô hình ở đây không tuyên bố kiểm chứng mọi tấn công hạ tầng hoặc host administrator độc hại.
 
-\par\penalty0
-\subsection{Tiêu chí hoàn thành}\label{subsection:requirements-7}
-% Trình bày tiêu chí hoàn thành; bổ sung nguồn và minh họa khi cần.
+\subsection{Các bất biến dùng cho đánh giá}
+\begin{enumerate}
+  \item \textbf{I1 -- Ngữ cảnh:} business SQL chỉ được gọi khi context đã xác thực; host và token của hai tenant khác nhau phải bị chặn trước nghiệp vụ.
+  \item \textbf{I2 -- Biên dữ liệu:} hành động của tenant A không trả nội dung hoặc thay đổi hàng\slash object thuộc B trong case được kiểm tra.
+  \item \textbf{I3 -- Quyền:} role hợp lệ cùng membership hiện hành quyết định hành động; client không tự nâng quyền bằng payload hoặc UI.
+  \item \textbf{I4 -- Cập nhật:} expected version cũ tạo conflict; một batch thất bại không để lại thay đổi một phần.
+  \item \textbf{I5 -- Side effect:} retry\slash callback\slash event lặp không nhân bản kết quả nghiệp vụ đã được deduplicate; event stale không gửi cho assignee cũ.
+  \item \textbf{I6 -- Cấp phát:} tenant chỉ ACTIVE sau khi placement\slash migration\slash route đủ điều kiện; compensation không xóa tài nguyên tenant khác.
+\end{enumerate}
+Từng bất biến được gắn với code và evidence ID ở Bảng~\ref{tab:traceability}. Điều kiện zero-cross-tenant ở đây là tiêu chí loại cho tập tình huống, không phải ước lượng xác suất bằng không cho toàn bộ hệ thống.
 
+Các bất biến được thực thi ở nhiều lớp như Hình~\ref{fig:trust-boundaries}. Kiểm tra quyền ở API, biên SQL và phạm vi object giải quyết những đường truy cập khác nhau; worker cần tái lập các điều kiện phù hợp vòng đời job.
+\input{assets/diagrams/trust-boundaries}
+
+\subsection{Metric và điều kiện đóng kết luận}
+Tính đúng đắn được quan sát bằng mã phản hồi, trạng thái trước\slash sau, số event\slash job\slash object và membership hiệu lực. Hiệu năng cần p50\slash p95, throughput, lỗi, HTTP 429, CPU, RAM và connections theo tenant. Khả dụng và phục hồi cần fault model, thời điểm lỗi, thời gian khôi phục và trạng thái dữ liệu. Không gán SLO trước pilot trên môi trường khóa.
+
+Báo cáo hiện tại hoàn thành khi đủ lập luận và phần thiếu có trạng thái cùng điều kiện bổ sung. Kết luận cuối còn phụ thuộc protocol, số đo, review ADR và phạm vi được xác nhận. Một báo cáo biên dịch đạt không thay cho các cổng nghiên cứu. Yêu cầu tối thiểu 50 trang nội dung của bản tổng kết được theo dõi riêng; không dùng trang trống hoặc kết quả giả để đạt số trang.

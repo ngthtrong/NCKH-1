@@ -1,0 +1,31 @@
+% Ngôn ngữ hình thống nhất: xanh = luồng hợp lệ, đỏ = từ chối/lỗi,
+% vàng = điều kiện cần kiểm tra; nhãn và kiểu đường vẫn rõ khi in xám.
+\definecolor{ReportInk}{HTML}{20344F}
+\definecolor{ReportBlue}{HTML}{2E6098}
+\definecolor{ReportTeal}{HTML}{157D87}
+\definecolor{ReportAmber}{HTML}{B87012}
+\definecolor{ReportRed}{HTML}{A43B43}
+\definecolor{ReportBorder}{HTML}{CBD5E1}
+\definecolor{ReportMist}{HTML}{F3F5F8}
+\definecolor{ReportBlueTint}{HTML}{EFF4FA}
+\definecolor{ReportTealTint}{HTML}{EBF7F5}
+\definecolor{ReportAmberTint}{HTML}{FFF5E5}
+\definecolor{ReportRedTint}{HTML}{FBEFF0}
+\tikzset{
+  report diagram/.style={font=\fontsize{10.5bp}{13bp}\selectfont,text=ReportInk},
+  rbox/.style={draw=ReportBorder,fill=white,line width=.7pt,
+    rounded corners=2mm,align=center,inner sep=3mm,minimum height=12mm},
+  rblue/.style={rbox,draw=ReportBlue,fill=ReportBlueTint},
+  rteal/.style={rbox,draw=ReportTeal,fill=ReportTealTint},
+  ramber/.style={rbox,draw=ReportAmber,fill=ReportAmberTint},
+  rred/.style={rbox,draw=ReportRed,fill=ReportRedTint,dashed},
+  rflow/.style={-{Stealth[length=2.2mm,width=1.6mm]},draw=ReportTeal,line width=.9pt},
+  raux/.style={-{Stealth[length=2.2mm,width=1.6mm]},draw=ReportBlue,line width=.85pt},
+  rfail/.style={-{Stealth[length=2.2mm,width=1.6mm]},draw=ReportRed,line width=.85pt,dashed},
+  rlabel/.style={font=\fontsize{9.5bp}{12bp}\selectfont,fill=white,inner sep=1.2mm,align=center},
+  rhead/.style={font=\fontsize{11bp}{14bp}\selectfont\bfseries,align=left},
+  rgroup/.style={draw=ReportBorder,fill=ReportMist,rounded corners=3mm,inner sep=4mm},
+  rnote/.style={fill=ReportMist,rounded corners=2mm,inner sep=3mm,align=left},
+  rnumber/.style={circle,fill=ReportInk,text=white,draw=none,
+    font=\fontsize{10bp}{12bp}\selectfont\bfseries,inner sep=0pt,minimum size=6mm}
+}

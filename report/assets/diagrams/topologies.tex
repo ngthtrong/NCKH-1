@@ -1,0 +1,26 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=125mm] (api) at (4.9,1.5) {\textbf{Cùng API và mã nghiệp vụ}\\Tenant context xác định datasource / placement};
+\node[rbox,text width=31mm,minimum height=43mm] (pool) at (0,-2.55) {};
+\node[rbox,text width=31mm,minimum height=43mm] (schema) at (4.9,-2.55) {};
+\node[rbox,text width=31mm,minimum height=43mm] (silo) at (9.8,-2.55) {};
+\node[rhead,anchor=north,inner sep=2mm] at (pool.north) {POOL};
+\node[rhead,anchor=north,inner sep=2mm,align=center] at (schema.north) {SCHEMA\\PER TENANT};
+\node[rhead,anchor=north,inner sep=2mm] at (silo.north) {SILO DATABASE};
+\node[rblue,text width=24mm,inner sep=1.5mm] at (0,-2.15) {Hàng tenant A};
+\node[rteal,text width=24mm,inner sep=1.5mm] at (0,-3.6) {Hàng tenant B};
+\node[rblue,text width=24mm,inner sep=1.5mm] at (4.9,-2.15) {Schema A\\role A};
+\node[rteal,text width=24mm,inner sep=1.5mm] at (4.9,-3.6) {Schema B\\role B};
+\node[rblue,text width=24mm,inner sep=1.5mm] at (9.8,-2.15) {Database A\\role A};
+\node[rteal,text width=24mm,inner sep=1.5mm] at (9.8,-3.6) {Database B\\role B};
+\draw[rflow] (api.south) -- ++(0,-.55) -| (pool.north);
+\draw[rflow] (api.south) -- (schema.north);
+\draw[rflow] (api.south) -- ++(0,-.55) -| (silo.north);
+\node[align=center,text width=37mm] at (0,-5.5) {Chung database, schema, bảng\\Guard theo hàng + RLS};
+\node[align=center,text width=37mm] at (4.9,-5.5) {Chung database\\Namespace + quyền schema};
+\node[align=center,text width=37mm] at (9.8,-5.5) {Database riêng\\Biên kết nối + quyền runtime};
+\node[rnote,text width=125mm] at (4.9,-7.4) {\textbf{Phần có thể vẫn chia sẻ:} control plane, API, worker, storage và tài nguyên máy chủ. Database riêng chưa đồng nghĩa toàn bộ hệ thống riêng.};
+\end{tikzpicture}
+\caption[Ba cách bố trí dữ liệu nghiệp vụ]{Ba topology dữ liệu trong Bridge. Màu A/B biểu diễn phạm vi tenant, không phải mức hiệu năng hoặc mức an toàn đã đo (E11).}\label{fig:topologies}
+\end{figure}

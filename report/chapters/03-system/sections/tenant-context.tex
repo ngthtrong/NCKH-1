@@ -1,0 +1,38 @@
+\section{N1 -- Định danh, định tuyến và truyền ngữ cảnh}\label{sec:n1}
+\subsection{Bài toán và câu hỏi}
+Một account thuộc A và B đăng nhập ở host A, sau đó gửi access token ấy tới host B. Nếu hệ thống tin Host mà không đối chiếu phiên, request có thể được định tuyến đúng B nhưng quyền lại đến từ A. Nếu chỉ tin token, nội dung A có thể xuất hiện tại địa chỉ B. Sau request, một thread hoặc connection được tái sử dụng cũng có thể giữ context cũ; job nền không còn request để làm nguồn ngữ cảnh.
+
+Câu hỏi N1 là làm thế nào xác lập một tenant đúng, truyền nhất quán tới business SQL\slash tài nguyên\slash job và dọn ngữ cảnh khi vòng đời kết thúc. Yêu cầu được đặt trước khi chọn cách định danh; subdomain là tín hiệu định tuyến, chưa là chứng cứ quyền.
+
+\subsection{Phương án và đánh đổi}
+\begin{table}[htbp]
+\centering\caption{So sánh phương án nhận diện tenant}\label{tab:n1-options}
+\begin{tabularx}{\textwidth}{P{.24\textwidth}XX}
+\toprule Phương án & Lợi ích trong bối cảnh đề tài & Điều kiện\slash đánh đổi \\
+\midrule
+Subdomain + token & Workspace có địa chỉ riêng; khớp luồng web hiện có & DNS\slash proxy\slash TLS và trusted host; phải đối chiếu quyền \\
+Path\slash header + token & API thuận tiện, ít phụ thuộc wildcard domain & Input client cần xác minh; giới hạn trình duyệt\slash proxy với header \\
+Tenant claim trong token & Ngữ cảnh nằm trong token đã ký & Cần tenant switching, revoke và đối chiếu target resource \\
+\bottomrule\end{tabularx}
+\end{table}
+Các hình thức domain\slash path\slash header\slash claim được Microsoft trình bày như các cách mapping request; bước authorization vẫn cần thực hiện \citep{azureTenantMapping}. Trong nguyên mẫu, lựa chọn triển khai là subdomain kết hợp token và lookup hiện hành.
+
+Truyền context bằng tham số làm phụ thuộc rõ và dễ dùng cho async, nhưng tăng số chữ ký hàm. Request scope thuận lợi trong tầng web nhưng không tự có ở worker. ThreadLocal giảm lặp tham số trong code đồng bộ, đổi lại phải quản lý set\slash remove và không tự truyền sang thread khác. Báo cáo đề xuất giữ ThreadLocal hiện tại ở ranh giới đã kiểm soát; khi mở rộng async cần truyền hoặc tái lập context rõ ràng, không kế thừa ngầm.
+
+\subsection{Tiêu chí và lựa chọn}
+Tiêu chí N1 gồm mismatch bị từ chối trước business service, tenant phải ACTIVE, membership phải hiện hành và context không còn sau request thành công hoặc exception. Worker phải tạo context riêng theo registry và không dùng tenant của vòng poll trước. Tiêu chí chưa bao gồm một cấu hình wildcard DNS\slash TLS công khai đã được kiểm chứng.
+
+Host--token--status--membership binding đang có phù hợp nguyên mẫu web và ADR-0007. Lookup membership tạo chi phí control plane và ảnh hưởng availability của request; đổi lại server không chỉ tin role cũ trong JWT. Chi phí lookup hoặc cache nếu thêm phải được đo riêng và cache cần tenant\slash user key cùng invalidation đúng.
+
+\subsection{Hiện thực tại ranh giới request và SQL}
+\Code{TenantHostResolver} đọc serverName, so suffix base domain, loại host trung tâm, prefix trống và nested prefix. \Code{TenantContextFilter} xử lý JWT tenant kind, so slug host với token, lookup tenant ID\slash status, active membership và security version, rồi mới tạo \Code{TenantContext}. Nhánh reject trả 403; finally dọn holder và nhãn MDC. Hình~\ref{fig:context} mô tả thứ tự kiểm tra \Evidence{E10}.
+\input{assets/diagrams/context}
+
+\Code{TenantJdbcExecutor} yêu cầu context trước khi lấy connection, tắt auto-commit, đặt app.\Code{tenant_id}\slash \Code{user_id}\slash \Code{correlation_id} và \Code{search_path} bằng \Code{set_config} có transaction-local flag, thực thi callback rồi commit hoặc rollback. finally khôi phục auto-commit và try-with-resources trả connection. Đây là phạm vi transaction của executor, không phải một session setting sống mãi trong pool.
+
+\Code{OutboxWorker} tạo context cho tenant ACTIVE từng lượt, xử lý event trong try\slash finally và dọn holder\slash MDC. Việc worker lấy membership để dựng context không cấp quyền tùy ý cho mọi recipient; các handler còn phải kiểm tra event, project và trạng thái người nhận. Nếu code mới gọi SQL ngoài executor hoặc mở async thread, các bất biến này cần được kiểm tra lại.
+
+\subsection{Bằng chứng, giới hạn và nơi đánh giá}
+\Code{TenantContextFilterTest}, \Code{TenantHostResolverTest} và \Code{TenantContextHolderTest} chứa tình huống binding và cleanup. E2E lịch sử ghi host\slash token matrix trên ba placement \Evidence{E05}; chưa được gọi là chạy lại hôm nay. Chi tiết kết quả và skip ở Mục~\ref{sec:coverage}; đường kiểm toán ở \Evidence{E10}.
+
+Giới hạn là chưa xác nhận trusted proxy\slash forwarded header, DNS và TLS trên Internet; context đúng ở unit test không đủ chứng minh cấu hình ingress production. Tiêu chí cần bổ sung khi triển khai là request qua reverse proxy thật, spoofed forwarding input và context cleanup khi error path chạy xuyên tầng.

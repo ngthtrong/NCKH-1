@@ -1,0 +1,16 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=43mm] (session) at (0,0) {\textbf{Phiên tenant A}\\Chỉ có quyền phạm vi A};
+\node[rred,text width=43mm] (request) at (6.8,0) {\textbf{Dùng ID tài nguyên B}\\Đọc / sửa / xóa trực tiếp};
+\node[ramber,text width=115mm] (gate) at (3.4,-2.1) {\textbf{Các hàng rào của thao tác}\\Host/token $\rightarrow$ project policy $\rightarrow$ tenant guard / role / RLS};
+\node[rred,text width=43mm] (deny) at (0,-4.3) {\textbf{Phản hồi bị từ chối}\\Không trả dữ liệu B};
+\node[rteal,text width=43mm] (unchanged) at (6.8,-4.3) {\textbf{Trạng thái B giữ nguyên}\\Không đổi row / event / object};
+\draw[rfail] (session) -- (request);
+\draw[rfail] (request) -- (gate);
+\draw[rfail] (gate) -- (deny);
+\draw[rflow] (gate) -- (unchanged);
+\node[rnote,text width=115mm] at (3.4,-6.3) {\textbf{Mở rộng case:} native SQL, bulk, job nền, schema ghi tường minh và connection sau rollback. Mỗi đường cần bằng chứng riêng.};
+\end{tikzpicture}
+\caption[Tình huống kiểm tra truy cập chéo]{Đọc, ghi và xóa chéo tenant phải được đánh giá cả phản hồi lẫn trạng thái dữ liệu trước--sau; từ chối đơn thuần chưa bao phủ mọi invariant.}\label{fig:isolation-case}
+\end{figure}

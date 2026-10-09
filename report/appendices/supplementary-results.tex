@@ -1,19 +1,67 @@
-\chapter{Tư liệu bổ sung}\label{chap:appendices-supplementary-results}
-% Trình bày tư liệu bổ sung; bổ sung nguồn và minh họa khi cần.
+\chapter{Ma trận quyền, mở rộng và công việc còn thiếu}\label{app:supplementary}
+\section{Ma trận quyền rút gọn}\label{app:permissions}
+Ma trận này tóm tắt một số hành động để đọc báo cáo; được đối chiếu với ma trận quyền và chính sách trong hồ sơ yêu cầu. A: cho phép khi các điều kiện tenant\slash project hiện hành hợp lệ; D: role đang xét không tự cấp quyền; C: có điều kiện ownership hoặc quan hệ cụ thể. Tenant role và project role không được gộp thành một thang quyền toàn hệ thống.
 
-\par\penalty0
-\section{Đối chiếu nguồn số liệu}\label{section:supplementary-results-2}
-% Trình bày đối chiếu nguồn số liệu; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Phân biệt quyền tenant và quyền project}\label{tab:roles}
+\begin{tabularx}{\textwidth}{XP{.15\textwidth}P{.15\textwidth}P{.15\textwidth}}
+\toprule Hành động cấp tenant & Owner & Admin & Member \\
+\midrule
+Mời\slash quản lý member trong giới hạn policy & A & C & D \\
+Chuyển ownership & A & D & D \\
+Xem aggregate storage usage & A & A & D \\
+Tạo project & A & A & A \\
+Đọc nội dung project nhờ tenant role & D & D & D \\
+\bottomrule\end{tabularx}
+\end{table}
 
-\par\penalty0
-\section{Khác biệt giữa các phiên bản}\label{section:supplementary-results-3}
-% Trình bày khác biệt giữa các phiên bản; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Một số quyền nội dung project}\label{tab:project-roles}
+\begin{tabularx}{\textwidth}{XP{.15\textwidth}P{.15\textwidth}P{.15\textwidth}}
+\toprule Hành động & Manager & Member & Viewer \\
+\midrule
+Đọc project\slash board\slash task\slash comment & A & A & A \\
+Quản lý board\slash column\slash project member & A & D & D \\
+Tạo\slash sửa\slash move task, bình luận & A & A & D \\
+Xóa task & A & D & D \\
+Tải resource đã authorize & A & A & A \\
+Xóa resource theo ownership\slash policy & A & C & D \\
+\bottomrule\end{tabularx}
+\end{table}
+Mỗi hành động cần kiểm tra role thấp nhất được allow, role bị deny, membership thiếu\slash revoked, ID tenant khác, host\slash token mismatch, suspended tenant và trạng thái dữ liệu không đổi sau deny. Archived project còn có read-only invariant. Bảng quyền mô tả policy; số ô đã kiểm chứng phải truy tới assertion\slash lần chạy, không suy từ A\slash D trong bảng.
 
-\par\penalty0
-\section{Thông tin phục vụ kiểm chứng}\label{section:supplementary-results-4}
-% Trình bày thông tin phục vụ kiểm chứng; bổ sung nguồn và minh họa khi cần.
+\section{Phần mở rộng ba placement và capability}
+Code\slash local checkpoint có capability grant\slash enable theo server policy, độc lập với tier. Bảng dưới mô tả khả năng cấp, không mô tả kết quả nghiên cứu đã phê duyệt. Effective capability còn phụ thuộc grant, enable và role hiện hành.
+\begin{table}[htbp]
+\centering\caption{Capability có thể cấp theo placement local}\label{tab:capabilities}
+\begin{tabularx}{\textwidth}{XP{.15\textwidth}P{.15\textwidth}P{.15\textwidth}P{.15\textwidth}}
+\toprule Placement & Branding & Custom Data & Approvals & Automation \\
+\midrule
+Pool & Có & Không & Không & Không \\
+Schema-per-tenant & Có & Có & Không & Không \\
+Silo database & Có & Có & Có & Có \\
+\bottomrule\end{tabularx}
+\end{table}
+Custom Data tạo field\slash bảng hữu hạn qua schema job; Approvals lưu snapshot và version; Automation có tập trigger\slash action hữu hạn và idempotency. Những module này không được dùng làm biến nhiễu trong comparison nghiệp vụ lõi. Thu hồi capability phải tuân policy giữ dữ liệu\slash lịch sử; capability không bỏ qua tenant\slash project authorization.
 
-\par\penalty0
-\section{Biểu mẫu bổ sung}\label{section:supplementary-results-5}
-% Trình bày biểu mẫu bổ sung; bổ sung nguồn và minh họa khi cần.
+\section{Các mâu thuẫn đã nhận diện}
+Các điểm cần xác nhận gồm thời gian 05--10 so với 03--08\slash 2026; phiên bản checkpoint so với phiên bản đang kiểm tra; V8\slash 96\slash 16 so với V12\slash 106\slash 22 ở mốc sau; ngày nội dung biên bản nhắc hạn khác tên file; protocol baseline Pool\slash Silo so với extension; worker concurrency trong ADR khác code tuần tự; IEEE so với quy cách cuối.
 
+\section{Điều kiện đóng các khoảng trống}
+\begin{longtable}{@{}P{.30\textwidth}P{.60\textwidth}@{}}
+\caption{Điều kiện bổ sung trước kết luận cuối}\label{tab:gaps}\\
+\toprule Khoảng trống & Điều kiện đóng \\
+\midrule\endfirsthead
+\toprule Khoảng trống & Điều kiện đóng \\
+\midrule\endhead
+Thời hạn và phạm vi & Hồ sơ ký\slash xác nhận học thuật, gồm extension và comparison ba placement \\
+Tổng quan & Ngày tìm kiếm, export, dedup\slash screening\slash extraction và chất lượng nguồn có truy vết \\
+Tích hợp hiện tại & Verify\slash front-end\slash E2E đúng phiên bản; Docker suite thực thi; skipped count rõ \\
+Lựa chọn công nghệ & Hồ sơ loại và measured artifact\slash scorecard review; ADR rõ trạng thái \\
+Hiệu năng\slash noisy neighbor & Protocol khóa, VPS\slash pilot\slash run lặp, per-tenant metric và QA raw data \\
+Nhiều process\slash worker & Test limiter\slash quota\slash cache budget\slash dedupe trên đúng topology multi-instance \\
+Internet\slash provider & Domain\slash TLS, payment\slash SMTP\slash VAPID theo scope cùng artifact kiểm chứng \\
+Người dùng & Phạm vi được xác nhận, tuyển mẫu\slash đồng thuận và dữ liệu ẩn danh \\
+Hồ sơ nộp & Số trang nội dung, bibliography, biểu mẫu và sản phẩm bàn giao được xác nhận \\
+\bottomrule\end{longtable}
+Không đánh dấu cổng A\slash B\slash E hoặc nghiệm thu cuối từ việc hoàn thiện báo cáo hiện tại. Các khoảng trống trên không cản việc review nội dung kiến trúc, nhưng giới hạn loại kết luận có thể đưa ra.

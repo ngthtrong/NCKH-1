@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[report diagram]
+\node[rblue,text width=125mm] (fixed) at (4.9,1.1) {\textbf{Giữ cố định:} VPS / dữ liệu và seed / API nghiệp vụ / workload / cấu hình module};
+\node[rbox,text width=32mm] (placement) at (0,-.7) {\textbf{3 placement}\\Pool / Schema / Silo};
+\node[rbox,text width=32mm] (tenants) at (4.9,-.7) {\textbf{2 mức tenant}\\3 hoặc 5 tenant};
+\node[rbox,text width=32mm] (vus) at (9.8,-.7) {\textbf{2 mức tải}\\10 hoặc 20 VU/tenant};
+\node[rteal,text width=125mm] (combinations) at (4.9,-2.5) {\textbf{3 $\times$ 2 $\times$ 2 = 12 tổ hợp}\\Xen kẽ thứ tự placement; ít nhất 3 run độc lập mỗi tổ hợp};
+\node[rblue,text width=45mm] (warmup) at (1.7,-4.5) {\textbf{Warm-up: 2 phút}\\Tách khỏi cửa sổ đo};
+\node[rteal,text width=45mm] (measure) at (8.1,-4.5) {\textbf{Đo: 5 phút/run}\\p95 / throughput / tài nguyên};
+\draw[raux] (placement) -- (combinations);
+\draw[raux] (tenants) -- (combinations);
+\draw[raux] (vus) -- (combinations);
+\draw[rflow] (warmup) -- (measure);
+\node[ramber,text width=125mm] at (4.9,-6.3) {\textbf{Chưa thực hiện:} cần pilot, khóa protocol và đăng ký phép so sánh ba placement trước khi thu dữ liệu.};
+\end{tikzpicture}
+\caption[Thiết kế so sánh placement đề xuất]{Thiết kế đề xuất gồm 12 tổ hợp, ít nhất ba run độc lập mỗi tổ hợp, tương ứng 36 run không tính pilot. Các tham số cần khóa trước khi thực hiện.}\label{fig:experiment-design}
+\end{figure}

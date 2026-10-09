@@ -1,40 +1,56 @@
-\par\penalty0
-\section{Triển khai và kiểm thử}\label{section:implementation-1}
-% Trình bày triển khai và kiểm thử; bổ sung nguồn và minh họa khi cần.
+\section{N5 -- Cấp phát và quản lý tài nguyên dùng chung}\label{sec:n5}
+\subsection{Bài toán và câu hỏi}
+Callback thanh toán lặp có thể tạo nhiều job; worker chết sau DDL nhưng trước finalize; migration lỗi để lại tài nguyên một phần. Tenant tải cao có thể chiếm connection, CPU hoặc storage và ảnh hưởng tenant khác. N5 hỏi cách quản lý vòng đời tài nguyên có thể phục hồi và giới hạn chia sẻ ở quy mô mục tiêu 3--5 tenant.
 
-\par\penalty0
-\subsection{Cấu trúc và đóng gói}\label{subsection:implementation-2}
-% Trình bày cấu trúc và đóng gói; bổ sung nguồn và minh họa khi cần.
+Đúng trạng thái provisioning và công bằng tài nguyên là hai mục tiêu liên quan nhưng có phép đánh giá khác nhau. Một tenant ACTIVE sau migration không chứng minh khả năng chịu tải; một quota tồn tại trong code không chứng minh mọi cuộc đua đa-instance được xử lý đúng.
 
-\par\penalty0
-\subsection{Nạp và kiểm tra tài nguyên}\label{subsection:implementation-3}
-% Trình bày nạp và kiểm tra tài nguyên; bổ sung nguồn và minh họa khi cần.
+\subsection{Phương án cấp phát và lựa chọn}
+\begin{table}[htbp]
+\centering\caption{So sánh phương án cấp phát tenant}\label{tab:n5-provisioning}
+\begin{tabularx}{\textwidth}{P{.25\textwidth}XX}
+\toprule Phương án & Lợi ích & Đánh đổi \\
+\midrule
+Cấp phát thủ công & Ít thành phần tự động & Lỗi thao tác, khó tái lập\slash retry\slash audit \\
+Đồng bộ trong request & Luồng dễ theo dõi & Request dài và lỗi từng phần sau side effect \\
+Worker\slash state machine\slash lease & Claim, checkpoint, retry và recovery rõ & Thêm trạng thái, idempotency và compensation \\
+\bottomrule\end{tabularx}
+\end{table}
+Lựa chọn hiện thực là worker\slash state machine với credential đặc quyền riêng. API chỉ ghi yêu cầu\slash control metadata; worker tạo database\slash schema\slash role, chạy migration và hoàn tất registry. FakePaymentProvider phục vụ local\slash test, không chứng minh adapter VNPay\slash Stripe thật đã đạt signature\slash callback contract. ADR payment còn Proposed và cần credential sandbox cùng scorecard.
 
-\par\penalty0
-\subsection{Lựa chọn chế độ vận hành}\label{subsection:implementation-4}
-% Trình bày lựa chọn chế độ vận hành; bổ sung nguồn và minh họa khi cần.
+\subsection{Tiêu chí cấp phát và phục hồi}
+Callback hoặc retry trùng không tạo thêm job\slash placement\slash role\slash database ngoài tài nguyên đã định danh. Hai worker claim cùng job chỉ một claim hợp lệ; worker mất lease không được finalize hoặc đổi trạng thái bằng token cũ. Tenant chỉ ACTIVE sau khi tài nguyên, schema và route đủ điều kiện. Rollback chỉ dọn tài nguyên đúng ownership; khi dọn thất bại phải giữ trạng thái lỗi có thể audit\slash manual recovery, không báo sạch giả.
 
-\par\penalty0
-\subsection{Trạng thái và phản hồi}\label{subsection:implementation-5}
-% Trình bày trạng thái và phản hồi; bổ sung nguồn và minh họa khi cần.
+Các ranh giới crash cần kiểm tra gồm sau DDL, sau Flyway và trước finalize. Recovery phải dùng metadata\slash credential ổn định đã chuẩn bị, không sinh database mới ở mỗi attempt. Giới hạn này quan trọng vì DDL và control update không nằm trong cùng một transaction.
 
-\par\penalty0
-\subsection{Các kênh tương tác}\label{subsection:implementation-6}
-% Trình bày các kênh tương tác; bổ sung nguồn và minh họa khi cần.
+\subsection{Hiện thực state machine và lease}
+\Code{ProvisioningJobClaimer} dùng transaction ngắn, row locking và SKIP LOCKED để ghi lease owner\slash token\slash expiry. \Code{ProvisioningJobCoordinator} kiểm tra ownership và attempt khi prepare\slash finalize\slash failure; \Code{DefaultProvisioningService} thực hiện các bước ngoài control transaction dài. \Code{TenantDatabaseProvisioner} áp dụng DDL, migration và quyền runtime. Hình~\ref{fig:provisioning} mô tả các trạng thái và nhánh lỗi \Evidence{E14}.
+\input{assets/diagrams/provisioning}
 
-\par\penalty0
-\subsection{Quyền truy cập và quản lý thao tác}\label{subsection:implementation-7}
-% Trình bày quyền truy cập và quản lý thao tác; bổ sung nguồn và minh họa khi cần.
+Trạng thái SUCCEEDED đi cùng việc tenant ACTIVE ở finalize hợp lệ. Lỗi còn attempt được ghi \Code{RETRYABLE_FAILED} và có next-attempt. Sau giới hạn thử, compensation thành công dẫn tới \Code{FAILED_ROLLED_BACK}; compensation thất bại là \Code{ROLLBACK_FAILED}. Manual retry được API\slash state machine giới hạn và ghi audit. Các tên trạng thái của job không được dùng thay trạng thái tenant khi đọc status ở giao diện.
 
-\par\penalty0
-\subsection{Kiểm thử thành phần}\label{subsection:implementation-8}
-% Trình bày kiểm thử thành phần; bổ sung nguồn và minh họa khi cần.
+\subsection{Connection pool và ngân sách tài nguyên}
+Resolver giữ một Pool datasource và cache datasource Schema\slash Silo theo tenant. Hikari có minimumIdle bằng 0, maximumPoolSize và timeout cấu hình; datasource nhàn rỗi được eviction định kỳ. Ngân sách Schema và Silo được cấu hình riêng. Trước khi đưa vào phép đo, cần cộng cả control pool, API\slash worker instance, Pool datasource, datasource cô lập, migration và connection giám sát.
 
-\par\penalty0
-\subsection{Kịch bản trình diễn và nghiên cứu}\label{subsection:implementation-9}
-% Trình bày kịch bản trình diễn và nghiên cứu; bổ sung nguồn và minh họa khi cần.
+Một biểu thức lập kế hoạch cho process là
+\begin{equation}\label{eq:connections}
+C_{\mathrm{plan}} = C_{\mathrm{control}} + C_{\mathrm{pool}} + n_{\mathrm{schema}}p_{\mathrm{schema}} + n_{\mathrm{silo}}p_{\mathrm{silo}} + C_{\mathrm{other}}.
+\end{equation}
+Các p là maximumPoolSize và n là số datasource hoạt động trong process; đây là ngân sách dự kiến, không phải số connections đo được. API và worker có thể có cache riêng. enforceGlobalCap hiện kiểm tra số datasource\slash cache theo placement để eviction; báo cáo không coi logic ấy là bằng chứng hard bound nguyên tử trước mọi cuộc đua tạo pool đa-thread hoặc đa-process. Cần đo và kiểm tra concurrency trước khi kết luận trần toàn hệ thống.
 
-\par\penalty0
-\subsection{Kiểm thử tích hợp}\label{subsection:implementation-10}
-% Trình bày kiểm thử tích hợp; bổ sung nguồn và minh họa khi cần.
+\subsection{Storage, quota và cleanup}
+\Code{ResourceService} kiểm tra role, namespace và quota trước upload. Object key sinh theo tenant\slash resource; \Code{ResourceStorageKey} và adapter từ chối key ngoài phạm vi. File có metadata và object; link HTTP(S) là tài nguyên không có object để dọn. Xóa mềm và physical deletion được tách qua outbox, với retry\slash dead-letter\slash requeue có audit. Storage SPI cho phép so filesystem và MinIO, nhưng ADR-0005 chưa có số đo\slash scorecard để chốt bên thắng.
 
+Quota upload trong code hiện được tuần tự hóa bằng ReentrantLock theo tenant trong một API process. Khóa này không tự bảo vệ nhiều API instance. Store object rồi ghi metadata cũng có khoảng lỗi và bước compensation nếu database write thất bại; cần fault case cho compensation. Signed URL có thời hạn là một capability đã cấp, nên revoke membership không mặc nhiên thu hồi mọi URL còn hiệu lực. Giới hạn này phải được mô tả khi đánh giá policy download.
+
+Hình~\ref{fig:storage-lifecycle} phân biệt hai workflow của cùng một tệp. Upload có khoảng lỗi giữa object và metadata, còn xóa mềm không đồng nghĩa object đã được dọn; trạng thái cleanup cần được quan sát riêng.
+\input{assets/diagrams/storage-lifecycle}
+
+\subsection{Limiter và quan sát noisy neighbor}
+\Code{TenantRateLimitFilter} dùng bucket in-memory keyed tenant ID, capacity theo tier và trả HTTP 429\slash Retry-After khi không còn token. Cơ chế phù hợp phạm vi một API instance, chưa có đồng bộ nhiều instance hoặc eviction bucket dài hạn. Việc có limiter chưa chứng minh victim được bảo vệ dưới mọi workload; mục đo còn thiếu là paired aggressor\slash victim trước--sau limiter, cùng seed và cấu hình.
+
+Metric\slash log cần tenant labels để phát hiện ảnh hưởng tới từng tenant, đồng thời tránh token hoặc nội dung nghiệp vụ. Prometheus hiện scrape API; worker không có endpoint metric riêng theo hồ sơ. Noisy neighbor có thể xuất phát ở API, PostgreSQL host, object storage hoặc nền, nên database Silo không loại bỏ mọi tài nguyên dùng chung.
+
+\subsection{Bằng chứng, giới hạn và nơi đánh giá}
+Hồ sơ P1 ghi claim, crash JVM con ở ba ranh giới, recovery và rollback PostgreSQL lỗi lặp rồi manual recovery \Evidence{E08}. Với MinIO outage, Pool\slash Silo tới dead letter lần thứ năm; requeue từng tenant giữ nguyên tài nguyên tenant còn lại. Đây là kết quả local lịch sử; lượt này không chạy lại fault injection.
+
+Các case tích hợp và giới hạn coverage xem Mục~\ref{sec:coverage}; thiết kế phép đo xem Mục~\ref{sec:measurement-plan}. Connection budget, hiệu quả limiter và provider Internet còn \PendingData.

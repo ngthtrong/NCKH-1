@@ -1,24 +1,46 @@
-\par\penalty0
-\section{Đối chiếu mục tiêu và hạn chế}\label{section:limitations-1}
-% Trình bày đối chiếu mục tiêu và hạn chế; bổ sung nguồn và minh họa khi cần.
+\section{Kế hoạch thu số liệu và bàn luận giới hạn}\label{sec:measurement-plan}
+\subsection{Bảng kết quả cần thu}
+Các bảng dưới đây định nghĩa đầu ra cho đợt sau; không chứa run thực nghiệm đã thực hiện. Khi có dữ liệu, mỗi hàng phải liên kết run ID, checksum và manifest. So sánh ba placement cần phụ lục protocol; các giá trị warm-up\slash thời gian đo\slash lặp ở Chương 2 là đề xuất cần khóa trước.
 
-\par\penalty0
-\subsection{Đối chiếu nội dung đăng ký}\label{subsection:limitations-2}
-% Trình bày đối chiếu nội dung đăng ký; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Trạng thái kết quả performance chưa có dữ liệu}\label{tab:pending-performance}
+\begin{tabularx}{\textwidth}{P{.23\textwidth}P{.21\textwidth}XX}
+\toprule Placement & Tổ hợp dự kiến & Đầu ra cần thu & Trạng thái \\
+\midrule
+Pool & 3\slash 5 tenant; 10\slash 20 VU & p50\slash p95, throughput, errors\slash 429, CPU\slash RAM\slash connections & \PendingData \\
+Schema-per-tenant & Cùng tổ hợp và seed & Cùng metric per-tenant\slash per-run & \PendingData \\
+Silo database & Cùng tổ hợp và seed & Cùng metric per-tenant\slash per-run & \PendingData \\
+\bottomrule\end{tabularx}
+\end{table}
 
-\par\penalty0
-\subsection{Giới hạn giá trị nội tại}\label{subsection:limitations-3}
-% Trình bày giới hạn giá trị nội tại; bổ sung nguồn và minh họa khi cần.
+\begin{table}[htbp]
+\centering\caption{Trạng thái đánh giá bổ sung}\label{tab:pending-others}
+\begin{tabularx}{\textwidth}{P{.25\textwidth}XX}
+\toprule Nội dung & Artifact và điều kiện cần & Trạng thái \\
+\midrule
+Noisy neighbor & Cặp limiter tắt\slash bật; aggressor\slash victim; metric tài nguyên & \PendingData \\
+Isolation\slash storage\slash payment & Hồ sơ loại, raw artifact hợp lệ, rubric\slash scorecard và review ADR & \PendingData \\
+Internet\slash provider & VPS\slash domain\slash TLS; callback\slash SMTP\slash VAPID thật theo scope & \PendingData \\
+Người dùng\slash SUS & Phạm vi xác nhận, đồng thuận, dữ liệu ẩn danh và codebook & \PendingData \\
+\bottomrule\end{tabularx}
+\end{table}
 
-\par\penalty0
-\subsection{Giới hạn giá trị ngoại tại}\label{subsection:limitations-4}
-% Trình bày giới hạn giá trị ngoại tại; bổ sung nguồn và minh họa khi cần.
+\subsection{Giới hạn giá trị nội tại}\label{sec:threats}
+Source inspection có thể bỏ sót đường gọi; tổng test không phản ánh toàn bộ permission matrix. Artifact cũ thiếu commit làm giảm provenance. Runtime state\slash credential và source cùng tên không bảo đảm cấu hình giống nhau. Database test bị skip khiến các bất biến SQL chưa được tái xác nhận hiện tại. Các cơ chế recovery\slash deduplication cần được kiểm tra ở đúng lớp, không suy từ claim provisioning sang claim outbox.
 
-\par\penalty0
-\subsection{Giới hạn triển khai và phép đo}\label{subsection:limitations-5}
-% Trình bày giới hạn triển khai và phép đo; bổ sung nguồn và minh họa khi cần.
+Đối với thực nghiệm, cache, JVM warm-up, I\slash O, thứ tự placement, seed\slash membership, pool và job nền đều có thể gây nhiễu. Công cụ thu metric cũng có thể thiếu tags hoặc sai cửa sổ. Phương án kiểm soát là khóa manifest, tách warm-up, xen kẽ thứ tự, lặp run, kiểm tra completeness và giữ raw input. Pilot chỉ phục vụ khóa protocol, không nhập vào kết quả cuối.
 
-\par\penalty0
-\subsection{Hướng xử lý từ kết quả chưa đạt}\label{subsection:limitations-6}
-% Trình bày hướng xử lý từ kết quả chưa đạt; bổ sung nguồn và minh họa khi cần.
+\subsection{Giới hạn giá trị cấu trúc và ngoại tại}
+Test số lượng notification không đo việc người dùng nhận\slash đọc thông báo. p95 endpoint đọc không đại diện latency workflow Kanban hỗn hợp. VU không tự đồng nghĩa người dùng thật. HTTP 429 cần diễn giải theo policy thay vì gộp thành lỗi server. Những phân biệt này tránh dùng metric dễ thu làm đại diện cho chất lượng chưa được đo.
 
+Nguyên mẫu Kanban trong đại học và một cấu hình VPS không đại diện mọi SaaS, database hoặc quy mô. Database riêng vẫn chung nhiều tài nguyên; cấu hình nhiều instance làm thay đổi limiter, quota lock và connection budget. Mailpit\slash FakePaymentProvider chỉ hỗ trợ luồng local. Availability\slash durability production, privacy certification và hiệu quả giáo dục cần đánh giá độc lập.
+
+\subsection{Nhất quán tài liệu và giới hạn phạm vi}
+Thời hạn hai khoảng tháng trong thuyết minh cần xác nhận bằng hồ sơ ký. Protocol 0.1 có note extension nhưng RQ\slash baseline đo vẫn Pool\slash Silo. ADR-0006 có thiết kế worker concurrency khác code tuần tự. Biên bản nhắc hạn có khác biệt tên file và ngày nội dung. Các mâu thuẫn được ghi trong baseline thay vì sửa hồi tố protocol hoặc biên bản.
+
+Capability, Custom Data, Approvals và Automation đã có code\slash local checkpoint, nhưng chưa phải phạm vi học thuật bổ sung đã xác nhận. Khi đưa vào phép đo, cần tách ảnh hưởng module khỏi placement; không để Silo chạy thêm automation rồi so độ trễ với Pool chỉ chạy lõi. Bảng extension ở phụ lục mô tả khả năng hiện thực, không xác nhận tác động hoặc lựa chọn tối ưu.
+
+\subsection{Điều kiện hoàn tất bản cuối}
+Các khoảng trống đóng theo thứ tự: xác nhận thời hạn\slash phạm vi\slash quy cách; hoàn tất tổng quan có hệ thống nếu nhóm yêu cầu; chạy suite tích hợp hiện tại không skip; review hồ sơ loại\slash spike và ADR; khóa VPS\slash protocol, pilot và run độc lập; QA\slash sinh lại bảng; đánh giá người dùng khi được xác nhận. Mỗi kết luận mới phải có evidence ID và giới hạn tương ứng.
+
+Bản tổng kết tối thiểu 50 trang nội dung theo tài liệu hình thức, không tính mục lục, bibliography và phụ lục. Số trang báo cáo hiện tại được báo cáo trong biên bản xuất bản; đạt hoặc chưa đạt độ dài không làm thay đổi trạng thái các cổng nghiên cứu. Công việc hoàn thiện nội dung sơ bộ không tự mở lại measurement, noisy-neighbor hoặc fault injection.
