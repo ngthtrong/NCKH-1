@@ -14,7 +14,7 @@ XÂY DỰNG ỨNG DỤNG QUẢN LÝ CÔNG VIỆC THEO KIẾN TRÚC ĐA THUÊ BAO
 
 ## 2. Mã số đề tài
 
-THS2026-
+THS2026-67
 
 ## Lĩnh vực ưu tiên (đánh dấu X)
 
@@ -371,11 +371,11 @@ Trong đề xuất này, **Bridge** là hệ thống kết hợp cả ba placeme
 
 ### A.2. Ba mức tùy biến đề xuất
 
-| Mức | Placement phù hợp | Phạm vi tùy biến tối đa |
-|---|---|---|
-| Tùy biến giao diện | `POOL`, `SCHEMA_PER_TENANT`, `SILO_DATABASE` | Màu chính, màu nhấn và logo theo tenant (`BRANDING`) |
-| Tùy biến dữ liệu nghiệp vụ | `SCHEMA_PER_TENANT`, `SILO_DATABASE` | Field mở rộng cho Task và bảng nghiệp vụ mới theo project (`CUSTOM_DATA`) |
-| Tùy biến quy trình | `SILO_DATABASE` | Phê duyệt nhiều bước (`APPROVALS`) và tự động hóa hữu hạn (`AUTOMATION`) |
+| Mức                             | Placement phù hợp                                | Phạm vi tùy biến tối đa                                                             |
+| -------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Tùy biến giao diện            | `POOL`, `SCHEMA_PER_TENANT`, `SILO_DATABASE` | Màu chính, màu nhấn và logo theo tenant (`BRANDING`)                              |
+| Tùy biến dữ liệu nghiệp vụ | `SCHEMA_PER_TENANT`, `SILO_DATABASE`           | Field mở rộng cho Task và bảng nghiệp vụ mới theo project (`CUSTOM_DATA`)       |
+| Tùy biến quy trình            | `SILO_DATABASE`                                  | Phê duyệt nhiều bước (`APPROVALS`) và tự động hóa hữu hạn (`AUTOMATION`) |
 
 Quản trị hệ thống cấp hoặc thu hồi từng capability trong giới hạn placement; gói giá không quyết định capability ở phiên bản đầu. Owner/Admin của tenant quản lý branding và trạng thái module đã được cấp. Manager cấu hình dữ liệu, quy trình và automation trong project mình. Phạm vi không bao gồm SQL tùy ý, plugin chứa mã thực thi, thay đổi cấu trúc lõi hay bản triển khai ứng dụng riêng cho tenant.
 
