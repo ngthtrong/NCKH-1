@@ -1,0 +1,27 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{times.ttf}[Path=/mnt/c/Windows/Fonts/,BoldFont=timesbd.ttf,ItalicFont=timesi.ttf]}
+\usetikzlibrary{positioning,fit,backgrounds}
+\begin{document}
+\begin{tikzpicture}[font=\small,box/.style={draw=blue!50!black,rounded corners=3pt,align=center,fill=blue!4,minimum width=3.7cm,minimum height=0.75cm},tenant/.style={box,minimum width=3.1cm,fill=white},every fit/.style={inner sep=8pt}]
+\node[box] (app) at (4.8,1.8) {Ứng dụng dùng chung cho A và B};
+\node[font=\bfseries] at (0,0.6) {S4 · Pool};
+\node[font=\bfseries] at (4.8,0.6) {S3 · Schema riêng};
+\node[font=\bfseries] at (9.6,0.6) {S2 · Database riêng};
+\node[tenant] (pa) at (0,-0.5) {Dòng của A: tenant\_id = A};
+\node[tenant,below=3pt of pa] (pb) {Dòng của B: tenant\_id = B};
+\node[box,fill=none,fit=(pa)(pb),label={[font=\footnotesize]below:Cùng một bảng task}] (pool) {};
+\node[tenant] (sa) at (4.8,-0.5) {Schema A · bảng task};
+\node[tenant,below=8pt of sa] (sb) {Schema B · bảng task};
+\node[box,fill=none,fit=(sa)(sb),label={[font=\footnotesize]below:Cùng một database}] (schema) {};
+\node[tenant] (da) at (9.6,-0.5) {Database A · bảng task};
+\node[tenant,below=8pt of da] (db) {Database B · bảng task};
+\draw[->,thick] (app.west) -| (0,0.2);
+\draw[->,thick] (app.south) -- (4.8,0.2);
+\draw[->,thick] (app.east) -| (9.6,0.2);
+\begin{scope}[on background layer]
+\node[draw=gray,rounded corners,fill=gray!4,fit=(pool)(schema)(da)(db),inner xsep=14pt,inner ysep=20pt] (server) {};
+\end{scope}
+\node[align=center,font=\footnotesize,below=2pt of server] {Ba phương án so sánh: đều có thể dùng chung máy chủ PostgreSQL.\\Tách dữ liệu không tự tách CPU, RAM và đĩa.};
+\end{tikzpicture}
+\end{document}

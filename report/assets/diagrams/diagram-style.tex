@@ -1,0 +1,65 @@
+% Shared preamble for the standalone TikZ diagrams (included after \documentclass).
+% Build with build.sh. Language is selected with \def\VI{1} (Vietnamese) or by default English:
+%   \LL{English text}{Văn bản tiếng Việt}
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{%
+  \setmainfont{times.ttf}[Path=/mnt/c/Windows/Fonts/,
+    BoldFont=timesbd.ttf,ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf]}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,patterns,shapes.misc,decorations.pathreplacing}
+
+\newcommand{\LL}[2]{\ifdefined\VI #2\else #1\fi}
+\hyphenpenalty=10000 \exhyphenpenalty=10000 \tolerance=9999 \emergencystretch=3em
+
+% --- palette (print-safe: meaning is never carried by colour alone) -----------
+\definecolor{ink}{HTML}{1F2937}
+\definecolor{muted}{HTML}{6B7280}
+\definecolor{rule}{HTML}{9CA3AF}
+\definecolor{shfill}{HTML}{DCE8F5}   % shared
+\definecolor{shline}{HTML}{2F5D8C}
+\definecolor{dedfill}{HTML}{FBE5CF}  % dedicated
+\definecolor{dedline}{HTML}{B5651D}
+\definecolor{neutral}{HTML}{F3F4F6}
+\definecolor{appfill}{HTML}{F6F9FC}
+\definecolor{appline}{HTML}{7C93AD}
+\definecolor{ctlfill}{HTML}{EFEAF7}
+\definecolor{ctlline}{HTML}{6B5B95}
+\definecolor{warn}{HTML}{B91C1C}
+\definecolor{ta}{HTML}{2A9D8F}       % tenant A
+\definecolor{tb}{HTML}{E09F3E}       % tenant B
+\definecolor{tc}{HTML}{8E6BBF}       % tenant C
+\colorlet{taL}{ta!22}
+\colorlet{tbL}{tb!28}
+\colorlet{tcL}{tc!24}
+
+\tikzset{
+  >=Latex,
+  every node/.style={font=\footnotesize, text=ink, inner sep=2pt},
+  box/.style={draw=ink!65, rounded corners=1.6pt, line width=0.5pt, fill=white,
+              align=center, inner sep=3pt, minimum height=5mm},
+  shared/.style={box, fill=shfill, draw=shline},
+  ded/.style={box, fill=dedfill, draw=dedline},
+  plain/.style={box, fill=neutral, draw=rule},
+  ta/.style={box, fill=taL, draw=ta},
+  tb/.style={box, fill=tbL, draw=tb},
+  tc/.style={box, fill=tcL, draw=tc},
+  tenantA/.style={ta}, tenantB/.style={tb}, tenantC/.style={tc},
+  zone/.style={draw=appline, fill=appfill, rounded corners=2.5pt, line width=0.6pt},
+  ctlzone/.style={draw=ctlline, fill=ctlfill, rounded corners=2.5pt, line width=0.6pt},
+  ttl/.style={font=\small\bfseries, text=ink, align=left, inner sep=1pt},
+  cp/.style={font=\scriptsize, text=muted, align=center, inner sep=1pt},
+  note/.style={font=\scriptsize, text=muted, align=left, inner sep=1pt},
+  arr/.style={->, line width=0.6pt, draw=ink!80},
+  arrm/.style={->, line width=0.6pt, draw=muted, dashed},
+  link/.style={line width=0.5pt, draw=muted},
+  bound/.style={line width=0.8pt, draw=warn, dash pattern=on 3pt off 2pt},
+  badge/.style={circle, fill=ink, text=white, font=\scriptsize\bfseries, inner sep=1.2pt, minimum size=3.6mm},
+}
+
+% a small user glyph (head + shoulders) centred at the given coordinate, colour as 3rd arg
+
+% user glyph: head and shoulders, centred at (x,y); 3rd argument = colour
+\newcommand{\user}[3]{%
+  \fill[#3] (#1,#2) circle (0.85mm);
+  \fill[#3] ($(#1,#2)+(-1.5mm,-2.5mm)$) arc (180:0:1.5mm) -- cycle;}

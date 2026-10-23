@@ -1,0 +1,126 @@
+{
+  "checked_on": "2026-10-23",
+  "timezone": "Asia/Taipei",
+  "checkout_head": "301514935fe541f2ab1b3d6657a785d241fa60b1",
+  "history_snapshot": "6dfb887aadc089df217e3a0fbe76f3c97d214913",
+  "scope": "Document synthesis; selected historical code inspection; no application execution or experiment.",
+  "local_sources": [
+    {
+      "path": "resource/thuyetMinhSaasMultiTenancy.md",
+      "sha256": "a43c7a3927ba3aef163edc1cc4e182520bdda13ebe14132765425c028cb39c0c"
+    },
+    {
+      "path": "resource/Research_Report.pdf",
+      "sha256": "281e9115e0aef26cb7ede4aa912b222be793bad0fbaed81bc4c13684a2c6829e"
+    },
+    {
+      "path": "meeting/draft.md",
+      "sha256": "9bfa65a5448e2a7a6b3381c561facb10a436fbfec38420ff13ac53a2e8cd13aa"
+    },
+    {
+      "path": "meeting/tom-tat-m4a.md",
+      "sha256": "3fd769f51fe2327923b0ec58f0dcb74af2804d53a1c714a8eb331292546d7429"
+    },
+    {
+      "path": "report/config/metadata.tex",
+      "sha256": "c679e6fac1ba31448366741cc4cb0b72322a7fdbddc5c8602cb48f03c137d18f"
+    },
+    {
+      "path": "research/01-khai-niem.md",
+      "sha256": "e973d4b5b579a79c6ec1d231eb3768321c8fa5f7f8239a9219da933ebb6ff886"
+    },
+    {
+      "path": "research/02-mo-hinh-mta.md",
+      "sha256": "c935763a8fe7ac9449fee430d092a5f23423b2bd9c2e2606c807ff407c61aa1c"
+    },
+    {
+      "path": "research/03-ngan-xep-hien-dai.md",
+      "sha256": "c94a5711b7abc3d8bb115fe08fdb54467e6a3733c93170ba9485c626f03af851"
+    },
+    {
+      "path": "research/04-kich-ban-va-danh-doi.md",
+      "sha256": "3de3463095234190c518a0c4113ed0ee0680d038090a2fadce82f54af82cf978"
+    },
+    {
+      "path": "research/05-lua-chon-kien-truc.md",
+      "sha256": "f22cea295d1aa6992e5d27fee31f7a38ba0b0614cb346ec87a787a290ee67f66"
+    },
+    {
+      "path": "research/06-thiet-ke-thuc-nghiem.md",
+      "sha256": "1454bb0f5ecbedabd0646907e6dcc797d775da87553d9471e361a92e236b47d0"
+    },
+    {
+      "path": "research/07-nguon-va-hieu-chinh.md",
+      "sha256": "625ba8a606d0d6647759a3b234939c94c273196e69fd7323e08393003e42e1d3"
+    },
+    {
+      "path": "research/08-cap-nhat-va-ban-kinh-anh-huong.md",
+      "sha256": "37f39443c10d26dfaa7fdab7b721571274a8ebc146d33498b8fe5616055fa434"
+    },
+    {
+      "path": "research/analysis/mta_matrix_results.md",
+      "sha256": "3dc9556379c3829ede4c9e013d8855183fafebff767d0a5ca96a2802b26d93ee"
+    }
+  ],
+  "historical_sources": [
+    {
+      "path": "docs/PROJECT_STATUS.md",
+      "sha256": "07e2e29112b62b9f0549b10238b073870d6d7ab2eb9919f4af2eb1f6fa9841ac"
+    },
+    {
+      "path": "docs/testing/extension-local-2026-09-08.md",
+      "sha256": "1f3f0df2f57e155ef797c8751b96e185f841db0f94b36ba328a31159b68baa4c"
+    },
+    {
+      "path": "docs/research/protocol.md",
+      "sha256": "0a4005d56befca69e9bec33670f50bff6a37cc257bb6a31b3a135e95c6a71834"
+    },
+    {
+      "path": "apps/api/src/main/java/vn/edu/ctu/saas/tenant/DefaultTenantDataSourceResolver.java",
+      "sha256": "669d2553bc40d0b8dd7344f980c02e81ac05a88a9c261a375328abf8473f0e1d"
+    },
+    {
+      "path": "apps/api/src/main/java/vn/edu/ctu/saas/tenant/TenantJdbcExecutor.java",
+      "sha256": "66d9af8d8df2601725700bac1e8773ca696992628784d3b6c4875cef37fb9ea5"
+    },
+    {
+      "path": "apps/api/src/main/java/vn/edu/ctu/saas/security/TenantContextFilter.java",
+      "sha256": "dbc675aff4b2f63970f6bdaafbc81f94ba67958a84afa76f8e910831e20badee"
+    },
+    {
+      "path": "docs/testing/preliminary-report-2026-10-09.json",
+      "sha256": "e03e5efe0a34e8881c9765c3d89ced56f49d04b3b3882366b13e5b55d3f6b179"
+    }
+  ],
+  "web_sources_opened": [
+    "https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
+    "https://www.postgresql.org/docs/current/ddl-schemas.html",
+    "https://www.postgresql.org/docs/18/manage-ag-overview.html",
+    "https://www.postgresql.org/docs/18/continuous-archiving.html",
+    "https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/considerations/tenancy-models",
+    "https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/considerations/control-planes"
+  ],
+  "web_limitations": "AWS pages could not be reopened; Kabbedijk and ISO are attributed through existing research notes, not newly verified.",
+  "format_revision": {
+    "date": "2026-10-24",
+    "evidence_cutoff": "2026-10-23",
+    "template_sources": [
+      {
+        "path": "report/template/ctu-report.cls",
+        "sha256": "e1e513720d8fcd0d93b922b2f4ec24f8304fceaba58f0b9163cb0e74187a90e0"
+      },
+      {
+        "path": "report/template/typography.tex",
+        "sha256": "233293d2b1cd8ee2a2bbcf6e6b8646073a08c0df79c9c982a4ecc880685e79e3"
+      },
+      {
+        "path": "report/template/packages.tex",
+        "sha256": "576305f89f7f994a4cd89f2f5cf57db728cb88eb539e8c2cdc49306796e18a1e"
+      },
+      {
+        "path": "report/template/commands.tex",
+        "sha256": "8f02e642dd99dec8ab6cca1a8df6f8517c7e8cf6cccd3a6eaf9fb3c9a9fd5d2f"
+      }
+    ]
+  }
+}
