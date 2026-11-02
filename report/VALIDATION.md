@@ -220,3 +220,28 @@ template/typography.tex
 LaTeX và PDF báo cáo không thay đổi trong lần bổ sung này; không biên
 dịch lại báo cáo. Các kiểm tra trên đánh giá skill và hình minh họa,
 không chứng minh ngữ nghĩa hoặc độ đầy đủ của schema một đề tài mới.
+# Cập nhật thông tin đề tài — 02/11/2026
+
+Mốc này chỉ điền thông tin nền của báo cáo THS2026-67, trước khi nhập
+nội dung chương 1 và chương 2 để duyệt local. `report/` là thư mục báo
+cáo hiện hành. Các biên bản kiểm tra template bên trên là lịch sử của
+khung, không phải kết quả khoa học của đề tài.
+
+- Nguồn: `resource/infoGroup.md`, thuyết minh mục 1–9, 12–14 và 19.
+- Đã điền tên/mã đề tài, chủ nhiệm, năm học/ngành/lớp, thông tin liên
+  hệ, năm thành viên/MSSV/lớp, người hướng dẫn, thời gian 05–10/2026,
+  địa điểm/ngày bìa và dự toán 15.000.000 đồng từ Đại học Cần Thơ.
+- Mục tiêu và phương pháp lấy từ thuyết minh, dùng chung trong quyển
+  và bản tin/tóm tắt Việt–Anh. Chưa điền kết quả, công bố, đóng góp thực
+  tế, xếp loại học tập, ảnh, nhận xét hoặc chữ ký chưa được cung cấp.
+- `make -C report doctor`, `make -C report all smoke`,
+  `make -C report check`, `git diff --check`: đạt.
+- Quyển một mặt/hai mặt: 31 trang A4; bản tin Việt/Anh và tóm tắt
+  Việt/Anh: mỗi bản 1 trang; PDF minh họa: 6 trang. Phông được nhúng,
+  không lỗi tràn khung, thiếu ký tự hoặc tham chiếu chưa giải quyết.
+- Đối chiếu văn bản PDF xác nhận mã đề tài/tên chủ nhiệm ở sáu đầu ra.
+  Quét bounding box toàn bộ sáu PDF không có chữ sát mép dưới 15 bp.
+  Đã xem hai bìa, thông tin chủ nhiệm và hai bản tin: không phát hiện
+  đè chữ/logo hoặc mất nội dung.
+- Đây là bản nền thông tin, chưa đáp ứng 50 trang nội dung hoặc xác
+  nhận đủ hồ sơ nghiệm thu; không tạo số liệu hay minh chứng giả.

@@ -1,8 +1,11 @@
-# Hướng dẫn cho agent trong template
+# Hướng dẫn cho agent trong báo cáo
 
-Template phải dùng được khi sao chép riêng ra dự án khác. Giữ nội dung
-nghiên cứu trống cho đến khi người dùng yêu cầu điền; không lấy dữ liệu
-từ báo cáo hoặc dự án cũ làm nội dung mẫu mặc định.
+`report/` là nơi soạn và lưu bản báo cáo tổng kết của đề tài THS2026-67.
+Thông tin hành chính lấy từ `../resource/infoGroup.md` và thuyết minh;
+nội dung nghiên cứu được cập nhật theo phạm vi người dùng yêu cầu.
+Không dùng `archive/` làm nguồn báo cáo hiện hành. Giữ dữ liệu còn thiếu,
+nhận xét, ảnh và chữ ký chưa được cung cấp ở trạng thái trống; không tạo
+kết quả thực nghiệm, thành tích hoặc xác nhận học thuật giả.
 
 [HinhThucBC.pdf](HinhThucBC.pdf) là căn cứ ưu tiên về hình thức và trình
 tự quyển. Chỉ đồng bộ thay đổi từ báo cáo đang dùng khi phù hợp với PDF

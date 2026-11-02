@@ -1,11 +1,17 @@
-# Quy tắc template — đồng bộ ngày 02/11/2026
+# Quy tắc trình bày báo cáo — đồng bộ ngày 02/11/2026
+
+Theo yêu cầu của nhóm, `report/` là thư mục báo cáo tổng kết chính thức
+của đề tài THS2026-67. Các quy tắc dàn trang kế thừa từ template dưới
+đây tiếp tục áp dụng. Nội dung và metadata được điền từ hồ sơ đề tài;
+phần chưa có bằng chứng giữ trống, không suy diễn kết quả nghiệm thu.
 
 Căn cứ ưu tiên là [HinhThucBC.pdf](HinhThucBC.pdf), trang 1. Chỉ kế thừa
 cấu hình đang dùng trong báo cáo khi phù hợp với PDF này. Đã đọc văn bản
 và xem trang quy định; bản PDF tại template có SHA-256
 `55a53c1f4411ad809faba96b1e67f225b9c6d6a009f6c931a7233203b863bb25`.
-Đây là lần đồng bộ template, không phải xác nhận quy định mới của trường.
-Template giữ nội dung nghiên cứu trống và dùng được khi sao chép riêng.
+Đây là lần đồng bộ cách trình bày, không phải xác nhận quy định mới của
+trường. Khung gốc là template trống; bản trong `report/` được điền theo
+hồ sơ và phạm vi cập nhật của đề tài này.
 
 ## Đối chiếu trực tiếp HinhThucBC.pdf
 
@@ -86,12 +92,13 @@ thuật này thành quy định của trường.
   `assets/template-layout-provenance.json`; không cần thư mục báo cáo gốc
   khi biên dịch bản sao độc lập.
 
-## Phạm vi của template trống
+## Phạm vi thông tin được điền
 
-Các trường hành chính, thành tích học tập, ảnh, nhận xét, chữ ký, công bố
-và nội dung khoa học giữ trống hoặc placeholder. Chữ ký dùng chỗ trống;
-không mang thông tin cá nhân hoặc liên kết ảnh của đề tài cũ sang đây.
-Tài liệu minh họa chỉ nằm trong `examples/`, không nhập vào báo cáo chính.
+Các trường hành chính được điền theo `resource/infoGroup.md` và thuyết
+minh. Thành tích học tập, ảnh, nhận xét, chữ ký, công bố và kết quả khoa
+học chưa có căn cứ tiếp tục giữ trống. Chữ ký dành cho người có thẩm
+quyền; không lấy dữ liệu của đề tài khác để điền. Tài liệu minh họa của
+template chỉ nằm trong `examples/`, không nhập vào báo cáo chính.
 
 Không áp số trang tối thiểu hay kiểm tra hồ sơ nghiệm thu vào template
 trống. Nếu cần báo cáo hoàn chỉnh, bổ sung thuyết minh và minh chứng thật

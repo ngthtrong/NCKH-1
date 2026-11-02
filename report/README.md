@@ -1,4 +1,13 @@
-# Template báo cáo nghiên cứu khoa học LaTeX
+# Báo cáo tổng kết đề tài THS2026-67
+
+`report/` là nơi lưu nguồn LaTeX và PDF của báo cáo **Xây dựng ứng dụng
+quản lý công việc theo kiến trúc đa thuê bao**. Thông tin chung được
+điền theo [`infoGroup.md`](../resource/infoGroup.md) và thuyết minh trong
+`resource/`; `archive/` chỉ lưu tài liệu lịch sử. Nguồn thông tin hành
+chính dùng chung nằm ở `config/metadata.tex` và `config/members.tex`.
+Mục tiêu, thời gian và kinh phí là thông tin đề tài; các phần kết quả
+chỉ được điền khi có bằng chứng. Thành tích, ảnh, nhận xét và chữ ký
+chưa được cung cấp vẫn giữ trống.
 
 Căn cứ ưu tiên là [HinhThucBC.pdf](HinhThucBC.pdf), không phải mọi thay
 đổi trong báo cáo gốc. Bảng đối chiếu mục 2 và 3.1–3.17 nằm trong
@@ -14,10 +23,9 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
-Nội dung nghiên cứu để trống, chỉ giữ tiêu đề khái quát và comment hướng
-dẫn. Ô trống và placeholder trên biểu mẫu là chủ ý. Thư mục này có thể
-sao chép ra ngoài repository để sử dụng; không cần dữ liệu, mô hình,
-minh chứng hoặc bước xuất số liệu. Bốn bản tin/tóm tắt được ghép sau
+Nội dung nghiên cứu được hoàn thiện theo từng phần đã được người dùng
+cho phép. Ô trống trên biểu mẫu dành cho thông tin chưa có căn cứ.
+Bốn bản tin/tóm tắt được ghép sau
 phụ lục và đồng thời có đầu ra PDF riêng. Kiểm tra kỹ thuật cho khung
 trống không áp số trang tối thiểu hoặc kiểm tra hồ sơ nghiệm thu; khi
 hoàn thiện vẫn phải đáp ứng mục 2.2 và 3.15–3.17 của PDF quy định.
@@ -52,13 +60,13 @@ Make và Poppler tương ứng. Chạy `make doctor` để kiểm tra thực t�
 Từ repository:
 
 ```bash
-make -C reportTemplate doctor
-make -C reportTemplate all
-make -C reportTemplate smoke
-make -C reportTemplate check
+make -C report doctor
+make -C report all
+make -C report smoke
+make -C report check
 ```
 
-Hoặc vào `reportTemplate/` và bỏ `-C reportTemplate` trong các lệnh.
+Hoặc vào `report/` và bỏ `-C reportTemplate` trong các lệnh.
 
 | Lệnh Make | PDF được tạo trong thư mục template |
 | --- | --- |
