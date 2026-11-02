@@ -1,4 +1,6 @@
-# **Mục Lục**
+# **Mục Lục** {#mục-lục}
+
+[**Mục Lục	1**](#mục-lục)
 
 [**CHƯƠNG 1: CƠ SỞ LÝ THUYẾT VÀ MÔ HÌNH HÓA KHÁI NIỆM ĐA THUÊ BAO (MULTI-TENANCY)	3**](#chương-1:-cơ-sở-lý-thuyết-và-mô-hình-hóa-khái-niệm-đa-thuê-bao-\(multi-tenancy\))
 
@@ -10,7 +12,7 @@
 
 [1.3. Mối liên hệ Kinh tế \- Kỹ thuật giữa SaaS và Kiến trúc Đa thuê bao (Multi-Tenancy)	5](#1.3.-mối-liên-hệ-kinh-tế---kỹ-thuật-giữa-saas-và-kiến-trúc-đa-thuê-bao-\(multi-tenancy\))
 
-[1.4. Đánh giá Mức độ Trưởng thành Kiến trúc SaaS theo Mô hình Chong & Carraro	6](#1.4.-đánh-giá-mức-độ-trưởng-thành-kiến-trúc-saas-theo-mô-hình-chong-&-carraro)
+[1.4. Đánh giá Mức độ Trưởng thành Kiến trúc SaaS theo Mô hình Chong & Carraro	7](#1.4.-đánh-giá-mức-độ-trưởng-thành-kiến-trúc-saas-theo-mô-hình-chong-&-carraro)
 
 [2\. Định nghĩa và sự phân kỳ góc nhìn về đa thuê bao (multi-tenancy)	8](#2.-định-nghĩa-và-sự-phân-kỳ-góc-nhìn-về-đa-thuê-bao-\(multi-tenancy\))
 
@@ -18,51 +20,79 @@
 
 [2.2. Sự Phân kỳ Góc nhìn giữa Giới Học thuật và Giới Công nghiệp	9](#2.2.-sự-phân-kỳ-góc-nhìn-giữa-giới-học-thuật-và-giới-công-nghiệp)
 
-[2.3. Phân tích Tần suất Thuật ngữ và Tiêu chí Đánh giá một Định nghĩa Chuẩn mực	10](#2.3.-phân-tích-tần-suất-thuật-ngữ-và-tiêu-chí-đánh-giá-một-định-nghĩa-chuẩn-mực)
+[2.3. Phân tích Tần suất Thuật ngữ và Tiêu chí Đánh giá một Định nghĩa Chuẩn mực	11](#2.3.-phân-tích-tần-suất-thuật-ngữ-và-tiêu-chí-đánh-giá-một-định-nghĩa-chuẩn-mực)
 
 [2.4. Định nghĩa Khoa học Chuẩn hóa về Đa thuê bao và Phân tích Thuộc tính Cốt lõi	12](#2.4.-định-nghĩa-khoa-học-chuẩn-hóa-về-đa-thuê-bao-và-phân-tích-thuộc-tính-cốt-lõi)
 
-[3\. Chuẩn hóa thuật ngữ và năm đặc trưng kiến trúc cốt lõi	14](#3.-chuẩn-hóa-thuật-ngữ-và-năm-đặc-trưng-kiến-trúc-cốt-lõi)
+[3\. Chuẩn hóa thuật ngữ và năm đặc trưng kiến trúc cốt lõi	15](#3.-chuẩn-hóa-thuật-ngữ-và-năm-đặc-trưng-kiến-trúc-cốt-lõi)
 
-[3.1. Chuẩn hóa Bộ ba Khái niệm Nền tảng: Thuê bao (Tenant) – Dịch vụ (Service) – Thực thể Vận hành (Instance)	14](#3.1.-chuẩn-hóa-bộ-ba-khái-niệm-nền-tảng:-thuê-bao-\(tenant\)-–-dịch-vụ-\(service\)-–-thực-thể-vận-hành-\(instance\))
+[3.1. Chuẩn hóa Bộ ba Khái niệm Nền tảng: Thuê bao (Tenant) – Dịch vụ (Service) – Thực thể Vận hành (Instance)	15](#3.1.-chuẩn-hóa-bộ-ba-khái-niệm-nền-tảng:-thuê-bao-\(tenant\)-–-dịch-vụ-\(service\)-–-thực-thể-vận-hành-\(instance\))
 
-[3.2. Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao Hiện đại	14](#3.2.-năm-đặc-trưng-kiến-trúc-cốt-lõi-của-hệ-thống-đa-thuê-bao-hiện-đại)
+[3.2. Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao Hiện đại	15](#3.2.-năm-đặc-trưng-kiến-trúc-cốt-lõi-của-hệ-thống-đa-thuê-bao-hiện-đại)
 
-[4\. Phân biệt và mô hình hóa các khái niệm dễ nhầm lẫn (st, mi, mu, mt)	14](#4.-phân-biệt-và-mô-hình-hóa-các-khái-niệm-dễ-nhầm-lẫn-\(st,-mi,-mu,-mt\))
+[3.2.1. Chia sẻ tài nguyên trong suốt	15](#3.2.1.-chia-sẻ-tài-nguyên-trong-suốt)
 
-[4.1. Bản chất Kỹ thuật của Bốn Mô hình: ST, MI, MU và MT	14](#4.1.-bản-chất-kỹ-thuật-của-bốn-mô-hình:-st,-mi,-mu-và-mt)
+[4\. Phân biệt và mô hình hóa các khái niệm dễ nhầm lẫn (st, mi, mu, mt)	18](#4.-phân-biệt-và-mô-hình-hóa-các-khái-niệm-dễ-nhầm-lẫn-\(st,-mi,-mu,-mt\))
 
-[4.2. Bảng Đối chiếu Đa Tiêu chí Phân định Bản chất Hệ thống	14](#4.2.-bảng-đối-chiếu-đa-tiêu-chí-phân-định-bản-chất-hệ-thống)
+[4.1. Bản chất Kỹ thuật của Bốn Mô hình: ST, MI, MU và MT	18](#4.1.-bản-chất-kỹ-thuật-của-bốn-mô-hình:-st,-mi,-mu-và-mt)
 
-[4.3. Sơ đồ Mô hình hóa Trực quan So sánh Bốn Khái niệm	14](#4.3.-sơ-đồ-mô-hình-hóa-trực-quan-so-sánh-bốn-khái-niệm)
+[4.1.2. Mô hình Đa thực thể vận hành (Multi-Instance)	19](#4.1.2.-mô-hình-đa-thực-thể-vận-hành-\(multi-instance\))
 
-[5\. Tái định nghĩa ngăn xếp hệ thống (figure 2 mới) và khái niệm ranh giới thuê bao	15](#5.-tái-định-nghĩa-ngăn-xếp-hệ-thống-\(figure-2-mới\)-và-khái-niệm-ranh-giới-thuê-bao)
+[4.1.3. Mô hình Đa thuê bao (Multi-Tenant)	19](#4.1.3.-mô-hình-đa-thuê-bao-\(multi-tenant\))
 
-[5.1. Phân tích Ngăn xếp Phần mềm Nguyên bản (Figure 2\) của Kabbedijk et al. (2015)	15](#5.1.-phân-tích-ngăn-xếp-phần-mềm-nguyên-bản-\(figure-2\)-của-kabbedijk-et-al.-\(2015\))
+[4.1.4. Mô hình Đa người dùng – MU (Multi-User)	20](#4.1.4.-mô-hình-đa-người-dùng-–-mu-\(multi-user\))
 
-[5.2. Động lực Dịch chuyển Công nghệ và Đề xuất Mô hình Ngăn xếp Cập nhật cho Kỷ nguyên Cloud-Native	15](#5.2.-động-lực-dịch-chuyển-công-nghệ-và-đề-xuất-mô-hình-ngăn-xếp-cập-nhật-cho-kỷ-nguyên-cloud-native)
+[4.2. Bảng Đối chiếu Đa Tiêu chí Phân định Bản chất Hệ thống	21](#4.2.-bảng-đối-chiếu-đa-tiêu-chí-phân-định-bản-chất-hệ-thống)
 
-[5.3. Định nghĩa Chi tiết 9 Tầng Thành phần trong Ngăn xếp Đa thuê bao Hiện đại	15](#5.3.-định-nghĩa-chi-tiết-9-tầng-thành-phần-trong-ngăn-xếp-đa-thuê-bao-hiện-đại)
+[4.3. Sơ đồ Mô hình hóa Trực quan So sánh Bốn Khái niệm	23](#4.3.-sơ-đồ-mô-hình-hóa-trực-quan-so-sánh-bốn-khái-niệm)
 
-[5.4. Đề xuất Khái niệm "Ranh giới Thuê bao" (Tenant Boundary) từ Nghịch lý của Tính Trong suốt	15](#5.4.-đề-xuất-khái-niệm-"ranh-giới-thuê-bao"-\(tenant-boundary\)-từ-nghịch-lý-của-tính-trong-suốt)
+[5\. Tái định nghĩa ngăn xếp hệ thống (figure 2 mới) và khái niệm ranh giới thuê bao	24](#5.-tái-định-nghĩa-ngăn-xếp-hệ-thống-\(figure-2-mới\)-và-khái-niệm-ranh-giới-thuê-bao)
 
-[5.5. Mô hình Hóa Tổng thể Kiến trúc Đa thuê bao (Mô hình Tích hợp Đầy đủ)	15](#5.5.-mô-hình-hóa-tổng-thể-kiến-trúc-đa-thuê-bao-\(mô-hình-tích-hợp-đầy-đủ\))
+[5.1. Phân tích Ngăn xếp Phần mềm Nguyên bản (Figure 2\) của Kabbedijk et al. (2015)	24](#5.1.-phân-tích-ngăn-xếp-phần-mềm-nguyên-bản-\(figure-2\)-của-kabbedijk-et-al.-\(2015\))
 
-[6\. Các khía cạnh xem xét và thách thức cốt lõi trong thiết kế đa thuê bao	15](#6.-các-khía-cạnh-xem-xét-và-thách-thức-cốt-lõi-trong-thiết-kế-đa-thuê-bao)
+[5.2. Động lực Dịch chuyển Công nghệ và Đề xuất Mô hình Ngăn xếp Cập nhật cho Kỷ nguyên Cloud-Native	26](#5.2.-động-lực-dịch-chuyển-công-nghệ-và-đề-xuất-mô-hình-ngăn-xếp-cập-nhật-cho-kỷ-nguyên-cloud-native)
 
-[6.1. Định danh, Ánh xạ Yêu cầu và Quản lý Tên miền (Identity, Tenant Resolution & Routing)	15](#heading=h.ryw1koms0z9l)
+[5.3. Định nghĩa Chi tiết 9 Tầng Thành phần trong Ngăn xếp Đa thuê bao Hiện đại	29](#5.3.-định-nghĩa-chi-tiết-9-tầng-thành-phần-trong-ngăn-xếp-đa-thuê-bao-hiện-đại)
 
-[6.2. Cô lập Thuê bao và Kiểm soát Bán kính Ảnh hưởng Sự cố (Tenant Isolation & Blast Radius)	15](#heading=h.n1m5l4i1lfx6)
+[5.4. Đề xuất Khái niệm "Ranh giới Thuê bao" (Tenant Boundary) từ Nghịch lý của Tính Trong suốt	35](#5.4.-đề-xuất-khái-niệm-"ranh-giới-thuê-bao"-\(tenant-boundary\)-từ-nghịch-lý-của-tính-trong-suốt)
 
-[6.3. Quản trị Hiệu năng và Ngăn chặn Hiệu ứng Hàng xóm Ồn ào (Noisy Neighbor Problem)	15](#heading=h.xepn3tiya8zh)
+[5.5. Mô hình Hóa Tổng thể Kiến trúc Đa thuê bao (Mô hình Tích hợp Đầy đủ)	40](#5.5.-mô-hình-hóa-tổng-thể-kiến-trúc-đa-thuê-bao-\(mô-hình-tích-hợp-đầy-đủ\))
 
-[6.4. Vòng đời Thuê bao và Mặt phẳng Điều khiển Tập trung (Tenant Lifecycle & Control Plane)	16](#heading=h.mg3ii3743lgl)
+[6\. Các khía cạnh xem xét và thách thức cốt lõi trong thiết kế đa thuê bao	40](#6.-các-khía-cạnh-xem-xét-và-thách-thức-cốt-lõi-trong-thiết-kế-đa-thuê-bao)
 
-[6.5. Khả năng Tùy biến Lúc chạy và Quản trị Tính năng (Runtime Customization & Feature Governance)	16](#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.)
+[6.1. Định danh, Ánh xạ Yêu cầu và Quản lý Tên miền (Identity, Tenant Resolution & Routing)	41](#6.1.-định-danh,-ánh-xạ-yêu-cầu-và-quản-lý-tên-miền-\(identity,-tenant-resolution-&-routing\))
 
-[6.6. Chiến lược Sao lưu, Phục hồi Thảm họa và Cập nhật Hệ thống (Backup, DR & Rolling Updates)	16](#heading=h.nz73jzi6f942)
+[6.2. Cô lập Thuê bao và Kiểm soát Bán kính Ảnh hưởng Sự cố	42](#6.2.-cô-lập-thuê-bao-và-kiểm-soát-bán-kính-ảnh-hưởng-sự-cố)
 
-[6.7. Thách thức Kỹ thuật trong Xây dựng Bộ máy Đo lường Tài nguyên (Metering Engine) và Ánh xạ Định giá	16](#heading=h.xv1kyh92p9vm)
+[6.3. Quản trị Hiệu năng và Ngăn chặn Hiệu ứng Hàng xóm Ồn ào	43](#6.3.-quản-trị-hiệu-năng-và-ngăn-chặn-hiệu-ứng-hàng-xóm-ồn-ào)
+
+[6.4. Vòng đời Thuê bao và Mặt phẳng Điều khiển Tập trung	44](#6.4.-vòng-đời-thuê-bao-và-mặt-phẳng-điều-khiển-tập-trung)
+
+[6.5. Khả năng Tùy biến Lúc chạy và Quản trị Tính năng	45](#6.5.-khả-năng-tùy-biến-lúc-chạy-và-quản-trị-tính-năng)
+
+[6.6. Chiến lược Sao lưu, Phục hồi Thảm họa và Cập nhật Hệ thống	46](#6.6.-chiến-lược-sao-lưu,-phục-hồi-thảm-họa-và-cập-nhật-hệ-thống)
+
+[6.7. Thách thức Kỹ thuật trong Xây dựng Bộ máy Đo lường Tài nguyên và Ánh xạ Định giá	48](#6.7.-thách-thức-kỹ-thuật-trong-xây-dựng-bộ-máy-đo-lường-tài-nguyên-và-ánh-xạ-định-giá)
+
+[Tổng kết Mục 1.6	49](#tổng-kết-mục-1.6)
+
+[**2.5. CÁC CƠ CHẾ KỸ THUẬT THỰC THI RANH GIỚI THUÊ BAO	55**](#2.5.-các-cơ-chế-kỹ-thuật-thực-thi-ranh-giới-thuê-bao)
+
+[2.5.1. Hệ thống Thực thi Ranh giới Định danh & Ngữ cảnh (Identity Boundary System)	55](#2.5.1.-hệ-thống-thực-thi-ranh-giới-định-danh-&-ngữ-cảnh-\(identity-boundary-system\))
+
+[2.5.2. Hệ thống Thực thi Ranh giới Dữ liệu & Lưu trữ (Data Boundary System)	58](#2.5.2.-hệ-thống-thực-thi-ranh-giới-dữ-liệu-&-lưu-trữ-\(data-boundary-system\))
+
+[2.5.3. Hệ thống Thực thi Ranh giới Hiệu năng & Điều tiết (Performance Boundary System)	62](#2.5.3.-hệ-thống-thực-thi-ranh-giới-hiệu-năng-&-điều-tiết-\(performance-boundary-system\))
+
+[2.5.4. Hệ thống Thực thi Ranh giới Logic & Tính năng (Feature/Logic Boundary System)	65](#2.5.4.-hệ-thống-thực-thi-ranh-giới-logic-&-tính-năng-\(feature/logic-boundary-system\))
+
+[2.6. Khung quyết định kiến trúc (architectural decision framework)	68](#2.6.-khung-quyết-định-kiến-trúc-\(architectural-decision-framework\))
+
+[2.6.1. Ma trận Tổng hợp So sánh Đánh đổi Đa chiều (Multi-Criteria Trade-off Matrix)	68](#2.6.1.-ma-trận-tổng-hợp-so-sánh-đánh-đổi-đa-chiều-\(multi-criteria-trade-off-matrix\))
+
+[2.6.2. Cây Quyết định Kiến trúc Tổng quát (Universal Architecture Decision Tree)	71](#2.6.2.-cây-quyết-định-kiến-trúc-tổng-quát-\(universal-architecture-decision-tree\))
+
+[2.6.3. Ma trận Đối soát Xuyên suốt (End-to-End Traceability Matrix)	73](#2.6.3.-ma-trận-đối-soát-xuyên-suốt-\(end-to-end-traceability-matrix\))
 
 # 
 
@@ -236,7 +266,7 @@ Thực thể Vận hành(Instance): Dưới góc độ kỹ thuật phần mềm
 
 ### **3.2. Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao Hiện đại** {#3.2.-năm-đặc-trưng-kiến-trúc-cốt-lõi-của-hệ-thống-đa-thuê-bao-hiện-đại}
 
-### **3.2.1. Chia sẻ tài nguyên trong suốt**
+### **3.2.1. Chia sẻ tài nguyên trong suốt** {#3.2.1.-chia-sẻ-tài-nguyên-trong-suốt}
 
 Chia sẻ tài nguyên trong suốt là khả năng nhiều tenant cùng sử dụng các tài nguyên của một hệ thống mà không cần trực tiếp nhận biết hoặc quản lý chi tiết cách thức các tài nguyên dùng chung được tổ chức và phân bổ bên dưới.
 
@@ -290,7 +320,7 @@ Bản chất kỹ thuật:
 * Sự tách biệt hoàn toàn: Mỗi khách hàng sở hữu một bản cài đặt ứng dụng và một cơ sở dữ liệu độc lập. Do không dùng chung thực thể vận hành với tổ chức khác, mô hình Đơn thuê bao cung cấp mức độ cô lập cao nhất về mặt dữ liệu và hiệu năng, hoàn toàn tránh được hiện tượng tranh chấp tài nguyên chéo giữa các khách hàng, đồng thời cho phép chỉnh sửa sâu mã nguồn theo yêu cầu riêng của từng đơn vị.  
 * Hạn chế về quy mô kinh tế: Xét trên toàn bộ tập khách hàng của nhà cung cấp, việc duy trì nhiều môi trường Đơn thuê bao tách biệt khiến chi phí phần cứng dự phòng, công sức cấu hình và gánh nặng triển khai bản vá lỗi tăng tuyến tính theo số lượng khách hàng.
 
-#### **4.1.2. Mô hình Đa thực thể vận hành (Multi-Instance)**
+#### **4.1.2. Mô hình Đa thực thể vận hành (Multi-Instance)** {#4.1.2.-mô-hình-đa-thực-thể-vận-hành-(multi-instance)}
 
 Định nghĩa: Đa thực thể vận hành là mô hình triển khai trong đó hệ thống khởi tạo và duy trì từ hai bản thể thực thi độc lập trở lên của cùng một phần mềm ứng dụng cùng cơ sở dữ liệu tương ứng để phục vụ tập khách hàng, trong đó mỗi thực thể vận hành hoạt động trong không gian bộ nhớ riêng và không chia sẻ trạng thái thực thi ở tầng ứng dụng với các thực thể khác.
 
@@ -298,7 +328,7 @@ Bản chất kỹ thuật:
 
 * Góc độ kiến trúc phân tán hiện đại: Trong các hệ thống đám mây ngày nay, việc chạy nhiều thực thể vận hành song song phía sau bộ cân bằng tải hoặc chia thành nhiều cụm triển khai theo vùng địa lý là kỹ thuật tiêu chuẩn để mở rộng quy mô theo chiều ngang và nâng cao tính sẵn sàng. Ở góc độ này, mỗi thực thể vận hành không bị khóa cứng cho một khách hàng đơn lẻ mà có thể phục vụ đồng thời cả một nhóm thuê bao.
 
-#### **4.1.3. Mô hình Đa thuê bao (Multi-Tenant)**
+#### **4.1.3. Mô hình Đa thuê bao (Multi-Tenant)** {#4.1.3.-mô-hình-đa-thuê-bao-(multi-tenant)}
 
 Định nghĩa học thuật: Đa thuê bao là mô hình kiến trúc phần mềm trong đó nhiều đơn vị khách hàng tổ chức \- mỗi thuê bao bao gồm nhiều người dùng cuối \- cùng chia sẻ trong suốt các tài nguyên tính toán, thực thể vận hành ứng dụng và hệ thống lưu trữ trên nền một bộ mã nguồn duy nhất, đồng thời hệ thống bảo đảm sự cô lập ngữ cảnh dữ liệu giữa các tổ chức và cung cấp khả năng cấu hình, tùy biến hành vi phần mềm lúc chạy thông qua siêu dữ liệu cho từng thuê bao riêng biệt
 
@@ -309,7 +339,7 @@ Bản chất kỹ thuật:
   2. Tầng Người dùng nội bộ: Quản lý danh tính cá nhân user\_id, tư cách thành viên và phân quyền vai trò bên trong phạm vi của thuê bao đó.  
 * Hợp nhất lợi thế của các mô hình trước: Nhờ duy trì một bộ mã nguồn thống nhất và chia sẻ thực thể vận hành, mô hình Đa thuê bao đạt được hiệu quả chi phí hạ tầng và sự thuận tiện khi nâng cấp tập trung tương tự như mô hình Đa người dùng, nhưng vẫn mang lại không gian làm việc độc lập và khả năng tùy biến linh hoạt cho từng tổ chức tương đương như trải nghiệm trên mô hình Đơn thuê bao và Đa thực thể.
 
-#### **4.1.4. Mô hình Đa người dùng – MU (Multi-User)**
+#### **4.1.4. Mô hình Đa người dùng – MU (Multi-User)** {#4.1.4.-mô-hình-đa-người-dùng-–-mu-(multi-user)}
 
 Định nghĩa: Đa người dùng là mô hình chức năng của phần mềm cho phép nhiều tài khoản người dùng cá nhân cùng truy cập, tương tác và chia sẻ một thực thể vận hành ứng dụng cùng một cơ sở dữ liệu chung, nhưng toàn bộ người dùng đều vận hành trên một tập chức năng cố định và một không gian quản trị phẳng duy nhất mà không có sự phân tách theo ranh giới tổ chức hay khả năng tùy biến cấu hình cấp thuê bao.
 
@@ -343,29 +373,29 @@ Bản chất kỹ thuật:
 
 *Hình 1.5a: Cấu trúc Ngăn xếp Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).*
 
-Trong nghiên cứu *Defining Multi-Tenancy: A Systematic Mapping Study on the Academic and the Industrial Perspective*, Kabbedijk et al. (2015) đề xuất một mô hình ngăn xếp phần mềm nhằm khái quát hóa các cấp độ khác nhau trong hệ thống mà tại đó cơ chế đa thuê bao có thể được áp dụng để chia sẻ tài nguyên. Mô hình này được minh họa tại Figure 2 với cấu trúc gồm chín tầng thành phần, trải dài từ hạ tầng phần cứng bên dưới đến thực thể ứng dụng đang vận hành ở phía trên.
+Trong nghiên cứu Defining Multi-Tenancy: A Systematic Mapping Study on the Academic and the Industrial Perspective, Kabbedijk et al. (2015) đề xuất một mô hình ngăn xếp phần mềm nhằm khái quát hóa các cấp độ khác nhau trong hệ thống mà tại đó cơ chế đa thuê bao có thể được áp dụng để chia sẻ tài nguyên. Mô hình này được minh họa tại Figure 2 với cấu trúc gồm chín tầng thành phần, trải dài từ hạ tầng phần cứng bên dưới đến thực thể ứng dụng đang vận hành ở phía trên.
 
 Thay vì giới hạn đa thuê bao trong một thành phần riêng biệt như cơ sở dữ liệu hoặc ứng dụng, ngăn xếp của Kabbedijk et al. cung cấp một góc nhìn tổng thể về hệ thống, qua đó cho thấy việc chia sẻ tài nguyên có thể được xem xét ở nhiều cấp độ kiến trúc khác nhau. Chín tầng trong mô hình, được sắp xếp theo thứ tự từ dưới lên, bao gồm:
 
-1. **Hardware (Phần cứng):** Nền tảng tài nguyên vật lý cung cấp năng lực tính toán, lưu trữ và kết nối mạng cho hệ thống.  
-2. **Virtual Machine (Máy ảo):** Lớp ảo hóa cho phép tổ chức và phân bổ tài nguyên phần cứng thành các môi trường máy tính ảo.  
-3. **Operating System (Hệ điều hành):** Lớp quản lý tài nguyên hệ thống và cung cấp môi trường thực thi cho các thành phần phần mềm.  
-4. **Database Server (Máy chủ cơ sở dữ liệu):** Dịch vụ quản trị và cung cấp khả năng truy cập, xử lý dữ liệu.  
-5. **Database (Cơ sở dữ liệu):** Đơn vị tổ chức và quản lý dữ liệu logic trong hệ quản trị cơ sở dữ liệu.  
-6. **Database Schema (Lược đồ cơ sở dữ liệu):** Cấu trúc định nghĩa các đối tượng dữ liệu và quan hệ bên trong cơ sở dữ liệu.  
-7. **Middleware (Phần mềm trung gian):** Lớp trung gian hỗ trợ kết nối, trao đổi và điều phối giữa các thành phần trong hệ thống.  
-8. **Application Server (Máy chủ ứng dụng):** Môi trường cung cấp khả năng triển khai và thực thi phần mềm ứng dụng.  
-9. **Application Instance (Thực thể ứng dụng):** Một bản thực thi cụ thể của ứng dụng, thông qua đó hệ thống tiếp nhận và xử lý các yêu cầu từ người dùng.
+1. Hardware (Phần cứng): Nền tảng tài nguyên vật lý cung cấp năng lực tính toán, lưu trữ và kết nối mạng cho hệ thống.  
+2. Virtual Machine (Máy ảo): Lớp ảo hóa cho phép tổ chức và phân bổ tài nguyên phần cứng thành các môi trường máy tính ảo.  
+3. Operating System (Hệ điều hành): Lớp quản lý tài nguyên hệ thống và cung cấp môi trường thực thi cho các thành phần phần mềm.  
+4. Database Server (Máy chủ cơ sở dữ liệu): Dịch vụ quản trị và cung cấp khả năng truy cập, xử lý dữ liệu.  
+5. Database (Cơ sở dữ liệu): Đơn vị tổ chức và quản lý dữ liệu logic trong hệ quản trị cơ sở dữ liệu.  
+6. Database Schema (Lược đồ cơ sở dữ liệu): Cấu trúc định nghĩa các đối tượng dữ liệu và quan hệ bên trong cơ sở dữ liệu.  
+7. Middleware (Phần mềm trung gian): Lớp trung gian hỗ trợ kết nối, trao đổi và điều phối giữa các thành phần trong hệ thống.  
+8. Application Server (Máy chủ ứng dụng): Môi trường cung cấp khả năng triển khai và thực thi phần mềm ứng dụng.  
+9. Application Instance (Thực thể ứng dụng): Một bản thực thi cụ thể của ứng dụng, thông qua đó hệ thống tiếp nhận và xử lý các yêu cầu từ người dùng.
 
-**Ý nghĩa của quy ước nét liền và nét đứt trong Figure 2 nguyên bản**
+Ý nghĩa của quy ước nét liền và nét đứt trong Figure 2 nguyên bản
 
-Một điểm đáng chú ý trong mô hình là cách Kabbedijk et al. sử dụng hai kiểu đường viền để phân biệt các thành phần của ngăn xếp. Theo giải thích trực tiếp của nhóm tác giả, những khối được biểu diễn bằng nét đứt là các thành phần không chịu tác động trực tiếp của cơ chế đa thuê bao ở cấp độ phần mềm (*software-level multi-tenancy*). Trong Figure 2, các tầng này bao gồm Hardware, Virtual Machine, Operating System và Middleware. Các tầng còn lại được biểu diễn bằng nét liền, thể hiện những cấp độ mà nhóm tác giả tập trung xem xét khi khái quát hóa cơ chế chia sẻ tài nguyên ở cấp phần mềm.
+Một điểm đáng chú ý trong mô hình là cách Kabbedijk et al. sử dụng hai kiểu đường viền để phân biệt các thành phần của ngăn xếp. Theo giải thích trực tiếp của nhóm tác giả, những khối được biểu diễn bằng nét đứt là các thành phần không chịu tác động trực tiếp của cơ chế đa thuê bao ở cấp độ phần mềm (software-level multi-tenancy). Trong Figure 2, các tầng này bao gồm Hardware, Virtual Machine, Operating System và Middleware. Các tầng còn lại được biểu diễn bằng nét liền, thể hiện những cấp độ mà nhóm tác giả tập trung xem xét khi khái quát hóa cơ chế chia sẻ tài nguyên ở cấp phần mềm.
 
 Đối với ba tầng Hardware, Virtual Machine và Operating System, cách phân biệt này phản ánh ranh giới phạm vi phân tích giữa cơ chế đa thuê bao ở cấp phần mềm và các thành phần hạ tầng nền tảng. Mặc dù hạ tầng phần cứng và ảo hóa vẫn có thể được dùng chung giữa nhiều khách hàng, các thành phần này không được xem là đối tượng chịu tác động trực tiếp của cơ chế đa thuê bao ở cấp phần mềm trong cách khái quát của nghiên cứu.
 
 Riêng đối với tầng Middleware, Kabbedijk et al. (2015) có một lưu ý quan trọng: các nghiên cứu về việc áp dụng đa thuê bao ở tầng phần mềm trung gian đã tồn tại, tiêu biểu là công trình của Strauch et al. (2013). Tuy nhiên, nhóm tác giả không phân tích riêng hướng tiếp cận này nhằm duy trì mục tiêu xây dựng một định nghĩa tổng quát ở cấp độ cao. Vì vậy, việc Middleware được biểu diễn bằng nét đứt cần được hiểu là giới hạn phạm vi phân tích của nghiên cứu, chứ không phải khẳng định tầng này không có khả năng hỗ trợ hoặc thực thi cơ chế đa thuê bao.
 
-**Giá trị và giới hạn của mô hình đối với nghiên cứu hiện tại**
+Giá trị và giới hạn của mô hình đối với nghiên cứu hiện tại
 
 Về giá trị phương pháp luận, Figure 2 cung cấp một khung tham chiếu có tính khái quát để xác định vị trí mà cơ chế đa thuê bao có thể xuất hiện trong một hệ thống phần mềm. Việc phân chia thành chín tầng giúp tránh cách tiếp cận chỉ đồng nhất đa thuê bao với việc dùng chung một bản chạy ứng dụng hoặc một cơ sở dữ liệu. Thay vào đó, mô hình mở rộng phạm vi xem xét đến các thành phần hạ tầng, lưu trữ, trung gian và thực thi ứng dụng. Đây là cơ sở phù hợp để phân tích sự khác biệt giữa các phương án tổ chức tài nguyên trong kiến trúc đa thuê bao.
 
@@ -377,33 +407,33 @@ Từ những nhận định trên, nghiên cứu kế thừa cấu trúc chín t
 
 Sự phát triển của kiến trúc điện toán đám mây và mô hình triển khai Cloud-Native đã làm thay đổi vai trò của một số thành phần trong ngăn xếp hệ thống đa thuê bao. Những thành phần trước đây chủ yếu được xem là hạ tầng hỗ trợ hoặc nằm ngoài phạm vi phân tích đa thuê bao ở cấp phần mềm nay có thể trực tiếp tham gia vào quá trình định danh, truyền tải ngữ cảnh, lưu trữ trạng thái và điều phối tài nguyên giữa các thuê bao. Vì vậy, việc kế thừa ngăn xếp 9 tầng của Kabbedijk et al. (2015) cần đi kèm với một số điều chỉnh nhằm phản ánh đầy đủ hơn các điểm thực thi ranh giới thuê bao trong kiến trúc hiện đại.
 
-**Động lực 1: Sự thay đổi vai trò của Middleware trong kiến trúc đa thuê bao hiện đại.**
+Động lực 1: Sự thay đổi vai trò của Middleware trong kiến trúc đa thuê bao hiện đại.
 
 Trong các hệ thống Cloud-Native, Middleware không còn chỉ đóng vai trò kết nối hoặc trung gian trao đổi dữ liệu giữa các thành phần ứng dụng. Những thành phần như API Gateway, bộ nhớ đệm (Cache), hàng đợi thông điệp (Message Queue) và kho lưu trữ đối tượng (Object Storage) ngày càng tham gia trực tiếp vào quá trình xử lý các yêu cầu gắn với từng thuê bao.
 
-Cụ thể, API Gateway có thể tiếp nhận và xác lập ngữ cảnh thuê bao từ tên miền, HTTP Header hoặc thông tin xác thực; Cache có thể lưu trữ dữ liệu được phân vùng theo tiền tố khóa gắn với `tenant_id`; hàng đợi thông điệp có thể mang thông tin định danh thuê bao trong phần Header của thông điệp; và kho lưu trữ đối tượng có thể phân chia dữ liệu theo bucket, thư mục hoặc tiền tố đường dẫn tương ứng với từng tenant. Những cơ chế này cho thấy Middleware có khả năng trở thành một điểm thực thi quan trọng của các quy tắc phân tách và kiểm soát truy cập giữa các thuê bao.
+Cụ thể, API Gateway có thể tiếp nhận và xác lập ngữ cảnh thuê bao từ tên miền, HTTP Header hoặc thông tin xác thực; Cache có thể lưu trữ dữ liệu được phân vùng theo tiền tố khóa gắn với tenant\_id; hàng đợi thông điệp có thể mang thông tin định danh thuê bao trong phần Header của thông điệp; và kho lưu trữ đối tượng có thể phân chia dữ liệu theo bucket, thư mục hoặc tiền tố đường dẫn tương ứng với từng tenant. Những cơ chế này cho thấy Middleware có khả năng trở thành một điểm thực thi quan trọng của các quy tắc phân tách và kiểm soát truy cập giữa các thuê bao.
 
 Trong Figure 2 nguyên bản, Kabbedijk et al. (2015) biểu diễn tầng Middleware bằng nét đứt, tương tự các tầng Hardware, Virtual Machine và Operating System. Cách biểu diễn này phản ánh phạm vi phân tích của nghiên cứu tại thời điểm đó, trong đó Middleware được xem là nằm ngoài phạm vi chịu tác động trực tiếp của đa thuê bao ở cấp phần mềm. Tuy nhiên, đối với kiến trúc hiện đại, việc tiếp tục loại Middleware khỏi phạm vi phân tích có thể bỏ sót những điểm mà ngữ cảnh thuê bao được khởi tạo, truyền tải hoặc sử dụng để phân vùng tài nguyên dùng chung.
 
-Do đó, mô hình cập nhật đề xuất biểu diễn Middleware bằng **nét liền**, nhằm xác định đây là một tầng cần được xem xét khi phân tích quyết định Tách hoặc Gộp tài nguyên và cơ chế duy trì ngữ cảnh thuê bao. Điều chỉnh này không hàm ý rằng mọi thành phần Middleware đều bắt buộc phải nhận biết tenant hoặc phải được phân tách riêng. Mức độ nhận biết và cô lập thuê bao phụ thuộc vào chức năng, phương án triển khai và chính sách kiểm soát được áp dụng cho từng thành phần.
+Do đó, mô hình cập nhật đề xuất biểu diễn Middleware bằng nét liền, nhằm xác định đây là một tầng cần được xem xét khi phân tích quyết định Tách hoặc Gộp tài nguyên và cơ chế duy trì ngữ cảnh thuê bao. Điều chỉnh này không hàm ý rằng mọi thành phần Middleware đều bắt buộc phải nhận biết tenant hoặc phải được phân tách riêng. Mức độ nhận biết và cô lập thuê bao phụ thuộc vào chức năng, phương án triển khai và chính sách kiểm soát được áp dụng cho từng thành phần.
 
-**Động lực 2: Sự phổ biến của Container và cơ chế cô lập ở cấp nhân hệ điều hành.**
+Động lực 2: Sự phổ biến của Container và cơ chế cô lập ở cấp nhân hệ điều hành.
 
 Bên cạnh máy ảo truyền thống, Container đã trở thành một phương thức đóng gói và triển khai ứng dụng phổ biến trong môi trường Cloud-Native. Khác với máy ảo dựa trên Hypervisor để ảo hóa phần cứng, Container thường chia sẻ nhân hệ điều hành với máy chủ nền, đồng thời sử dụng các cơ chế cô lập ở cấp hệ điều hành để tạo ra những môi trường thực thi tương đối độc lập.
 
-Trong môi trường Linux, hai cơ chế quan trọng hỗ trợ mô hình này là *Namespaces* và *Control Groups (cgroups)*. Namespaces cung cấp các không gian nhìn và phạm vi định danh riêng đối với những tài nguyên hệ thống nhất định; trong khi cgroups hỗ trợ quản lý, giới hạn và theo dõi mức tiêu thụ tài nguyên của các nhóm tiến trình. Khi được kết hợp trong nền tảng Container, các cơ chế này cho phép thiết lập những ranh giới cô lập và hạn mức tài nguyên ở cấp tiến trình hoặc nhóm tiến trình.
+Trong môi trường Linux, hai cơ chế quan trọng hỗ trợ mô hình này là Namespaces và Control Groups (cgroups). Namespaces cung cấp các không gian nhìn và phạm vi định danh riêng đối với những tài nguyên hệ thống nhất định; trong khi cgroups hỗ trợ quản lý, giới hạn và theo dõi mức tiêu thụ tài nguyên của các nhóm tiến trình. Khi được kết hợp trong nền tảng Container, các cơ chế này cho phép thiết lập những ranh giới cô lập và hạn mức tài nguyên ở cấp tiến trình hoặc nhóm tiến trình.
 
 Đối với kiến trúc đa thuê bao, Container tạo thêm một lựa chọn triển khai giữa việc dùng chung môi trường thực thi và phân bổ môi trường thực thi riêng cho từng thuê bao hoặc nhóm thuê bao. Tuy nhiên, không thể mặc định rằng một Container tương ứng với một Tenant. Quan hệ ánh xạ này là quyết định thiết kế, phụ thuộc vào yêu cầu về mức độ cô lập, mật độ triển khai, khả năng quản trị và chi phí vận hành của hệ thống.
 
-Vì vậy, trong mô hình ngăn xếp cập nhật, Container được đưa vào như một **chú thích mở rộng liên quan đến tầng Virtual Machine và Operating System**, thay vì được xem là một tầng độc lập thay thế máy ảo. Cách biểu diễn này bảo toàn cấu trúc 9 tầng kế thừa từ Figure 2, đồng thời phản ánh sự xuất hiện của một cơ chế cô lập quan trọng trong kiến trúc hiện đại. Container có thể được triển khai trên máy ảo hoặc trực tiếp trên máy chủ vật lý, do đó vị trí của nó cần được hiểu theo quan hệ công nghệ với tầng ảo hóa và hệ điều hành, không phải như một tầng cố định có quan hệ kế thừa bắt buộc.
+Vì vậy, trong mô hình ngăn xếp cập nhật, Container được đưa vào như một chú thích mở rộng liên quan đến tầng Virtual Machine và Operating System, thay vì được xem là một tầng độc lập thay thế máy ảo. Cách biểu diễn này bảo toàn cấu trúc 9 tầng kế thừa từ Figure 2, đồng thời phản ánh sự xuất hiện của một cơ chế cô lập quan trọng trong kiến trúc hiện đại. Container có thể được triển khai trên máy ảo hoặc trực tiếp trên máy chủ vật lý, do đó vị trí của nó cần được hiểu theo quan hệ công nghệ với tầng ảo hóa và hệ điều hành, không phải như một tầng cố định có quan hệ kế thừa bắt buộc.
 
-**Quy ước ký hiệu trong mô hình ngăn xếp cập nhật.**
+Quy ước ký hiệu trong mô hình ngăn xếp cập nhật.
 
 Trên cơ sở hai động lực công nghệ nêu trên, nghiên cứu đề xuất điều chỉnh cách diễn giải ký hiệu của ngăn xếp 9 tầng như sau:
 
-- **Nét liền:** Biểu thị các tầng được lựa chọn làm trọng tâm phân tích các quyết định Tách hoặc Gộp tài nguyên, cũng như vị trí xác lập, truyền tải hoặc thực thi ngữ cảnh thuê bao. Các tầng này bao gồm Database Server, Database, Database Schema, Middleware, Application Server và Application Instance.  
-- **Nét đứt:** Biểu thị các tầng hạ tầng nền được giữ lại trong mô hình để thể hiện môi trường triển khai và các cơ chế cô lập ở cấp thấp, nhưng không phải trọng tâm chính của phân tích đa thuê bao ở cấp phần mềm. Các tầng này bao gồm Hardware, Virtual Machine và Operating System.  
-- **Chú thích Container:** Được sử dụng để làm rõ cơ chế cô lập ở cấp hệ điều hành, đặc biệt thông qua Namespaces và cgroups. Chú thích này mở rộng cách diễn giải các tầng Virtual Machine và Operating System, không làm thay đổi số lượng tầng của ngăn xếp.
+- Nét liền: Biểu thị các tầng được lựa chọn làm trọng tâm phân tích các quyết định Tách hoặc Gộp tài nguyên, cũng như vị trí xác lập, truyền tải hoặc thực thi ngữ cảnh thuê bao. Các tầng này bao gồm Database Server, Database, Database Schema, Middleware, Application Server và Application Instance.  
+- Nét đứt: Biểu thị các tầng hạ tầng nền được giữ lại trong mô hình để thể hiện môi trường triển khai và các cơ chế cô lập ở cấp thấp, nhưng không phải trọng tâm chính của phân tích đa thuê bao ở cấp phần mềm. Các tầng này bao gồm Hardware, Virtual Machine và Operating System.  
+- Chú thích Container: Được sử dụng để làm rõ cơ chế cô lập ở cấp hệ điều hành, đặc biệt thông qua Namespaces và cgroups. Chú thích này mở rộng cách diễn giải các tầng Virtual Machine và Operating System, không làm thay đổi số lượng tầng của ngăn xếp.
 
 Cần nhấn mạnh rằng nét đứt không đồng nghĩa với việc tầng tương ứng không có khả năng chia sẻ, không cần cô lập hoặc không ảnh hưởng đến mức độ an toàn và hiệu năng của hệ thống. Đây chỉ là quy ước xác định trọng tâm phân tích của mô hình. Trên thực tế, các tầng hạ tầng vẫn có thể được cấu hình theo hướng dùng chung hoặc dành riêng, đồng thời tạo ra những tác động trực tiếp đến ranh giới thuê bao.
 
@@ -418,15 +448,15 @@ Như vậy, mô hình ngăn xếp cập nhật vẫn duy trì cấu trúc 9 tầ
 
 Về nguyên tắc, chín tầng được sắp xếp theo thứ tự từ hạ tầng vật lý đến môi trường thực thi ứng dụng. Mỗi tầng đảm nhiệm một chức năng kỹ thuật riêng, nhưng không hoạt động hoàn toàn độc lập mà có quan hệ phụ thuộc với các tầng liền kề. Trong kiến trúc đa thuê bao, quyết định dùng chung hay phân tách tại một tầng có thể ảnh hưởng đến cách tổ chức tài nguyên và mức độ cô lập ở các tầng còn lại.
 
-**1\. Hardware (Phần cứng)**
+1\. Hardware (Phần cứng)
 
 Đây là tầng nền tảng thấp nhất của ngăn xếp, bao gồm các tài nguyên phần cứng vật lý như bộ xử lý trung tâm (CPU), bộ nhớ truy cập ngẫu nhiên (RAM), thiết bị lưu trữ và thiết bị mạng. Các tài nguyên này cung cấp năng lực tính toán, lưu trữ và truyền thông cho toàn bộ hệ thống phần mềm phía trên.
 
 Trong kiến trúc đa thuê bao, việc phân bổ phần cứng có thể được thực hiện theo hướng dành riêng tài nguyên vật lý cho từng khách hàng hoặc cho phép nhiều thuê bao cùng khai thác một hạ tầng phần cứng. Phương án dành riêng tạo ra mức độ phân tách cao về mặt vật lý, trong khi phương án dùng chung giúp tăng mật độ khai thác tài nguyên và giảm chi phí đầu tư trên mỗi thuê bao. Tuy nhiên, việc chia sẻ phần cứng cũng đặt ra yêu cầu quản lý và phân bổ tài nguyên nhằm hạn chế cạnh tranh tài nguyên giữa các workload.
 
-*Quy ước trong mô hình: Nét đứt.*
+Quy ước trong mô hình: Nét đứt.
 
-**2\. Virtual Machine (Máy ảo)**
+2\. Virtual Machine (Máy ảo)
 
 Tầng Virtual Machine đại diện cho lớp ảo hóa phần cứng, cho phép một máy chủ vật lý được phân chia thành nhiều môi trường máy tính ảo có tài nguyên và phạm vi thực thi tương đối độc lập. Công nghệ Hypervisor, với các nền tảng tiêu biểu như KVM hoặc Nitro, đảm nhiệm việc quản lý và phân bổ tài nguyên phần cứng cho các máy ảo.
 
@@ -434,9 +464,9 @@ Trong kiến trúc đa thuê bao, máy ảo có thể được cấp phát riên
 
 Trong phạm vi mô hình này, Container không được xem là một tầng độc lập thay thế Virtual Machine. Container được sử dụng như một chú thích công nghệ liên quan đến cơ chế đóng gói và cô lập ở cấp hệ điều hành, có thể triển khai trên máy ảo hoặc trực tiếp trên máy chủ vật lý.
 
-*Quy ước trong mô hình: Nét đứt.*
+Quy ước trong mô hình: Nét đứt.
 
-**3\. Operating System (Hệ điều hành)**
+3\. Operating System (Hệ điều hành)
 
 Tầng Operating System bao gồm hệ điều hành máy chủ và nhân hệ điều hành (OS Kernel), chịu trách nhiệm quản lý các tài nguyên cấp thấp, điều phối tiến trình, bộ nhớ, thiết bị và hoạt động vào/ra của hệ thống. Đây là lớp trung gian giữa hạ tầng tính toán bên dưới và các dịch vụ phần mềm phía trên.
 
@@ -444,9 +474,9 @@ Trong môi trường Cloud-Native, các cơ chế như Linux Namespaces và Cont
 
 Đối với hệ thống đa thuê bao, tầng hệ điều hành có thể tham gia vào việc cô lập môi trường thực thi và kiểm soát mức tiêu thụ CPU, bộ nhớ hoặc các tài nguyên hệ thống khác. Tuy nhiên, việc sử dụng Container không mặc nhiên đồng nghĩa với việc mỗi Container tương ứng với một thuê bao. Quan hệ ánh xạ giữa Container và Tenant phụ thuộc vào quyết định thiết kế kiến trúc.
 
-*Quy ước trong mô hình: Nét đứt.*
+Quy ước trong mô hình: Nét đứt.
 
-**4\. Database Server (Máy chủ Cơ sở dữ liệu)**
+4\. Database Server (Máy chủ Cơ sở dữ liệu)
 
 Tầng Database Server đại diện cho tiến trình hoặc dịch vụ quản trị cơ sở dữ liệu, chẳng hạn như PostgreSQL hoặc MySQL. Thành phần này cung cấp môi trường thực thi các thao tác quản lý, truy vấn và cập nhật dữ liệu, đồng thời tiếp nhận các kết nối từ ứng dụng hoặc các thành phần hệ thống khác.
 
@@ -454,9 +484,9 @@ Trong kiến trúc đa thuê bao, Database Server có thể được triển kha
 
 Cần phân biệt Database Server với Database: Database Server là tiến trình hoặc dịch vụ quản trị, còn Database là đơn vị dữ liệu logic được dịch vụ đó quản lý.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
-**5\. Database (Cơ sở dữ liệu)**
+5\. Database (Cơ sở dữ liệu)
 
 Tầng Database là đơn vị cơ sở dữ liệu logic được quản lý bởi Database Server, nơi tổ chức và lưu trữ dữ liệu phục vụ hoạt động của ứng dụng. Một Database Server có thể quản lý một hoặc nhiều Database, tùy theo khả năng của hệ quản trị cơ sở dữ liệu và phương án triển khai.
 
@@ -464,31 +494,31 @@ Trong kiến trúc đa thuê bao, dữ liệu có thể được phân tách b�
 
 Vì vậy, tầng Database là một trong những vị trí quan trọng để đưa ra quyết định giữa việc tách riêng không gian dữ liệu và chia sẻ tài nguyên lưu trữ.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
-**6\. Database Schema (Lược đồ Cơ sở dữ liệu)**
+6\. Database Schema (Lược đồ Cơ sở dữ liệu)
 
 Tầng Database Schema biểu thị không gian định nghĩa cấu trúc dữ liệu bên trong một Database, bao gồm các bảng, trường dữ liệu, kiểu dữ liệu, quan hệ và những ràng buộc được thiết lập trên dữ liệu. Schema giúp tổ chức cấu trúc lưu trữ và xác định cách các đối tượng dữ liệu được quản lý trong phạm vi cơ sở dữ liệu.
 
-Trong kiến trúc đa thuê bao, việc phân tách có thể được thực hiện thông qua mô hình Schema-per-Tenant, theo đó mỗi thuê bao được gán một Schema riêng trong cùng một Database. Một phương án khác là nhiều thuê bao cùng sử dụng một Schema và được phân biệt bằng thuộc tính định danh như `tenant_id` trong các bảng dữ liệu.
+Trong kiến trúc đa thuê bao, việc phân tách có thể được thực hiện thông qua mô hình Schema-per-Tenant, theo đó mỗi thuê bao được gán một Schema riêng trong cùng một Database. Một phương án khác là nhiều thuê bao cùng sử dụng một Schema và được phân biệt bằng thuộc tính định danh như tenant\_id trong các bảng dữ liệu.
 
-Ở phương án dùng chung bảng, các cơ chế kiểm soát tại tầng truy cập dữ liệu có vai trò đặc biệt quan trọng. Điều kiện truy vấn như `WHERE tenant_id = ...` có thể được sử dụng để giới hạn phạm vi bản ghi, đồng thời chính sách Row-Level Security (RLS) do hệ quản trị cơ sở dữ liệu cung cấp có thể bổ sung lớp kiểm soát ở cấp hàng dữ liệu. Cách tổ chức này giúp tăng mức độ chia sẻ tài nguyên, nhưng yêu cầu quản lý ngữ cảnh thuê bao và quyền truy cập một cách nhất quán.
+Ở phương án dùng chung bảng, các cơ chế kiểm soát tại tầng truy cập dữ liệu có vai trò đặc biệt quan trọng. Điều kiện truy vấn như WHERE tenant\_id \= ... có thể được sử dụng để giới hạn phạm vi bản ghi, đồng thời chính sách Row-Level Security (RLS) do hệ quản trị cơ sở dữ liệu cung cấp có thể bổ sung lớp kiểm soát ở cấp hàng dữ liệu. Cách tổ chức này giúp tăng mức độ chia sẻ tài nguyên, nhưng yêu cầu quản lý ngữ cảnh thuê bao và quyền truy cập một cách nhất quán.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
-**7\. Middleware (Phần mềm trung gian)**
+7\. Middleware (Phần mềm trung gian)
 
 Tầng Middleware bao gồm các thành phần phần mềm trung gian hỗ trợ kết nối, điều phối và trao đổi dữ liệu giữa ứng dụng với các dịch vụ hoặc tài nguyên khác trong hệ thống. Trong kiến trúc hiện đại, tầng này có thể bao gồm API Gateway, hệ thống bộ nhớ đệm (Cache), hàng đợi thông điệp (Message Queue) và kho lưu trữ đối tượng (Object Storage).
 
 Khác với cách biểu diễn trong Figure 2 nguyên bản của Kabbedijk et al. (2015), nghiên cứu đề xuất đưa Middleware vào nhóm tầng được biểu diễn bằng nét liền. Sự điều chỉnh này xuất phát từ việc Middleware trong kiến trúc Cloud-Native có thể trực tiếp tham gia vào quá trình tiếp nhận, truyền tải và xử lý ngữ cảnh thuê bao.
 
-Cụ thể, API Gateway có thể xác định hoặc tiếp nhận thông tin định danh thuê bao từ yêu cầu gửi đến; Cache có thể tổ chức khóa dữ liệu theo tiền tố gắn với `tenant_id`; Message Queue có thể truyền tải ngữ cảnh thuê bao thông qua Header của thông điệp; và Object Storage có thể phân vùng dữ liệu bằng bucket hoặc tiền tố đường dẫn riêng. Do đó, nếu các thành phần Middleware được dùng chung, hệ thống cần có cơ chế phân vùng dữ liệu, kiểm soát truy cập và duy trì ngữ cảnh thuê bao phù hợp.
+Cụ thể, API Gateway có thể xác định hoặc tiếp nhận thông tin định danh thuê bao từ yêu cầu gửi đến; Cache có thể tổ chức khóa dữ liệu theo tiền tố gắn với tenant\_id; Message Queue có thể truyền tải ngữ cảnh thuê bao thông qua Header của thông điệp; và Object Storage có thể phân vùng dữ liệu bằng bucket hoặc tiền tố đường dẫn riêng. Do đó, nếu các thành phần Middleware được dùng chung, hệ thống cần có cơ chế phân vùng dữ liệu, kiểm soát truy cập và duy trì ngữ cảnh thuê bao phù hợp.
 
 Việc đưa Middleware vào phạm vi phân tích không có nghĩa mọi thành phần tại tầng này đều bắt buộc phải triển khai riêng cho từng thuê bao. Thay vào đó, tầng Middleware được xem là một vị trí có thể áp dụng các quyết định Tách hoặc Gộp và cần được đánh giá về khả năng duy trì ranh giới thuê bao trong quá trình xử lý.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
-**8\. Application Server (Máy chủ Ứng dụng)**
+8\. Application Server (Máy chủ Ứng dụng)
 
 Tầng Application Server là môi trường thực thi các thành phần phần mềm nghiệp vụ của hệ thống. Tầng này có thể bao gồm các nền tảng runtime hoặc máy chủ ứng dụng như Java Virtual Machine (JVM), Node.js Runtime, Apache Tomcat hoặc Kestrel. Chức năng chính là cung cấp môi trường để tải, quản lý và thực thi mã nguồn ứng dụng, đồng thời xử lý các yêu cầu nghiệp vụ được chuyển đến từ các tầng bên dưới hoặc bên ngoài hệ thống.
 
@@ -496,9 +526,9 @@ Trong kiến trúc đa thuê bao, Application Server có thể được triển 
 
 Vì vậy, Application Server là tầng có vai trò quan trọng trong việc thực thi các quy tắc nghiệp vụ và bảo đảm ngữ cảnh thuê bao được duy trì chính xác trong quá trình xử lý.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
-**9\. Application Instance (Thực thể Ứng dụng)**
+9\. Application Instance (Thực thể Ứng dụng)
 
 Tầng Application Instance biểu thị một bản thực thi cụ thể của ứng dụng tại thời điểm vận hành. Đây là đơn vị ứng dụng đang được khởi chạy và xử lý các yêu cầu thực tế, có thể được triển khai dưới dạng một tiến trình, một bản sao ứng dụng (replica) hoặc một đơn vị thực thi tương ứng với cấu hình triển khai của hệ thống.
 
@@ -506,7 +536,7 @@ Trong kiến trúc đa thuê bao, một Application Instance có thể phục v�
 
 Tầng này thể hiện rõ sự khác biệt giữa việc chia sẻ mã nguồn ứng dụng và việc chia sẻ thực thể đang chạy. Nhiều thuê bao có thể sử dụng cùng một phiên bản phần mềm nhưng được phục vụ bởi các Instance độc lập; ngược lại, nhiều thuê bao cũng có thể cùng truy cập một Instance dùng chung. Do đó, việc xác định phạm vi chia sẻ tại tầng Application Instance là một nội dung quan trọng khi đánh giá mức độ đa thuê bao của kiến trúc.
 
-*Quy ước trong mô hình: Nét liền.*
+Quy ước trong mô hình: Nét liền.
 
 Tóm lại, ngăn xếp 9 tầng cung cấp một khung phân tích thống nhất để nhận diện các vị trí có thể triển khai cơ chế Tách hoặc Gộp trong kiến trúc đa thuê bao. Các tầng Hardware, Virtual Machine và Operating System mô tả nền tảng hạ tầng và môi trường thực thi cấp thấp; trong khi các tầng Database Server, Database, Database Schema, Middleware, Application Server và Application Instance thể hiện những thành phần có thể được kiến trúc phần mềm chủ động tổ chức, cấu hình và kiểm soát theo ngữ cảnh thuê bao.
 
@@ -514,7 +544,7 @@ Cần lưu ý rằng quy ước nét liền và nét đứt trong mô hình nh�
 
 ### **5.4. Đề xuất Khái niệm "Ranh giới Thuê bao" (Tenant Boundary) từ Nghịch lý của Tính Trong suốt** {#5.4.-đề-xuất-khái-niệm-"ranh-giới-thuê-bao"-(tenant-boundary)-từ-nghịch-lý-của-tính-trong-suốt}
 
-**Nghịch lý của tính trong suốt trong kiến trúc đa thuê bao**
+Nghịch lý của tính trong suốt trong kiến trúc đa thuê bao
 
 Một trong những đặc trưng quan trọng của kiến trúc đa thuê bao là khả năng cung cấp trải nghiệm sử dụng dịch vụ có tính độc lập cho từng khách hàng, mặc dù các tài nguyên tính toán, lưu trữ và vận hành có thể được chia sẻ giữa nhiều thuê bao. Tính trong suốt (Transparency) trong trường hợp này thể hiện ở việc người dùng không cần nhận biết hoặc trực tiếp quản lý sự tồn tại của các thuê bao khác trong cùng một hệ thống. Tuy nhiên, tính trong suốt về mặt trải nghiệm không đồng nghĩa với việc các thuê bao mặc nhiên đạt được sự độc lập về dữ liệu, trạng thái thực thi, hiệu năng và phạm vi ảnh hưởng của sự cố.
 
@@ -522,7 +552,7 @@ Một trong những đặc trưng quan trọng của kiến trúc đa thuê bao 
 
 Từ góc độ này, nghiên cứu đặt ra vấn đề về sự cần thiết của một khái niệm thống nhất để mô tả cách thức phân định phạm vi giữa các thuê bao trong kiến trúc đa thuê bao, thay vì chỉ xem xét sự phân tách ở cấp cơ sở dữ liệu hoặc ứng dụng.
 
-**Đề xuất định nghĩa Ranh giới Thuê bao** 
+Đề xuất định nghĩa Ranh giới Thuê bao 
 
 Trong phạm vi nghiên cứu, Ranh giới Thuê bao được đề xuất là tập hợp các quy tắc, chính sách và cơ chế kiểm soát kỹ thuật được thiết lập tại một hoặc nhiều tầng của ngăn xếp hệ thống nhằm xác định và thực thi phạm vi phân tách giữa các thuê bao. Ranh giới này quy định quyền truy cập dữ liệu, khả năng tác động đến trạng thái hệ thống, phạm vi sử dụng tài nguyên và mức độ tùy biến được phép của từng thuê bao trong môi trường vận hành dùng chung.
 
@@ -530,32 +560,32 @@ Khác với cách tiếp cận chỉ xem xét ranh giới thông qua sự phân 
 
 Để phân tích một ranh giới thuê bao một cách có hệ thống, nghiên cứu sử dụng ba câu hỏi phương pháp luận làm cơ sở:
 
-- **Phân định cái gì?** Xác định đối tượng cần được bảo vệ hoặc kiểm soát giữa các thuê bao, bao gồm khả năng quan sát dữ liệu, khả năng thay đổi trạng thái và mức độ tiêu thụ tài nguyên.  
-- **Ranh giới được thực thi ở đâu?** Xác định tầng thành phần và cơ chế kỹ thuật chịu trách nhiệm thực thi chính sách phân tách.  
-- **Mức độ hiệu quả được kiểm chứng như thế nào?** Xác định các tiêu chí và chỉ số đánh giá tương ứng nhằm kiểm chứng khả năng bảo vệ dữ liệu, duy trì tính toàn vẹn trạng thái và kiểm soát việc sử dụng tài nguyên.
+- Phân định cái gì? Xác định đối tượng cần được bảo vệ hoặc kiểm soát giữa các thuê bao, bao gồm khả năng quan sát dữ liệu, khả năng thay đổi trạng thái và mức độ tiêu thụ tài nguyên.  
+- Ranh giới được thực thi ở đâu? Xác định tầng thành phần và cơ chế kỹ thuật chịu trách nhiệm thực thi chính sách phân tách.  
+- Mức độ hiệu quả được kiểm chứng như thế nào? Xác định các tiêu chí và chỉ số đánh giá tương ứng nhằm kiểm chứng khả năng bảo vệ dữ liệu, duy trì tính toàn vẹn trạng thái và kiểm soát việc sử dụng tài nguyên.
 
-**Ba thuộc tính bất biến của Ranh giới Thuê bao** 
+Ba thuộc tính bất biến của Ranh giới Thuê bao 
 
 Để xác định những yêu cầu cốt lõi mà một ranh giới thuê bao cần bảo đảm, nghiên cứu đề xuất ba thuộc tính bất biến. Đây là các thuộc tính mang tính mục tiêu, được sử dụng làm cơ sở phân tích và đánh giá hiệu quả cô lập, không phụ thuộc vào việc hệ thống lựa chọn mô hình triển khai Silo, Pool hay Hybrid.
 
-- **Tầm nhìn Dữ liệu:** Bảo đảm mỗi thuê bao chỉ có thể quan sát và truy xuất những dữ liệu nằm trong phạm vi quyền hạn được cấp. Thuộc tính này hướng đến việc ngăn ngừa hiện tượng truy cập hoặc tiết lộ dữ liệu chéo giữa các thuê bao (Cross-Tenant Data Leakage), kể cả khi dữ liệu được lưu trữ trên cùng một hệ thống cơ sở dữ liệu.  
-- **Đột biến Trạng thái:** Bảo đảm một thuê bao không thể thực hiện các thao tác tạo lập, cập nhật hoặc xóa dữ liệu làm thay đổi trạng thái thuộc phạm vi quản lý của thuê bao khác nếu không có quyền hạn hợp lệ. Thuộc tính này mở rộng yêu cầu cô lập từ khả năng đọc dữ liệu sang khả năng kiểm soát các tác động làm biến đổi trạng thái hệ thống.  
-- **Tiêu thụ Tài nguyên:** Bảo đảm việc sử dụng tài nguyên của từng thuê bao được kiểm soát trong giới hạn chính sách đã thiết lập, hạn chế tình trạng một thuê bao chiếm dụng tài nguyên dùng chung và làm suy giảm chất lượng dịch vụ của các thuê bao còn lại. Thuộc tính này gắn với khả năng điều tiết tải, kiểm soát hạn mức và khoanh vùng ảnh hưởng khi phát sinh sự cố tài nguyên.
+- Tầm nhìn Dữ liệu: Bảo đảm mỗi thuê bao chỉ có thể quan sát và truy xuất những dữ liệu nằm trong phạm vi quyền hạn được cấp. Thuộc tính này hướng đến việc ngăn ngừa hiện tượng truy cập hoặc tiết lộ dữ liệu chéo giữa các thuê bao (Cross-Tenant Data Leakage), kể cả khi dữ liệu được lưu trữ trên cùng một hệ thống cơ sở dữ liệu.  
+- Đột biến Trạng thái: Bảo đảm một thuê bao không thể thực hiện các thao tác tạo lập, cập nhật hoặc xóa dữ liệu làm thay đổi trạng thái thuộc phạm vi quản lý của thuê bao khác nếu không có quyền hạn hợp lệ. Thuộc tính này mở rộng yêu cầu cô lập từ khả năng đọc dữ liệu sang khả năng kiểm soát các tác động làm biến đổi trạng thái hệ thống.  
+- Tiêu thụ Tài nguyên: Bảo đảm việc sử dụng tài nguyên của từng thuê bao được kiểm soát trong giới hạn chính sách đã thiết lập, hạn chế tình trạng một thuê bao chiếm dụng tài nguyên dùng chung và làm suy giảm chất lượng dịch vụ của các thuê bao còn lại. Thuộc tính này gắn với khả năng điều tiết tải, kiểm soát hạn mức và khoanh vùng ảnh hưởng khi phát sinh sự cố tài nguyên.
 
 Ba thuộc tính trên có quan hệ bổ trợ lẫn nhau. Trong đó, Data Visibility và State Mutation tập trung vào tính độc lập về dữ liệu và trạng thái; Resource Consumption tập trung vào tính độc lập về khai thác tài nguyên và chất lượng vận hành. Việc phân định các thuộc tính này tạo cơ sở để nghiên cứu xác định những chiều thực thi cụ thể của ranh giới thuê bao.
 
-**Bốn chiều Ranh giới Thực thi** 
+Bốn chiều Ranh giới Thực thi 
 
 Trên cơ sở ba thuộc tính bất biến, nghiên cứu đề xuất bốn chiều ranh giới cốt lõi nhằm phân loại các cơ chế kiểm soát được triển khai trong kiến trúc đa thuê bao:
 
-- **B1 – Ranh giới Định danh và Ngữ cảnh:** Xác định danh tính thuê bao và duy trì tính nhất quán của ngữ cảnh thuê bao trong suốt quá trình xử lý yêu cầu. Chiều ranh giới này bao gồm các cơ chế phân giải định danh, xác thực, ủy quyền và truyền tải ngữ cảnh giữa các thành phần hệ thống. Đây là cơ sở để những tầng xử lý phía sau xác định chính xác phạm vi quyền hạn tương ứng với từng thuê bao.  
-- **B2 – Ranh giới Dữ liệu và Lưu trữ:** Kiểm soát phạm vi truy cập và thao tác dữ liệu giữa các thuê bao. Các cơ chế thực thi có thể bao gồm phân tách cơ sở dữ liệu, phân tách lược đồ, phân vùng dữ liệu hoặc áp dụng các chính sách kiểm soát truy cập ở cấp hàng dữ liệu (Row-Level Security). Chiều ranh giới này trực tiếp hỗ trợ bảo đảm tính riêng tư và toàn vẹn dữ liệu giữa các thuê bao.  
-- **B3 – Ranh giới Hiệu năng và Điều tiết Tài nguyên:** Kiểm soát mức độ sử dụng tài nguyên tính toán và tài nguyên dịch vụ dùng chung của từng thuê bao. Các cơ chế điển hình bao gồm giới hạn tốc độ yêu cầu (Rate Limiting), hạn mức tài nguyên (Resource Quotas), điều phối xử lý công bằng (Fair Queuing) và phân vùng tài nguyên. Mục tiêu là hạn chế hiệu ứng Hàng xóm Ồn ào (Noisy Neighbor) và duy trì chất lượng dịch vụ trong môi trường chia sẻ.  
-- **B4 – Ranh giới Logic, Tính năng và Cấu hình:** Phân định phạm vi chức năng, quy trình nghiệp vụ và cấu hình được phép áp dụng cho từng thuê bao. Các cơ chế có thể bao gồm cờ tính năng theo thuê bao (Tenant-Scoped Feature Flags), quản lý quyền sử dụng tính năng (Entitlement Management), cấu hình dựa trên siêu dữ liệu (Metadata-driven Configuration) và kiểm soát các thành phần logic tùy biến. Chiều ranh giới này cho phép đáp ứng sự khác biệt về nhu cầu sử dụng giữa các thuê bao mà không nhất thiết phải duy trì những bản mã nguồn riêng biệt.
+- B1 – Ranh giới Định danh và Ngữ cảnh: Xác định danh tính thuê bao và duy trì tính nhất quán của ngữ cảnh thuê bao trong suốt quá trình xử lý yêu cầu. Chiều ranh giới này bao gồm các cơ chế phân giải định danh, xác thực, ủy quyền và truyền tải ngữ cảnh giữa các thành phần hệ thống. Đây là cơ sở để những tầng xử lý phía sau xác định chính xác phạm vi quyền hạn tương ứng với từng thuê bao.  
+- B2 – Ranh giới Dữ liệu và Lưu trữ: Kiểm soát phạm vi truy cập và thao tác dữ liệu giữa các thuê bao. Các cơ chế thực thi có thể bao gồm phân tách cơ sở dữ liệu, phân tách lược đồ, phân vùng dữ liệu hoặc áp dụng các chính sách kiểm soát truy cập ở cấp hàng dữ liệu (Row-Level Security). Chiều ranh giới này trực tiếp hỗ trợ bảo đảm tính riêng tư và toàn vẹn dữ liệu giữa các thuê bao.  
+- B3 – Ranh giới Hiệu năng và Điều tiết Tài nguyên: Kiểm soát mức độ sử dụng tài nguyên tính toán và tài nguyên dịch vụ dùng chung của từng thuê bao. Các cơ chế điển hình bao gồm giới hạn tốc độ yêu cầu (Rate Limiting), hạn mức tài nguyên (Resource Quotas), điều phối xử lý công bằng (Fair Queuing) và phân vùng tài nguyên. Mục tiêu là hạn chế hiệu ứng Hàng xóm Ồn ào (Noisy Neighbor) và duy trì chất lượng dịch vụ trong môi trường chia sẻ.  
+- B4 – Ranh giới Logic, Tính năng và Cấu hình: Phân định phạm vi chức năng, quy trình nghiệp vụ và cấu hình được phép áp dụng cho từng thuê bao. Các cơ chế có thể bao gồm cờ tính năng theo thuê bao (Tenant-Scoped Feature Flags), quản lý quyền sử dụng tính năng (Entitlement Management), cấu hình dựa trên siêu dữ liệu (Metadata-driven Configuration) và kiểm soát các thành phần logic tùy biến. Chiều ranh giới này cho phép đáp ứng sự khác biệt về nhu cầu sử dụng giữa các thuê bao mà không nhất thiết phải duy trì những bản mã nguồn riêng biệt.
 
 Bốn chiều ranh giới không phải là bốn lớp độc lập hoặc bốn tầng cố định trong ngăn xếp hệ thống. Chúng là bốn phương diện phân tích và thực thi có thể giao thoa với nhau. Một cơ chế kỹ thuật có thể đồng thời hỗ trợ nhiều chiều ranh giới; ngược lại, một chiều ranh giới có thể được bảo vệ bởi nhiều cơ chế ở các tầng khác nhau. Chẳng hạn, việc kiểm soát truy cập dữ liệu thông qua Row-Level Security phụ thuộc vào ngữ cảnh định danh thuê bao được truyền đến tầng cơ sở dữ liệu, qua đó thể hiện mối liên hệ giữa B1 và B2.
 
-**Phổ Độ dày Ranh giới**
+Phổ Độ dày Ranh giới
 
 Bên cạnh việc xác định các chiều thực thi, nghiên cứu đề xuất khái niệm Phổ Độ dày Ranh giới (Boundary Thickness Spectrum) để mô tả mức độ phân tách tài nguyên giữa các thuê bao theo vị trí và phạm vi thực thi của cơ chế cô lập trên ngăn xếp hệ thống. Khái niệm này được sử dụng như một khung phân loại kiến trúc, cho phép so sánh các phương án triển khai từ mức độ tách biệt cao ở tầng hạ tầng đến mức độ chia sẻ cao với cơ chế kiểm soát logic ở tầng dữ liệu và ứng dụng.
 
@@ -565,15 +595,15 @@ Bên cạnh việc xác định các chiều thực thi, nghiên cứu đề xu�
 
 Trong phạm vi nghiên cứu, phổ được tổ chức thành năm cấp độ đại diện:
 
-- **Level 1 – Siêu dày (Ultra-Thick):** Phân tách ở cấp phần cứng vật lý (Bare-Metal/Hardware). Mỗi thuê bao hoặc nhóm thuê bao được bố trí trên hạ tầng vật lý riêng biệt. Mô hình này cung cấp mức độ phân tách hạ tầng cao, nhưng kéo theo yêu cầu lớn hơn về chi phí đầu tư, cấp phát và vận hành.  
-- **Level 2 – Dày (Thick):** Phân tách tại cấp máy ảo (Virtual Machine). Các thuê bao sử dụng những máy ảo riêng biệt trên cùng một hạ tầng vật lý. Cơ chế ảo hóa tạo ra ranh giới giữa các môi trường thực thi, đồng thời cho phép nhà cung cấp khai thác chung tài nguyên phần cứng bên dưới.  
-- **Level 3 – Trung bình (Moderate):** Phân tách tại cấp hệ điều hành và môi trường container thông qua các cơ chế như Namespaces, cgroups và Pods. Các thuê bao có thể sử dụng những môi trường thực thi riêng biệt nhưng vẫn chia sẻ nhân hệ điều hành hoặc hạ tầng điều phối bên dưới.  
-- **Level 4 – Mỏng (Thin):** Chia sẻ môi trường tính toán và ứng dụng, nhưng phân tách dữ liệu tại cấp cơ sở dữ liệu hoặc lược đồ (Database-per-Tenant/Schema-per-Tenant). Mô hình này giảm mức độ phân tách ở tầng tính toán nhưng vẫn duy trì phạm vi lưu trữ riêng cho từng thuê bao.  
-- **Level 5 – Siêu mỏng (Ultra-Thin):** Chia sẻ tối đa môi trường ứng dụng và cơ sở dữ liệu, trong đó dữ liệu của nhiều thuê bao có thể cùng tồn tại trong các bảng dùng chung. Việc phân tách được thực thi thông qua định danh thuê bao, điều kiện truy vấn dữ liệu (tenant\_id) và các chính sách kiểm soát truy cập ở cấp cơ sở dữ liệu, chẳng hạn Row-Level Security (RLS) của PostgreSQL.
+- Level 1 – Siêu dày (Ultra-Thick): Phân tách ở cấp phần cứng vật lý (Bare-Metal/Hardware). Mỗi thuê bao hoặc nhóm thuê bao được bố trí trên hạ tầng vật lý riêng biệt. Mô hình này cung cấp mức độ phân tách hạ tầng cao, nhưng kéo theo yêu cầu lớn hơn về chi phí đầu tư, cấp phát và vận hành.  
+- Level 2 – Dày (Thick): Phân tách tại cấp máy ảo (Virtual Machine). Các thuê bao sử dụng những máy ảo riêng biệt trên cùng một hạ tầng vật lý. Cơ chế ảo hóa tạo ra ranh giới giữa các môi trường thực thi, đồng thời cho phép nhà cung cấp khai thác chung tài nguyên phần cứng bên dưới.  
+- Level 3 – Trung bình (Moderate): Phân tách tại cấp hệ điều hành và môi trường container thông qua các cơ chế như Namespaces, cgroups và Pods. Các thuê bao có thể sử dụng những môi trường thực thi riêng biệt nhưng vẫn chia sẻ nhân hệ điều hành hoặc hạ tầng điều phối bên dưới.  
+- Level 4 – Mỏng (Thin): Chia sẻ môi trường tính toán và ứng dụng, nhưng phân tách dữ liệu tại cấp cơ sở dữ liệu hoặc lược đồ (Database-per-Tenant/Schema-per-Tenant). Mô hình này giảm mức độ phân tách ở tầng tính toán nhưng vẫn duy trì phạm vi lưu trữ riêng cho từng thuê bao.  
+- Level 5 – Siêu mỏng (Ultra-Thin): Chia sẻ tối đa môi trường ứng dụng và cơ sở dữ liệu, trong đó dữ liệu của nhiều thuê bao có thể cùng tồn tại trong các bảng dùng chung. Việc phân tách được thực thi thông qua định danh thuê bao, điều kiện truy vấn dữ liệu (tenant\_id) và các chính sách kiểm soát truy cập ở cấp cơ sở dữ liệu, chẳng hạn Row-Level Security (RLS) của PostgreSQL.
 
 Năm cấp độ trên đại diện cho các phương án bố trí ranh giới điển hình, không phải một thang đo tuyệt đối về mức độ an toàn của hệ thống. Mức độ bảo vệ thực tế còn phụ thuộc vào chất lượng triển khai, cấu hình, cơ chế kiểm soát truy cập và khả năng xử lý sai lỗi tại từng tầng. Đặc biệt, trong một hệ thống đa thuê bao thực tế, các cấp độ này có thể được kết hợp đồng thời trên những thành phần khác nhau của ngăn xếp. Vì vậy, phổ độ dày cần được hiểu là công cụ phân loại vị trí và mức độ phân tách kiến trúc, thay vì yêu cầu toàn bộ hệ thống phải thuộc duy nhất một cấp độ.
 
-**Quy luật đánh đổi kiến trúc và sự dịch chuyển trách nhiệm cô lập**
+Quy luật đánh đổi kiến trúc và sự dịch chuyển trách nhiệm cô lập
 
 Sự thay đổi độ dày của ranh giới thuê bao phản ánh mối quan hệ đánh đổi giữa mức độ phân tách tài nguyên, chi phí vận hành và trách nhiệm kiểm soát kỹ thuật. Khi chuyển từ các cấp độ phân tách dày sang các cấp độ chia sẻ mỏng hơn, nhà cung cấp có thể nâng cao mật độ khai thác tài nguyên và giảm chi phí cấp phát riêng biệt cho từng thuê bao. Tuy nhiên, lợi ích này đồng thời làm tăng sự phụ thuộc vào các cơ chế kiểm soát logic, chính sách truy cập dữ liệu và tính chính xác của quá trình xử lý ngữ cảnh thuê bao.
 
@@ -587,155 +617,155 @@ vẽ sau
 
 ## **6\. Các khía cạnh xem xét và thách thức cốt lõi trong thiết kế đa thuê bao** {#6.-các-khía-cạnh-xem-xét-và-thách-thức-cốt-lõi-trong-thiết-kế-đa-thuê-bao}
 
-### Việc thiết kế một hệ thống đa thuê bao không chỉ đặt ra yêu cầu tổ chức nhiều khách hàng cùng sử dụng một nền tảng phần mềm, mà còn đòi hỏi giải quyết đồng thời các vấn đề về định danh, cô lập dữ liệu, phân bổ tài nguyên, quản trị vòng đời và duy trì khả năng tùy biến. Các vấn đề này có mối quan hệ phụ thuộc lẫn nhau, bởi một quyết định chia sẻ hoặc phân tách tại một tầng của ngăn xếp hệ thống có thể tác động đến mức độ an toàn, hiệu năng và chi phí vận hành ở những tầng còn lại. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Việc thiết kế một hệ thống đa thuê bao không chỉ đặt ra yêu cầu tổ chức nhiều khách hàng cùng sử dụng một nền tảng phần mềm, mà còn đòi hỏi giải quyết đồng thời các vấn đề về định danh, cô lập dữ liệu, phân bổ tài nguyên, quản trị vòng đời và duy trì khả năng tùy biến. Các vấn đề này có mối quan hệ phụ thuộc lẫn nhau, bởi một quyết định chia sẻ hoặc phân tách tại một tầng của ngăn xếp hệ thống có thể tác động đến mức độ an toàn, hiệu năng và chi phí vận hành ở những tầng còn lại.
 
-### Trên cơ sở mô hình ngăn xếp 9 tầng và khái niệm Ranh giới Thuê bao đã trình bày ở Mục 1.5, nghiên cứu xác định bảy khía cạnh cần xem xét trong quá trình thiết kế kiến trúc đa thuê bao. Các khía cạnh này không được xem là những tầng kiến trúc độc lập, mà là những nhóm vấn đề kỹ thuật có thể trải rộng trên nhiều tầng và có quan hệ trực tiếp với các quyết định Tách hoặc Gộp tài nguyên. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trên cơ sở mô hình ngăn xếp 9 tầng và khái niệm Ranh giới Thuê bao đã trình bày ở Mục 1.5, nghiên cứu xác định bảy khía cạnh cần xem xét trong quá trình thiết kế kiến trúc đa thuê bao. Các khía cạnh này không được xem là những tầng kiến trúc độc lập, mà là những nhóm vấn đề kỹ thuật có thể trải rộng trên nhiều tầng và có quan hệ trực tiếp với các quyết định Tách hoặc Gộp tài nguyên.
 
-### Bảy khía cạnh được sử dụng làm cơ sở hình thành bộ tiêu chí phân tích và đánh giá kiến trúc. Trên phương diện giải pháp, các vấn đề này được tiếp tục phân tích thông qua các mô hình triển khai, cơ chế thực thi ranh giới và kịch bản đánh đổi tại Chương 2\. Trên phương diện thực nghiệm, chúng cung cấp cơ sở xác định các tiêu chí cần quan sát, đo lường và kiểm chứng trong những chương tiếp theo. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bảy khía cạnh được sử dụng làm cơ sở hình thành bộ tiêu chí phân tích và đánh giá kiến trúc. Trên phương diện giải pháp, các vấn đề này được tiếp tục phân tích thông qua các mô hình triển khai, cơ chế thực thi ranh giới và kịch bản đánh đổi tại Chương 2\. Trên phương diện thực nghiệm, chúng cung cấp cơ sở xác định các tiêu chí cần quan sát, đo lường và kiểm chứng trong những chương tiếp theo.
 
-## **6.1. Định danh, Ánh xạ Yêu cầu và Quản lý Tên miền (Identity, Tenant Resolution & Routing)**
+### **6.1. Định danh, Ánh xạ Yêu cầu và Quản lý Tên miền (Identity, Tenant Resolution & Routing)** {#6.1.-định-danh,-ánh-xạ-yêu-cầu-và-quản-lý-tên-miền-(identity,-tenant-resolution-&-routing)}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Trong một hệ thống đa thuê bao, nhiều tổ chức hoặc khách hàng cùng truy cập một nền tảng dịch vụ. Vì vậy, hệ thống phải xác định chính xác thuê bao mà mỗi yêu cầu đang đại diện trước khi chuyển yêu cầu đến các thành phần xử lý nghiệp vụ hoặc truy cập dữ liệu. Nếu quá trình định danh và ánh xạ không chính xác, yêu cầu có thể được định tuyến đến sai không gian dữ liệu hoặc sử dụng nhầm cấu hình và quyền hạn của một thuê bao khác. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trong một hệ thống đa thuê bao, nhiều tổ chức hoặc khách hàng cùng truy cập một nền tảng dịch vụ. Vì vậy, hệ thống phải xác định chính xác thuê bao mà mỗi yêu cầu đang đại diện trước khi chuyển yêu cầu đến các thành phần xử lý nghiệp vụ hoặc truy cập dữ liệu. Nếu quá trình định danh và ánh xạ không chính xác, yêu cầu có thể được định tuyến đến sai không gian dữ liệu hoặc sử dụng nhầm cấu hình và quyền hạn của một thuê bao khác.
 
-### Thách thức cốt lõi nằm ở việc phân biệt danh tính người dùng (*User Identity*) với ngữ cảnh thuê bao (*Tenant Context*). Danh tính người dùng xác định chủ thể đang thực hiện hành động, trong khi ngữ cảnh thuê bao xác định không gian tổ chức hoặc khách hàng mà hành động đó thuộc về. Một người dùng có thể được cấp quyền truy cập nhiều thuê bao khác nhau; do đó, không thể mặc định danh tính người dùng đồng nhất với định danh thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thách thức cốt lõi nằm ở việc phân biệt danh tính người dùng (*User Identity*) với ngữ cảnh thuê bao (*Tenant Context*). Danh tính người dùng xác định chủ thể đang thực hiện hành động, trong khi ngữ cảnh thuê bao xác định không gian tổ chức hoặc khách hàng mà hành động đó thuộc về. Một người dùng có thể được cấp quyền truy cập nhiều thuê bao khác nhau; do đó, không thể mặc định danh tính người dùng đồng nhất với định danh thuê bao.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Quá trình phân giải thuê bao (*Tenant Resolution*) có thể dựa trên nhiều dấu hiệu nhận diện trong yêu cầu gửi đến, bao gồm tên miền phụ (*Subdomain*), tên miền tùy biến (*Custom Domain*), đường dẫn URL (*URL Path*), HTTP Request Header hoặc thông tin khai báo trong các thuộc tính của JSON Web Token (JWT Claims). Mỗi phương thức có đặc điểm riêng về cách tổ chức định tuyến, quản lý tên miền và khả năng tích hợp với cơ chế xác thực hiện có. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Quá trình phân giải thuê bao (*Tenant Resolution*) có thể dựa trên nhiều dấu hiệu nhận diện trong yêu cầu gửi đến, bao gồm tên miền phụ (*Subdomain*), tên miền tùy biến (*Custom Domain*), đường dẫn URL (*URL Path*), HTTP Request Header hoặc thông tin khai báo trong các thuộc tính của JSON Web Token (JWT Claims). Mỗi phương thức có đặc điểm riêng về cách tổ chức định tuyến, quản lý tên miền và khả năng tích hợp với cơ chế xác thực hiện có.
 
-### Bên cạnh việc lựa chọn phương thức nhận diện, hệ thống cần bảo đảm tính nhất quán giữa thông tin định danh người dùng, thuê bao được lựa chọn và quyền truy cập tương ứng. Ngữ cảnh thuê bao sau khi được xác thực cần được truyền xuyên suốt quá trình xử lý yêu cầu, bao gồm cả các luồng xử lý đồng bộ và bất đồng bộ. Đặc biệt, trong môi trường sử dụng Thread Pool hoặc cơ chế tái sử dụng luồng, việc thiết lập và giải phóng ngữ cảnh phải được kiểm soát chặt chẽ nhằm tránh hiện tượng dữ liệu định danh của yêu cầu trước bị sử dụng nhầm cho yêu cầu thuộc thuê bao khác. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bên cạnh việc lựa chọn phương thức nhận diện, hệ thống cần bảo đảm tính nhất quán giữa thông tin định danh người dùng, thuê bao được lựa chọn và quyền truy cập tương ứng. Ngữ cảnh thuê bao sau khi được xác thực cần được truyền xuyên suốt quá trình xử lý yêu cầu, bao gồm cả các luồng xử lý đồng bộ và bất đồng bộ. Đặc biệt, trong môi trường sử dụng Thread Pool hoặc cơ chế tái sử dụng luồng, việc thiết lập và giải phóng ngữ cảnh phải được kiểm soát chặt chẽ nhằm tránh hiện tượng dữ liệu định danh của yêu cầu trước bị sử dụng nhầm cho yêu cầu thuộc thuê bao khác.
 
-### Như vậy, định danh và ánh xạ yêu cầu không đơn thuần là vấn đề định tuyến tại cổng giao tiếp, mà còn là điều kiện nền tảng để duy trì tính chính xác của ranh giới thuê bao trong toàn bộ quá trình thực thi ứng dụng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Như vậy, định danh và ánh xạ yêu cầu không đơn thuần là vấn đề định tuyến tại cổng giao tiếp, mà còn là điều kiện nền tảng để duy trì tính chính xác của ranh giới thuê bao trong toàn bộ quá trình thực thi ứng dụng.
 
-## **6.2. Cô lập Thuê bao và Kiểm soát Bán kính Ảnh hưởng Sự cố**
+### **6.2. Cô lập Thuê bao và Kiểm soát Bán kính Ảnh hưởng Sự cố** {#6.2.-cô-lập-thuê-bao-và-kiểm-soát-bán-kính-ảnh-hưởng-sự-cố}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Cô lập thuê bao là yêu cầu bảo đảm rằng hoạt động của một khách hàng không thể truy cập, thay đổi hoặc gây ảnh hưởng trái phép đến dữ liệu và trạng thái vận hành của khách hàng khác. Yêu cầu này trở nên đặc biệt quan trọng trong các kiến trúc sử dụng chung cơ sở dữ liệu, bảng dữ liệu, tiến trình ứng dụng hoặc các dịch vụ hạ tầng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Cô lập thuê bao là yêu cầu bảo đảm rằng hoạt động của một khách hàng không thể truy cập, thay đổi hoặc gây ảnh hưởng trái phép đến dữ liệu và trạng thái vận hành của khách hàng khác. Yêu cầu này trở nên đặc biệt quan trọng trong các kiến trúc sử dụng chung cơ sở dữ liệu, bảng dữ liệu, tiến trình ứng dụng hoặc các dịch vụ hạ tầng.
 
-### Khi nhiều thuê bao cùng tồn tại trong một môi trường lưu trữ, việc phân biệt bản ghi bằng một thuộc tính định danh như `tenant_id` chưa đủ để bảo đảm an toàn. Nếu một thao tác truy vấn hoặc cập nhật không áp dụng đúng điều kiện phân tách, dữ liệu của thuê bao khác có thể bị đọc, sửa hoặc xóa ngoài phạm vi được cấp quyền. Những sai sót này có thể xuất hiện dưới dạng lỗ hổng tham chiếu đối tượng trực tiếp không an toàn (*Insecure Direct Object References – IDOR*) hoặc các lỗi kiểm soát truy cập ở tầng ứng dụng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Khi nhiều thuê bao cùng tồn tại trong một môi trường lưu trữ, việc phân biệt bản ghi bằng một thuộc tính định danh như `tenant_id` chưa đủ để bảo đảm an toàn. Nếu một thao tác truy vấn hoặc cập nhật không áp dụng đúng điều kiện phân tách, dữ liệu của thuê bao khác có thể bị đọc, sửa hoặc xóa ngoài phạm vi được cấp quyền. Những sai sót này có thể xuất hiện dưới dạng lỗ hổng tham chiếu đối tượng trực tiếp không an toàn (*Insecure Direct Object References – IDOR*) hoặc các lỗi kiểm soát truy cập ở tầng ứng dụng.
 
-### Ngoài phạm vi bảo vệ dữ liệu, cô lập thuê bao còn liên quan đến khả năng khoanh vùng sự cố (*Blast Radius*). Một lỗi phần mềm, tiến trình xử lý bất thường hoặc sự cố hạ tầng tại một khu vực của hệ thống không nên mặc nhiên dẫn đến việc gián đoạn dịch vụ trên phạm vi toàn bộ các thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Ngoài phạm vi bảo vệ dữ liệu, cô lập thuê bao còn liên quan đến khả năng khoanh vùng sự cố (*Blast Radius*). Một lỗi phần mềm, tiến trình xử lý bất thường hoặc sự cố hạ tầng tại một khu vực của hệ thống không nên mặc nhiên dẫn đến việc gián đoạn dịch vụ trên phạm vi toàn bộ các thuê bao.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Thứ nhất, cần xem xét khả năng duy trì phân tách dữ liệu giữa các thuê bao ở cả thao tác đọc và thao tác ghi. Đối với mô hình dùng chung bảng (*Shared-Table*), việc lọc dữ liệu bằng điều kiện `tenant_id` tại tầng ứng dụng có thể tạo ra rủi ro nếu lập trình viên bỏ sót điều kiện trong một truy vấn hoặc thao tác dữ liệu. Do đó, cần đánh giá khả năng kết hợp kiểm soát tại tầng ứng dụng với các chính sách bảo vệ ở cấp hệ quản trị cơ sở dữ liệu, chẳng hạn cơ chế Row-Level Security (RLS). {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ nhất, cần xem xét khả năng duy trì phân tách dữ liệu giữa các thuê bao ở cả thao tác đọc và thao tác ghi. Đối với mô hình dùng chung bảng (*Shared-Table*), việc lọc dữ liệu bằng điều kiện `tenant_id` tại tầng ứng dụng có thể tạo ra rủi ro nếu lập trình viên bỏ sót điều kiện trong một truy vấn hoặc thao tác dữ liệu. Do đó, cần đánh giá khả năng kết hợp kiểm soát tại tầng ứng dụng với các chính sách bảo vệ ở cấp hệ quản trị cơ sở dữ liệu, chẳng hạn cơ chế Row-Level Security (RLS).
 
-### Thứ hai, cần xem xét khả năng giới hạn phạm vi ảnh hưởng khi xảy ra sự cố. Việc tổ chức tài nguyên theo các miền triển khai độc lập hoặc mô hình tế bào (*Cell-Based Architecture*) có thể hỗ trợ khoanh vùng sự cố, hạn chế tác động lan truyền giữa các nhóm thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ hai, cần xem xét khả năng giới hạn phạm vi ảnh hưởng khi xảy ra sự cố. Việc tổ chức tài nguyên theo các miền triển khai độc lập hoặc mô hình tế bào (*Cell-Based Architecture*) có thể hỗ trợ khoanh vùng sự cố, hạn chế tác động lan truyền giữa các nhóm thuê bao.
 
-### Thứ ba, cần đánh giá tính nhất quán của cơ chế cô lập trên toàn bộ quy trình xử lý, từ xác thực yêu cầu, truy cập dữ liệu đến cập nhật trạng thái và trả kết quả. Một ranh giới dữ liệu được thiết lập tại cơ sở dữ liệu vẫn có thể bị suy yếu nếu ngữ cảnh thuê bao bị truyền sai hoặc các thành phần ứng dụng không tuân thủ chính sách truy cập tương ứng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ ba, cần đánh giá tính nhất quán của cơ chế cô lập trên toàn bộ quy trình xử lý, từ xác thực yêu cầu, truy cập dữ liệu đến cập nhật trạng thái và trả kết quả. Một ranh giới dữ liệu được thiết lập tại cơ sở dữ liệu vẫn có thể bị suy yếu nếu ngữ cảnh thuê bao bị truyền sai hoặc các thành phần ứng dụng không tuân thủ chính sách truy cập tương ứng.
 
-### Vì vậy, cô lập thuê bao cần được xem xét như một thuộc tính xuyên suốt của kiến trúc, kết hợp giữa kiểm soát truy cập dữ liệu và giới hạn phạm vi ảnh hưởng của sự cố, thay vì chỉ dựa vào một cơ chế phân tách riêng lẻ. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vì vậy, cô lập thuê bao cần được xem xét như một thuộc tính xuyên suốt của kiến trúc, kết hợp giữa kiểm soát truy cập dữ liệu và giới hạn phạm vi ảnh hưởng của sự cố, thay vì chỉ dựa vào một cơ chế phân tách riêng lẻ.
 
-## **6.3. Quản trị Hiệu năng và Ngăn chặn Hiệu ứng Hàng xóm Ồn ào**
+### **6.3. Quản trị Hiệu năng và Ngăn chặn Hiệu ứng Hàng xóm Ồn ào** {#6.3.-quản-trị-hiệu-năng-và-ngăn-chặn-hiệu-ứng-hàng-xóm-ồn-ào}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Trong kiến trúc đa thuê bao, nhiều khách hàng cùng khai thác một tập hợp tài nguyên tính toán và dịch vụ dùng chung. Mặc dù phương án này giúp tăng mật độ khai thác tài nguyên và cải thiện hiệu quả chi phí, nó cũng tạo ra nguy cơ cạnh tranh tài nguyên giữa các thuê bao. Hiện tượng một thuê bao phát sinh tải lớn hoặc sử dụng tài nguyên vượt mức dự kiến, từ đó làm suy giảm hiệu năng của các thuê bao khác, được gọi là hiệu ứng Hàng xóm Ồn ào (*Noisy Neighbor Problem*). {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trong kiến trúc đa thuê bao, nhiều khách hàng cùng khai thác một tập hợp tài nguyên tính toán và dịch vụ dùng chung. Mặc dù phương án này giúp tăng mật độ khai thác tài nguyên và cải thiện hiệu quả chi phí, nó cũng tạo ra nguy cơ cạnh tranh tài nguyên giữa các thuê bao. Hiện tượng một thuê bao phát sinh tải lớn hoặc sử dụng tài nguyên vượt mức dự kiến, từ đó làm suy giảm hiệu năng của các thuê bao khác, được gọi là hiệu ứng Hàng xóm Ồn ào (*Noisy Neighbor Problem*).
 
-### Hiện tượng này có thể xuất hiện tại nhiều thành phần, bao gồm CPU, RAM, kết nối cơ sở dữ liệu, bộ nhớ đệm và hệ thống xử lý thông điệp. Chẳng hạn, một thuê bao thực hiện nhiều truy vấn tiêu tốn tài nguyên có thể làm tăng thời gian chờ trong Connection Pool; một luồng yêu cầu đột biến có thể chiếm dụng năng lực xử lý của các Worker; hoặc một nhóm tác vụ có tần suất truy cập cao có thể gây áp lực lên bộ nhớ đệm dùng chung. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Hiện tượng này có thể xuất hiện tại nhiều thành phần, bao gồm CPU, RAM, kết nối cơ sở dữ liệu, bộ nhớ đệm và hệ thống xử lý thông điệp. Chẳng hạn, một thuê bao thực hiện nhiều truy vấn tiêu tốn tài nguyên có thể làm tăng thời gian chờ trong Connection Pool; một luồng yêu cầu đột biến có thể chiếm dụng năng lực xử lý của các Worker; hoặc một nhóm tác vụ có tần suất truy cập cao có thể gây áp lực lên bộ nhớ đệm dùng chung.
 
-### Vấn đề không chỉ nằm ở khả năng đáp ứng tải tổng thể của hệ thống, mà còn ở khả năng duy trì mức chất lượng dịch vụ tương đối ổn định giữa các thuê bao có đặc điểm sử dụng khác nhau. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề không chỉ nằm ở khả năng đáp ứng tải tổng thể của hệ thống, mà còn ở khả năng duy trì mức chất lượng dịch vụ tương đối ổn định giữa các thuê bao có đặc điểm sử dụng khác nhau.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Trước hết, cần xem xét cơ chế kiểm soát lượng yêu cầu mà mỗi thuê bao được phép gửi đến hệ thống thông qua các phương pháp giới hạn tốc độ (*Rate Limiting*) và điều tiết lưu lượng (*Throttling*). Các giới hạn này có thể được thiết lập ở cấp thuê bao hoặc cấp người dùng nhằm tránh tình trạng một chủ thể chiếm dụng quá mức năng lực xử lý dùng chung. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trước hết, cần xem xét cơ chế kiểm soát lượng yêu cầu mà mỗi thuê bao được phép gửi đến hệ thống thông qua các phương pháp giới hạn tốc độ (*Rate Limiting*) và điều tiết lưu lượng (*Throttling*). Các giới hạn này có thể được thiết lập ở cấp thuê bao hoặc cấp người dùng nhằm tránh tình trạng một chủ thể chiếm dụng quá mức năng lực xử lý dùng chung.
 
-### Bên cạnh đó, hệ thống cần có khả năng thiết lập hạn mức tài nguyên (*Resource Quotas*) và chính sách phân bổ tài nguyên phù hợp với từng nhóm dịch vụ. Việc quản lý hạn mức cần xem xét các tài nguyên có khả năng trở thành điểm nghẽn, chẳng hạn CPU, bộ nhớ, số lượng kết nối cơ sở dữ liệu và năng lực xử lý của các dịch vụ trung gian. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bên cạnh đó, hệ thống cần có khả năng thiết lập hạn mức tài nguyên (*Resource Quotas*) và chính sách phân bổ tài nguyên phù hợp với từng nhóm dịch vụ. Việc quản lý hạn mức cần xem xét các tài nguyên có khả năng trở thành điểm nghẽn, chẳng hạn CPU, bộ nhớ, số lượng kết nối cơ sở dữ liệu và năng lực xử lý của các dịch vụ trung gian.
 
-### Đối với các thành phần xử lý bất đồng bộ, cơ chế điều phối công bằng (*Fair Queuing*) là một khía cạnh cần được quan tâm nhằm hạn chế tình trạng một thuê bao chiếm phần lớn năng lực xử lý của hàng đợi hoặc nhóm Worker. Tương tự, đối với hệ thống Cache dùng chung, cần xem xét khả năng phân vùng dữ liệu và hạn chế việc một thuê bao gây ảnh hưởng đến hiệu quả lưu giữ dữ liệu hữu ích của các thuê bao khác. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Đối với các thành phần xử lý bất đồng bộ, cơ chế điều phối công bằng (*Fair Queuing*) là một khía cạnh cần được quan tâm nhằm hạn chế tình trạng một thuê bao chiếm phần lớn năng lực xử lý của hàng đợi hoặc nhóm Worker. Tương tự, đối với hệ thống Cache dùng chung, cần xem xét khả năng phân vùng dữ liệu và hạn chế việc một thuê bao gây ảnh hưởng đến hiệu quả lưu giữ dữ liệu hữu ích của các thuê bao khác.
 
-### Cuối cùng, hiệu quả của các biện pháp điều tiết cần được đánh giá thông qua những chỉ số phản ánh chất lượng dịch vụ, chẳng hạn thời gian đáp ứng ở các phân vị cao (p95, p99), mức sử dụng tài nguyên và khả năng duy trì hiệu năng của các thuê bao ít tải khi hệ thống chịu tải lớn từ một thuê bao khác. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Cuối cùng, hiệu quả của các biện pháp điều tiết cần được đánh giá thông qua những chỉ số phản ánh chất lượng dịch vụ, chẳng hạn thời gian đáp ứng ở các phân vị cao (p95, p99), mức sử dụng tài nguyên và khả năng duy trì hiệu năng của các thuê bao ít tải khi hệ thống chịu tải lớn từ một thuê bao khác.
 
-### Như vậy, quản trị hiệu năng trong môi trường đa thuê bao không chỉ hướng đến tối ưu thông lượng tổng thể, mà còn phải bảo đảm tính công bằng trong sử dụng tài nguyên và hạn chế tác động tiêu cực giữa các thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Như vậy, quản trị hiệu năng trong môi trường đa thuê bao không chỉ hướng đến tối ưu thông lượng tổng thể, mà còn phải bảo đảm tính công bằng trong sử dụng tài nguyên và hạn chế tác động tiêu cực giữa các thuê bao.
 
-## **6.4. Vòng đời Thuê bao và Mặt phẳng Điều khiển Tập trung**
+### **6.4. Vòng đời Thuê bao và Mặt phẳng Điều khiển Tập trung** {#6.4.-vòng-đời-thuê-bao-và-mặt-phẳng-điều-khiển-tập-trung}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Một nền tảng đa thuê bao phải có khả năng tiếp nhận và đưa các thuê bao mới vào hoạt động mà không phụ thuộc quá nhiều vào thao tác cấu hình thủ công. Khi số lượng khách hàng tăng lên, việc tạo không gian thuê bao, khởi tạo cấu trúc dữ liệu, cấp phát tài nguyên và thiết lập thông tin định tuyến cần được tổ chức theo quy trình có thể tự động hóa và quản lý tập trung. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một nền tảng đa thuê bao phải có khả năng tiếp nhận và đưa các thuê bao mới vào hoạt động mà không phụ thuộc quá nhiều vào thao tác cấu hình thủ công. Khi số lượng khách hàng tăng lên, việc tạo không gian thuê bao, khởi tạo cấu trúc dữ liệu, cấp phát tài nguyên và thiết lập thông tin định tuyến cần được tổ chức theo quy trình có thể tự động hóa và quản lý tập trung.
 
-### Thách thức này gắn với việc phân biệt Mặt phẳng Điều khiển (*Control Plane*) và Mặt phẳng Ứng dụng/Dữ liệu (*Application/Data Plane*). Control Plane chịu trách nhiệm quản lý thông tin cấu hình, trạng thái và các quyết định cấp phát tài nguyên; trong khi Application/Data Plane trực tiếp tiếp nhận và xử lý các yêu cầu nghiệp vụ của thuê bao. Việc phân định hai mặt phẳng giúp hệ thống quản lý tập trung vòng đời thuê bao mà không làm lẫn chức năng quản trị với chức năng phục vụ giao dịch. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thách thức này gắn với việc phân biệt Mặt phẳng Điều khiển (*Control Plane*) và Mặt phẳng Ứng dụng/Dữ liệu (*Application/Data Plane*). Control Plane chịu trách nhiệm quản lý thông tin cấu hình, trạng thái và các quyết định cấp phát tài nguyên; trong khi Application/Data Plane trực tiếp tiếp nhận và xử lý các yêu cầu nghiệp vụ của thuê bao. Việc phân định hai mặt phẳng giúp hệ thống quản lý tập trung vòng đời thuê bao mà không làm lẫn chức năng quản trị với chức năng phục vụ giao dịch.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Trọng tâm đầu tiên là tự động hóa quá trình khởi tạo thuê bao (*Automated Onboarding/Provisioning*). Khi một khách hàng đăng ký dịch vụ, hệ thống cần có khả năng tạo bản ghi định danh thuê bao, khởi tạo cấu hình tương ứng, cấp phát không gian dữ liệu hoặc môi trường thực thi theo mô hình kiến trúc được lựa chọn, đồng thời thiết lập các thông tin cần thiết để thuê bao có thể bắt đầu sử dụng dịch vụ. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trọng tâm đầu tiên là tự động hóa quá trình khởi tạo thuê bao (*Automated Onboarding/Provisioning*). Khi một khách hàng đăng ký dịch vụ, hệ thống cần có khả năng tạo bản ghi định danh thuê bao, khởi tạo cấu hình tương ứng, cấp phát không gian dữ liệu hoặc môi trường thực thi theo mô hình kiến trúc được lựa chọn, đồng thời thiết lập các thông tin cần thiết để thuê bao có thể bắt đầu sử dụng dịch vụ.
 
-### Quá trình cấp phát có thể khác nhau tùy theo phương án Tách/Gộp. Trong mô hình dùng chung (*Pool*), việc khởi tạo có thể chủ yếu tập trung vào đăng ký thông tin thuê bao, thiết lập metadata và cấu hình quyền truy cập. Trong mô hình phân tách môi trường thực thi, hệ thống có thể cần cấp phát thêm tài nguyên như Pod hoặc môi trường chạy riêng. Vì vậy, thời gian khởi tạo và mức độ phức tạp của quy trình provisioning là những yếu tố cần được xem xét khi so sánh các mô hình triển khai. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Quá trình cấp phát có thể khác nhau tùy theo phương án Tách/Gộp. Trong mô hình dùng chung (*Pool*), việc khởi tạo có thể chủ yếu tập trung vào đăng ký thông tin thuê bao, thiết lập metadata và cấu hình quyền truy cập. Trong mô hình phân tách môi trường thực thi, hệ thống có thể cần cấp phát thêm tài nguyên như Pod hoặc môi trường chạy riêng. Vì vậy, thời gian khởi tạo và mức độ phức tạp của quy trình provisioning là những yếu tố cần được xem xét khi so sánh các mô hình triển khai.
 
-### Một nội dung quan trọng khác là quản lý trạng thái thuê bao và điều phối định tuyến theo trạng thái hoặc gói dịch vụ. Hệ thống cần phân biệt các trạng thái như đang khởi tạo, sẵn sàng phục vụ hoặc tạm ngừng hoạt động; đồng thời bảo đảm yêu cầu của thuê bao được chuyển đến đúng môi trường xử lý và đúng cấu hình dịch vụ. Đối với nền tảng cung cấp nhiều phân khúc như Free, Pro và Enterprise, cơ chế định tuyến còn cần phản ánh sự khác biệt về tài nguyên và chính sách phục vụ giữa các gói. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một nội dung quan trọng khác là quản lý trạng thái thuê bao và điều phối định tuyến theo trạng thái hoặc gói dịch vụ. Hệ thống cần phân biệt các trạng thái như đang khởi tạo, sẵn sàng phục vụ hoặc tạm ngừng hoạt động; đồng thời bảo đảm yêu cầu của thuê bao được chuyển đến đúng môi trường xử lý và đúng cấu hình dịch vụ. Đối với nền tảng cung cấp nhiều phân khúc như Free, Pro và Enterprise, cơ chế định tuyến còn cần phản ánh sự khác biệt về tài nguyên và chính sách phục vụ giữa các gói.
 
-### Cuối cùng, cần xem xét khả năng kiểm soát tính nhất quán của quy trình khởi tạo, đặc biệt trong trường hợp một bước cấp phát hoặc cấu hình bị lỗi giữa chừng. Một quy trình onboarding có tính tự động nhưng không bảo đảm trạng thái nhất quán vẫn có thể tạo ra các thuê bao được đăng ký nhưng chưa đủ điều kiện hoạt động. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Cuối cùng, cần xem xét khả năng kiểm soát tính nhất quán của quy trình khởi tạo, đặc biệt trong trường hợp một bước cấp phát hoặc cấu hình bị lỗi giữa chừng. Một quy trình onboarding có tính tự động nhưng không bảo đảm trạng thái nhất quán vẫn có thể tạo ra các thuê bao được đăng ký nhưng chưa đủ điều kiện hoạt động.
 
-### Do đó, thách thức về vòng đời thuê bao trong phạm vi nghiên cứu này tập trung vào khả năng tự động hóa cấp phát, quản lý trạng thái và điều phối định tuyến, tạo nền tảng cho việc mở rộng số lượng thuê bao mà không làm gia tăng tương ứng khối lượng thao tác vận hành thủ công. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Do đó, thách thức về vòng đời thuê bao trong phạm vi nghiên cứu này tập trung vào khả năng tự động hóa cấp phát, quản lý trạng thái và điều phối định tuyến, tạo nền tảng cho việc mở rộng số lượng thuê bao mà không làm gia tăng tương ứng khối lượng thao tác vận hành thủ công.
 
-## **6.5. Khả năng Tùy biến Lúc chạy và Quản trị Tính năng** 
+## **6.5. Khả năng Tùy biến Lúc chạy và Quản trị Tính năng**  {#6.5.-khả-năng-tùy-biến-lúc-chạy-và-quản-trị-tính-năng}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Trong môi trường SaaS đa thuê bao, các khách hàng có thể có nhu cầu khác nhau về giao diện, cấu trúc dữ liệu, quy trình nghiệp vụ và phạm vi tính năng được sử dụng. Tuy nhiên, việc duy trì một nhánh mã nguồn riêng cho từng khách hàng sẽ làm tăng độ phức tạp trong phát triển, kiểm thử, triển khai và bảo trì phần mềm. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trong môi trường SaaS đa thuê bao, các khách hàng có thể có nhu cầu khác nhau về giao diện, cấu trúc dữ liệu, quy trình nghiệp vụ và phạm vi tính năng được sử dụng. Tuy nhiên, việc duy trì một nhánh mã nguồn riêng cho từng khách hàng sẽ làm tăng độ phức tạp trong phát triển, kiểm thử, triển khai và bảo trì phần mềm.
 
-### Thách thức đặt ra là làm thế nào để đáp ứng sự khác biệt giữa các thuê bao mà vẫn duy trì một nền tảng phần mềm có cấu trúc thống nhất. Điều này đòi hỏi hệ thống phải có khả năng cấu hình và điều chỉnh hành vi ứng dụng theo ngữ cảnh thuê bao tại thời điểm chạy (*Runtime Customization*), thay vì phụ thuộc hoàn toàn vào việc sửa đổi hoặc triển khai lại mã nguồn cho từng khách hàng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thách thức đặt ra là làm thế nào để đáp ứng sự khác biệt giữa các thuê bao mà vẫn duy trì một nền tảng phần mềm có cấu trúc thống nhất. Điều này đòi hỏi hệ thống phải có khả năng cấu hình và điều chỉnh hành vi ứng dụng theo ngữ cảnh thuê bao tại thời điểm chạy (*Runtime Customization*), thay vì phụ thuộc hoàn toàn vào việc sửa đổi hoặc triển khai lại mã nguồn cho từng khách hàng.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Một khía cạnh cần xem xét là khả năng tùy biến giao diện người dùng, bao gồm các yếu tố như thương hiệu, logo, màu sắc và cách bố trí thành phần giao diện (*Branding and UI Customization*). Việc tùy biến cần được tổ chức theo cấu hình gắn với từng thuê bao, bảo đảm sự khác biệt về trải nghiệm sử dụng không làm phân tách nền tảng ứng dụng thành nhiều phiên bản độc lập. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một khía cạnh cần xem xét là khả năng tùy biến giao diện người dùng, bao gồm các yếu tố như thương hiệu, logo, màu sắc và cách bố trí thành phần giao diện (*Branding and UI Customization*). Việc tùy biến cần được tổ chức theo cấu hình gắn với từng thuê bao, bảo đảm sự khác biệt về trải nghiệm sử dụng không làm phân tách nền tảng ứng dụng thành nhiều phiên bản độc lập.
 
-### Bên cạnh đó, một số khách hàng có thể cần mở rộng cấu trúc dữ liệu hoặc bổ sung các trường thông tin riêng (*Custom Fields*). Hệ thống cần xem xét khả năng hỗ trợ cấu hình dữ liệu linh hoạt mà không làm ảnh hưởng đến cấu trúc dữ liệu nền tảng hoặc gây khó khăn cho quá trình nâng cấp chung. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bên cạnh đó, một số khách hàng có thể cần mở rộng cấu trúc dữ liệu hoặc bổ sung các trường thông tin riêng (*Custom Fields*). Hệ thống cần xem xét khả năng hỗ trợ cấu hình dữ liệu linh hoạt mà không làm ảnh hưởng đến cấu trúc dữ liệu nền tảng hoặc gây khó khăn cho quá trình nâng cấp chung.
 
-### Đối với quy trình nghiệp vụ, yêu cầu tùy biến có thể thể hiện qua sự khác biệt về luồng xử lý, điều kiện phê duyệt hoặc các chức năng được phép sử dụng. Việc quản lý những khác biệt này cần tránh tạo ra quá nhiều nhánh xử lý riêng biệt trong mã nguồn, bởi điều đó có thể làm tăng chi phí bảo trì và nguy cơ phát sinh lỗi khi triển khai phiên bản mới. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Đối với quy trình nghiệp vụ, yêu cầu tùy biến có thể thể hiện qua sự khác biệt về luồng xử lý, điều kiện phê duyệt hoặc các chức năng được phép sử dụng. Việc quản lý những khác biệt này cần tránh tạo ra quá nhiều nhánh xử lý riêng biệt trong mã nguồn, bởi điều đó có thể làm tăng chi phí bảo trì và nguy cơ phát sinh lỗi khi triển khai phiên bản mới.
 
-### Một nội dung đặc biệt quan trọng là quản trị quyền sử dụng tính năng (*Feature Governance*). Các tính năng cần được xác định theo gói dịch vụ hoặc quyền hạn của từng thuê bao, chẳng hạn Free, Pro và Enterprise. Cơ chế kiểm soát cần được thực thi ở tầng backend, thay vì chỉ ẩn hoặc hiện chức năng trên giao diện, nhằm bảo đảm người dùng không thể gọi trực tiếp các chức năng vượt quá quyền hạn được cấp. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một nội dung đặc biệt quan trọng là quản trị quyền sử dụng tính năng (*Feature Governance*). Các tính năng cần được xác định theo gói dịch vụ hoặc quyền hạn của từng thuê bao, chẳng hạn Free, Pro và Enterprise. Cơ chế kiểm soát cần được thực thi ở tầng backend, thay vì chỉ ẩn hoặc hiện chức năng trên giao diện, nhằm bảo đảm người dùng không thể gọi trực tiếp các chức năng vượt quá quyền hạn được cấp.
 
-### Như vậy, khả năng tùy biến lúc chạy cần được xem xét đồng thời với tính nhất quán của mã nguồn, khả năng mở rộng cấu hình và cơ chế kiểm soát quyền tính năng. Đây là cơ sở để cân bằng giữa nhu cầu khác biệt của khách hàng và mục tiêu duy trì một nền tảng SaaS có khả năng phát triển, triển khai và bảo trì tập trung. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Như vậy, khả năng tùy biến lúc chạy cần được xem xét đồng thời với tính nhất quán của mã nguồn, khả năng mở rộng cấu hình và cơ chế kiểm soát quyền tính năng. Đây là cơ sở để cân bằng giữa nhu cầu khác biệt của khách hàng và mục tiêu duy trì một nền tảng SaaS có khả năng phát triển, triển khai và bảo trì tập trung.
 
-## **6.6. Chiến lược Sao lưu, Phục hồi Thảm họa và Cập nhật Hệ thống**
+## **6.6. Chiến lược Sao lưu, Phục hồi Thảm họa và Cập nhật Hệ thống** {#6.6.-chiến-lược-sao-lưu,-phục-hồi-thảm-họa-và-cập-nhật-hệ-thống}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Hoạt động sao lưu, phục hồi và cập nhật hệ thống trong kiến trúc đa thuê bao có mức độ phức tạp phụ thuộc đáng kể vào cách tài nguyên được tổ chức và phân tách. Khi dữ liệu của nhiều thuê bao được lưu trữ trong cùng một cơ sở dữ liệu hoặc bảng dữ liệu, việc quản trị dữ liệu ở phạm vi từng khách hàng có thể trở nên khó khăn hơn so với mô hình phân tách Database hoặc Schema riêng biệt. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Hoạt động sao lưu, phục hồi và cập nhật hệ thống trong kiến trúc đa thuê bao có mức độ phức tạp phụ thuộc đáng kể vào cách tài nguyên được tổ chức và phân tách. Khi dữ liệu của nhiều thuê bao được lưu trữ trong cùng một cơ sở dữ liệu hoặc bảng dữ liệu, việc quản trị dữ liệu ở phạm vi từng khách hàng có thể trở nên khó khăn hơn so với mô hình phân tách Database hoặc Schema riêng biệt.
 
-### Đặc biệt, khả năng phục hồi dữ liệu của một thuê bao về một thời điểm xác định (*Point-in-Time Recovery per Tenant*) là một vấn đề cần được cân nhắc khi so sánh các mô hình triển khai. Trong mô hình dùng chung bảng (*Pool*), dữ liệu của nhiều thuê bao có thể đan xen trong cùng một cấu trúc lưu trữ vật lý. Vì vậy, việc phục hồi toàn bộ cơ sở dữ liệu không đồng nghĩa với việc có thể khôi phục riêng dữ liệu của một thuê bao mà không ảnh hưởng đến dữ liệu của những thuê bao khác. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Đặc biệt, khả năng phục hồi dữ liệu của một thuê bao về một thời điểm xác định (*Point-in-Time Recovery per Tenant*) là một vấn đề cần được cân nhắc khi so sánh các mô hình triển khai. Trong mô hình dùng chung bảng (*Pool*), dữ liệu của nhiều thuê bao có thể đan xen trong cùng một cấu trúc lưu trữ vật lý. Vì vậy, việc phục hồi toàn bộ cơ sở dữ liệu không đồng nghĩa với việc có thể khôi phục riêng dữ liệu của một thuê bao mà không ảnh hưởng đến dữ liệu của những thuê bao khác.
 
-### Bên cạnh bài toán sao lưu và phục hồi, việc cập nhật cấu trúc dữ liệu và phiên bản ứng dụng cũng đặt ra yêu cầu duy trì tính liên tục của dịch vụ. Một thay đổi lược đồ không tương thích có thể khiến phiên bản ứng dụng đang hoạt động không thể tiếp tục truy cập dữ liệu, từ đó gây gián đoạn trên phạm vi nhiều thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bên cạnh bài toán sao lưu và phục hồi, việc cập nhật cấu trúc dữ liệu và phiên bản ứng dụng cũng đặt ra yêu cầu duy trì tính liên tục của dịch vụ. Một thay đổi lược đồ không tương thích có thể khiến phiên bản ứng dụng đang hoạt động không thể tiếp tục truy cập dữ liệu, từ đó gây gián đoạn trên phạm vi nhiều thuê bao.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Thứ nhất, cần xem xét sự đánh đổi giữa các mô hình Tách và Gộp trong chiến lược sao lưu, phục hồi dữ liệu. Với mô hình Silo hoặc Bridge, việc phân tách Database hoặc Schema có thể tạo thuận lợi hơn cho hoạt động quản trị dữ liệu và phục hồi theo phạm vi thuê bao. Ngược lại, mô hình Pool giúp tập trung quản lý và tối ưu tài nguyên lưu trữ, nhưng làm tăng độ phức tạp khi cần khôi phục riêng dữ liệu của một khách hàng trong môi trường có dữ liệu dùng chung. Đây là một tiêu chí quan trọng khi đánh giá mức độ phù hợp của từng mô hình với yêu cầu vận hành và phục hồi thảm họa. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ nhất, cần xem xét sự đánh đổi giữa các mô hình Tách và Gộp trong chiến lược sao lưu, phục hồi dữ liệu. Với mô hình Silo hoặc Bridge, việc phân tách Database hoặc Schema có thể tạo thuận lợi hơn cho hoạt động quản trị dữ liệu và phục hồi theo phạm vi thuê bao. Ngược lại, mô hình Pool giúp tập trung quản lý và tối ưu tài nguyên lưu trữ, nhưng làm tăng độ phức tạp khi cần khôi phục riêng dữ liệu của một khách hàng trong môi trường có dữ liệu dùng chung. Đây là một tiêu chí quan trọng khi đánh giá mức độ phù hợp của từng mô hình với yêu cầu vận hành và phục hồi thảm họa.
 
-### Thứ hai, cần xem xét khả năng cập nhật lược đồ dữ liệu mà không làm gián đoạn hoạt động của các thuê bao (*Zero-downtime Schema Migration*). Trong môi trường đa thuê bao, một thay đổi cấu trúc cơ sở dữ liệu có thể ảnh hưởng đồng thời đến nhiều nhóm khách hàng đang sử dụng cùng một phiên bản dịch vụ hoặc cùng một hệ thống lưu trữ. Vì vậy, quá trình chuyển đổi cần bảo đảm tính tương thích giữa phiên bản ứng dụng đang chạy và cấu trúc dữ liệu trong các giai đoạn nâng cấp. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ hai, cần xem xét khả năng cập nhật lược đồ dữ liệu mà không làm gián đoạn hoạt động của các thuê bao (*Zero-downtime Schema Migration*). Trong môi trường đa thuê bao, một thay đổi cấu trúc cơ sở dữ liệu có thể ảnh hưởng đồng thời đến nhiều nhóm khách hàng đang sử dụng cùng một phiên bản dịch vụ hoặc cùng một hệ thống lưu trữ. Vì vậy, quá trình chuyển đổi cần bảo đảm tính tương thích giữa phiên bản ứng dụng đang chạy và cấu trúc dữ liệu trong các giai đoạn nâng cấp.
 
-### Một hướng tiếp cận cần được xem xét là mẫu thiết kế *Expand/Contract*, trong đó cấu trúc dữ liệu được mở rộng trước để hỗ trợ đồng thời phiên bản cũ và phiên bản mới, sau đó mới thực hiện chuyển đổi và loại bỏ các thành phần không còn được sử dụng. Việc tự động hóa quá trình di trú thông qua công cụ quản lý phiên bản lược đồ như Flyway cũng là một khía cạnh cần được đánh giá nhằm bảo đảm tính nhất quán và khả năng kiểm soát khi triển khai thay đổi. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một hướng tiếp cận cần được xem xét là mẫu thiết kế *Expand/Contract*, trong đó cấu trúc dữ liệu được mở rộng trước để hỗ trợ đồng thời phiên bản cũ và phiên bản mới, sau đó mới thực hiện chuyển đổi và loại bỏ các thành phần không còn được sử dụng. Việc tự động hóa quá trình di trú thông qua công cụ quản lý phiên bản lược đồ như Flyway cũng là một khía cạnh cần được đánh giá nhằm bảo đảm tính nhất quán và khả năng kiểm soát khi triển khai thay đổi.
 
-### Như vậy, thách thức của nhóm vấn đề này nằm ở việc cân bằng giữa khả năng quản trị và phục hồi dữ liệu theo từng thuê bao với yêu cầu duy trì hoạt động liên tục khi hệ thống được nâng cấp. Trong phạm vi nghiên cứu, chiến lược sao lưu và phục hồi được xem xét chủ yếu như một tiêu chí đánh đổi giữa các mô hình kiến trúc; trong khi cơ chế di trú lược đồ tương thích ngược và cập nhật không gián đoạn là nội dung được tập trung phân tích sâu hơn ở phần giải pháp kỹ thuật. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Như vậy, thách thức của nhóm vấn đề này nằm ở việc cân bằng giữa khả năng quản trị và phục hồi dữ liệu theo từng thuê bao với yêu cầu duy trì hoạt động liên tục khi hệ thống được nâng cấp. Trong phạm vi nghiên cứu, chiến lược sao lưu và phục hồi được xem xét chủ yếu như một tiêu chí đánh đổi giữa các mô hình kiến trúc; trong khi cơ chế di trú lược đồ tương thích ngược và cập nhật không gián đoạn là nội dung được tập trung phân tích sâu hơn ở phần giải pháp kỹ thuật.
 
-## **6.7. Thách thức Kỹ thuật trong Xây dựng Bộ máy Đo lường Tài nguyên và Ánh xạ Định giá**
+## **6.7. Thách thức Kỹ thuật trong Xây dựng Bộ máy Đo lường Tài nguyên và Ánh xạ Định giá** {#6.7.-thách-thức-kỹ-thuật-trong-xây-dựng-bộ-máy-đo-lường-tài-nguyên-và-ánh-xạ-định-giá}
 
-### **Vấn đề kỹ thuật.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Vấn đề kỹ thuật.
 
-### Một đặc trưng quan trọng của nền tảng SaaS đa thuê bao là khả năng phục vụ các nhóm khách hàng có mức nhu cầu và gói dịch vụ khác nhau trên cùng một hạ tầng. Để phân bổ tài nguyên phù hợp, hệ thống cần có khả năng theo dõi mức sử dụng của từng thuê bao, xác định mức tiêu thụ so với hạn mức được cấp và hỗ trợ điều phối dịch vụ theo phân tầng gói cước. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Một đặc trưng quan trọng của nền tảng SaaS đa thuê bao là khả năng phục vụ các nhóm khách hàng có mức nhu cầu và gói dịch vụ khác nhau trên cùng một hạ tầng. Để phân bổ tài nguyên phù hợp, hệ thống cần có khả năng theo dõi mức sử dụng của từng thuê bao, xác định mức tiêu thụ so với hạn mức được cấp và hỗ trợ điều phối dịch vụ theo phân tầng gói cước.
 
-### Tuy nhiên, việc đo lường trong môi trường đa thuê bao không đơn giản là thu thập tổng mức sử dụng tài nguyên của toàn hệ thống. Dữ liệu cần được gắn với đúng ngữ cảnh thuê bao để có thể phân biệt mức tiêu thụ giữa các khách hàng, đồng thời tránh tạo thêm tải xử lý đáng kể cho các tiến trình nghiệp vụ chính. Nếu việc thu thập và tổng hợp số liệu được thực hiện không phù hợp, chính cơ chế đo lường có thể trở thành nguồn phát sinh độ trễ hoặc điểm nghẽn mới. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Tuy nhiên, việc đo lường trong môi trường đa thuê bao không đơn giản là thu thập tổng mức sử dụng tài nguyên của toàn hệ thống. Dữ liệu cần được gắn với đúng ngữ cảnh thuê bao để có thể phân biệt mức tiêu thụ giữa các khách hàng, đồng thời tránh tạo thêm tải xử lý đáng kể cho các tiến trình nghiệp vụ chính. Nếu việc thu thập và tổng hợp số liệu được thực hiện không phù hợp, chính cơ chế đo lường có thể trở thành nguồn phát sinh độ trễ hoặc điểm nghẽn mới.
 
-### **Nội dung xem xét.** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Nội dung xem xét.
 
-### Trước hết, cần xem xét khả năng theo dõi mức sử dụng tài nguyên theo từng `tenant_id`, bao gồm các chỉ số như số lượng API calls, dung lượng lưu trữ và mức tiêu thụ tài nguyên tính toán. Những thông tin này là cơ sở để xác định mức sử dụng thực tế của từng thuê bao và đối chiếu với hạn mức tương ứng với gói dịch vụ. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trước hết, cần xem xét khả năng theo dõi mức sử dụng tài nguyên theo từng `tenant_id`, bao gồm các chỉ số như số lượng API calls, dung lượng lưu trữ và mức tiêu thụ tài nguyên tính toán. Những thông tin này là cơ sở để xác định mức sử dụng thực tế của từng thuê bao và đối chiếu với hạn mức tương ứng với gói dịch vụ.
 
-### Thứ hai, cần xem xét cơ chế quản lý hạn mức và theo dõi tốc độ sử dụng (*Usage Quota & Rate Tracking*). Hệ thống cần xác định ngưỡng sử dụng phù hợp cho từng nhóm thuê bao, đồng thời kiểm soát những yêu cầu vượt quá hạn mức đã được thiết lập. Việc phân định hạn mức ở cấp thuê bao và cấp người dùng cũng có ý nghĩa trong việc hạn chế tình trạng một người dùng hoặc một nhóm hoạt động chiếm dụng quá mức tài nguyên được phân bổ cho toàn bộ tổ chức. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ hai, cần xem xét cơ chế quản lý hạn mức và theo dõi tốc độ sử dụng (*Usage Quota & Rate Tracking*). Hệ thống cần xác định ngưỡng sử dụng phù hợp cho từng nhóm thuê bao, đồng thời kiểm soát những yêu cầu vượt quá hạn mức đã được thiết lập. Việc phân định hạn mức ở cấp thuê bao và cấp người dùng cũng có ý nghĩa trong việc hạn chế tình trạng một người dùng hoặc một nhóm hoạt động chiếm dụng quá mức tài nguyên được phân bổ cho toàn bộ tổ chức.
 
-### Thứ ba, dữ liệu đo lường cần được liên kết với cơ chế phân bổ tài nguyên theo gói dịch vụ (*Tier-based Resource Allocation*). Chẳng hạn, các gói Free, Pro và Enterprise có thể được áp dụng những mức hạn ngạch, chính sách điều tiết lưu lượng và năng lực phục vụ khác nhau. Việc ánh xạ thông tin sử dụng với các phân tầng này giúp hệ thống thực thi chính sách dịch vụ nhất quán và hỗ trợ nhà cung cấp đánh giá mức độ phù hợp giữa tài nguyên được cấp phát với nhu cầu thực tế của từng nhóm khách hàng. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Thứ ba, dữ liệu đo lường cần được liên kết với cơ chế phân bổ tài nguyên theo gói dịch vụ (*Tier-based Resource Allocation*). Chẳng hạn, các gói Free, Pro và Enterprise có thể được áp dụng những mức hạn ngạch, chính sách điều tiết lưu lượng và năng lực phục vụ khác nhau. Việc ánh xạ thông tin sử dụng với các phân tầng này giúp hệ thống thực thi chính sách dịch vụ nhất quán và hỗ trợ nhà cung cấp đánh giá mức độ phù hợp giữa tài nguyên được cấp phát với nhu cầu thực tế của từng nhóm khách hàng.
 
-### Cuối cùng, cần xem xét chi phí xử lý của chính hoạt động đo lường. Cơ chế thu thập và tổng hợp dữ liệu sử dụng phải hạn chế ảnh hưởng đến độ trễ của các yêu cầu nghiệp vụ, tránh tạo ra các truy vấn thống kê nặng hoặc làm tăng áp lực lên cơ sở dữ liệu và các dịch vụ dùng chung. Do đó, việc lựa chọn tần suất thu thập, phương thức lưu trữ và cách tổng hợp số liệu là những yếu tố cần được cân nhắc trong thiết kế. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Cuối cùng, cần xem xét chi phí xử lý của chính hoạt động đo lường. Cơ chế thu thập và tổng hợp dữ liệu sử dụng phải hạn chế ảnh hưởng đến độ trễ của các yêu cầu nghiệp vụ, tránh tạo ra các truy vấn thống kê nặng hoặc làm tăng áp lực lên cơ sở dữ liệu và các dịch vụ dùng chung. Do đó, việc lựa chọn tần suất thu thập, phương thức lưu trữ và cách tổng hợp số liệu là những yếu tố cần được cân nhắc trong thiết kế.
 
-### Trong phạm vi nghiên cứu này, Metering Engine được tiếp cận chủ yếu dưới góc độ đo lường mức sử dụng, theo dõi hạn mức và hỗ trợ phân bổ tài nguyên theo phân tầng dịch vụ. Nội dung không đặt trọng tâm vào việc xây dựng một hệ thống kế toán hoặc tính cước hoàn chỉnh theo thời gian thực, mà tập trung vào mối liên hệ giữa mức sử dụng của thuê bao, chính sách hạn mức và quyết định điều phối tài nguyên trong kiến trúc đa thuê bao. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Trong phạm vi nghiên cứu này, Metering Engine được tiếp cận chủ yếu dưới góc độ đo lường mức sử dụng, theo dõi hạn mức và hỗ trợ phân bổ tài nguyên theo phân tầng dịch vụ. Nội dung không đặt trọng tâm vào việc xây dựng một hệ thống kế toán hoặc tính cước hoàn chỉnh theo thời gian thực, mà tập trung vào mối liên hệ giữa mức sử dụng của thuê bao, chính sách hạn mức và quyết định điều phối tài nguyên trong kiến trúc đa thuê bao.
 
-### **Tổng kết Mục 1.6** {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+### **Tổng kết Mục 1.6** {#tổng-kết-mục-1.6}
 
-### Bảy khía cạnh được trình bày cho thấy thiết kế kiến trúc đa thuê bao là một bài toán liên ngành giữa quản trị định danh, bảo vệ dữ liệu, điều tiết hiệu năng, tổ chức vòng đời thuê bao, tùy biến phần mềm, duy trì tính liên tục vận hành và quản lý mức sử dụng tài nguyên. Các thách thức này không tồn tại tách biệt mà có mối liên hệ với nhau thông qua những quyết định Tách hoặc Gộp tại các tầng của ngăn xếp hệ thống. {#bảy-khía-cạnh-được-trình-bày-cho-thấy-thiết-kế-kiến-trúc-đa-thuê-bao-là-một-bài-toán-liên-ngành-giữa-quản-trị-định-danh,-bảo-vệ-dữ-liệu,-điều-tiết-hiệu-năng,-tổ-chức-vòng-đời-thuê-bao,-tùy-biến-phần-mềm,-duy-trì-tính-liên-tục-vận-hành-và-quản-lý-mức-sử-dụng-tài-nguyên.-các-thách-thức-này-không-tồn-tại-tách-biệt-mà-có-mối-liên-hệ-với-nhau-thông-qua-những-quyết-định-tách-hoặc-gộp-tại-các-tầng-của-ngăn-xếp-hệ-thống.}
+Bảy khía cạnh được trình bày cho thấy thiết kế kiến trúc đa thuê bao là một bài toán liên ngành giữa quản trị định danh, bảo vệ dữ liệu, điều tiết hiệu năng, tổ chức vòng đời thuê bao, tùy biến phần mềm, duy trì tính liên tục vận hành và quản lý mức sử dụng tài nguyên. Các thách thức này không tồn tại tách biệt mà có mối liên hệ với nhau thông qua những quyết định Tách hoặc Gộp tại các tầng của ngăn xếp hệ thống.
 
-### Do đó, việc lựa chọn một mô hình đa thuê bao không thể chỉ dựa trên khả năng chia sẻ tài nguyên hoặc mức tiết kiệm chi phí, mà cần xem xét đồng thời các yêu cầu về an toàn dữ liệu, hiệu năng, khả năng quản trị và đặc điểm dịch vụ của từng nhóm khách hàng. Bảy khía cạnh trên tạo thành cơ sở đánh giá để Chương 2 tiếp tục phân tích các mô hình triển khai, cơ chế thực thi ranh giới và những kịch bản đánh đổi kiến trúc; đồng thời làm căn cứ xác định các tiêu chí kiểm chứng trong phần thực nghiệm của nghiên cứu.
+Do đó, việc lựa chọn một mô hình đa thuê bao không thể chỉ dựa trên khả năng chia sẻ tài nguyên hoặc mức tiết kiệm chi phí, mà cần xem xét đồng thời các yêu cầu về an toàn dữ liệu, hiệu năng, khả năng quản trị và đặc điểm dịch vụ của từng nhóm khách hàng. Bảy khía cạnh trên tạo thành cơ sở đánh giá để Chương 2 tiếp tục phân tích các mô hình triển khai, cơ chế thực thi ranh giới và những kịch bản đánh đổi kiến trúc; đồng thời làm căn cứ xác định các tiêu chí kiểm chứng trong phần thực nghiệm của nghiên cứu.
 
 CHƯƠNG 2: KIẾN TRÚC ĐA THUÊ BAO: CƠ CHẾ CHIA SẺ, RANH GIỚI VÀ CÁC KỊCH BẢN ĐÁNH ĐỔI  
 2.1. Dẫn nhập: Từ Thách thức Đa thuê bao đến Không gian Giải pháp Kiến trúc  
@@ -790,7 +820,84 @@ Chỉ định Sơ đồ 9 tầng tích hợp & Bàn luận Đánh đổi Đượ
 
 # 
 
-# **2.5. CÁC CƠ CHẾ KỸ THUẬT THỰC THI RANH GIỚI THUÊ BAO**
+**2.3. Phân tích Cơ chế Tách/Gộp theo các Đặc trưng Multi-Tenancy (Attribute-Driven Granular Analysis)**  
+**2.3.1. Đặc trưng Tùy biến Giao diện (UI/UX Customization):**  
+Tầng can thiệp: Tầng 8 và tầng 9 (Application Server và Application Instance). Các thành phần phần mềm trung gian tại tầng 7 có thể tham gia hỗ trợ phân phối và lưu đệm tài nguyên giao diện. Trong trường hợp giao diện được cung cấp dưới dạng tệp tĩnh thông qua CDN, việc phân tích cần xem xét thêm kiến trúc phân phối giao diện thực tế, vì CDN không trực tiếp tương đương một tầng cố định trong ngăn xếp chín tầng. 
+
+### **2.3.1.1. Cơ sở của bài toán tách/gộp**
+
+Khả năng tùy biến giao diện cho phép mỗi tenant điều chỉnh các yếu tố trình bày và trải nghiệm sử dụng dịch vụ theo nhu cầu riêng, chẳng hạn như biểu trưng, bảng màu, bố cục, ngôn ngữ và cách hiển thị chức năng.
+
+Trong hệ thống đa thuê bao, yêu cầu này đặt ra bài toán lựa chọn giữa việc triển khai các thành phần giao diện riêng theo tenant và duy trì một ứng dụng giao diện dùng chung với cấu hình khác nhau. Quyết định này ảnh hưởng đến mức độ tùy biến, khả năng chuẩn hóa giao diện, quy trình cập nhật và chi phí quản lý phiên bản phần mềm.
+
+### **2.3.1.2. Phương án tách biệt: Giao diện triển khai riêng theo tenant**
+
+Trong phương án tách biệt, mỗi tenant hoặc nhóm tenant có thể được phục vụ bởi một đơn vị triển khai giao diện riêng. Đơn vị này có thể là ứng dụng web, container hoặc một thành phần frontend được triển khai độc lập.
+
+Các đơn vị giao diện chuyên biệt có thể sử dụng chung mã nguồn gốc nhưng được cấu hình, đóng gói hoặc phát hành độc lập. Nếu cần mức độ tùy biến sâu hơn, hệ thống cũng có thể cho phép sử dụng những module giao diện hoặc thành phần mở rộng riêng. Tuy nhiên, việc phân tách triển khai không bắt buộc phải tạo những nhánh mã nguồn độc lập cho từng khách hàng.
+
+Ưu điểm của phương án này là tăng khả năng kiểm soát việc triển khai giao diện theo tenant. Những thay đổi đặc thù có thể được thử nghiệm và phát hành trong phạm vi một môi trường triển khai mà không nhất thiết phải thay đổi đồng thời các môi trường khác. Phương án này cũng có thể phù hợp khi một tenant có yêu cầu riêng về tích hợp giao diện hoặc lịch phát hành.
+
+Hạn chế chủ yếu nằm ở số lượng đơn vị triển khai và cấu hình cần duy trì. Khi số tenant tăng, hệ thống có thể phải quản lý nhiều bản đóng gói, môi trường kiểm thử và lịch cập nhật khác nhau. Nếu các tenant sử dụng những phiên bản giao diện không đồng nhất, nguy cơ lệch phiên bản và tăng chi phí bảo trì có thể xuất hiện.
+
+Cần lưu ý rằng micro-frontends là phương pháp phân rã giao diện thành các thành phần có thể phát triển hoặc triển khai độc lập, chứ không mặc nhiên là phương pháp cô lập giao diện theo tenant. Việc sử dụng micro-frontends chỉ tạo ra ranh giới tách biệt theo tenant khi kiến trúc thực sự bố trí các thành phần tương ứng riêng cho từng tenant.
+
+### **2.2.1.3. Phương án gộp chung: Giao diện điều khiển bằng siêu dữ liệu (Metadata-driven UI)**
+
+Trong phương án gộp chung, nhiều tenant sử dụng cùng một ứng dụng giao diện hoặc cùng một bộ mã nguồn frontend. Sự khác biệt về giao diện được biểu diễn thông qua các cấu hình và siêu dữ liệu gắn với tenant.
+
+Khi người dùng truy cập, ứng dụng xác định tenant đang được yêu cầu, truy xuất cấu hình tương ứng và sử dụng các thông số để điều chỉnh giao diện tại thời điểm chạy. Những thông số này có thể bao gồm logo, màu sắc, cách hiển thị trường dữ liệu, cấu trúc điều hướng hoặc trạng thái bật/tắt các thành phần giao diện.
+
+Ví dụ, trong ứng dụng quản lý công việc Kanban, các tenant có thể dùng chung mã nguồn giao diện nhưng cấu hình tên cột công việc, nhãn trạng thái, màu nhận diện và các trường thông tin mở rộng khác nhau.
+
+Ưu điểm của phương án này là giảm nhu cầu duy trì nhiều bản triển khai giao diện độc lập. Các thay đổi đối với thành phần giao diện cốt lõi có thể được phát hành tập trung, giúp hạn chế phân mảnh mã nguồn và đơn giản hóa hoạt động bảo trì.
+
+Tuy nhiên, phạm vi tùy biến phụ thuộc vào những điểm biến thiên mà nhà phát triển đã thiết kế. Khi nhu cầu giao diện trở nên quá khác biệt, cấu trúc metadata và bộ xử lý giao diện có thể tăng độ phức tạp. Ngoài ra, hệ thống phải kiểm soát tính hợp lệ của cấu hình và bảo đảm dữ liệu giao diện của tenant này không được áp dụng nhầm cho tenant khác.
+
+### **2.3.1.4. Phân tích đánh đổi**
+
+Phương án tách biệt có thể tạo thuận lợi cho triển khai những biến thể giao diện đặc thù, nhưng làm tăng số lượng môi trường và phiên bản cần quản lý. Ngược lại, phương án gộp chung dựa trên metadata giúp chuẩn hóa nền tảng và giảm sự dư thừa trong triển khai, nhưng yêu cầu thiết kế một cơ chế cấu hình đủ linh hoạt.
+
+Điểm cần phân biệt là mức độ tùy biến giao diện không tỷ lệ trực tiếp với mức độ cô lập tài nguyên. Một ứng dụng frontend dùng chung vẫn có thể hỗ trợ tùy biến sâu thông qua cấu hình, trong khi một frontend triển khai riêng vẫn có thể bị giới hạn chức năng.
+
+Do đó, lựa chọn tách hoặc gộp giao diện cần dựa trên mức độ khác biệt về yêu cầu trình bày, khả năng cấu hình của nền tảng và chi phí duy trì các biến thể. Nguyên tắc này phù hợp với hướng tiếp cận của Microsoft về các phương án triển khai đa thuê bao, trong đó mức độ chuyên biệt hóa cần được cân đối với chi phí và khả năng quản lý.
+
+Microsoft Learn
+
+Phân tích Đánh đổi: Tách Micro-frontends (Tự do cao / Build phức tạp) vs Gộp Metadata-driven UI.  
+2.3.2. Đặc trưng Tùy biến Quy trình Nghiệp vụ (Business Logic Customization):  
+Tầng can thiệp: Tầng 8 & 9 (App Server / Instance)
+
+Phân tích Đánh đổi: Tách Container Pod (Chạy script tùy biến) vs Gộp qua Feature Flags (Single Codebase).
+
+2.3.3. Đặc trưng Cô lập An toàn Dữ liệu (Data Isolation & Compliance):  
+Tầng can thiệp: Tầng 4, 5, 6 (DB Server, DB, Schema).  
+Phân tích Đánh đổi: Tách DB/Schema (An toàn vật lý / Tốn kém) vs Gộp Shared-Table có RLS (Rẻ / Rủi ro rò rỉ).  
+2.3.4. Đặc trưng Kiểm soát Nhiễu Tài nguyên (Noisy Neighbor Mitigation):  
+Tầng can thiệp: Tầng 1-3 (Hạ tầng cgroups) & Tầng 7 (Middleware Cache/Queue).  
+Phân tích Đánh đổi: Tách vCPU/Redis/Queue (Bảo đảm SLA / Phân mảnh RAM) vs Gộp có Rate Limiting.  
+2.3.5. Đặc trưng Tối ưu Chi phí Vận hành và Co giãn (TCO & Elasticity):  
+Tầng can thiệp: Toàn bộ 9 tầng.  
+Quy luật Đánh đổi Tổng quát: Mối tương quan nghịch đảo giữa Chi phí Biên (Marginal Cost) và Độ dày Ranh giới.  
+2.4. Xây dựng Kịch bản Tích hợp Đa Đặc trưng (Composite Scenarios / Real-World Profiles)  
+2.4.1. Kịch bản 1: SaaS Tối ưu Chi phí & Khởi tạo Nhanh (The SMB / Startup Profile)  
+Đặc trưng hướng tới: Tối ưu TCO \+ Tùy biến UI/Logic cơ bản \+ Onboarding tức thì.  
+Lắp ráp Kiến trúc: Ranh giới Level 5 (Pool DB \+ Feature Flags \+ Token Bucket Rate Limiting \+ RLS Fail-Closed).  
+Chỉ định Sơ đồ 9 tầng tích hợp & Bàn luận Đánh đổi Được/Mất.  
+2.4.2. Kịch bản 2: SaaS Tuân thủ Bảo mật & Hiệu năng Cao (The Enterprise / Regulated Profile)  
+Đặc trưng hướng tới: Cô lập dữ liệu khắt khe (HIPAA) \+ Chống Noisy Neighbor cứng \+ Chạy Custom Script.  
+Lắp ráp Kiến trúc: Ranh giới Level 2 & 3 (Silo DB BYOK \+ Pod K8s cgroups v2 \+ Dedicated Redis Cluster).  
+Chỉ định Sơ đồ 9 tầng tích hợp & Bàn luận Đánh đổi Được/Mất.  
+2.4.3. Kịch bản 3: Nền tảng SaaS Linh hoạt Phân tầng (The Tiered Platform Profile)  
+Đặc trưng hướng tới: Phục vụ đồng thời đa phân khúc (Free, Pro, Enterprise) trên một hạ tầng thống nhất.  
+Lắp ráp Kiến trúc: Hybrid kết hợp Cell-Based, điều phối lưu lượng qua Dynamic API Gateway.  
+Chỉ định Sơ đồ 9 tầng tích hợp & Bàn luận Đánh đổi Được/Mất (Operational Overhead).
+
+# 
+
+# 
+
+# **2.5. CÁC CƠ CHẾ KỸ THUẬT THỰC THI RANH GIỚI THUÊ BAO** {#2.5.-các-cơ-chế-kỹ-thuật-thực-thi-ranh-giới-thuê-bao}
 
 Sau khi xác định các mô hình triển khai và phân tích những đánh đổi giữa Tách và Gộp tài nguyên, vấn đề tiếp theo là xác định cách thức các ranh giới thuê bao được thực thi trong môi trường vận hành. Đối với những kiến trúc có mức độ chia sẻ cao như mô hình Pool, nhiều thuê bao có thể cùng sử dụng tiến trình ứng dụng, cấu trúc dữ liệu, bộ nhớ đệm, hàng đợi thông điệp và các kết nối cơ sở dữ liệu. Vì vậy, tính độc lập giữa các thuê bao không thể chỉ dựa vào cách tổ chức tài nguyên mà còn phụ thuộc vào những cơ chế kiểm soát được thực thi trong quá trình hệ thống hoạt động (*runtime enforcement*).
 
@@ -800,7 +907,7 @@ Trên cơ sở bốn chiều ranh giới B1–B4 đã xác định ở Chương 
 
 Các cơ chế được trình bày theo nguyên lý phòng thủ chiều sâu (*Defense-in-Depth*). Theo đó, bảo vệ tenant không phụ thuộc vào một điều kiện lọc hoặc một thành phần duy nhất mà được hỗ trợ bởi nhiều lớp kiểm soát tại các vị trí khác nhau của ngăn xếp. Cần nhấn mạnh rằng việc kết hợp các cơ chế logic có thể tăng cường khả năng cưỡng chế ranh giới trong môi trường dùng chung, nhưng không mặc nhiên tạo ra mức cô lập tương đương với phân tách vật lý trong mọi khía cạnh. Hiệu quả thực tế vẫn phụ thuộc vào cấu hình, quyền vận hành, quy trình kiểm thử và đặc điểm tải của hệ thống.
 
-## **2.5.1. Hệ thống Thực thi Ranh giới Định danh & Ngữ cảnh (Identity Boundary System)**
+## **2.5.1. Hệ thống Thực thi Ranh giới Định danh & Ngữ cảnh (Identity Boundary System)** {#2.5.1.-hệ-thống-thực-thi-ranh-giới-định-danh-&-ngữ-cảnh-(identity-boundary-system)}
 
 Trong kiến trúc đa thuê bao, việc xác định đúng danh tính thuê bao và duy trì ngữ cảnh tương ứng trong suốt quá trình xử lý yêu cầu là điều kiện nền tảng để bảo đảm các thao tác nghiệp vụ được thực hiện trong đúng phạm vi. Khi nhiều tenant cùng sử dụng một môi trường thực thi, hệ thống không chỉ cần xác thực người dùng mà còn phải xác định người dùng đó đang đại diện cho tenant nào, được phép truy cập tenant nào và ngữ cảnh này cần được duy trì ra sao khi yêu cầu đi qua nhiều thành phần xử lý.
 
@@ -842,7 +949,7 @@ Cần đồng thời phân biệt việc giải phóng ngữ cảnh với việc
 
 Tóm lại, Hệ thống Thực thi Ranh giới Định danh và Ngữ cảnh tạo thành chuỗi kiểm soát từ lúc xác định tenant đến khi kết thúc công việc. Tenant Resolution và Context Immutability bảo đảm ngữ cảnh được xác lập đúng; Context Propagation duy trì ngữ cảnh qua các luồng; còn cơ chế giải phóng trạng thái ngăn ngừa việc sử dụng lại ngữ cảnh cũ. Đây là tiền đề để các chính sách dữ liệu và điều tiết tài nguyên ở những mục tiếp theo được áp dụng đúng tenant.
 
-## **2.5.2. Hệ thống Thực thi Ranh giới Dữ liệu & Lưu trữ (Data Boundary System)**
+## **2.5.2. Hệ thống Thực thi Ranh giới Dữ liệu & Lưu trữ (Data Boundary System)** {#2.5.2.-hệ-thống-thực-thi-ranh-giới-dữ-liệu-&-lưu-trữ-(data-boundary-system)}
 
 Trong kiến trúc đa thuê bao, dữ liệu của nhiều tổ chức có thể được tổ chức trong các Database hoặc Schema riêng, hoặc cùng tồn tại trong một cấu trúc bảng và được phân biệt bằng thuộc tính như `tenant_id`. Mỗi phương án tạo ra mức độ cô lập, chi phí và độ phức tạp quản trị khác nhau. Khi dữ liệu được dùng chung, ranh giới truy cập phải được duy trì nhất quán ở tầng ứng dụng và hệ quản trị cơ sở dữ liệu; nếu một truy vấn không giới hạn đúng tenant, hệ thống có thể phát sinh truy cập chéo, cập nhật sai hoặc xóa dữ liệu ngoài phạm vi.
 
@@ -914,7 +1021,7 @@ Expand/Contract không trực tiếp thực thi quyền truy cập và không th
 
 Tóm lại, Hệ thống Thực thi Ranh giới Dữ liệu và Lưu trữ sử dụng các cơ chế có vai trò khác nhau: RLS cưỡng chế chính sách truy cập ở cấp hàng; `SET LOCAL` gắn ngữ cảnh tenant với transaction trên kết nối dùng chung; Dynamic Connection Routing lựa chọn nguồn dữ liệu phù hợp với topology; còn Flyway kết hợp Expand/Contract quản lý thay đổi cấu trúc theo hướng tương thích. Những cơ chế này cần được lựa chọn theo mô hình Tách/Gộp thực tế, không phải thành phần nào cũng bắt buộc xuất hiện trong mọi cấu hình kiến trúc.
 
-## **2.5.3. Hệ thống Thực thi Ranh giới Hiệu năng & Điều tiết (Performance Boundary System)**
+## **2.5.3. Hệ thống Thực thi Ranh giới Hiệu năng & Điều tiết (Performance Boundary System)** {#2.5.3.-hệ-thống-thực-thi-ranh-giới-hiệu-năng-&-điều-tiết-(performance-boundary-system)}
 
 Trong môi trường đa thuê bao, việc dùng chung CPU, bộ nhớ, kết nối cơ sở dữ liệu, Cache và dịch vụ xử lý nền có thể nâng cao hiệu quả khai thác tài nguyên. Tuy nhiên, nhu cầu sử dụng giữa các tenant không đồng đều và thay đổi theo thời gian. Một tenant tạo ra lượng yêu cầu lớn hoặc thực hiện những tác vụ tiêu tốn nhiều tài nguyên có thể làm tăng thời gian phản hồi, giảm thông lượng hoặc kéo dài thời gian chờ của các tenant khác. Hiện tượng này được gọi là hiệu ứng Hàng xóm Ồn ào (*Noisy Neighbor Problem*).
 
@@ -970,7 +1077,7 @@ Trong trường hợp yêu cầu cô lập cao, hệ thống có thể tách Que
 
 Tóm lại, Hệ thống Thực thi Ranh giới Hiệu năng và Điều tiết kết hợp các cơ chế ở nhiều điểm nghẽn khác nhau: Token Bucket kiểm soát tốc độ tiếp nhận yêu cầu; giới hạn Connection Pool và mức đồng thời kiểm soát cạnh tranh kết nối; cgroups bổ sung giới hạn tài nguyên tính toán khi cần; Cache Partitioning và W-TinyLFU hạn chế ảnh hưởng của truy cập bất thường lên bộ nhớ đệm; còn Fair-Share Queuing điều phối tác vụ nền. Các cơ chế này không bảo đảm triệt tiêu hoàn toàn Noisy Neighbor, nhưng cung cấp các lớp kiểm soát có thể đo lường và điều chỉnh theo đặc điểm workload.
 
-## **2.5.4. Hệ thống Thực thi Ranh giới Logic & Tính năng (Feature/Logic Boundary System)**
+## **2.5.4. Hệ thống Thực thi Ranh giới Logic & Tính năng (Feature/Logic Boundary System)** {#2.5.4.-hệ-thống-thực-thi-ranh-giới-logic-&-tính-năng-(feature/logic-boundary-system)}
 
 Trong môi trường SaaS đa thuê bao, các khách hàng có thể khác nhau về giao diện, tập tính năng và quy trình nghiệp vụ. Tuy nhiên, việc duy trì nhánh mã nguồn riêng cho từng tenant làm tăng độ phức tạp trong phát triển, kiểm thử, phát hành và bảo trì. Ở chiều ngược lại, nếu mọi tenant chỉ sử dụng một tập chức năng cố định, nền tảng có thể không đáp ứng được sự khác biệt về nhu cầu sử dụng.
 
@@ -1016,13 +1123,13 @@ Các Hook cần được triển khai như những điểm mở rộng có kiể
 
 Tóm lại, Hệ thống Thực thi Ranh giới Logic và Tính năng hỗ trợ quản lý khác biệt giữa các tenant trên nền mã nguồn thống nhất. Tenant-Scoped Feature Flagging biểu diễn quyền sử dụng tính năng; Canary Rollout giới hạn phạm vi phát hành; Metadata-Driven UI và các mẫu Customizable Data Views, Module Dependent Menu điều chỉnh trải nghiệm theo cấu hình; còn Pre/Post Update Hooks cung cấp điểm mở rộng cho quy trình nghiệp vụ. Các cơ chế này chỉ bảo đảm ranh giới khi được kết hợp với xác thực, phân quyền backend, kiểm soát cấu hình và giới hạn phạm vi thực thi.
 
-## **2.6. KHUNG QUYẾT ĐỊNH KIẾN TRÚC (ARCHITECTURAL DECISION FRAMEWORK)**
+## **2.6. Khung quyết định kiến trúc (architectural decision framework)** {#2.6.-khung-quyết-định-kiến-trúc-(architectural-decision-framework)}
 
 Các mục trước đã trình bày những mô hình triển khai, cơ chế Tách/Gộp và các hệ thống kỹ thuật thực thi Ranh giới Thuê bao. Tuy nhiên, không có một mô hình nào mặc nhiên phù hợp với mọi hệ thống. Việc lựa chọn kiến trúc cần cân nhắc đồng thời mức độ cô lập dữ liệu, tác động của Noisy Neighbor, bán kính ảnh hưởng sự cố, chi phí sở hữu, độ phức tạp vận hành, khả năng tùy biến và thời gian khởi tạo tenant.
 
 Khung Quyết định Kiến trúc được xây dựng nhằm liên kết yêu cầu nghiệp vụ với đặc điểm của từng phương án. Khung này không đưa ra một cấu hình tối ưu duy nhất, mà cung cấp ba công cụ bổ trợ: (1) ma trận so sánh đánh đổi giữa các kịch bản tích hợp; (2) cây quyết định sử dụng các yếu tố dẫn đường để sàng lọc phương án; và (3) ma trận đối soát nối thách thức, giải pháp và nội dung kiểm chứng ở các chương tiếp theo.
 
-## **2.6.1. Ma trận Tổng hợp So sánh Đánh đổi Đa chiều (Multi-Criteria Trade-off Matrix)**
+### **2.6.1. Ma trận Tổng hợp So sánh Đánh đổi Đa chiều (Multi-Criteria Trade-off Matrix)** {#2.6.1.-ma-trận-tổng-hợp-so-sánh-đánh-đổi-đa-chiều-(multi-criteria-trade-off-matrix)}
 
 Ma trận so sánh đối chiếu ba kịch bản kiến trúc tích hợp tại Mục 2.4, bao gồm: kịch bản Startup/SMB sử dụng Pool kết hợp RLS; kịch bản Enterprise sử dụng Silo hoặc các phương án cô lập chuyên dụng; và kịch bản Tiered Platform kết hợp Hybrid với Cell-Based Architecture. Các kịch bản được so sánh theo chín tiêu chí, trong đó cấp độ độ dày ranh giới là tiêu chí định hướng để diễn giải mức độ Tách/Gộp, còn những tiêu chí còn lại thể hiện hệ quả về dữ liệu, hiệu năng, vận hành và khả năng cung cấp dịch vụ.
 
@@ -1048,7 +1155,7 @@ Các nhận định trong ma trận là đánh giá định tính dựa trên đ
 
 Ma trận hiện sử dụng chín tiêu chí nhưng chưa thiết lập thang điểm, trọng số hoặc hàm tổng hợp. Vì vậy, kết quả của bảng nên được hiểu là so sánh định tính, không gọi là đánh giá bán định lượng. Nếu nghiên cứu cần xếp hạng bằng điểm số ở giai đoạn sau, cần xác định trước thang đo, trọng số, cách chuẩn hóa và nguồn dữ liệu cho từng tiêu chí. Điều này giúp tránh tạo ra điểm số chủ quan nhưng được diễn giải như kết quả định lượng.
 
-## **2.6.2. Cây Quyết định Kiến trúc Tổng quát (Universal Architecture Decision Tree)**
+### **2.6.2. Cây Quyết định Kiến trúc Tổng quát (Universal Architecture Decision Tree)** {#2.6.2.-cây-quyết-định-kiến-trúc-tổng-quát-(universal-architecture-decision-tree)}
 
 Bên cạnh ma trận so sánh, cây quyết định kiến trúc chuyển hóa những yêu cầu và ràng buộc có tính định hướng thành quy trình sàng lọc các nhóm kiến trúc. Thay vì lựa chọn công nghệ ngay từ đầu, kiến trúc sư cần xác định những yếu tố có khả năng làm thay đổi căn bản mức độ Tách/Gộp, môi trường thực thi và chi phí vận hành. Trong nghiên cứu này, bốn nhóm câu hỏi được sử dụng làm yếu tố dẫn đường (*Decision Drivers*): tuân thủ và pháp lý; thực thi mã tùy biến; khác biệt giữa các phân khúc khách hàng; và ngân sách/Tổng chi phí sở hữu.
 
@@ -1099,7 +1206,7 @@ Nếu nhiều điều kiện cùng đúng, các quyết định cần được k
 
 Như vậy, cây quyết định là công cụ sàng lọc và định hướng ban đầu, không phải thuật toán tự động xác định một kiến trúc duy nhất. Tại Chương 3, các tham số của bài toán nền tảng quản lý bảng công việc Kanban—bao gồm ngân sách hạ tầng, yêu cầu cô lập dữ liệu, quy mô người dùng và đặc điểm vận hành—sẽ được đối chiếu với các yếu tố dẫn đường để luận chứng cho phương án được lựa chọn.
 
-## **2.6.3. Ma trận Đối soát Xuyên suốt (End-to-End Traceability Matrix)**
+### **2.6.3. Ma trận Đối soát Xuyên suốt (End-to-End Traceability Matrix)** {#2.6.3.-ma-trận-đối-soát-xuyên-suốt-(end-to-end-traceability-matrix)}
 
 Để bảo đảm tính nhất quán giữa cơ sở lý thuyết, giải pháp kiến trúc và phương pháp thực nghiệm, nghiên cứu xây dựng Ma trận Đối soát Xuyên suốt (*End-to-End Traceability Matrix*). Ma trận liên kết bảy thách thức ở Chương 1 với các giải pháp kiến trúc và cơ chế kỹ thuật ở Chương 2, đồng thời xác định nội dung cần đo lường hoặc kiểm thử trong Chương 4 và Chương 5\.
 
