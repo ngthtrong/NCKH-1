@@ -1,66 +1,114 @@
 [
   {
     "stem": "hinh_2_1_master_blueprint",
-    "title": "Hình 2.1 · Sơ đồ gốc 9 tầng ngăn xếp hệ thống"
+    "title": "Hình 2.1 · Sơ đồ gốc 9 tầng ngăn xếp hệ thống",
+    "drawio": "drawio/hinh_2_1_master_blueprint.drawio",
+    "png": "png/hinh_2_1_master_blueprint.drawio.png",
+    "svg": "svg/hinh_2_1_master_blueprint.svg"
   },
   {
     "stem": "hinh_2_2_silo_model",
-    "title": "Hình 2.2 · Mô hình Silo"
+    "title": "Hình 2.2 · Mô hình Silo",
+    "drawio": "drawio/hinh_2_2_silo_model.drawio",
+    "png": "png/hinh_2_2_silo_model.drawio.png",
+    "svg": "svg/hinh_2_2_silo_model.svg"
   },
   {
     "stem": "hinh_2_3_pool_model",
-    "title": "Hình 2.3 · Mô hình Pool"
+    "title": "Hình 2.3 · Mô hình Pool",
+    "drawio": "drawio/hinh_2_3_pool_model.drawio",
+    "png": "png/hinh_2_3_pool_model.drawio.png",
+    "svg": "svg/hinh_2_3_pool_model.svg"
   },
   {
     "stem": "hinh_2_4_bridge_model",
-    "title": "Hình 2.4 · Mô hình Bridge"
+    "title": "Hình 2.4 · Mô hình Bridge",
+    "drawio": "drawio/hinh_2_4_bridge_model.drawio",
+    "png": "png/hinh_2_4_bridge_model.drawio.png",
+    "svg": "svg/hinh_2_4_bridge_model.svg"
   },
   {
     "stem": "hinh_2_5_hybrid_model",
-    "title": "Hình 2.5 · Mô hình Hybrid"
+    "title": "Hình 2.5 · Mô hình Hybrid",
+    "drawio": "drawio/hinh_2_5_hybrid_model.drawio",
+    "png": "png/hinh_2_5_hybrid_model.drawio.png",
+    "svg": "svg/hinh_2_5_hybrid_model.svg"
   },
   {
     "stem": "hinh_2_6_data_isolation",
-    "title": "Hình 2.6 · Trọng tâm cô lập dữ liệu"
+    "title": "Hình 2.6 · Trọng tâm cô lập dữ liệu",
+    "drawio": "drawio/hinh_2_6_data_isolation.drawio",
+    "png": "png/hinh_2_6_data_isolation.drawio.png",
+    "svg": "svg/hinh_2_6_data_isolation.svg"
   },
   {
     "stem": "hinh_2_7_tco_rls_engine",
-    "title": "Hình 2.7 · Trọng tâm TCO và RLS Engine"
+    "title": "Hình 2.7 · Trọng tâm TCO và RLS Engine",
+    "drawio": "drawio/hinh_2_7_tco_rls_engine.drawio",
+    "png": "png/hinh_2_7_tco_rls_engine.drawio.png",
+    "svg": "svg/hinh_2_7_tco_rls_engine.svg"
   },
   {
     "stem": "hinh_2_8_schema_namespace",
-    "title": "Hình 2.8 · Trọng tâm tùy biến cấu trúc"
+    "title": "Hình 2.8 · Trọng tâm tùy biến cấu trúc",
+    "drawio": "drawio/hinh_2_8_schema_namespace.drawio",
+    "png": "png/hinh_2_8_schema_namespace.drawio.png",
+    "svg": "svg/hinh_2_8_schema_namespace.svg"
   },
   {
     "stem": "hinh_2_9_customer_segmentation",
-    "title": "Hình 2.9 · Trọng tâm phân khúc khách hàng"
+    "title": "Hình 2.9 · Trọng tâm phân khúc khách hàng",
+    "drawio": "drawio/hinh_2_9_customer_segmentation.drawio",
+    "png": "png/hinh_2_9_customer_segmentation.drawio.png",
+    "svg": "svg/hinh_2_9_customer_segmentation.svg"
   },
   {
     "stem": "hinh_2_10_smb_profile",
-    "title": "Hình 2.10 · SMB / Startup Profile"
+    "title": "Hình 2.10 · SMB / Startup Profile",
+    "drawio": "drawio/hinh_2_10_smb_profile.drawio",
+    "png": "png/hinh_2_10_smb_profile.drawio.png",
+    "svg": "svg/hinh_2_10_smb_profile.svg"
   },
   {
     "stem": "hinh_2_11_enterprise_profile",
-    "title": "Hình 2.11 · Enterprise / Regulated Profile"
+    "title": "Hình 2.11 · Enterprise / Regulated Profile",
+    "drawio": "drawio/hinh_2_11_enterprise_profile.drawio",
+    "png": "png/hinh_2_11_enterprise_profile.drawio.png",
+    "svg": "svg/hinh_2_11_enterprise_profile.svg"
   },
   {
     "stem": "hinh_2_12_cell_based_profile",
-    "title": "Hình 2.12 · Global Hyper-Scale Cell-Based Profile"
+    "title": "Hình 2.12 · Global Hyper-Scale Cell-Based Profile",
+    "drawio": "drawio/hinh_2_12_cell_based_profile.drawio",
+    "png": "png/hinh_2_12_cell_based_profile.drawio.png",
+    "svg": "svg/hinh_2_12_cell_based_profile.svg"
   },
   {
     "stem": "hinh_2_13_feature_flags_sequence",
-    "title": "Hình 2.13 · Lan truyền ngữ cảnh và cờ tính năng"
+    "title": "Hình 2.13 · Lan truyền ngữ cảnh và cờ tính năng",
+    "drawio": "drawio/hinh_2_13_feature_flags_sequence.drawio",
+    "png": "png/hinh_2_13_feature_flags_sequence.drawio.png",
+    "svg": "svg/hinh_2_13_feature_flags_sequence.svg"
   },
   {
     "stem": "hinh_2_14_set_local_sequence",
-    "title": "Hình 2.14 · SET LOCAL và tái sử dụng Connection Pool"
+    "title": "Hình 2.14 · SET LOCAL và tái sử dụng Connection Pool",
+    "drawio": "drawio/hinh_2_14_set_local_sequence.drawio",
+    "png": "png/hinh_2_14_set_local_sequence.drawio.png",
+    "svg": "svg/hinh_2_14_set_local_sequence.svg"
   },
   {
     "stem": "hinh_2_15_two_tier_caching",
-    "title": "Hình 2.15 · Two-Tier Caching và W-TinyLFU"
+    "title": "Hình 2.15 · Two-Tier Caching và W-TinyLFU",
+    "drawio": "drawio/hinh_2_15_two_tier_caching.drawio",
+    "png": "png/hinh_2_15_two_tier_caching.drawio.png",
+    "svg": "svg/hinh_2_15_two_tier_caching.svg"
   },
   {
     "stem": "hinh_2_16_decision_tree",
-    "title": "Hình 2.16 · Cây quyết định kiến trúc"
+    "title": "Hình 2.16 · Cây quyết định kiến trúc",
+    "drawio": "drawio/hinh_2_16_decision_tree.drawio",
+    "png": "png/hinh_2_16_decision_tree.drawio.png",
+    "svg": "svg/hinh_2_16_decision_tree.svg"
   }
 ]

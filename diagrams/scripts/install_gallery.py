@@ -12,10 +12,14 @@ from urllib.parse import unquote
 
 BASE=Path(__file__).resolve().parents[1]
 BUILD=BASE/'_build'
-manifest=json.loads((BUILD/'manifest.json').read_text(encoding='utf-8'))
+GALLERY_ONLY='--gallery-only' in sys.argv
+manifest=json.loads(((BASE if GALLERY_ONLY else BUILD)/'manifest.json').read_text(encoding='utf-8'))
+for m in manifest:
+    m.update(drawio=f"drawio/{m['stem']}.drawio", png=f"png/{m['stem']}.drawio.png", svg=f"svg/{m['stem']}.svg")
+for folder in ['drawio','png','svg']:(BASE/folder).mkdir(exist_ok=True)
 
 # Validate all deliverables before changing the original directory.
-for m in manifest:
+for m in ([] if GALLERY_ONLY else manifest):
     p=BUILD/(m['stem']+'.drawio')
     r=subprocess.run([sys.executable,str(BASE.parent/'AIDraw/drawio-skill/scripts/validate.py'),str(p)],capture_output=True)
     if r.returncode: raise RuntimeError(r.stdout.decode('utf-8',errors='replace'))
@@ -36,7 +40,7 @@ for m in manifest:
 
 archive=(BASE/'_archive/2026-11-06-ban-cu').resolve()
 if not archive.is_relative_to(BASE.resolve()): raise ValueError('Archive escaped workspace')
-if not (BASE/'manifest.json').exists():
+if not GALLERY_ONLY and not (BASE/'manifest.json').exists():
     archive.mkdir(parents=True,exist_ok=False)
     originals=[p for p in BASE.iterdir() if p.is_file() and (p.suffix in ['.drawio','.svg'] or p.name.endswith('.drawio.png'))]
     oldmanifest={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in originals}
@@ -48,7 +52,7 @@ if not (BASE/'manifest.json').exists():
 
 # The 16-figure reference supersedes the prior 14+4 edition. Preserve that
 # edition before replacing names, so the root never mixes two numbering sets.
-if (BASE/'manifest.json').exists():
+if not GALLERY_ONLY and (BASE/'manifest.json').exists():
     previous=json.loads((BASE/'manifest.json').read_text(encoding='utf-8'))
     if {m['stem'] for m in previous}!={m['stem'] for m in manifest}:
         snap=(BASE/'_archive/2026-11-06-ban-14-cong-4').resolve()
@@ -65,23 +69,23 @@ if (BASE/'manifest.json').exists():
         supplemental=BASE/'bo-sung'
         if supplemental.exists() and not any(supplemental.iterdir()):supplemental.rmdir()
 
-for m in manifest:
-    target=BASE/m['stem'];target.parent.mkdir(parents=True,exist_ok=True)
-    shutil.copy2(BUILD/(m['stem']+'.drawio'),str(target)+'.drawio')
-    shutil.copy2(BUILD/'final'/(m['stem']+'.png'),str(target)+'.drawio.png')
-    shutil.copy2(BUILD/'final'/(m['stem']+'.svg'),str(target)+'.svg')
+for m in ([] if GALLERY_ONLY else manifest):
+    shutil.copy2(BUILD/(m['stem']+'.drawio'),BASE/m['drawio'])
+    shutil.copy2(BUILD/'final'/(m['stem']+'.png'),BASE/m['png'])
+    shutil.copy2(BUILD/'final'/(m['stem']+'.svg'),BASE/m['svg'])
 
 (BASE/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
 
 # Offline HTML: local PNG/SVG/source links, zoom dialog and arrow-key navigation.
 cards=[]
 for i,m in enumerate(manifest):
-    stem=html.escape(m['stem']); title=html.escape(m['title'])
+    title=html.escape(m['title'])
+    png,svg,drawio=(html.escape(m[k]) for k in ['png','svg','drawio'])
     cards.append(f'''<article id="fig-{i}" data-title="{title.lower()}">
-    <button class="image" data-index="{i}" aria-label="Phóng to {title}"><img loading="lazy" src="{stem}.drawio.png" alt="{title}"></button>
+    <button class="image" data-index="{i}" aria-label="Phóng to {title}"><img loading="lazy" src="{png}" alt="{title}"></button>
     <h2>{title}</h2><div class="links"><button data-index="{i}">Phóng to</button>
-    <a href="{stem}.drawio.png" target="_blank">PNG</a><a href="{stem}.svg" target="_blank">SVG</a>
-    <a href="{stem}.drawio" download>Nguồn Draw.io</a></div></article>''')
+    <a href="{png}" target="_blank">PNG</a><a href="{svg}" target="_blank">SVG</a>
+    <a href="{drawio}" download>Nguồn Draw.io</a></div></article>''')
 data=json.dumps(manifest,ensure_ascii=False).replace('</','<\/')
 doc='''<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Diagram Chương 2 — bản đã sửa</title><style>
@@ -107,7 +111,7 @@ dialog::backdrop{background:#162133cc}.toolbar{position:sticky;top:0;display:fle
 <strong id="caption"></strong><button id="size">Kích thước gốc</button><a id="png" target="_blank">Mở PNG</a><a id="svg" target="_blank">Mở SVG</a><button id="close">Đóng ✕</button></div>
 <div id="viewer" class="viewer"><img id="large" alt=""></div></dialog><script>
 const figures='''+data+''';let current=0;const dlg=document.getElementById('zoom'),viewer=document.getElementById('viewer');
-function show(i){current=(i+figures.length)%figures.length;const f=figures[current];document.getElementById('large').src=f.stem+'.drawio.png';document.getElementById('large').alt=f.title;document.getElementById('caption').textContent=f.title;document.getElementById('png').href=f.stem+'.drawio.png';document.getElementById('svg').href=f.stem+'.svg';if(!dlg.open)dlg.showModal();viewer.scrollTo(0,0)}
+function show(i){current=(i+figures.length)%figures.length;const f=figures[current];document.getElementById('large').src=f.png;document.getElementById('large').alt=f.title;document.getElementById('caption').textContent=f.title;document.getElementById('png').href=f.png;document.getElementById('svg').href=f.svg;if(!dlg.open)dlg.showModal();viewer.scrollTo(0,0)}
 document.querySelectorAll('[data-index]').forEach(b=>b.onclick=()=>show(Number(b.dataset.index)));
 document.getElementById('prev').onclick=()=>show(current-1);document.getElementById('next').onclick=()=>show(current+1);document.getElementById('close').onclick=()=>dlg.close();
 document.getElementById('size').onclick=()=>{viewer.classList.toggle('full');document.getElementById('size').textContent=viewer.classList.contains('full')?'Vừa màn hình':'Kích thước gốc'};
@@ -120,6 +124,8 @@ document.getElementById('search').oninput=e=>{const q=e.target.value.toLocaleLow
 notes='''# Danh mục 16 hình — đối chiếu bản tham chiếu mới
 
 [Mở bộ xem ảnh](xem-tat-ca.html). PNG 2.400 px; SVG và nguồn Draw.io có thể chỉnh sửa.
+
+File được phân loại trong `png/`, `svg/` và `drawio/`; PNG xem nhanh cũng nằm trong `png/`.
 
 Chuẩn áp dụng: bản lưu trữ gồm 16 sơ đồ Mermaid người dùng gửi. Bản 14 hình chính + 4 hình phụ trước đó dùng một dàn ý khác và đã được thay thế. Các file nguồn Mermaid nguyên bản nằm tại `tham-chieu-16-hinh/`.
 
@@ -141,7 +147,7 @@ Tên công nghệ chỉ giữ ở hình giải thích cơ chế cần thiết (v
 
 '''
 for m in manifest:
-    s=m['stem'];notes+=f"### {m['title']}\n\n[PNG]({s}.drawio.png) · [SVG]({s}.svg) · [Draw.io]({s}.drawio)\n\n![{m['title']}]({s}.drawio.png)\n\n"
+    notes+=f"### {m['title']}\n\n[PNG]({m['png']}) · [SVG]({m['svg']}) · [Draw.io]({m['drawio']})\n\n![{m['title']}]({m['png']})\n\n"
 (BASE/'danh-muc-hinh.md').write_text(notes,encoding='utf-8')
 
 # Raster contact sheets for quick inspection outside a browser.
@@ -153,10 +159,10 @@ for group,items in [('tong-quan-01',manifest[:8]),('tong-quan-02',manifest[8:]),
     dr=ImageDraw.Draw(sheet)
     for i,m in enumerate(items):
         x=(i%cols)*tilew;y=(i//cols)*tileh
-        im=Image.open(BASE/(m['stem']+'.drawio.png')).convert('RGB')
+        im=Image.open(BASE/m['png']).convert('RGB')
         im=ImageOps.contain(im,(tilew-36,tileh-90),Image.Resampling.LANCZOS)
         sheet.paste(im,(x+(tilew-im.width)//2,y+64+(tileh-90-im.height)//2))
         title=m['title']
         dr.text((x+20,y+18),title,font=font,fill='#213047')
-    sheet.save(BASE/(group+'.png'))
+    sheet.save(BASE/'png'/(group+'.png'))
 print(f'Installed {len(manifest)} diagrams, {len(manifest)*2} exports, gallery and contact sheets.')

@@ -43,8 +43,10 @@ Chuẩn áp dụng: **“BẢN LƯU TRỮ: CHƯƠNG 2 KÈM HƯỚNG DẪN VẼ V
 
 Nguồn kỹ thuật đã đối chiếu trong phiên làm việc: [PostgreSQL SET](https://www.postgresql.org/docs/current/sql-set.html), [PostgreSQL RLS](https://www.postgresql.org/docs/current/ddl-rowsecurity.html), [Caffeine Design](https://github.com/ben-manes/caffeine/wiki/Design), [OpenFeature Providers](https://openfeature.dev/specification/sections/providers/).
 
+File được phân loại trong `drawio/` (nguồn), `png/` (ảnh và tổng quan), `svg/` (ảnh vector).
+
 ## File bàn giao và kiểm tra
 
-Thư mục chính chứa đúng 16 nguồn `.drawio`, 16 `.drawio.png` và 16 `.svg` theo số/chủ đề của bản mới. Các đoạn Mermaid nguyên bản được lưu riêng, không sửa âm thầm. Bản 14+4 được giữ trong `_archive/2026-11-06-ban-14-cong-4/`; bộ gốc nằm trong `_archive/2026-11-06-ban-cu/`.
+Bộ hiện tại gồm 16 nguồn trong `drawio/`, 16 ảnh xuất cùng ảnh tổng quan trong `png/` và 16 ảnh vector trong `svg/`, theo số/chủ đề của bản mới. Các đoạn Mermaid nguyên bản được lưu riêng, không sửa âm thầm. Bản 14+4 được giữ trong `_archive/2026-11-06-ban-14-cong-4/`; bộ gốc nằm trong `_archive/2026-11-06-ban-cu/`.
 
 Đã kiểm tra cấu trúc XML, các đầu nối, ảnh PNG/SVG và trình xem ảnh. Đây là kiểm tra sơ đồ và diễn giải, không phải kiểm thử hệ thống thực thi hoặc đo hiệu năng.
