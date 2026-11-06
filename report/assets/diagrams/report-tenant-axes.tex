@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=blue!55!black,rounded corners=2pt,fill=blue!4,align=center,
+    text width=59mm,minimum height=15mm,inner sep=3mm,font=\fontsize{11bp}{13bp}\selectfont},
+  wide/.style={box,text width=134mm,fill=gray!5},
+  flow/.style={-Latex,thick,draw=blue!60!black}]
+\node[box] (a) at (0,0) {Workspace A\\Người dùng A1, A2};
+\node[box] (b) at (7.5,0) {Workspace B\\Người dùng B1, B2};
+\node[wide] (scope) at (3.75,-2.2) {Xác thực người dùng, kiểm tra membership\\và phân giải ngữ cảnh workspace};
+\node[box] (app1) at (0,-4.4) {Instance ứng dụng 1\\Có thể phục vụ A và B};
+\node[box] (app2) at (7.5,-4.4) {Instance ứng dụng 2\\Có thể phục vụ A và B};
+\node[wide] (data) at (3.75,-6.6) {Dữ liệu và cấu hình theo tenant\\Chính sách truy cập áp dụng trên từng luồng xử lý};
+\draw[flow] (a) -- (scope);\draw[flow] (b) -- (scope);
+\draw[flow] (scope) -- (app1);\draw[flow] (scope) -- (app2);
+\draw[flow] (app1) -- (data);\draw[flow] (app2) -- (data);
+\end{tikzpicture}
+\caption{Ví dụ một dịch vụ đồng thời đa người dùng, đa thuê bao và đa instance. Hình minh họa khả năng kết hợp, không quy định ứng dụng phải có hai instance.}
+\label{fig:tenant-axes}
+\end{figure}

@@ -123,10 +123,16 @@ Git; file phụ, log và tệp tạm bị bỏ qua.
   Việt–Anh và thông tin chủ nhiệm. Thay `\PendingField{...}` bằng nội
   dung cần kê khai; thêm/bớt khối năm học và chèn ảnh vào đúng ô.
 - `chapters/introduction.tex`: sáu mục Mở đầu.
-- `chapters/01-foundations/` đến `04-evaluation/`: bốn chương chính,
-  mỗi chương có `chapter.tex` và các tệp mục con trong `sections/`.
-  `main.tex` xếp cơ sở lý thuyết → thiết kế hệ thống → dữ liệu/phương
-  pháp → thực nghiệm; số trong tên thư mục không quyết định số chương.
+- `chapters/01-foundations/` và `02-architecture/`: hai chương cơ sở lý
+  thuyết và phân tích phương án; bản nội dung đang duyệt local, xem
+  [LOCAL_REVIEW.md](LOCAL_REVIEW.md).
+- `chapters/03-system/`, `04-implementation/`, `04-evaluation/`: khung
+  tiếp nối cho yêu cầu/thiết kế → hiện thực → kiểm thử và thực nghiệm.
+  Thư mục `02-data-methods/` được giữ làm khung tham khảo, không nhập
+  riêng vào quyển; phương pháp đánh giá sẽ nằm cùng chương thực nghiệm.
+  `main.tex` xếp cơ sở lý thuyết → phương án kiến trúc → thiết kế →
+  hiện thực → thực nghiệm. Các nội dung khung chưa có kết quả vẫn để trống.
+  Số trong tên thư mục không quyết định số chương.
 - `chapters/conclusion.tex`: kết luận và kiến nghị.
 - `appendices/`: hai phụ lục khái quát, có thể đổi tên/thêm/bớt.
 - `deliverables/content/`: nội dung bản tin Việt–Anh; hai bản tóm tắt

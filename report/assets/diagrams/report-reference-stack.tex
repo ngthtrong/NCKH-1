@@ -1,0 +1,25 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  layer/.style={draw=blue!60!black,fill=blue!3,align=center,text width=59mm,
+    minimum height=12mm,inner sep=2mm,font=\fontsize{11bp}{13bp}\selectfont},
+  infra/.style={layer,text width=134mm,dashed,fill=gray!5},
+  flow/.style={-Latex,draw=gray!75,thick}]
+\node[layer] (schema) at (0,0) {6. Database Schema\\Đối tượng và chính sách dữ liệu};
+\node[layer] (instance) at (7.5,0) {9. Application Instance\\Bản thực thi ứng dụng};
+\node[layer] (db) at (0,-1.7) {5. Database\\Đơn vị dữ liệu logic};
+\node[layer] (runtime) at (7.5,-1.7) {8. Application Server\\Môi trường thực thi};
+\node[layer] (dbms) at (0,-3.4) {4. Database Server\\Tiến trình/dịch vụ DBMS};
+\node[layer] (middle) at (7.5,-3.4) {7. Middleware\\Gateway, cache, queue, kho tệp};
+\node[infra] (os) at (3.75,-5.3) {3. Operating System --- nhân và điều phối tài nguyên\\Container: cơ chế liên quan OS, không là tầng bắt buộc};
+\node[infra] (vm) at (3.75,-7.2) {2. Virtual Machine --- môi trường máy ảo khi được sử dụng};
+\node[infra] (hardware) at (3.75,-8.9) {1. Hardware --- CPU, RAM, thiết bị lưu trữ và mạng};
+\draw[flow] (dbms) -- (db);\draw[flow] (db) -- (schema);
+\draw[flow] (middle) -- (runtime);\draw[flow] (runtime) -- (instance);
+\draw[flow] (hardware) -- (vm);\draw[flow] (vm) -- (os);
+\draw[flow] (os.north -| dbms.south) -- (dbms.south);
+\draw[flow] (os.north -| middle.south) -- (middle.south);
+\end{tikzpicture}
+\caption{Ngăn xếp tham chiếu điều chỉnh từ Kabbedijk và cộng sự~\citep{Kabbedijk2015}. Nét liền: trọng tâm phân tích dữ liệu/ứng dụng; nét đứt: hạ tầng nền. Mũi tên biểu thị quan hệ môi trường/thành phần, không phải thứ tự xử lý request.}
+\label{fig:reference-stack}
+\end{figure}

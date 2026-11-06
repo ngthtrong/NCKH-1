@@ -6,11 +6,16 @@
 \input{template/commands}
 \input{template/bibliography}
 \hypersetup{pdftitle={\ProjectTitle},pdfauthor={\PrincipalName}}
+\KOMAoptions{numbers=enddot}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\DeclareTOCStyleEntries[raggedentrytext=true]{tocline}{chapter,section,subsection,subsubsection}
 \begin{document}
 \pagestyle{empty}\hypersetup{pageanchor=false}
 \input{frontmatter/cover}
 \input{frontmatter/title-page}
-\clearpage\pagenumbering{roman}\pagestyle{scrheadings}
+% Reset page-builder dimensions outside the cover environments before the list.
+\restoregeometry\pagenumbering{roman}\pagestyle{scrheadings}
 \hypersetup{pageanchor=true}
 \renewcommand{\theHtable}{front.\thepage.\arabic{table}}
 \input{frontmatter/participants}
@@ -25,9 +30,12 @@
 \renewcommand{\theHtable}{\theHchapter.\arabic{table}}
 \include{chapters/introduction}
 \include{chapters/01-foundations/chapter}
+\include{chapters/02-architecture/chapter}
+\KOMAoptions{chapterprefix=false}
 \include{chapters/03-system/chapter}
-\include{chapters/02-data-methods/chapter}
+\include{chapters/04-implementation/chapter}
 \include{chapters/04-evaluation/chapter}
+\KOMAoptions{chapterprefix=true}
 \include{chapters/conclusion}
 \clearpage
 \begingroup\sloppy\PrintReportBibliography\endgroup

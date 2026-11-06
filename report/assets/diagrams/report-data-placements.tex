@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=blue!55!black,fill=blue!4,align=center,text width=41mm,
+    minimum height=16mm,inner sep=2mm,font=\fontsize{11bp}{13bp}\selectfont},
+  flow/.style={-Latex,thick,draw=blue!60!black}]
+\node[box,fill=blue!12] (t1) at (0,0) {Chung bảng};
+\node[box,fill=blue!12] (t2) at (5.1,0) {Riêng schema};
+\node[box,fill=blue!12] (t3) at (10.2,0) {Riêng database};
+\node[box] (a1) at (0,-2.4) {Ứng dụng chung\\Tenant A và B};
+\node[box] (a2) at (5.1,-2.4) {Ứng dụng chung\\Tenant A và B};
+\node[box] (a3) at (10.2,-2.4) {Ứng dụng chung\\Tenant A và B};
+\node[box,minimum height=25mm] (d1) at (0,-5.4) {Database chung\\Bảng chứa \texttt{tenant\_id}\\Chính sách theo hàng};
+\node[box,minimum height=25mm] (d2) at (5.1,-5.4) {Database chung\\Schema A / Schema B\\Quyền theo không gian};
+\node[box,minimum height=25mm] (d3) at (10.2,-5.4) {Database A\\Database B\\Có thể cùng DBMS};
+\draw[flow] (t1) -- (a1);\draw[flow] (t2) -- (a2);\draw[flow] (t3) -- (a3);
+\draw[flow] (a1) -- (d1);\draw[flow] (a2) -- (d2);\draw[flow] (a3) -- (d3);
+\end{tikzpicture}
+\caption{Ba cách bố trí dữ liệu khi giữ ứng dụng dùng chung. Tổng hợp theo các mô hình PostgreSQL~\citep{AWSPostgresMatrix}; database/schema riêng trong hình không biểu thị phần cứng riêng.}
+\label{fig:data-placements}
+\end{figure}

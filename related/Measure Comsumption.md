@@ -1,1 +1,0 @@
-[learn.microsoft.com/en-us/azure/architecture/guide/multitenant/considerations/measure-consumption](https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/considerations/measure-consumption)

@@ -57,9 +57,11 @@ bắt buộc trích dẫn theo IEEE; đó là các lựa chọn của template.
 | Build | Build quyển một/hai mặt tự dựng lại cả bốn PDF riêng; không xuất số liệu hoặc chạy mô hình | `scripts/build.py` |
 
 Số chương và tên chương là mặc định có thể chỉnh theo đề tài, không phải
-yêu cầu bắt buộc của hướng dẫn hình thức. Thứ tự hiện tại là cơ sở lý
-thuyết → thiết kế và xây dựng hệ thống → dữ liệu/phương pháp → thực
-nghiệm. Tên thư mục và nhãn cũ được giữ để tránh hỏng liên kết.
+yêu cầu bắt buộc của hướng dẫn hình thức. Bản nội dung local dùng năm
+chương: cơ sở lý thuyết → phương án kiến trúc → yêu cầu/thiết kế → hiện
+thực/triển khai → kiểm thử/thực nghiệm. Phương pháp đánh giá nằm cùng
+chương thực nghiệm. Các chương sau chương 2 mới giữ khung để tiếp tục
+hoàn thiện; xem `LOCAL_REVIEW.md` về phạm vi bản duyệt.
 
 Quy ước vị trí hình/bảng, cỡ tiêu đề, đánh số và cách dùng nhãn là lựa
 chọn trình bày được kế thừa từ báo cáo. Không diễn giải mọi lựa chọn kỹ

@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  phasebox/.style={draw=blue!55!black,rounded corners=2pt,fill=blue!4,align=center,
+    text width=122mm,minimum height=14mm,inner sep=2.5mm,font=\fontsize{11bp}{13bp}\selectfont},
+  flow/.style={-Latex,thick,draw=blue!60!black}]
+\node[phasebox] (input) at (0,0) {Tiếp nhận request hoặc thông điệp\\Nhận dấu hiệu tenant và thông tin danh tính};
+\node[phasebox] (auth) at (0,-2.1) {Xác thực và kiểm tra quyền đại diện tenant\\Sai hoặc thiếu thông tin: từ chối, không chọn tenant mặc định};
+\node[phasebox] (context) at (0,-4.2) {Tạo TenantContext cho đơn vị công việc\\Chuyển sang worker: mang ngữ cảnh đã kiểm tra};
+\node[phasebox] (work) at (0,-6.3) {Chọn tài nguyên và thực thi nghiệp vụ\\Giao dịch, quyền và chính sách dữ liệu áp dụng đúng tenant};
+\node[phasebox,fill=gray!6] (cleanup) at (0,-8.4) {Kết thúc trong phạm vi bảo đảm dọn dẹp\\Commit/rollback, xóa hoặc khôi phục ngữ cảnh của request/worker};
+\draw[flow] (input) -- (auth);\draw[flow] (auth) -- (context);
+\draw[flow] (context) -- (work);\draw[flow] (work) -- (cleanup);
+\draw[flow,dashed] (context.east) -- ++(.8,0) |- node[pos=.25,right,font=\fontsize{10bp}{12bp}\selectfont] {Ngoại lệ} (cleanup.east);
+\end{tikzpicture}
+\caption{Các điểm kiểm soát trong vòng đời ngữ cảnh tenant. Sơ đồ nguyên lý áp dụng cho request và tác vụ nền, không mô tả một lần thực thi đã được đo.}
+\label{fig:context-lifecycle}
+\end{figure}

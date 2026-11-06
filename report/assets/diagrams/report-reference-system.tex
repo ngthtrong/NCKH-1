@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=blue!55!black,rounded corners=2pt,fill=blue!4,align=center,
+    text width=59mm,minimum height=22mm,inner sep=3mm,font=\fontsize{11bp}{13bp}\selectfont},
+  wide/.style={box,text width=134mm},
+  flow/.style={-Latex,thick,draw=blue!60!black}]
+\node[wide] (entry) at (3.75,0) {Người dùng và workspace được yêu cầu\\Tiếp nhận, xác thực và kiểm tra quyền đại diện tenant};
+\node[box,fill=gray!6] (control) at (0,-3) {Mặt phẳng điều khiển\\Định danh tenant, cấu hình, trạng thái cấp phát và ánh xạ tài nguyên};
+\node[box] (app) at (7.5,-3) {Mặt phẳng ứng dụng\\Nghiệp vụ Kanban, phân quyền, giao dịch và tác vụ nền};
+\node[wide] (data) at (3.75,-6.1) {Tài nguyên được truy cập theo ngữ cảnh\\Dữ liệu: chung bảng / riêng schema / riêng database\\Cache, hàng đợi, kho tệp: kiểm soát phạm vi tương ứng};
+\draw[flow] (entry) -- (app);
+\draw[flow] (control) -- (app);
+\draw[flow] (app) -- (data);
+\draw[flow,dashed] (control) -- node[left,font=\fontsize{10bp}{12bp}\selectfont] {Cấp phát} (data);
+\end{tikzpicture}
+\caption{Mô hình tham chiếu về trách nhiệm điều khiển và nghiệp vụ, tổng hợp theo yêu cầu đề tài và hướng dẫn control plane~\citep{AzureControlPlanes}. Các phương án dữ liệu trong hình là lựa chọn thay thế.}
+\label{fig:reference-system}
+\end{figure}
