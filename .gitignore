@@ -43,3 +43,10 @@ __pycache__/
 .data/
 data/
 backups/
+
+# Local diagram build artifacts
+.diagram-tools/
+diagrams/_build/
+diagrams/_archive/
+**/__pycache__/
+*.pyc

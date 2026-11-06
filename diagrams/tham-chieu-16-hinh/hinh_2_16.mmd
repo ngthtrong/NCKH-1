@@ -1,0 +1,25 @@
+flowchart TD
+    Start([BẮT ĐẦU: LỰA CHỌN MÔ HÌNH LƯU TRỮ SAAS]) --> Q1{1. Yêu cầu Tuân thủ & Pháp lý khắt khe?\nHIPAA, PCI-DSS Level 1, FedRAMP, BYOK}
+    
+    Q1 -- "CÓ" --> Silo[CHỌN MÔ HÌNH FULL SILO\nDedicated Database / Dedicated Compute\nCách ly vật lý tối đa]
+    
+    Q1 -- "KHÔNG" --> Q2{2. Nhu cầu Tùy biến Cấu trúc Bảng sâu?\nTenant tự định nghĩa trường/trigger riêng biệt}
+    
+    Q2 -- "CÓ" --> Bridge[CHỌN MÔ HÌNH SCHEMA-PER-TENANT\nBridge Model\nPostgreSQL Schema riêng biệt cho mỗi Tenant]
+    
+    Q2 -- "KHÔNG" --> Q3{3. Hồ sơ Tải trọng / Doanh thu phân hóa?\nCó 'Whale Tenant' chiếm >70% tải hoặc yêu cầu SLA riêng}
+    
+    Q3 -- "CÓ" --> Hybrid[CHỌN MÔ HÌNH TIERED HYBRID\nTier Free/Standard: Pooled Shared-Schema + RLS\nTier Enterprise: Cấp phát riêng Silo Database]
+    
+    Q3 -- "KHÔNG" --> Q4{4. Mô hình Kinh doanh & Ngân sách TCO?\nKhách hàng SMB, ARPU thấp, ưu tiên tối đa hóa lợi nhuận biên}
+    
+    Q4 -- "CÓ" --> Pool[CHỌN MÔ HÌNH FULL POOL\nShared-Database, Shared-Schema\nBắt buộc thiết lập PostgreSQL RLS + Composite Indexes]
+    
+    Q4 -- "KHÔNG" --> ShardedPool[CHỌN MÔ HÌNH CELL-BASED / DEPLOYMENT STAMPS\nChia nhóm Tenant theo cụm Stamp/Region\nMỗi Stamp là một Pool có RLS để giới hạn Blast Radius]
+
+
+    style Silo fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style Bridge fill:#fff8e1,stroke:#ffa000,stroke-width:2px
+    style Hybrid fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Pool fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style ShardedPool fill:#e0f2f1,stroke:#00695c,stroke-width:2px

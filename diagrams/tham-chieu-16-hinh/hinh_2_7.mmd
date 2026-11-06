@@ -1,0 +1,24 @@
+graph TD
+    subgraph Query_Execution ["TRUY VẤN TỪ TẦNG ỨNG DỤNG (BỎ QUÊN WHERE)"]
+        BadSQL["SELECT * FROM boards; (Không có WHERE tenant_id)"]
+    end
+
+
+    subgraph Kernel_RLS_ZoomIn ["TẦNG ĐÒN BẨY: NHÂN BẢO VỆ POSTGRESQL RLS (TẦNG 6)"]
+        direction TB
+        SessionContext["Biến Session: current_setting('app.current_tenant_id') = 'T-01'"]
+        RLSEngine{"PostgreSQL RLS Policy Engine\n(Ép buộc tự động chèn bộ lọc ở cấp Kernel)"}
+        PhysicalTable[("BẢNG BOARDS DÙNG CHUNG\n[tenant_id | board_id | title]\nRow 1: T-01 | B-101 | Kế hoạch A\nRow 2: T-02 | B-201 | Dự án Bí mật B")]
+        
+        SessionContext --> RLSEngine
+        RLSEngine --> PhysicalTable
+    end
+
+
+    BadSQL --> RLSEngine
+    PhysicalTable -- "Chỉ trả về bản ghi thỏa mãn T-01 (Loại bỏ Row 2)" --> Result["Dữ liệu an toàn: [B-101 | Kế hoạch A]"]
+
+
+    style Query_Execution fill:#ffebee,stroke:#c62828,stroke-width:1px
+    style Kernel_RLS_ZoomIn fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style RLSEngine fill:#fff9c4,stroke:#fbc02d,stroke-width:2px

@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_14_decision_tree" name="Hình 2.16 · Cây quyết định kiến trúc">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="1210">
+      <root>
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
+        <mxCell id="2" value="Hình 2.16 · Cây quyết định kiến trúc" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Bốn nhóm tiêu chí theo bản tham chiếu 16 hình. Các nhánh là hướng lựa chọn cần kiểm chứng theo yêu cầu thực tế." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="1 · Bắt buộc triển khai&#10;tài nguyên dành riêng?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="SILO PROFILE · Level 2&#10;Dedicated Compute + Dedicated DB" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="660" y="175" width="470" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Có" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="2 · Cần tùy biến sâu&#10;cấu trúc bảng / trigger?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="350" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="SCHEMA-PER-TENANT · BRIDGE&#10;Schema riêng cho từng tenant" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="660" y="375" width="470" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Có" edge="1" parent="1" source="7" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Không" edge="1" parent="1" source="4" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="3 · Tải / doanh thu / SLA&#10;phân hóa mạnh giữa các tenant?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="550" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="TIERED HYBRID&#10;Standard: Pool · Enterprise: Silo" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="660" y="575" width="470" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Có" edge="1" parent="1" source="11" target="12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Không" edge="1" parent="1" source="7" target="11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="4 · SMB / ARPU thấp,&#10;ưu tiên tối ưu TCO?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="750" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="SMB / STARTUP PROFILE&#10;Pool + RLS · Level 5" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="660" y="775" width="470" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Có" edge="1" parent="1" source="15" target="16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Không" edge="1" parent="1" source="11" target="15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Đánh giá thêm tải, quy mô, vùng triển khai và vận hành.&#10;Cell-Based là lựa chọn khi cần phân vùng sức chứa / phạm vi sự cố; không phải mặc định chỉ vì ngân sách cao." style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1000" width="1050" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Không" edge="1" parent="1" source="15" target="19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.17;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="Yêu cầu tuân thủ/BYOK phải chuyển thành yêu cầu triển khai cụ thể; không tự động đồng nghĩa Silo.&#10;Giữ nhánh tùy biến bảng → Bridge theo bản tham chiếu. Cell-Based cần tiêu chí quy mô / vùng triển khai / phạm vi sự cố." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1120" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

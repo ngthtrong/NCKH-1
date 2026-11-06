@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile>
+  <diagram id="seqlayout" name="Hình 2.13 · Lan truyền ngữ cảnh và cờ tính năng">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" style="" />
+        <mxCell id="1" parent="0" style="" />
+        <mxCell id="c" value="Client" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=40;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="30.0" y="110.0" width="180" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="g" value="API Gateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=40;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="360.0" y="110.0" width="180" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="a" value="Backend / Context Filter" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=40;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="690.0" y="110.0" width="180" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="f" value="In-Memory Feature Engine" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=40;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="1020.0" y="110.0" width="180" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="d" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=40;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="1350.0" y="110.0" width="180" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="m0" value="HTTP request + JWT" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.0989;entryX=0.5;entryY=0.0989;" edge="1" parent="1" source="c" target="g">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="Request đã xác thực" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.1813;entryX=0.5;entryY=0.1813;" edge="1" parent="1" source="g" target="a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="Tạo immutable TenantContext" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.2637;entryX=0.5;entryY=0.2967;" edge="1" parent="1" source="a" target="a">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="840.0" y="350.0" />
+              <mxPoint x="840.0" y="380.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="EvaluateFlag(flag, tenant, tier)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.3626;entryX=0.5;entryY=0.3626;" edge="1" parent="1" source="a" target="f">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="Giá trị flag từ bộ nhớ" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.4451;entryX=0.5;entryY=0.4451;" edge="1" parent="1" source="f" target="a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="Transaction + SET LOCAL; truy vấn RLS" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.5275;entryX=0.5;entryY=0.5275;" edge="1" parent="1" source="a" target="d">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" value="Dữ liệu đúng tenant" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.6099;entryX=0.5;entryY=0.6099;" edge="1" parent="1" source="d" target="a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m7" value="finally: clear TenantContext" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.6923;entryX=0.5;entryY=0.7253;" edge="1" parent="1" source="a" target="a">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="840.0" y="740.0" />
+              <mxPoint x="840.0" y="770.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="Kết quả hoặc lỗi" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.7912;entryX=0.5;entryY=0.7912;" edge="1" parent="1" source="a" target="g">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m9" value="HTTP response" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.8736;entryX=0.5;entryY=0.8736;" edge="1" parent="1" source="g" target="c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="reference-title" value="Hình 2.13 · Lan truyền ngữ cảnh và cờ tính năng" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=24;fontStyle=1;">
+          <mxGeometry x="30" y="20" width="1500.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="reference-footer" value="TenantContext được lưu và dọn tại Backend trong finally, không truyền qua HTTP bằng ThreadLocal.&#10;Đánh giá tại bộ nhớ là lựa chọn provider, không phải bảo đảm &lt;1ms. Truy cập Database theo Hình 2.14." vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=14;fontStyle=0;">
+          <mxGeometry x="30" y="1050.0" width="1500.0" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

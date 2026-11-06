@@ -1,0 +1,468 @@
+BẢN LƯU TRỮ: CHƯƠNG 2 KÈM HƯỚNG DẪN VẼ VÀ MÃ NGUỒN SƠ ĐỒ CHI TIẾT
+CHƯƠNG 2: KIẾN TRÚC ĐA THUÊ BAO: CƠ CHẾ CHIA SẺ, RANH GIỚI VÀ CÁC KỊCH BẢN ĐÁNH ĐỔI
+(Tập tin này được lưu trữ riêng để tra cứu toàn bộ 16 sơ đồ Mermaid, quy chuẩn thị giác, quy ước ranh giới nét liền/nét đứt và mã nguồn vẽ sơ đồ phục vụ giai đoạn dàn trang đồ họa).
+
+MỤC LỤC DANH MỤC 16 SƠ ĐỒ KIẾN TRÚC
+Hình 2.1 (Mục 2.1.3): Sơ đồ Gốc 9 Tầng Ngăn xếp Hệ thống (Master Blueprint).
+Hình 2.2 (Mục 2.2.1): Nền tảng Mô hình Silo (Cô lập Vật lý Toàn diện).
+Hình 2.3 (Mục 2.2.2): Nền tảng Mô hình Pool (Chia sẻ Toàn diện).
+Hình 2.4 (Mục 2.2.3): Nền tảng Mô hình Bridge (Gộp Compute, Tách Schema).
+Hình 2.5 (Mục 2.2.4): Nền tảng Mô hình Hybrid (Phân tầng Silo & Pool).
+Hình 2.6 (Mục 2.3.1): Kịch bản Trọng tâm Cô lập Dữ liệu (Zoom-in Tầng 4-6 DBMS/Disk).
+Hình 2.7 (Mục 2.3.2): Kịch bản Trọng tâm TCO & RLS Engine (Zoom-in Tầng 6 Table/Kernel).
+Hình 2.8 (Mục 2.3.3): Kịch bản Trọng tâm Tùy biến Cấu trúc (Zoom-in Tầng 6 Schema Namespace).
+Hình 2.9 (Mục 2.3.4): Kịch bản Trọng tâm Phân khúc Khách hàng (Zoom-in Tầng 7 Gateway Routing).
+Hình 2.10 (Mục 2.4.1): Kịch bản Tích hợp 1 - The SMB / Startup Profile.
+Hình 2.11 (Mục 2.4.2): Kịch bản Tích hợp 2 - The Enterprise / Regulated Profile.
+Hình 2.12 (Mục 2.4.3): Kịch bản Tích hợp 3 - The Global Hyper-Scale Cell-Based Profile.
+Hình 2.13 (Mục 2.5.1): Biểu đồ Tuần tự Lan truyền Ngữ cảnh & Đánh giá Cờ tính năng In-Memory.
+Hình 2.14 (Mục 2.5.2): Biểu đồ Tuần tự Ngăn ngừa Ô nhiễm Connection Pool bằng SET LOCAL.
+Hình 2.15 (Mục 2.5.3): Sơ đồ Bộ nhớ đệm Two-Tier Caching W-TinyLFU chống Cache Pollution.
+Hình 2.16 (Mục 2.6.2): Lưu đồ Cây Quyết định Kiến trúc Tổng quát (Universal Architecture Decision Tree).
+
+CHI TIẾT MÃ NGUỒN MERMAID VÀ QUY CHUẨN ĐỒ HỌA CHO 16 SƠ ĐỒ
+Sơ đồ 1: Sơ đồ Gốc 9 Tầng Ngăn xếp Hệ thống (Master Blueprint)
+```mermaid
+graph TD
+    subgraph App_Data_Stack ["PHÂN VÙNG NHẬN THỨC THUÊ BAO (TENANT-AWARE STACK)"]
+        direction TB
+        L9["9. Application Instance (Bản thể Ứng dụng Thực thi trong Bộ nhớ)"]
+        L8["8. Application Server (Runtime Môi trường Máy chủ: Node.js, JVM, Kestrel)"]
+        L7["7. Middleware (Thành phần Trung gian: API Gateway, Redis Cache, Message Broker, MinIO)"]
+        L6["6. Database Schema (Không gian Tên / Lược đồ Bảng CSDL)"]
+        L5["5. Database (Cơ sở Dữ liệu Logic / Vật lý)"]
+        L4["4. Database Server (Hệ Quản trị CSDL: PostgreSQL DBMS Daemon)"]
+    end
+
+
+    subgraph Infra_Stack ["PHÂN VÙNG HẠ TẦNG NỀN TẢNG (UNDERLYING INFRASTRUCTURE STACK)"]
+        direction TB
+        L3["3. Operating System (Hệ điều hành / Linux Host Kernel - Namespaces, cgroups v2)"]
+        L2["2. Virtual Machine / Container Runtime (Lớp Ảo hóa Phần cứng / Docker Engine / K8s Pod)"]
+        L1["1. Hardware (Phần cứng Vật lý: Bare-metal CPU, RAM, NVMe Storage, NIC)"]
+    end
+
+
+    L9 --- L8 --- L7 --- L6 --- L5 --- L4
+    L4 --- L3 --- L2 --- L1
+
+
+    style App_Data_Stack fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Infra_Stack fill:#f5f5f5,stroke:#616161,stroke-width:2px,stroke-dasharray: 4 4
+    style L9 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style L8 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style L7 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style L6 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style L5 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style L4 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style L3 fill:#ede7f6,stroke:#512da8,stroke-width:1px
+    style L2 fill:#ede7f6,stroke:#512da8,stroke-width:1px
+    style L1 fill:#e0e0e0,stroke:#424242,stroke-width:1px
+```
+
+Sơ đồ 2: Nền tảng Mô hình Silo
+```mermaid
+graph TD
+    ClientA[Client Tenant A] --> LB[Bộ Định tuyến Mạng / DNS Routing]
+    ClientB[Client Tenant B] --> LB
+    
+    subgraph Silo_A ["RANH GIỚI VẬT LÝ DÀNH RIÊNG - TENANT A"]
+        direction TB
+        AppA["Tầng 8-9: App Server & Instance A"]
+        MidA["Tầng 7: Middleware Cache/Queue A"]
+        DBA["Tầng 4-6: Dedicated Database A"]
+        AppA --> MidA & DBA
+    end
+    
+    subgraph Silo_B ["RANH GIỚI VẬT LÝ DÀNH RIÊNG - TENANT B"]
+        direction TB
+        AppB["Tầng 8-9: App Server & Instance B"]
+        MidB["Tầng 7: Middleware Cache/Queue B"]
+        DBB["Tầng 4-6: Dedicated Database B"]
+        AppB --> MidB & DBB
+    end
+    
+    LB -. Định tuyến vật lý .-> AppA
+    LB -. Định tuyến vật lý .-> AppB
+
+
+    style Silo_A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 5 5
+    style Silo_B fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 5 5
+```
+
+Sơ đồ 3: Nền tảng Mô hình Pool
+```mermaid
+graph TD
+    ClientA[Client Tenant A] --> Gateway[API Gateway / Ingress Router]
+    ClientB[Client Tenant B] --> Gateway
+    
+    subgraph Shared_Cluster ["HỆ THỐNG DÙNG CHUNG TOÀN DIỆN (FULL POOL)"]
+        direction TB
+        SharedApp["Tầng 8-9: Shared App Instances Pool"]
+        SharedMid["Tầng 7: Shared Redis Cache & Shared Message Queue"]
+        SharedDB["Tầng 4-6: Shared Database Engine & Shared Tables (Discriminator: tenant_id)"]
+        SharedApp --> SharedMid & SharedDB
+    end
+
+
+    Gateway --> SharedApp
+
+
+    style Shared_Cluster fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style SharedApp fill:#e1f5fe,stroke:#0288d1,stroke-width:1px
+    style SharedMid fill:#fff3e0,stroke:#f57c00,stroke-width:1px
+    style SharedDB fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+```
+
+Sơ đồ 4: Nền tảng Mô hình Bridge
+```mermaid
+graph TD
+    ClientA[Client Tenant A] --> Ingress[API Gateway]
+    ClientB[Client Tenant B] --> Ingress
+    
+    subgraph Shared_Compute ["TẦNG THỰC THI DÙNG CHUNG (GỘP)"]
+        Ingress --> SharedApp["Tầng 8-9: Shared App Server & Instances"]
+    end
+    
+    subgraph Shared_DBMS ["MÁY CHỦ CSDL POSTGRESQL CHUNG (TẦNG 4-5)"]
+        direction TB
+        subgraph Schema_A ["SCHEMA DÀNH RIÊNG - TENANT A (TẦNG 6)"]
+            TableA["Bảng Dữ liệu Tenant A"]
+        end
+        subgraph Schema_B ["SCHEMA DÀNH RIÊNG - TENANT B (TẦNG 6)"]
+            TableB["Bảng Dữ liệu Tenant B"]
+        end
+    end
+
+
+    SharedApp -- "SET search_path = 'tenant_a'" --> Schema_A
+    SharedApp -- "SET search_path = 'tenant_b'" --> Schema_B
+
+
+    style Shared_Compute fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Shared_DBMS fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Schema_A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 4 4
+    style Schema_B fill:#fff8e1,stroke:#ffa000,stroke-width:2px,stroke-dasharray: 4 4
+```
+
+Sơ đồ 5: Nền tảng Mô hình Hybrid
+```mermaid
+graph TD
+    ReqStd[Request Thuê bao Standard] --> Router[API Gateway / Dynamic Tier Router]
+    ReqVIP[Request Thuê bao Enterprise] --> Router
+    
+    subgraph Pooled_Zone ["PHÂN VÙNG DÙNG CHUNG (POOLED TIER)"]
+        AppStd[Shared App Pool] --> DBStd[(Shared Database + RLS)]
+    end
+    
+    subgraph Silo_Zone ["PHÂN VÙNG DÀNH RIÊNG (SILO TIER)"]
+        AppVIP[Dedicated App Instance] --> DBVIP[(Dedicated Database)]
+    end
+
+
+    Router -- "Tier == Standard" --> AppStd
+    Router -- "Tier == Enterprise" --> AppVIP
+
+
+    style Pooled_Zone fill:#f5f5f5,stroke:#616161,stroke-width:2px,stroke-dasharray: 3 3
+    style Silo_Zone fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+```
+
+Sơ đồ 6: Kịch bản Trọng tâm Cô lập Dữ liệu (Zoom-in Tầng 4-6)
+```mermaid
+graph TD
+    subgraph App_Layer ["TẦNG THỰC THI ỨNG DỤNG"]
+        AppInstances["Shared App Cluster / Dynamic Data Source Router"]
+    end
+    
+    subgraph Data_Layer_ZoomIn ["TẦNG ĐÒN BẨY: CÔ LẬP VẬT LÝ DỮ LIỆU (TẦNG 4-6)"]
+        direction LR
+        subgraph DB_Tenant_A ["POSTGRESQL INSTANCE A (CÔ LẬP)"]
+            EngineA["DBMS Process A (Port 5432)"] --> DiskA[("Storage Volume A\n/var/lib/postgresql/tenant_a")]
+        end
+        subgraph DB_Tenant_B ["POSTGRESQL INSTANCE B (CÔ LẬP)"]
+            EngineB["DBMS Process B (Port 5433)"] --> DiskB[("Storage Volume B\n/var/lib/postgresql/tenant_b")]
+        end
+    end
+
+
+    AppInstances == "Kết nối Connection Pool A" ==> EngineA
+    AppInstances == "Kết nối Connection Pool B" ==> EngineB
+
+
+    style App_Layer fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px
+    style Data_Layer_ZoomIn fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style DB_Tenant_A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 5 5
+    style DB_Tenant_B fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 5 5
+```
+
+Sơ đồ 7: Kịch bản Trọng tâm TCO & RLS Engine (Zoom-in Tầng 6)
+```mermaid
+graph TD
+    subgraph Query_Execution ["TRUY VẤN TỪ TẦNG ỨNG DỤNG (BỎ QUÊN WHERE)"]
+        BadSQL["SELECT * FROM boards; (Không có WHERE tenant_id)"]
+    end
+
+
+    subgraph Kernel_RLS_ZoomIn ["TẦNG ĐÒN BẨY: NHÂN BẢO VỆ POSTGRESQL RLS (TẦNG 6)"]
+        direction TB
+        SessionContext["Biến Session: current_setting('app.current_tenant_id') = 'T-01'"]
+        RLSEngine{"PostgreSQL RLS Policy Engine\n(Ép buộc tự động chèn bộ lọc ở cấp Kernel)"}
+        PhysicalTable[("BẢNG BOARDS DÙNG CHUNG\n[tenant_id | board_id | title]\nRow 1: T-01 | B-101 | Kế hoạch A\nRow 2: T-02 | B-201 | Dự án Bí mật B")]
+        
+        SessionContext --> RLSEngine
+        RLSEngine --> PhysicalTable
+    end
+
+
+    BadSQL --> RLSEngine
+    PhysicalTable -- "Chỉ trả về bản ghi thỏa mãn T-01 (Loại bỏ Row 2)" --> Result["Dữ liệu an toàn: [B-101 | Kế hoạch A]"]
+
+
+    style Query_Execution fill:#ffebee,stroke:#c62828,stroke-width:1px
+    style Kernel_RLS_ZoomIn fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style RLSEngine fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+```
+
+Sơ đồ 8: Kịch bản Trọng tâm Tùy biến Cấu trúc (Zoom-in Tầng 6)
+```mermaid
+graph LR
+    subgraph App_Thread ["LUỒNG XỬ LÝ (APP WORKER)"]
+        Worker["Worker Thread\n(Tenant Context = 'tenant_beta')"]
+    end
+
+
+    subgraph Postgres_Catalog ["TẦNG ĐÒN BẨY: KHÔNG GIAN TÊN SCHEMA (TẦNG 6)"]
+        direction TB
+        SetCmd["Lệnh điều phối:\nSET search_path = tenant_beta, public;"]
+        subgraph Schema_Alpha ["Schema: tenant_alpha"]
+            TblA["Bảng cards (3 cột tiêu chuẩn)"]
+        end
+        subgraph Schema_Beta ["Schema: tenant_beta (Tùy biến)"]
+            TblB["Bảng cards (3 cột tiêu chuẩn + 2 CỘT TÙY BIẾN RIÊNG)"]
+        end
+    end
+
+
+    Worker --> SetCmd
+    SetCmd -. Tự động ánh xạ truy vấn .-> TblB
+
+
+    style App_Thread fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px
+    style Postgres_Catalog fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Schema_Alpha fill:#e0e0e0,stroke:#757575,stroke-width:1px,stroke-dasharray: 3 3
+    style Schema_Beta fill:#fff8e1,stroke:#ffa000,stroke-width:2px
+```
+
+Sơ đồ 9: Kịch bản Trọng tâm Phân khúc Khách hàng (Zoom-in Tầng 7)
+```mermaid
+graph TD
+    ClientReq["Client HTTP Request\nHeader: Authorization: Bearer JWT_TOKEN"] --> IngressGateway["API GATEWAY / INGRESS ROUTER"]
+
+
+    subgraph Gateway_ZoomIn ["TẦNG ĐÒN BẨY: BỘ GIẢI MÃ VÀ ĐỊNH TUYẾN PHÂN TẦNG (TẦNG 7)"]
+        direction TB
+        JWTParser["Trích xuất JWT Claims: tenant_id='T-99', tier='ENTERPRISE'"]
+        RouterEngine{"Dynamic Routing Table\n(Quy tắc Phân hạng Dịch vụ)"}
+        JWTParser --> RouterEngine
+    end
+
+
+    IngressGateway --> JWTParser
+    RouterEngine -- "tier == 'FREE'" --> ClusterFree["Shared Kubernetes Pods\n(Shared Node Pool)"]
+    RouterEngine -- "tier == 'ENTERPRISE'" --> ClusterVIP["Dedicated Kubernetes Pods\n(Tainted / Isolated Node Pool)"]
+
+
+    style Gateway_ZoomIn fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style RouterEngine fill:#ffe082,stroke:#ff8f00,stroke-width:2px
+    style ClusterFree fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px
+    style ClusterVIP fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+```
+
+Sơ đồ 10: Hồ sơ 1 - Startup / SMB Profile
+```mermaid
+graph TD
+    Client["Client Request (Tenant A)"] --> Ingress["API Gateway (Bucket4j Rate Limiting)"]
+    
+    subgraph App_Tier ["TẦNG THỰC THI ỨNG DỤNG"]
+        direction TB
+        ContextFilter["Tenant Context Filter (ThreadLocal)"]
+        FeatureFlags{"In-Memory Feature Flags (OpenFeature)\nKiểm tra gói cước: Advanced_Kanban == True?"}
+        AppLogic["Business Logic Processing"]
+        ContextFilter --> FeatureFlags --> AppLogic
+    end
+    
+    subgraph Data_Tier ["TẦNG LƯU TRỮ VÀ BỘ NHỚ ĐỆM"]
+        RedisCache[("Shared Redis (Key: 'tenant_a:boards')")]
+        PostgresDB[("Shared PostgreSQL\n(Ép buộc RLS + SET LOCAL)")]
+    end
+
+
+    Ingress --> ContextFilter
+    AppLogic --> RedisCache & PostgresDB
+
+
+    style App_Tier fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style Data_Tier fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style FeatureFlags fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+```
+
+Sơ đồ 11: Hồ sơ 2 - Enterprise / Regulated Profile
+```mermaid
+graph TD
+    VIP_Client["Enterprise Client Request"] --> DedicatedIngress["Dedicated Ingress Controller (Custom Domain)"]
+
+
+    subgraph K8s_Isolated_Pod ["KUBERNETES ISOLATED NAMESPACE (CGROUPS V2)"]
+        direction TB
+        PodApp["Dedicated App Pod (CPU limit: 4 cores, RAM limit: 8GB)"]
+        CustomRunner["Custom Script Runner (Sandboxed gVisor Runtime)"]
+        PodApp --> CustomRunner
+    end
+
+
+    subgraph Dedicated_Services ["DỊCH VỤ VÀ LƯU TRỮ DÀNH RIÊNG"]
+        DedicatedRedis[("Dedicated Redis Cluster A")]
+        DedicatedDB[("Dedicated PostgreSQL RDS Instance A (BYOK Encryption)")]
+    end
+
+
+    DedicatedIngress --> PodApp
+    PodApp --> DedicatedRedis & DedicatedDB
+
+
+    style K8s_Isolated_Pod fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 4 4
+    style Dedicated_Services fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 4 4
+```
+
+Sơ đồ 12: Hồ sơ 3 - Cell-Based Architecture / Deployment Stamps
+```mermaid
+graph TD
+    GlobalUsers[Người dùng Toàn cầu] --> GlobalRouter[Global Cell Router / Edge DNS]
+
+
+    subgraph Cell_01 ["CELL 01 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1 -> 1.000)"]
+        AppCell1[App Cluster 1] --> DBCell1[(Database Cluster 1)]
+    end
+
+
+    subgraph Cell_02 ["CELL 02 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1.001 -> 2.000)"]
+        AppCell2[App Cluster 2] --> DBCell2[(Database Cluster 2)]
+    end
+
+
+    subgraph Cell_03 ["CELL 03 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 2.001 -> 3.000)"]
+        AppCell3[App Cluster 3] --> DBCell3[(Database Cluster 3)]
+    end
+
+
+    GlobalRouter -- "Tenant ID % 3 == 1" --> Cell_01
+    GlobalRouter -- "Tenant ID % 3 == 2" --> Cell_02
+    GlobalRouter -- "Tenant ID % 3 == 0" --> Cell_03
+
+
+    style Cell_01 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style Cell_02 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style Cell_03 fill:#fff3e0,stroke:#e65100,stroke-width:2px
+```
+
+Sơ đồ 13: Lan truyền Ngữ cảnh & Đánh giá Cờ tính năng In-Memory
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Client App
+    participant GW as API Gateway
+    participant TL as ThreadLocal (JVM Context)
+    participant Engine as In-Memory Feature Engine
+    participant DB as PostgreSQL Database
+
+
+    Client->>GW: HTTP GET /api/v1/boards (Bearer JWT)
+    GW->>GW: Trích xuất tenant_id="T-10", tier="PRO"
+    GW->>TL: Lưu TenantContext(id="T-10", tier="PRO")
+    GW->>Engine: EvaluateFlag("export_excel", Context)
+    Engine-->>GW: Trả về TRUE (Đánh giá in-memory < 1ms)
+    GW->>DB: Truy vấn dữ liệu với Ngữ cảnh Tenant
+    DB-->>GW: Dữ liệu thuộc Tenant T-10
+    GW->>TL: Giải phóng Context (clear())
+    GW-->>Client: HTTP 200 OK (Kèm tính năng Export Excel)
+```
+
+Sơ đồ 14: Ngăn ngừa Ô nhiễm Connection Pool bằng SET LOCAL
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Ứng dụng Backend
+    participant Pool as Connection Pool (HikariCP)
+    participant Conn as Kết nối Vật lý PostgreSQL
+
+
+    Note over App,Conn: GIAI ĐOẠN 1: REQUEST CỦA TENANT A
+    App->>Pool: Thuê Connection
+    Pool-->>App: Cấp phát Conn #1
+    App->>Conn: BEGIN;
+    App->>Conn: SET LOCAL app.current_tenant_id = 'Tenant_A';
+    App->>Conn: SELECT * FROM boards; (RLS lọc theo Tenant_A)
+    App->>Conn: COMMIT; (Ngữ cảnh Tenant_A TỰ ĐỘNG BỊ HỦY tại đây)
+    App->>Pool: Trả Conn #1 về Pool
+
+
+    Note over App,Conn: GIAI ĐOẠN 2: REQUEST CỦA TENANT B (TÁI SỬ DỤNG CONN #1)
+    App->>Pool: Thuê Connection
+    Pool-->>App: Cấp phát lại Conn #1
+    Note over Conn: Nhờ 'SET LOCAL', Conn #1 hoàn toàn sạch sẽ!<br/>current_setting('app.current_tenant_id') = NULL (Fail-Closed)
+    App->>Conn: BEGIN;
+    App->>Conn: SET LOCAL app.current_tenant_id = 'Tenant_B';
+    App->>Conn: SELECT * FROM boards; (RLS lọc an toàn theo Tenant_B)
+    App->>Conn: COMMIT;
+```
+
+Sơ đồ 15: Two-Tier Caching W-TinyLFU chống Cache Pollution
+```mermaid
+graph TD
+    ClientReq[Yêu cầu Đọc Dữ liệu] --> L1Filter{"L1 Cache (Caffeine)\nThuật toán W-TinyLFU"}
+    
+    L1Filter -- "Hit" --> ReturnL1[Trả về kết quả tức thời]
+    L1Filter -- "Miss: Truy vấn Quét (Cold Data)" --> CountMinSketch{"Count-Min Sketch Filter\n(Tần suất dự đoán thấp?)"}
+    
+    CountMinSketch -- "Tần suất thấp" --> DiscardCold[Không cho nạp vào Cache chính / Bỏ qua]
+    CountMinSketch -- "Tần suất cao (Hot Data)" --> L2Redis[("L2 Cache (Redis Cluster)\nKey: 'tenant:id:key'")]
+    
+    L2Redis -- "Miss" --> FetchDB[(PostgreSQL RLS Database)]
+    FetchDB --> FeedL1[Nạp vào L1]
+
+
+    style L1Filter fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style CountMinSketch fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    style L2Redis fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style FetchDB fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+```
+
+Sơ đồ 16: Cây Quyết định Kiến trúc Tổng quát
+```mermaid
+flowchart TD
+    Start([BẮT ĐẦU: LỰA CHỌN MÔ HÌNH LƯU TRỮ SAAS]) --> Q1{1. Yêu cầu Tuân thủ & Pháp lý khắt khe?\nHIPAA, PCI-DSS Level 1, FedRAMP, BYOK}
+    
+    Q1 -- "CÓ" --> Silo[CHỌN MÔ HÌNH FULL SILO\nDedicated Database / Dedicated Compute\nCách ly vật lý tối đa]
+    
+    Q1 -- "KHÔNG" --> Q2{2. Nhu cầu Tùy biến Cấu trúc Bảng sâu?\nTenant tự định nghĩa trường/trigger riêng biệt}
+    
+    Q2 -- "CÓ" --> Bridge[CHỌN MÔ HÌNH SCHEMA-PER-TENANT\nBridge Model\nPostgreSQL Schema riêng biệt cho mỗi Tenant]
+    
+    Q2 -- "KHÔNG" --> Q3{3. Hồ sơ Tải trọng / Doanh thu phân hóa?\nCó 'Whale Tenant' chiếm >70% tải hoặc yêu cầu SLA riêng}
+    
+    Q3 -- "CÓ" --> Hybrid[CHỌN MÔ HÌNH TIERED HYBRID\nTier Free/Standard: Pooled Shared-Schema + RLS\nTier Enterprise: Cấp phát riêng Silo Database]
+    
+    Q3 -- "KHÔNG" --> Q4{4. Mô hình Kinh doanh & Ngân sách TCO?\nKhách hàng SMB, ARPU thấp, ưu tiên tối đa hóa lợi nhuận biên}
+    
+    Q4 -- "CÓ" --> Pool[CHỌN MÔ HÌNH FULL POOL\nShared-Database, Shared-Schema\nBắt buộc thiết lập PostgreSQL RLS + Composite Indexes]
+    
+    Q4 -- "KHÔNG" --> ShardedPool[CHỌN MÔ HÌNH CELL-BASED / DEPLOYMENT STAMPS\nChia nhóm Tenant theo cụm Stamp/Region\nMỗi Stamp là một Pool có RLS để giới hạn Blast Radius]
+
+
+    style Silo fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style Bridge fill:#fff8e1,stroke:#ffa000,stroke-width:2px
+    style Hybrid fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Pool fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style ShardedPool fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+```

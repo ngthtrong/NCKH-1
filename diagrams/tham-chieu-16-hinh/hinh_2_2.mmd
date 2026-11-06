@@ -1,0 +1,26 @@
+graph TD
+    ClientA[Client Tenant A] --> LB[Bộ Định tuyến Mạng / DNS Routing]
+    ClientB[Client Tenant B] --> LB
+    
+    subgraph Silo_A ["RANH GIỚI VẬT LÝ DÀNH RIÊNG - TENANT A"]
+        direction TB
+        AppA["Tầng 8-9: App Server & Instance A"]
+        MidA["Tầng 7: Middleware Cache/Queue A"]
+        DBA["Tầng 4-6: Dedicated Database A"]
+        AppA --> MidA & DBA
+    end
+    
+    subgraph Silo_B ["RANH GIỚI VẬT LÝ DÀNH RIÊNG - TENANT B"]
+        direction TB
+        AppB["Tầng 8-9: App Server & Instance B"]
+        MidB["Tầng 7: Middleware Cache/Queue B"]
+        DBB["Tầng 4-6: Dedicated Database B"]
+        AppB --> MidB & DBB
+    end
+    
+    LB -. Định tuyến vật lý .-> AppA
+    LB -. Định tuyến vật lý .-> AppB
+
+
+    style Silo_A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 5 5
+    style Silo_B fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 5 5

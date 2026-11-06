@@ -1,0 +1,21 @@
+graph TD
+    ClientReq["Client HTTP Request\nHeader: Authorization: Bearer JWT_TOKEN"] --> IngressGateway["API GATEWAY / INGRESS ROUTER"]
+
+
+    subgraph Gateway_ZoomIn ["TẦNG ĐÒN BẨY: BỘ GIẢI MÃ VÀ ĐỊNH TUYẾN PHÂN TẦNG (TẦNG 7)"]
+        direction TB
+        JWTParser["Trích xuất JWT Claims: tenant_id='T-99', tier='ENTERPRISE'"]
+        RouterEngine{"Dynamic Routing Table\n(Quy tắc Phân hạng Dịch vụ)"}
+        JWTParser --> RouterEngine
+    end
+
+
+    IngressGateway --> JWTParser
+    RouterEngine -- "tier == 'FREE'" --> ClusterFree["Shared Kubernetes Pods\n(Shared Node Pool)"]
+    RouterEngine -- "tier == 'ENTERPRISE'" --> ClusterVIP["Dedicated Kubernetes Pods\n(Tainted / Isolated Node Pool)"]
+
+
+    style Gateway_ZoomIn fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style RouterEngine fill:#ffe082,stroke:#ff8f00,stroke-width:2px
+    style ClusterFree fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px
+    style ClusterVIP fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px

@@ -1,0 +1,24 @@
+graph TD
+    VIP_Client["Enterprise Client Request"] --> DedicatedIngress["Dedicated Ingress Controller (Custom Domain)"]
+
+
+    subgraph K8s_Isolated_Pod ["KUBERNETES ISOLATED NAMESPACE (CGROUPS V2)"]
+        direction TB
+        PodApp["Dedicated App Pod (CPU limit: 4 cores, RAM limit: 8GB)"]
+        CustomRunner["Custom Script Runner (Sandboxed gVisor Runtime)"]
+        PodApp --> CustomRunner
+    end
+
+
+    subgraph Dedicated_Services ["DỊCH VỤ VÀ LƯU TRỮ DÀNH RIÊNG"]
+        DedicatedRedis[("Dedicated Redis Cluster A")]
+        DedicatedDB[("Dedicated PostgreSQL RDS Instance A (BYOK Encryption)")]
+    end
+
+
+    DedicatedIngress --> PodApp
+    PodApp --> DedicatedRedis & DedicatedDB
+
+
+    style K8s_Isolated_Pod fill:#fce4ec,stroke:#c2185b,stroke-width:2px,stroke-dasharray: 4 4
+    style Dedicated_Services fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,stroke-dasharray: 4 4
