@@ -44,3 +44,4 @@ __pycache__/
 .data/
 data/
 backups/
+.diagram-tools/
