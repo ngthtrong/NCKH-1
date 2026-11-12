@@ -1,0 +1,98 @@
+{
+  "protocol_id": "NCKH-POOL3-20261112-v3",
+  "status": "locked-before-controlled-runs",
+  "scope": "local laboratory experiment; protocol choices fill unspecified report placeholders; no external approval implied",
+  "repetitions": 5,
+  "pair_order": [
+    [
+      "before",
+      "after"
+    ],
+    [
+      "after",
+      "before"
+    ],
+    [
+      "before",
+      "after"
+    ],
+    [
+      "after",
+      "before"
+    ],
+    [
+      "before",
+      "after"
+    ]
+  ],
+  "warmup_seconds": 30,
+  "measurement_seconds": 60,
+  "cooldown_seconds": 10,
+  "aggressor_rps": 30,
+  "victim_read_rps_each": 1,
+  "writer_interval_seconds": 5,
+  "dataset": {
+    "small": {
+      "tenant": "t-acme",
+      "boards": 1,
+      "tasks_per_board": 200
+    },
+    "medium": {
+      "tenant": "pool-demo",
+      "boards": 4,
+      "tasks_per_board": 500
+    },
+    "large": {
+      "tenant": "t-lotus",
+      "boards": 20,
+      "tasks_per_board": 1000
+    }
+  },
+  "seed": "SQL generate_series plus canonical snapshot; exact snapshot restored before each branch",
+  "slo": {
+    "victim_success_rate": 1,
+    "victim_p95_ms": 500,
+    "dropped_iterations": 0,
+    "foreign_rows": 0,
+    "invalid_jwt_accepts": 0,
+    "after_aggressor_429_min": 1
+  },
+  "resources": {
+    "api": {
+      "cpu": 1,
+      "ram_mib": 768,
+      "tomcat_threads": 8,
+      "control_pool": 5,
+      "application_pool": 5
+    },
+    "postgres": {
+      "cpu": 1,
+      "ram_mib": 768
+    },
+    "redis": {
+      "cpu": 0.25,
+      "ram_mib": 256
+    },
+    "web": {
+      "cpu": 0.25,
+      "ram_mib": 128
+    }
+  },
+  "analysis": "per-role per-run p50/p95/p99; arithmetic mean, sample standard deviation, median and range across five runs; paired differences; no claim of population significance at n=5",
+  "exclusions": "No silent exclusions or adaptive tuning. Failed runs retained, reported and excluded from passing-set claims. Baseline and proposed differ in cache and limiter jointly; no individual causal attribution.",
+  "generator": {
+    "request_timeout_seconds": 10,
+    "aggressor_preallocated_vus": 320,
+    "aggressor_max_vus": 400,
+    "victim_preallocated_vus_each": 16,
+    "victim_max_vus_each": 16,
+    "reason": "v1 pilot saturated the 120-VU generator bound. Allocate >= 30 RPS * 10-second timeout; application budget and offered load unchanged."
+  },
+  "component_reuse": "Five functional trials and SQL trials from v1 retained unchanged; v2 differs only in generator allocation and mount fix, which do not affect these component tests.",
+  "instrumentation": {
+    "metrics_scrape_deadline_seconds": 2,
+    "boundary_scrape_deadline_seconds": 5,
+    "docker_stats_interval_seconds_approx": 5,
+    "reason": "v2 baseline saturated the shared HTTP metrics endpoint; bound telemetry wait so overload cannot deadlock the controller. Missing scrapes recorded, Docker stats sampled independently."
+  }
+}

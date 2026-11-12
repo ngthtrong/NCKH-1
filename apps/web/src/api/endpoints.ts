@@ -99,6 +99,7 @@ function mapBoard(raw: RawBoard): Board {
           columnId: task.columnId,
           parentTaskId: task.parentTaskId ?? undefined,
           customData: task.customData,
+          wipWarning: task.wipWarning,
           title: task.title,
           description: task.description ?? undefined,
           priority: task.priority,

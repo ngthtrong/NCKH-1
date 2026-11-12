@@ -1542,6 +1542,8 @@ export interface components {
             customData?: {
                 [key: string]: unknown;
             };
+            /** @description True when a WARN-mode work column exceeds its limit. */
+            wipWarning?: boolean;
             id: components["schemas"]["UUID"];
             projectId: components["schemas"]["UUID"];
             boardId: components["schemas"]["UUID"];

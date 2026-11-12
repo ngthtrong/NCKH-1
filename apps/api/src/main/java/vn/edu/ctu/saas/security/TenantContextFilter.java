@@ -32,6 +32,9 @@ import vn.edu.ctu.saas.tenant.TenantStatus;
 public class TenantContextFilter extends OncePerRequestFilter {
     @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}")
     private boolean reportMode;
+    @org.springframework.beans.factory.annotation.Value("${app.experiment.request-audit:false}")
+    private boolean requestAudit;
+    private static final org.slf4j.Logger AUDIT = org.slf4j.LoggerFactory.getLogger(TenantContextFilter.class);
     private final TenantRepository tenantRepository;
     private final TenantMembershipRepository membershipRepository;
     private final TenantPlacementRepository placementRepository;
@@ -62,7 +65,12 @@ public class TenantContextFilter extends OncePerRequestFilter {
                     establish(jwt, request);
                 }
             }
+            TenantContext active = TenantContextHolder.getNullable();
+            if (active != null) response.setHeader("X-Tenant-ID", active.tenantId().toString());
             filterChain.doFilter(request, response);
+            if (requestAudit && active != null) {
+                AUDIT.info("tenant_request_audit status={} method={} path={}", response.getStatus(), request.getMethod(), request.getRequestURI());
+            }
         } catch (TenantVerificationException exception) {
             SecurityContextHolder.clearContext();
             response.setStatus(reportMode ? HttpServletResponse.SC_UNAUTHORIZED : HttpServletResponse.SC_FORBIDDEN);

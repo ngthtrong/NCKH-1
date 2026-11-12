@@ -35,14 +35,14 @@ public record KanbanSettings(String wipMode, int wipLimit, String cardStyle,
     }
 
     public void validateData(java.util.Map<String, Object> data) {
-        if (data == null) throw new IllegalArgumentException("Custom data must be an object");
+        if (data == null) throw new MetadataValidationException("Custom data must be an object");
         if (data.keySet().stream().anyMatch(k -> fields.stream().noneMatch(f -> f.key().equals(k)))) {
-            throw new IllegalArgumentException("Custom data contains fields outside this tenant's schema");
+            throw new MetadataValidationException("Custom data contains fields outside this tenant's schema");
         }
         for (Field field : fields) {
             Object value = data.get(field.key());
             if (value == null || value instanceof String s && s.isBlank()) {
-                if (field.required()) throw new IllegalArgumentException("Required field: " + field.label());
+                if (field.required()) throw new MetadataValidationException("Required field: " + field.label());
                 continue;
             }
             boolean valid = switch (field.type()) {
@@ -51,7 +51,7 @@ public record KanbanSettings(String wipMode, int wipLimit, String cardStyle,
                 case "BOOLEAN" -> value instanceof Boolean;
                 default -> false;
             };
-            if (!valid) throw new IllegalArgumentException("Invalid type or value for " + field.label());
+            if (!valid) throw new MetadataValidationException("Invalid type or value for " + field.label());
         }
     }
 }

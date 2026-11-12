@@ -37,8 +37,9 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             TenantContextFilter tenantContextFilter,
-            TenantRateLimitFilter rateLimitFilter) throws Exception {
-        return http
+            TenantRateLimitFilter rateLimitFilter,
+            @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}") boolean reportMode) throws Exception {
+        http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,9 +54,15 @@ public class SecurityConfiguration {
                                 "/api/v1/payments/webhooks/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .addFilterAfter(tenantContextFilter, BearerTokenAuthenticationFilter.class)
-                .addFilterAfter(rateLimitFilter, TenantContextFilter.class)
-                .build();
+                ;
+        if (reportMode) {
+            http.addFilterAfter(rateLimitFilter, BearerTokenAuthenticationFilter.class)
+                    .addFilterAfter(tenantContextFilter, TenantRateLimitFilter.class);
+        } else {
+            http.addFilterAfter(tenantContextFilter, BearerTokenAuthenticationFilter.class)
+                    .addFilterAfter(rateLimitFilter, TenantContextFilter.class);
+        }
+        return http.build();
     }
 
     @Bean
@@ -84,7 +91,7 @@ public class SecurityConfiguration {
         configuration.setAllowedHeaders(List.of(
                 "Authorization", "Content-Type", "Idempotency-Key", "X-CSRF-Token",
                 "X-Request-ID", "X-Correlation-ID"));
-        configuration.setExposedHeaders(List.of("X-Request-ID", "X-Correlation-ID", "Retry-After"));
+        configuration.setExposedHeaders(List.of("X-Request-ID", "X-Correlation-ID", "X-Tenant-ID", "Retry-After"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

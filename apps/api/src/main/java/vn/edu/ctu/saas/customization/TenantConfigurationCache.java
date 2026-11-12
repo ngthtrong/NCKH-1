@@ -42,13 +42,13 @@ public class TenantConfigurationCache {
         if (!cacheEnabled) return loader.get();
         String key = "tenant:" + tenantId + ":" + resource + ":" + version;
         String found = local.getIfPresent(key);
-        if (found != null) { record("l1", "hit"); return found; }
-        record("l1", "miss");
+        if (found != null) { record(tenantId, resource, "l1", "hit"); return found; }
+        record(tenantId, resource, "l1", "miss");
         if (enabled) {
             try {
                 found = redis.getObject().opsForValue().get(key);
-                if (found != null) { record("l2", "hit"); local.put(key, found); return found; }
-                record("l2", "miss");
+                if (found != null) { record(tenantId, resource, "l2", "hit"); local.put(key, found); return found; }
+                record(tenantId, resource, "l2", "miss");
             } catch (org.springframework.dao.DataAccessException ignored) {
                 // A cache outage may fall back to the authoritative database.
             }
@@ -62,8 +62,8 @@ public class TenantConfigurationCache {
         return loaded;
     }
 
-    private void record(String layer, String result) {
-        if (metrics != null) metrics.counter("tenant_cache_requests", "layer", layer, "result", result).increment();
+    private void record(UUID tenantId, String resource, String layer, String result) {
+        if (metrics != null) metrics.counter("tenant_cache_requests", "layer", layer, "result", result, "tenant_id", tenantId.toString(), "resource", resource).increment();
     }
 
     public void invalidate(UUID tenantId) {
@@ -75,6 +75,7 @@ public class TenantConfigurationCache {
     }
 
     void invalidateLocal(String tenantId) {
+        if (metrics != null) metrics.counter("tenant_cache_invalidations", "tenant_id", tenantId).increment();
         String prefix = "tenant:" + tenantId + ":config:";
         local.asMap().keySet().removeIf(key -> key.startsWith(prefix));
     }

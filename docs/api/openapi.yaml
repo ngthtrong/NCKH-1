@@ -1941,6 +1941,7 @@ components:
       required: [id, projectId, boardId, columnId, title, priority, position, version, subtaskCount, completedSubtaskCount, commentCount, createdAt, updatedAt]
       properties:
         customData: {type: object, additionalProperties: true}
+        wipWarning: {type: boolean, description: True when a WARN-mode work column exceeds its limit.}
         id: {$ref: '#/components/schemas/UUID'}
         projectId: {$ref: '#/components/schemas/UUID'}
         boardId: {$ref: '#/components/schemas/UUID'}

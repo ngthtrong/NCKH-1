@@ -1,0 +1,25 @@
+# Isolated experimental volumes/network/ports; never point this at the demo project.
+services:
+  postgres:
+    ports: !override []
+  mailpit:
+    ports: !override []
+  caddy:
+    ports: !override ["127.0.0.1:18081:80"]
+  prometheus:
+    ports: !override ["127.0.0.1:19091:9090"]
+  api:
+    image: nckh-experiment-api:20261112
+    environment:
+      PUBLIC_ACCOUNTS_URL: http://accounts.localhost:18081
+      PUBLIC_TENANT_URL_TEMPLATE: http://%s.localhost:18081
+      SERVER_TOMCAT_THREADS_MAX: "8"
+      SERVER_TOMCAT_THREADS_MIN_SPARE: "4"
+      CONTROL_DB_POOL_SIZE: "5"
+      POOL_DB_POOL_SIZE: "5"
+      APP_EXPERIMENT_REQUEST_AUDIT: "true"
+      ACCESS_TOKEN_TTL: PT1H
+  worker:
+    environment:
+      PUBLIC_ACCOUNTS_URL: http://accounts.localhost:18081
+      PUBLIC_TENANT_URL_TEMPLATE: http://%s.localhost:18081

@@ -79,7 +79,20 @@ public final class ApplicationDtos {
             long completedSubtaskCount,
             long commentCount,
             Instant createdAt,
-            Instant updatedAt, Map<String,Object> customData) {}
+            Instant updatedAt, Map<String,Object> customData, boolean wipWarning) {
+        public TaskView(UUID id, UUID projectId, UUID boardId, UUID columnId, UUID parentTaskId,
+                String title, String description, TaskPriority priority, UUID assigneeUserId, Instant dueAt,
+                BigDecimal position, long version, long subtaskCount, long completedSubtaskCount,
+                long commentCount, Instant createdAt, Instant updatedAt, Map<String,Object> customData) {
+            this(id,projectId,boardId,columnId,parentTaskId,title,description,priority,assigneeUserId,dueAt,
+                position,version,subtaskCount,completedSubtaskCount,commentCount,createdAt,updatedAt,customData,false);
+        }
+        public TaskView withWipWarning(boolean warning) {
+            return new TaskView(id,projectId,boardId,columnId,parentTaskId,title,description,priority,
+                assigneeUserId,dueAt,position,version,subtaskCount,completedSubtaskCount,commentCount,
+                createdAt,updatedAt,customData,warning);
+        }
+    }
     public record CreateTaskRequest(
             @NotNull UUID columnId,
             UUID parentTaskId,

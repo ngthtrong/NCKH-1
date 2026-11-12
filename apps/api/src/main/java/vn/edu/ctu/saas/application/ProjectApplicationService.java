@@ -687,6 +687,12 @@ public class ProjectApplicationService {
                 WHERE t.tenant_id=? AND t.board_id=? AND t.deleted_at IS NULL
                 ORDER BY t.board_column_id,t.position
                 """, this::taskRow, context.tenantId(), boardId);
+        if (kanbanSettings.wipMode().equals("WARN")) {
+            var counts = tasks.stream().collect(java.util.stream.Collectors.groupingBy(TaskView::columnId, java.util.stream.Collectors.counting()));
+            var warningColumns = columns.stream().filter(c -> c.taskLimit() != null && counts.getOrDefault(c.id(), 0L) > c.taskLimit())
+                    .map(ColumnView::id).collect(java.util.stream.Collectors.toSet());
+            tasks = tasks.stream().map(t -> t.withWipWarning(warningColumns.contains(t.columnId()))).toList();
+        }
         return new BoardView(header.id(), header.projectId(), header.name(), header.version(), columns, tasks);
     }
 
@@ -727,7 +733,17 @@ public class ProjectApplicationService {
                 WHERE t.tenant_id=? AND t.id=? AND t.deleted_at IS NULL
                 """, this::taskRow, context.tenantId(), taskId);
         if (tasks.isEmpty()) throw new NotFoundException("Task not found");
-        return tasks.getFirst();
+        TaskView task = tasks.getFirst();
+        var settings = PooledKanbanService.load(jdbc, context, objectMapper);
+        if (settings.wipMode().equals("WARN")) {
+            Boolean warning = jdbc.queryForObject("""
+                    SELECT NOT c.completed AND c.position > (SELECT min(position) FROM board_columns WHERE tenant_id=? AND board_id=?)
+                      AND (SELECT count(*) FROM tasks WHERE tenant_id=? AND board_column_id=? AND deleted_at IS NULL)>?
+                    FROM board_columns c WHERE c.tenant_id=? AND c.id=?
+                    """, Boolean.class, context.tenantId(),task.boardId(),context.tenantId(),task.columnId(),settings.wipLimit(),context.tenantId(),task.columnId());
+            return task.withWipWarning(Boolean.TRUE.equals(warning));
+        }
+        return task;
     }
 
     private CommentView findComment(JdbcTemplate jdbc, TenantContext context, UUID commentId) {

@@ -83,6 +83,7 @@ export type TaskPriority = ApiSchemas['TaskPriority'];
 
 export interface TaskCard {
   customData?: Record<string, unknown>;
+  wipWarning?: boolean;
   id: UUID;
   columnId: UUID;
   parentTaskId?: UUID;

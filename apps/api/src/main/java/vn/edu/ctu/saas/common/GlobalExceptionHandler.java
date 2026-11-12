@@ -22,6 +22,10 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiError> wipLimit(vn.edu.ctu.saas.customization.WipLimitException exception, HttpServletRequest request) {
         return error(HttpStatus.UNPROCESSABLE_ENTITY, "WIP_LIMIT_EXCEEDED", exception.getMessage(), request, Map.of());
     }
+    @ExceptionHandler(vn.edu.ctu.saas.customization.MetadataValidationException.class)
+    ResponseEntity<ApiError> metadata(vn.edu.ctu.saas.customization.MetadataValidationException exception, HttpServletRequest request) {
+        return error(HttpStatus.UNPROCESSABLE_ENTITY, "METADATA_VALIDATION_FAILED", exception.getMessage(), request, Map.of());
+    }
     @ExceptionHandler(NotFoundException.class)
     ResponseEntity<ApiError> notFound(NotFoundException exception, HttpServletRequest request) {
         return error(HttpStatus.NOT_FOUND, "NOT_FOUND", exception.getMessage(), request, Map.of());

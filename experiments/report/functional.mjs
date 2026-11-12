@@ -89,8 +89,8 @@ try {
     await api(`/boards/${pa.boardId}`,{session:b,expect:[403,404]});
     const created=await task(a,pa,pa.board.columns[0].id,'Acme fields',{story_points:5,sprint:'S1'});
     await api(`/tasks/${created.id}`,{session:b,expect:[403,404]});
-    await task(a,pa,pa.board.columns[0].id,'Wrong type',{story_points:'five'},400);
-    await task(b,pb,pb.board.columns[0].id,'Foreign schema',{story_points:5},400);
+    await task(a,pa,pa.board.columns[0].id,'Wrong type',{story_points:'five'},422);
+    await task(b,pb,pb.board.columns[0].id,'Foreign schema',{story_points:5},422);
     const read=await api(`/tasks/${created.id}`,{session:a});
     assert(read.customData.story_points===5,'JSONB round trip failed');
     return {crossTenantBoard:'denied',crossTenantTask:'denied',invalidMetadata:'rejected',
