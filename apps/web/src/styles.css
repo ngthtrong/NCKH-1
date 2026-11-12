@@ -1,3 +1,7 @@
+@font-face { font-family: "Be Vietnam Pro"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/be-vietnam-pro-400.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam Pro"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/be-vietnam-pro-500.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam Pro"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/be-vietnam-pro-600.ttf") format("truetype"); }
+@font-face { font-family: "Be Vietnam Pro"; font-style: normal; font-weight: 700; font-display: swap; src: url("/fonts/be-vietnam-pro-700.ttf") format("truetype"); }
 :root {
   color-scheme: light;
   font-synthesis: none;
@@ -223,29 +227,22 @@ select {
   padding: 70px 0;
 }
 
-.tenant-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-  gap: 18px;
-}
-
-.tenant-card {
-  padding: 22px;
-  border-color: #e1e6ef !important;
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-}
-
-.tenant-card:hover {
-  border-color: #b9c9ef !important;
-  box-shadow: 0 16px 40px rgb(23 44 81 / 9%);
-  transform: translateY(-2px);
-}
-
-.tenant-card__avatar,
-.tenant-switcher__avatar {
-  color: #246bfd !important;
-  background: #e8efff !important;
-}
+.tenant-grid { display: flex; flex-direction: column; gap: 12px; }
+.tenant-card { display: grid; grid-template-columns: 48px minmax(160px, 1fr) 150px 130px auto; align-items: center; gap: 24px; padding: 24px; border-color: #dfe4eb !important; transition: border-color 160ms ease; }
+.tenant-card:hover { border-color: #9caec8 !important; }
+.tenant-card__avatar { width: 48px !important; height: 48px !important; font-size: 16px !important; font-weight: 700 !important; border-radius: 12px !important; }
+.tenant-avatar--blue, .tenant-switcher__avatar { color: #1d4ed8 !important; background: #e8efff !important; }
+.tenant-avatar--orange { color: #9a450c !important; background: #fff0df !important; }
+.tenant-avatar--slate { color: #475569 !important; background: #eef1f5 !important; }
+.tenant-card__identity h2 { font-size: 1rem; font-weight: 600; }
+.selection-help { margin-top: 24px !important; color: #566378; }
+.project-list-avatar { color: #1d4ed8 !important; background: #e8efff !important; border-radius: 10px !important; font-weight: 600 !important; }
+.project-table-progress { min-width: 110px; font-size: 12px; color: #566378; }
+.project-table-progress__track { height: 4px; margin-top: 8px; background: #edf0f5; border-radius: 4px; overflow: hidden; }
+.project-table-progress__track > div { height: 100%; background: #1d4ed8; }
+.projects-panel { padding: 24px; }
+@media (max-width: 1000px) { .tenant-card { grid-template-columns: 48px 1fr auto; gap: 16px; } .tenant-card__membership { grid-column: 2; } .tenant-card__status { grid-column: 3; grid-row: 1; } .tenant-card > .MuiButton-root { grid-column: 3; grid-row: 2; } }
+@media (max-width: 600px) { .tenant-card { grid-template-columns: 42px 1fr; padding: 18px; gap: 14px; } .tenant-card__status { grid-column: 2; grid-row: 2; } .tenant-card__membership { grid-row: 3; } .tenant-card > .MuiButton-root { grid-column: 1 / -1; grid-row: 4; } .selection-heading { flex-direction: column !important; align-items: stretch !important; gap: 20px; } .selection-heading > .MuiStack-root { justify-content: space-between; } .selection-heading .MuiButton-root { white-space: nowrap; } .projects-panel { padding: 16px; } }
 
 /* Local tenant onboarding */
 .onboarding-page {
@@ -388,9 +385,9 @@ select {
 }
 
 .page-container {
-  width: min(1180px, calc(100% - 48px));
+  width: min(1480px, calc(100% - 72px));
   margin: 0 auto;
-  padding: 38px 0 56px;
+  padding: 32px 0 56px;
 }
 
 .page-container--wide {
@@ -459,44 +456,12 @@ select {
   margin-bottom: 16px;
   padding: 22px;
   border-color: #dfe5ef !important;
-  background: linear-gradient(135deg, #fff 45%, #f3f7ff 100%) !important;
-}
-
-.project-hero__avatar {
-  width: 58px !important;
-  height: 58px !important;
-  color: #246bfd !important;
-  background: #e6eeff !important;
-  font-size: 1.35rem !important;
-  font-weight: 850 !important;
-}
-
-.project-metric-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.project-metric-grid > .MuiPaper-root {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 17px 18px;
-  border-color: #e3e8f0;
-}
-
-.project-metric-grid svg {
-  padding: 9px;
-  border-radius: 11px;
-  color: #246bfd;
-  background: #edf2ff;
-  font-size: 42px;
+  background: #fff !important;
 }
 
 .project-workspace-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 16px;
   align-items: start;
 }
@@ -883,8 +848,8 @@ select {
 
 @media (min-width: 900px) {
   .app-topbar {
-    width: calc(100% - 252px) !important;
-    margin-left: 252px;
+    width: calc(100% - 232px) !important;
+    margin-left: 232px;
   }
 }
 

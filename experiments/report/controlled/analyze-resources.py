@@ -2,7 +2,10 @@ import json,math,re,statistics,sys
 from datetime import datetime
 from pathlib import Path
 out=Path(sys.argv[1]);manifest=json.loads((out/'manifest.json').read_text());fixtures=json.loads((out/'fixtures.json').read_text())
-def stamp(s):return datetime.fromisoformat(s.replace('Z','+00:00')).timestamp()
+def stamp(s):
+ # k6 emits nanoseconds; Python 3.10 accepts microseconds. Keep the raw timestamp unchanged.
+ normalized=re.sub(r'\.(\d+)', lambda match: '.' + match[1][:6].ljust(6,'0'), s.replace('Z','+00:00'))
+ return datetime.fromisoformat(normalized).timestamp()
 def counters(lines):
  values={}
  for line in lines:

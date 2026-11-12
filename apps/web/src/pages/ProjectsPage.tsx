@@ -217,9 +217,8 @@ export function ProjectsPage() {
   };
 
   return (
-    <Box className="page-container">
+    <Box className="page-container projects-page">
       <PageHeader
-        eyebrow="Không gian làm việc"
         title="Dự án"
         description="Tạo, lưu trữ và quản lý quyền truy cập riêng cho từng dự án."
         actions={(
@@ -237,7 +236,7 @@ export function ProjectsPage() {
           {feedback}
         </Alert>
       )}
-      <Paper className="panel" variant="outlined">
+      <Paper className="panel projects-panel" variant="outlined">
         {Boolean(projects.data?.length) && (
           <Box className="project-filter-bar">
             <TextField
@@ -246,7 +245,7 @@ export function ProjectsPage() {
               onChange={(event) => setFilter('q', event.target.value)}
               placeholder="Tìm theo tên hoặc mô tả"
               inputProps={{ 'aria-label': 'Tìm dự án' }}
-              sx={{ flex: 1, minWidth: 0 }}
+              sx={{ flex: 1, minWidth: 0, maxWidth: { sm: 480 } }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start"><SearchOutlined fontSize="small" /></InputAdornment>
@@ -313,7 +312,7 @@ export function ProjectsPage() {
                     <TableRow key={project.id} hover>
                       <TableCell className="project-title-cell">
                         <Stack direction="row" alignItems="center" gap={1.25}>
-                          <Avatar variant="rounded">{project.name.slice(0, 1).toUpperCase()}</Avatar>
+                          <Avatar variant="rounded" className="project-list-avatar">{project.name.slice(0, 1).toUpperCase()}</Avatar>
                           <Box>
                             <Link to={`/projects/${project.id}`} className="project-name-link">
                               <Typography fontWeight={700}>{project.name}</Typography>
@@ -327,7 +326,7 @@ export function ProjectsPage() {
                       <TableCell data-label="Trạng thái"><StatusChip status={project.status} /></TableCell>
                       <TableCell data-label="Vai trò">{roleLabels[project.role]}</TableCell>
                       <TableCell data-label="Thành viên">{project.memberCount}</TableCell>
-                      <TableCell data-label="Công việc">{project.completedTaskCount}/{project.taskCount}</TableCell>
+                      <TableCell data-label="Công việc"><Box className="project-table-progress"><Typography variant="body2">{project.completedTaskCount}/{project.taskCount} hoàn thành</Typography><Box className="project-table-progress__track"><Box sx={{ width: `${project.taskCount ? project.completedTaskCount/project.taskCount*100 : 0}%` }} /></Box></Box></TableCell>
                       <TableCell className="project-actions-cell" align="right">
                         <Stack direction="row" justifyContent="flex-end">
                           <Tooltip title="Mở tổng quan dự án">

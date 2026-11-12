@@ -1,0 +1,19 @@
+{
+  "description": "Non-destructive showcase projects; existing user projects retained. Colors configured through the tenant settings API.",
+  "projects": [
+    {
+      "slug": "t-acme",
+      "projectId": "add5e38e-d28f-431a-885c-3c541cb73536",
+      "name": "Acme — Quy trình phát triển",
+      "boardId": "bd468e34-926d-4674-a73d-0fc952f90886",
+      "url": "http://t-acme.localhost:18080/kanban/bd468e34-926d-4674-a73d-0fc952f90886"
+    },
+    {
+      "slug": "t-lotus",
+      "projectId": "46f56d50-b77c-45df-98ae-cf41305e1042",
+      "name": "Lotus — Chiến dịch truyền thông",
+      "boardId": "6dc8d10f-686e-4fa1-8c7b-9a09e5069767",
+      "url": "http://t-lotus.localhost:18080/kanban/6dc8d10f-686e-4fa1-8c7b-9a09e5069767"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { notificationsApi, tenantSettingsApi } from '../api/endpoints';
 import { useAuth } from '../auth/AuthContext';
 
-const drawerWidth = 252;
+const drawerWidth = 232;
 
 const primaryNavigation = [
   { label: 'Tổng quan', to: '/dashboard', icon: <DashboardOutlined /> },
@@ -116,7 +116,7 @@ export function AppShell() {
         >{activeBranding?.logoUrl ? null : 'T'}</Box>
         <Box>
           <Typography className="brand__name">TenantFlow</Typography>
-          <Typography className="brand__caption">Project workspace</Typography>
+          <Typography className="brand__caption">Không gian làm việc</Typography>
         </Box>
       </Box>
       <Box className="tenant-switcher">
@@ -124,11 +124,11 @@ export function AppShell() {
           {tenant ? initials(tenant.name) : '—'}
         </Avatar>
         <Box minWidth={0} flex={1}>
-          <Typography fontWeight={700} noWrap>
+          <Typography fontWeight={600} sx={{ fontSize: 13, overflowWrap: 'anywhere' }}>
             {tenant?.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {tenant?.placement} · {tenant?.tier}
+            {tenant?.role === 'OWNER' ? 'Chủ sở hữu' : tenant?.role === 'ADMIN' ? 'Quản trị viên' : 'Thành viên'}
           </Typography>
         </Box>
         <Tooltip title="Đổi không gian">
@@ -210,18 +210,7 @@ export function AppShell() {
           </List>
         </>
       )}
-      <Box className="drawer-footnote">
-        <Typography variant="caption" color="text.secondary">
-          Dữ liệu được cô lập theo tenant
-        </Typography>
-        <Box className="isolation-indicator">
-          <span /> {tenant?.placement === 'SILO_DATABASE'
-            ? 'Cơ sở dữ liệu riêng'
-            : tenant?.placement === 'SCHEMA_PER_TENANT'
-              ? 'Schema riêng trong CSDL chung'
-              : 'Schema và bảng dùng chung'}
-        </Box>
-      </Box>
+      <Box className="drawer-footnote"><Typography variant="caption" color="text.secondary">Dữ liệu chỉ hiển thị trong tổ chức này.</Typography></Box>
     </Box>
   );
 

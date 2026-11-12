@@ -36,7 +36,9 @@ dùng adapter filesystem và volume chung API/worker; không phụ thuộc image
 Hướng dẫn từng bước, tài khoản demo, luồng kiểm thử và xử lý lỗi nằm tại
 [docs/RUN_APPLICATION.md](docs/RUN_APPLICATION.md).
 
-Sau khi health check thành công:
+Trên máy hiện tại, demo dùng **http://accounts.localhost:18080** vì cổng 8080 đã có dịch vụ khác. Cổng lấy từ `HTTP_PORT` trong `infra/.env`. Xem [kịch bản demo và kết quả thực đo](docs/research/demo-and-results.md).
+
+Các URL dưới đây dùng cổng mặc định của bản cấu hình mẫu; thay bằng `HTTP_PORT` khi đã đổi cổng. Sau khi health check thành công:
 
 - Trang đăng nhập: `http://accounts.localhost:8080`
 - Tenant Pool mẫu: `http://pool-demo.localhost:8080`

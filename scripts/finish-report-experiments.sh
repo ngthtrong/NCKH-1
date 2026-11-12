@@ -21,7 +21,7 @@ node experiments/report/controlled/browser-prepare.mjs "$result_directory/browse
  cd apps/web
  E2E_ENV_FILE=../../infra/.env E2E_ACCOUNTS_URL=http://accounts.localhost:18081 \
  PLAYWRIGHT_CHROMIUM_EXECUTABLE="${PLAYWRIGHT_CHROMIUM_EXECUTABLE:-$HOME/.cache/ms-playwright/chromium-1194/chrome-linux/chrome}" \
- npm run test:e2e -- controlled-report.e2e.ts
+ npm run test:e2e -- controlled-report.e2e.ts --output="$result_directory/browser/test-results"
 )
 python3 experiments/report/controlled/analyze.py "$result_directory"
 python3 experiments/report/controlled/analyze-resources.py "$result_directory"

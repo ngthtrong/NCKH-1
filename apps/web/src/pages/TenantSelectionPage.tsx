@@ -1,15 +1,12 @@
 import Add from '@mui/icons-material/Add';
 import ArrowForward from '@mui/icons-material/ArrowForward';
-import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
 import Logout from '@mui/icons-material/Logout';
 import Refresh from '@mui/icons-material/Refresh';
-import StorageOutlined from '@mui/icons-material/StorageOutlined';
 import {
   Alert,
   Avatar,
   Box,
   Button,
-  Chip,
   IconButton,
   Paper,
   Stack,
@@ -24,11 +21,7 @@ import { useAuth } from '../auth/AuthContext';
 import { EmptyState } from '../components/AsyncState';
 import { StatusChip } from '../components/StatusChip';
 
-const placementLabels: Record<TenantSummary['placement'], string> = {
-  POOL: 'Hạ tầng dùng chung',
-  SCHEMA_PER_TENANT: 'Lược đồ riêng',
-  SILO_DATABASE: 'CSDL riêng',
-};
+const tierLabels: Record<string, string> = { STARTER: 'Khởi đầu', PROFESSIONAL: 'Chuyên nghiệp', ENTERPRISE: 'Doanh nghiệp' };
 
 const roleLabels: Record<TenantSummary['role'], string> = {
   OWNER: 'Chủ sở hữu',
@@ -72,19 +65,19 @@ export function TenantSelectionPage() {
         </Stack>
       </Box>
       <Box component="main" className="selection-content">
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={3}>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" className="selection-heading" mb={4}>
           <Box>
-            <Typography className="eyebrow">Không gian của bạn</Typography>
+
             <Typography variant="h4" component="h1">
               Chọn tổ chức để tiếp tục
             </Typography>
             <Typography color="text.secondary" mt={1}>
-              Mỗi tổ chức có miền truy cập và phạm vi dữ liệu độc lập.
+              Chọn không gian làm việc của bạn.
             </Typography>
           </Box>
           <Stack direction="row" gap={1}>
             <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/onboarding')}>
-              Tạo workspace
+              Tạo tổ chức
             </Button>
             <Tooltip title="Tải lại danh sách">
               <IconButton onClick={() => void reloadTenants()}>
@@ -97,7 +90,7 @@ export function TenantSelectionPage() {
         {tenants.length === 0 ? (
           <EmptyState
             title="Chưa có không gian làm việc"
-            description="Tạo workspace Pool/Silo đầu tiên hoặc chờ lời mời từ một tổ chức."
+            description="Tạo tổ chức đầu tiên hoặc chờ lời mời từ một tổ chức."
           />
         ) : (
           <Box className="tenant-grid">
@@ -105,32 +98,21 @@ export function TenantSelectionPage() {
               const canOpen = tenant.status === 'ACTIVE';
               return (
                 <Paper key={tenant.id} className="tenant-card" variant="outlined">
-                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                    <Avatar variant="rounded" className="tenant-card__avatar">
-                      <BusinessOutlined />
-                    </Avatar>
-                    <StatusChip status={tenant.status} />
-                  </Stack>
-                  <Typography variant="h6" mt={2} noWrap>
-                    {tenant.name}
-                  </Typography>
-                  <Typography color="text.secondary" variant="body2">
-                    {tenant.host ?? `${tenant.slug}.localhost`}
-                  </Typography>
-                  <Stack direction="row" gap={1} mt={2} flexWrap="wrap">
-                    <Chip size="small" label={roleLabels[tenant.role]} />
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      icon={<StorageOutlined />}
-                      label={`${placementLabels[tenant.placement]} · ${tenant.tier}`}
-                    />
-                  </Stack>
+                  <Avatar variant="rounded" className={`tenant-card__avatar tenant-avatar--${tenant.slug === 't-lotus' ? 'orange' : tenant.slug === 't-acme' ? 'blue' : 'slate'}`}>
+                    {tenant.name.split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase()}
+                  </Avatar>
+                  <Box className="tenant-card__identity">
+                    <Typography component="h2" variant="h6" noWrap>{tenant.name}</Typography>
+                    <Typography color="text.secondary" variant="body2">{tenant.host ?? `${tenant.slug}.localhost`}</Typography>
+                  </Box>
+                  <Box className="tenant-card__membership">
+                    <Typography variant="body2" fontWeight={600}>{roleLabels[tenant.role]}</Typography>
+                    <Typography variant="body2" color="text.secondary">{tierLabels[tenant.tier] ?? tenant.tier}</Typography>
+                  </Box>
+                  <Box className="tenant-card__status"><StatusChip status={tenant.status} /></Box>
                   {canOpen ? (
                     <Button
-                      fullWidth
                       variant="contained"
-                      sx={{ mt: 2.5 }}
                       endIcon={<ArrowForward />}
                       disabled={openingSlug !== null}
                       onClick={() => void openTenant(tenant)}
@@ -140,15 +122,13 @@ export function TenantSelectionPage() {
                   ) : ['PENDING_PAYMENT', 'PROVISIONING', 'FAILED'].includes(tenant.status) &&
                     (tenant.role === 'OWNER' || tenant.role === 'ADMIN') ? (
                     <Button
-                      fullWidth
                       variant="outlined"
-                      sx={{ mt: 2.5 }}
                       onClick={() => navigate(`/onboarding?tenant=${tenant.id}`)}
                     >
                       Tiếp tục onboarding
                     </Button>
                   ) : (
-                    <Button fullWidth disabled sx={{ mt: 2.5 }}>
+                    <Button disabled>
                       {tenant.status === 'SUSPENDED' ? 'Workspace đã tạm ngưng' : 'Chưa thể truy cập'}
                     </Button>
                   )}
@@ -157,6 +137,7 @@ export function TenantSelectionPage() {
             })}
           </Box>
         )}
+        {tenants.length > 0 && <Typography variant="body2" className="selection-help">Bạn có thể đổi tổ chức bất kỳ lúc nào từ menu không gian làm việc.</Typography>}
       </Box>
     </Box>
   );

@@ -26,6 +26,8 @@ plans=json.loads((out/'application-query-plans.json').read_text())
 for role,items in plans['roles'].items():
  values=[r['plan'][0]['Execution Time']for r in items];d=desc(values);extras.append(f"| {role} | {d['mean']:.3f} ± {d['sd']:.3f} |")
 extras+=['','SELECT ứng dụng gồm các truy vấn con đếm công việc con và bình luận; EXPLAIN trên DB ấm sau tải. Đây là executor time, không phải toàn bộ HTTP latency. Kế hoạch và buffers từng mẫu có trong application-query-plans.json.']
+revision=out/'IMPLEMENTATION-REVISION.md'
+if revision.exists():extras+=['',revision.read_text().replace('# Ghi nhận phiên bản triển khai và kết luận','## Ghi nhận phiên bản triển khai và kết luận',1)]
 text=(out/'RESULTS.md').read_text()+'\n'.join(extras)+'\n';(out/'RESULTS.md').write_text(text)
 (root/'output/report-experiment-results.md').write_text(text)
 # Keep actual executed controller from source archive; helpers are separately hashed.

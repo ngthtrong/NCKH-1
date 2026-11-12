@@ -1,13 +1,10 @@
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import ArrowForward from '@mui/icons-material/ArrowForward';
-import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import FolderOutlined from '@mui/icons-material/FolderOutlined';
 import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
-import SpaceDashboardOutlined from '@mui/icons-material/SpaceDashboardOutlined';
 import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import ViewKanbanOutlined from '@mui/icons-material/ViewKanbanOutlined';
 import {
-  Avatar,
   Box,
   Breadcrumbs,
   Button,
@@ -93,7 +90,6 @@ export function ProjectWorkspacePage() {
             <Typography color="text.primary">{project.name}</Typography>
           </Breadcrumbs>
         )}
-        eyebrow="Không gian dự án"
         title={project.name}
         description={project.description || 'Chưa có mô tả cho dự án này.'}
         actions={(
@@ -116,9 +112,6 @@ export function ProjectWorkspacePage() {
       />
 
       <Paper variant="outlined" className="project-hero">
-        <Avatar variant="rounded" className="project-hero__avatar">
-          {project.name.slice(0, 1).toUpperCase()}
-        </Avatar>
         <Box flex={1} minWidth={0}>
           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
             <Typography variant="h6">Tổng quan tiến độ</Typography>
@@ -135,19 +128,13 @@ export function ProjectWorkspacePage() {
         </Box>
       </Paper>
 
-      <Box className="project-metric-grid">
-        <Paper variant="outlined"><SpaceDashboardOutlined /><Box><Typography variant="h5">{boards.data?.length ?? '—'}</Typography><Typography color="text.secondary">Bảng Kanban</Typography></Box></Paper>
-        <Paper variant="outlined"><GroupsOutlined /><Box><Typography variant="h5">{project.memberCount}</Typography><Typography color="text.secondary">Thành viên</Typography></Box></Paper>
-        <Paper variant="outlined"><CheckCircleOutline /><Box><Typography variant="h5">{project.taskCount}</Typography><Typography color="text.secondary">Công việc</Typography></Box></Paper>
-      </Box>
-
       <Box className="project-workspace-grid">
         <Paper variant="outlined" className="panel">
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
             <Box>
               <Typography variant="h6">Bảng trong dự án</Typography>
               <Typography variant="body2" color="text.secondary">
-                Dự án → bảng → cột → công việc → công việc con
+                {boards.data?.length ?? 0} bảng · {project.taskCount} công việc · {project.memberCount} thành viên
               </Typography>
             </Box>
           </Stack>
