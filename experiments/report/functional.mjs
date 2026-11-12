@@ -116,8 +116,9 @@ try {
       cacheTiming:'Request durations are recorded; distributed propagation needs a separate multi-process run'};
   });
   await test('KB-3-smoke','Per-tenant 429 isolation (functional; use k6 for latency conclusions)',async()=>{
+    // Allow enough requests to exceed the quota even across a minute boundary.
     let throttled=0;
-    for(let batch=0;batch<24 && !throttled;batch++) {
+    for(let batch=0;batch<48 && !throttled;batch++) {
       const results=await Promise.all(Array.from({length:8},()=>api('/projects',{session:n,expect:[200,429]})));
       // api() preserves measured HTTP status in evidence, not response bodies.
       throttled=evidence.requests.filter(r=>r.host===n.host && r.status===429).length;
