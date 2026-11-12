@@ -34,8 +34,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.control.TenantEntity;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -119,7 +119,7 @@ class DeadlineReminderIntegrationTest {
                 """);
         seedData();
         executor = tenantExecutor();
-        objectMapper = JsonMapper.builder().build();
+        objectMapper = JsonMapper.builder().findAndAddModules().build();
         service = new DeadlineReminderService(executor, objectMapper);
         useTenantA();
     }

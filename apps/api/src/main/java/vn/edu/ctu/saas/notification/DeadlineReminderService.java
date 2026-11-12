@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.tenant.TenantContext;
 import vn.edu.ctu.saas.tenant.TenantContextHolder;
 import vn.edu.ctu.saas.tenant.TenantJdbcExecutor;
@@ -116,7 +116,7 @@ public class DeadlineReminderService {
 
     private String serialize(Map<String, ?> payload) {
         try {
-            return objectMapper.writeValueAsString(payload);
+            return vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, payload);
         } catch (Exception exception) {
             throw new IllegalStateException("Cannot serialize deadline reminder event", exception);
         }

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="bo-sung/bs_03_schema_namespace" name="Bổ sung 03 · Schema namespace và tùy biến dữ liệu">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="955">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Bổ sung 03 · Schema namespace và tùy biến dữ liệu" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Schema-per-Tenant cho phép cấu trúc bảng khác nhau; cần quản lý migration và quyền truy cập." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Backend: tenant_beta đã xác thực" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="310" y="130" width="580" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Tra schema từ registry tin cậy&#10;BEGIN; SET LOCAL search_path = tenant_beta, pg_catalog;" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="240" y="290" width="720" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Schema tenant_alpha · dành riêng" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#EAF2FF;swimlaneFillColor=#ffffff;strokeColor=#527CB8;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="510" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Schema tenant_beta · dành riêng" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#F0ECFA;swimlaneFillColor=#ffffff;strokeColor=#8263B1;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="650" y="520" width="510" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="cards: 3 cột tiêu chuẩn" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="6">
+          <mxGeometry x="30" y="85" width="450" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="cards: 3 cột tiêu chuẩn&#10;+ 2 cột tùy biến" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;" vertex="1" parent="7">
+          <mxGeometry x="30" y="85" width="450" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="SELECT * FROM cards;" edge="1" parent="1" source="5" target="9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.75;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="810" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="810" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="810" width="580" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="search_path chọn cách phân giải tên; quyền USAGE/schema và quyền table phải được cấu hình phù hợp.&#10;COMMIT/ROLLBACK kết thúc SET LOCAL; schema riêng vẫn chia sẻ DBMS/CPU/I/O và không tạo ranh giới vật lý." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="865" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_13_two_tier_caching" name="Hình 2.15 · Two-Tier Caching và W-TinyLFU">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="1045">
+      <root>
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
+        <mxCell id="2" value="Hình 2.15 · Two-Tier Caching và W-TinyLFU" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="L1 Cache (W-TinyLFU) → L2 Cache dùng chung → DB. Cache miss hoặc từ chối admission vẫn phải phục vụ dữ liệu." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Request đã xác thực&#10;Key = tenant:{id}:{resource}" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="100" y="130" width="350" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="L1 Cache&#10;Có dữ liệu?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="245" width="330" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="L2 Cache dùng chung&#10;Có dữ liệu?" style="rhombus;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF8DE;strokeColor=#C39C35;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="455" width="330" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Đọc PostgreSQL&#10;Transaction + SET LOCAL + RLS" style="shape=cylinder3;size=15;boundedLbl=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="100" y="700" width="350" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Trả dữ liệu cho client" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="820" y="440" width="310" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Cân nhắc cập nhật L1&#10;W-TinyLFU quản lý window/main" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="600" y="570" width="480" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Dữ liệu đọc từ DB&#10;Cập nhật L2 theo TTL / quota / chính sách" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="600" y="705" width="480" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Miss" edge="1" parent="1" source="5" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Miss" edge="1" parent="1" source="6" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Hit: trả ngay" edge="1" parent="1" source="5" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="975" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" value="Hit" edge="1" parent="1" source="6" target="9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="520" />
+              <mxPoint x="520" y="607" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" value="Dữ liệu" edge="1" parent="1" source="7" target="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" edge="1" parent="1" source="10" target="9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Luôn trả dữ liệu" edge="1" parent="1" source="9" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.8;exitY=0;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Không nhận vào cache ≠ bỏ request.&#10;W-TinyLFU của L1 Cache không tự quyết định admission vào Cache L2." style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="70" y="845" width="1060" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Khóa của cả L1/L2 phải chứa tenant_id. Key prefix tránh trùng khóa nhưng không tự tạo quota RAM theo tenant.&#10;Nếu cần chống một tenant lấn cache: thêm phân vùng/quota có thực thi; kiểm tra bằng tải quét và đo hit rate/p99." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="955" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

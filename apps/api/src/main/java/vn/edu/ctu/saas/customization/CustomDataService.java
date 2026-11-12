@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.tenant.ProjectRole;
@@ -93,7 +93,7 @@ public class CustomDataService {
                         options_json,required,position,status,version)
                     VALUES (?,?,?,?,?,?,CAST(? AS jsonb),?,?,'PENDING',0)
                     """, fieldId, context.tenantId(), definitionId, normalizedName(displayName), physicalColumn,
-                    type.name(), objectMapper.writeValueAsString(normalizedOptions), required, position);
+                    type.name(), vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, normalizedOptions), required, position);
             enqueue(jdbc, context, definitionId, fieldId, "ADD_FIELD", 0);
             audit(jdbc, context, "CUSTOM_FIELD_CREATED", "CustomField", fieldId,
                     Map.of("definitionId", definitionId, "type", type.name()));
@@ -130,7 +130,7 @@ public class CustomDataService {
                     UPDATE custom_fields SET display_name=?,options_json=CAST(? AS jsonb),required=?,position=?,
                         version=version+1,updated_at=now()
                     WHERE tenant_id=? AND id=? AND definition_id=? AND version=? AND deleted_at IS NULL
-                    """, normalizedName(displayName), objectMapper.writeValueAsString(normalizedOptions), required,
+                    """, normalizedName(displayName), vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, normalizedOptions), required,
                     position, context.tenantId(), fieldId, definitionId, expectedVersion);
             if (updated == 0) throw new ConflictException("Custom field version is stale");
             return findDefinition(jdbc, context, definitionId);
@@ -391,7 +391,7 @@ public class CustomDataService {
     }
 
     private List<String> readOptions(String json) {
-        JsonNode node = objectMapper.readTree(json);
+        JsonNode node = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, json);
         List<String> result = new ArrayList<>();
         node.forEach(item -> result.add(item.asText()));
         return List.copyOf(result);
@@ -575,7 +575,7 @@ public class CustomDataService {
                     id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
                 VALUES (?,?,?,?,?,?,?,CAST(? AS jsonb))
                 """, UUID.randomUUID(), context.tenantId(), context.userId(), type, aggregateType,
-                aggregateId, context.correlationId(), objectMapper.writeValueAsString(details));
+                aggregateId, context.correlationId(), vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, details));
     }
 
     private TenantContext contextWithCapability() {

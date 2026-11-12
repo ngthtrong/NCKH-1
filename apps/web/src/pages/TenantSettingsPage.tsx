@@ -19,6 +19,7 @@ import type { TenantCapability } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { FullPageLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
+import { KanbanConfigurationPanel } from '../components/KanbanConfigurationPanel';
 
 const labels: Record<TenantCapability, string> = {
   BRANDING: 'Nhận diện giao diện',
@@ -91,26 +92,26 @@ export function TenantSettingsPage() {
   };
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3} className="page-container">
       <PageHeader
         eyebrow="Tenant configuration"
         title="Tùy chỉnh workspace"
-        description="Capability do System Admin cấp và luôn bị giới hạn theo placement."
+        description="Quản lý nhận diện, quy trình Kanban và thông tin riêng của tổ chức."
       />
       {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
       {!canManage && <Alert severity="info">Bạn đang xem cấu hình ở chế độ chỉ đọc.</Alert>}
+      <KanbanConfigurationPanel canManage={canManage} />
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 6 }}>
           <Card variant="outlined">
             <CardContent>
-              <Typography variant="h6" gutterBottom>Capability</Typography>
+              <Typography variant="h6" gutterBottom>Tính năng workspace</Typography>
               <Stack spacing={1.5}>
-                {settings.data.capabilities.map((item) => (
+                {settings.data.capabilities.filter((item) => item.supported).map((item) => (
                   <Box key={item.capability} display="flex" alignItems="center" justifyContent="space-between" gap={2}>
                     <Box>
                       <Typography fontWeight={700}>{labels[item.capability]}</Typography>
                       <Stack direction="row" spacing={1} mt={0.5}>
-                        <Chip size="small" label={item.supported ? 'Placement hỗ trợ' : 'Ngoài giới hạn placement'} />
                         <Chip size="small" color={item.granted ? 'success' : 'default'} label={item.granted ? 'Đã cấp' : 'Chưa cấp'} />
                       </Stack>
                     </Box>
@@ -131,7 +132,7 @@ export function TenantSettingsPage() {
         <Grid size={{ xs: 12, lg: 6 }}>
           <Card variant="outlined">
             <CardContent component="form" onSubmit={submitBranding}>
-              <Typography variant="h6" gutterBottom>Branding theo tenant</Typography>
+              <Typography variant="h6" gutterBottom>Nhận diện tổ chức</Typography>
               <Stack spacing={2}>
                 <TextField
                   label="Màu chính"

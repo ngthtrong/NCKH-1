@@ -33,6 +33,10 @@ import vn.edu.ctu.saas.tenant.TenantStatus;
 @Profile("worker")
 @ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true")
 public class DemoDataInitializer {
+    @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}")
+    private boolean reportMode;
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.jdbc.core.JdbcTemplate controlJdbc;
     private static final Logger log = LoggerFactory.getLogger(DemoDataInitializer.class);
     private final AppProperties properties;
     private final UserAccountRepository userRepository;
@@ -65,7 +69,7 @@ public class DemoDataInitializer {
     @Scheduled(initialDelayString = "PT1S", fixedDelayString = "PT30S")
     public void ensureDemoData() {
         SeedUsers users = ensureControlData();
-        for (String slug : List.of("pool-demo", "schema-demo", "silo-demo")) {
+        for (String slug : reportMode ? List.of("pool-demo", "t-acme", "t-lotus") : List.of("pool-demo", "schema-demo", "silo-demo")) {
             TenantEntity tenant = tenantRepository.findBySlug(slug).orElse(null);
             if (tenant != null && tenant.getStatus() == TenantStatus.ACTIVE) {
                 seedApplicationData(tenant, users);
@@ -94,8 +98,13 @@ public class DemoDataInitializer {
             return userRepository.save(created);
         });
         ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, member);
-        ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
-        ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
+        if (reportMode) {
+            ensureTenant("t-acme", "Acme Software", "PROFESSIONAL", TenantPlacement.POOL, owner, member);
+            ensureTenant("t-lotus", "Lotus Media", "PROFESSIONAL", TenantPlacement.POOL, owner, member);
+        } else {
+            ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
+            ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
+        }
         return new SeedUsers(owner, member);
     }
 
@@ -151,6 +160,18 @@ public class DemoDataInitializer {
                 placement.getPlacementType(), Set.of(TenantRole.OWNER), correlationId, correlationId));
         try {
             executor.writeWithoutResult(jdbc -> {
+                if (reportMode && (tenant.getSlug().equals("t-acme") || tenant.getSlug().equals("t-lotus"))) {
+                    boolean acme = tenant.getSlug().equals("t-acme");
+                    String settings = acme
+                            ? "{\"wipMode\":\"STRICT\",\"wipLimit\":2,\"cardStyle\":\"FULL\",\"defaultColumns\":[\"Backlog\",\"In Dev\",\"Code Review\",\"Done\"],\"fields\":[{\"key\":\"story_points\",\"label\":\"Story points\",\"type\":\"NUMBER\",\"required\":false},{\"key\":\"sprint\",\"label\":\"Sprint\",\"type\":\"STRING\",\"required\":false}]}"
+                            : "{\"wipMode\":\"WARN\",\"wipLimit\":2,\"cardStyle\":\"COMPACT\",\"defaultColumns\":[\"Ý tưởng\",\"Sản xuất\",\"Phát hành\"],\"fields\":[{\"key\":\"channel\",\"label\":\"Kênh truyền thông\",\"type\":\"STRING\",\"required\":false},{\"key\":\"budget_usd\",\"label\":\"Ngân sách (USD)\",\"type\":\"NUMBER\",\"required\":false}]}";
+                    jdbc.update("INSERT INTO tenant_kanban_settings(tenant_id,settings) VALUES (?,CAST(? AS jsonb)) ON CONFLICT DO NOTHING",
+                            tenant.getId(), settings);
+                    controlJdbc.update("""
+                            INSERT INTO tenant_branding(id,tenant_id,primary_color,accent_color,version,created_at,updated_at)
+                            VALUES (?,?,?,?,0,now(),now()) ON CONFLICT (tenant_id) DO NOTHING
+                            """, UUID.randomUUID(), tenant.getId(), acme ? "#2563EB" : "#C2410C", acme ? "#0284C7" : "#EA580C");
+                }
                 UUID projectId = stableId(tenant.getId(), "project");
                 UUID boardId = stableId(tenant.getId(), "board");
                 UUID todoId = stableId(tenant.getId(), "todo");
@@ -175,9 +196,17 @@ public class DemoDataInitializer {
                         INSERT INTO boards(id,tenant_id,project_id,name) VALUES (?,?,?,?)
                         ON CONFLICT (tenant_id,id) DO NOTHING
                         """, boardId, tenant.getId(), projectId, "Bảng nghiên cứu");
-                insertColumn(jdbc, tenant.getId(), boardId, todoId, "Cần làm", 1000);
-                insertColumn(jdbc, tenant.getId(), boardId, doingId, "Đang làm", 2000);
-                insertColumn(jdbc, tenant.getId(), boardId, doneId, "Hoàn tất", 3000);
+                String[] names = reportMode && tenant.getSlug().equals("t-acme")
+                        ? new String[]{"Backlog", "In Dev", "Done"}
+                        : reportMode && tenant.getSlug().equals("t-lotus")
+                        ? new String[]{"Ý tưởng", "Sản xuất", "Phát hành"}
+                        : new String[]{"Cần làm", "Đang làm", "Hoàn tất"};
+                insertColumn(jdbc, tenant.getId(), boardId, todoId, names[0], 1000);
+                insertColumn(jdbc, tenant.getId(), boardId, doingId, names[1], 2000);
+                if (reportMode && tenant.getSlug().equals("t-acme")) {
+                    insertColumn(jdbc, tenant.getId(), boardId, stableId(tenant.getId(), "review"), "Code Review", 2500);
+                }
+                insertColumn(jdbc, tenant.getId(), boardId, doneId, names[2], 3000);
                 insertTask(jdbc, tenant.getId(), projectId, boardId, todoId, users.owner().getId(), "Hoàn thiện threat model", 1000);
                 insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.member().getId(), "Chạy spike cô lập dữ liệu", 1000);
                 insertTask(jdbc, tenant.getId(), projectId, boardId, doneId, users.owner().getId(), "Chuẩn hóa giao thức nghiên cứu", 1000);
@@ -197,9 +226,9 @@ public class DemoDataInitializer {
             String name,
             long position) {
         jdbc.update("""
-                INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,?)
+                INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)
                 ON CONFLICT (tenant_id,id) DO NOTHING
-                """, id, tenantId, boardId, name, BigDecimal.valueOf(position));
+                """, id, tenantId, boardId, name, BigDecimal.valueOf(position), position == 3000);
     }
 
     private void insertTask(

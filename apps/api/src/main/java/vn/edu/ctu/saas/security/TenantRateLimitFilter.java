@@ -22,6 +22,14 @@ import vn.edu.ctu.saas.tenant.TenantContextHolder;
 public class TenantRateLimitFilter extends OncePerRequestFilter {
     private final AppProperties properties;
     private final Map<UUID, Bucket> buckets = new ConcurrentHashMap<>();
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.beans.factory.ObjectProvider<org.springframework.data.redis.core.StringRedisTemplate> redis;
+    @org.springframework.beans.factory.annotation.Value("${app.redis.enabled:false}")
+    private boolean distributed;
+
+    private static final org.springframework.data.redis.core.script.DefaultRedisScript<Long> INCREMENT =
+            new org.springframework.data.redis.core.script.DefaultRedisScript<>(
+                    "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]) end; return n", Long.class);
 
     public TenantRateLimitFilter(AppProperties properties) {
         this.properties = properties;
@@ -36,6 +44,30 @@ public class TenantRateLimitFilter extends OncePerRequestFilter {
             return;
         }
         long capacity = capacityFor(context.tier());
+        if (distributed) {
+            long window = java.time.Instant.now().getEpochSecond() / 60;
+            long used;
+            try {
+                used = redis.getObject().execute(INCREMENT,
+                        java.util.List.of("tenant:" + context.tenantId() + ":ratelimit:" + window), "120");
+            } catch (org.springframework.dao.DataAccessException exception) {
+                response.setStatus(503);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"code\":\"RATE_LIMIT_UNAVAILABLE\",\"message\":\"Please retry shortly\"}");
+                return;
+            }
+            response.setHeader("X-RateLimit-Limit", Long.toString(capacity));
+            response.setHeader("X-RateLimit-Remaining", Long.toString(Math.max(0, capacity - used)));
+            if (used > capacity) {
+                response.setStatus(429);
+                response.setHeader("Retry-After", Long.toString(60 - java.time.Instant.now().getEpochSecond() % 60));
+                response.setContentType("application/json");
+                response.getWriter().write("{\"code\":\"TENANT_RATE_LIMITED\",\"message\":\"Tenant request limit exceeded\"}");
+                return;
+            }
+            filterChain.doFilter(request, response);
+            return;
+        }
         Bucket bucket = buckets.computeIfAbsent(context.tenantId(), ignored -> Bucket.builder()
                 .addLimit(Bandwidth.builder()
                         .capacity(capacity)

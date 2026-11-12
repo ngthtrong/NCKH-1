@@ -1,4 +1,12 @@
 spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      connect-timeout: 2s
+      timeout: 2s
   application:
     name: multi-tenant-task-api
   datasource:
@@ -52,6 +60,11 @@ management:
       application: ${spring.application.name}
 
 app:
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+  report-mode: ${REPORT_MODE:false}
+  redis:
+    enabled: ${REDIS_ENABLED:false}
   base-domain: ${BASE_DOMAIN:localhost}
   accounts-subdomain: ${ACCOUNTS_SUBDOMAIN:accounts}
   jwt:

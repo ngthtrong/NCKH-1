@@ -83,7 +83,8 @@ class ResourceDeletionOutboxIntegrationTest {
 
     @Container
     static final GenericContainer<?> MINIO = new GenericContainer<>(
-            "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z")
+            System.getenv().getOrDefault("MINIO_TEST_IMAGE",
+                    "ghcr.io/l33tlamer/minio-backup@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e"))
             .withEnv("MINIO_ROOT_USER", "minioadmin")
             .withEnv("MINIO_ROOT_PASSWORD", "minioadmin123")
             .withCommand("server", "/data")
@@ -245,8 +246,8 @@ class ResourceDeletionOutboxIntegrationTest {
                 users,
                 tenantExecutor(),
                 dispatcher,
-                new ResourceDeletionHandler(storage, new tools.jackson.databind.ObjectMapper()),
-                new tools.jackson.databind.ObjectMapper());
+                new ResourceDeletionHandler(storage, new com.fasterxml.jackson.databind.ObjectMapper()),
+                new com.fasterxml.jackson.databind.ObjectMapper());
         worker.poll();
 
         ArgumentCaptor<TenantEvent> deliveredEvent = ArgumentCaptor.forClass(TenantEvent.class);
@@ -463,8 +464,8 @@ class ResourceDeletionOutboxIntegrationTest {
                 mock(UserAccountRepository.class),
                 tenantExecutor(),
                 mock(NotificationDispatcher.class),
-                new ResourceDeletionHandler(resourceStorage, new tools.jackson.databind.ObjectMapper()),
-                new tools.jackson.databind.ObjectMapper());
+                new ResourceDeletionHandler(resourceStorage, new com.fasterxml.jackson.databind.ObjectMapper()),
+                new com.fasterxml.jackson.databind.ObjectMapper());
     }
 
     private ResourceOutboxAdminService resourceOutboxAdminService() {

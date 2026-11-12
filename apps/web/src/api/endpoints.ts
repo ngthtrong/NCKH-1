@@ -91,12 +91,14 @@ function mapBoard(raw: RawBoard): Board {
       name: column.name,
       position: Number(column.position),
       completed: column.completed,
+      taskLimit: column.taskLimit ?? undefined,
       tasks: raw.tasks
         .filter((task) => task.columnId === column.id)
         .map((task) => ({
           id: task.id,
           columnId: task.columnId,
           parentTaskId: task.parentTaskId ?? undefined,
+          customData: task.customData,
           title: task.title,
           description: task.description ?? undefined,
           priority: task.priority,
@@ -168,6 +170,7 @@ export const authApi = {
 };
 
 export const tenantsApi = {
+  architecture: () => request<{ mode: 'POOL' | 'BRIDGE'; maturityLevel: number }>('/architecture', { skipAuth: true }),
   list: () => request<TenantSummary[]>('/tenants'),
   create: (payload: CreateTenantRequest) =>
     request<TenantSummary>('/tenants', { method: 'POST', body: payload }),
@@ -281,6 +284,7 @@ export const boardsApi = {
       body: {
         columnId,
         parentTaskId: payload.parentTaskId,
+        customData: payload.customData,
         title: payload.title,
         description: payload.description,
         priority: payload.priority,
@@ -300,6 +304,7 @@ export const boardsApi = {
       method: 'PATCH',
       body: {
         columnId: payload.columnId,
+        customData: payload.customData,
         title: payload.title,
         description: payload.description,
         priority: payload.priority,

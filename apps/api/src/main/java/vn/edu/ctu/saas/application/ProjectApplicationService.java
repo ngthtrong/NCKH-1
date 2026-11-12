@@ -2,7 +2,7 @@ package vn.edu.ctu.saas.application;
 
 import static vn.edu.ctu.saas.application.ApplicationDtos.*;
 
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.customization.ApprovalService;
+import vn.edu.ctu.saas.customization.PooledKanbanService;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
 import vn.edu.ctu.saas.tenant.ProjectRole;
@@ -29,6 +30,8 @@ import vn.edu.ctu.saas.tenant.TenantJdbcExecutor;
 
 @Service
 public class ProjectApplicationService {
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private vn.edu.ctu.saas.customization.TenantConfigurationCache boardCache;
     private final TenantJdbcExecutor executor;
     private final ObjectMapper objectMapper;
     private final TenantMembershipRepository tenantMembershipRepository;
@@ -112,7 +115,7 @@ public class ProjectApplicationService {
                 UUID boardId = UUID.randomUUID();
                 jdbc.update("INSERT INTO boards(id,tenant_id,project_id,name) VALUES (?,?,?,?)",
                         boardId, context.tenantId(), projectId, "Kanban");
-                String[] columnNames = {"To do", "In progress", "Done"};
+                String[] columnNames = PooledKanbanService.load(jdbc, context, objectMapper).defaultColumns().toArray(String[]::new);
                 for (int index = 0; index < columnNames.length; index++) {
                     jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)",
                             UUID.randomUUID(), context.tenantId(), boardId, columnNames[index],
@@ -237,7 +240,7 @@ public class ProjectApplicationService {
             UUID boardId = UUID.randomUUID();
             jdbc.update("INSERT INTO boards(id,tenant_id,project_id,name) VALUES (?,?,?,?)",
                     boardId, context.tenantId(), projectId, request.name().trim());
-            String[] names = {"To do", "In progress", "Done"};
+            String[] names = PooledKanbanService.load(jdbc, context, objectMapper).defaultColumns().toArray(String[]::new);
             for (int i = 0; i < names.length; i++) {
                 jdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)",
                         UUID.randomUUID(), context.tenantId(), boardId, names[i],
@@ -311,6 +314,14 @@ public class ProjectApplicationService {
                     context.tenantId(), boardId);
             if (projectId == null) throw new NotFoundException("Board not found");
             requireProjectRole(jdbc, context, projectId, ProjectRole.VIEWER);
+            if (boardCache != null) {
+                long generation = jdbc.queryForObject(
+                        "SELECT content_version+version FROM boards WHERE tenant_id=? AND id=?", Long.class,
+                        context.tenantId(), boardId);
+                String json = boardCache.get(context.tenantId(), "board:" + boardId, generation,
+                        () -> vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, findBoard(jdbc, context, boardId)));
+                return vn.edu.ctu.saas.common.JsonSupport.read(objectMapper, json, BoardView.class);
+            }
             return findBoard(jdbc, context, boardId);
         });
     }
@@ -426,17 +437,19 @@ public class ProjectApplicationService {
             requireActiveProject(jdbc, context, projectId);
             requireColumn(jdbc, context, boardId, request.columnId());
             ApprovalService.assertCreateColumnAllowed(jdbc, context, boardId, request.columnId());
+            PooledKanbanService.checkWip(jdbc, context, objectMapper, boardId, request.columnId(), null);
             if (request.parentTaskId() != null) requireTopLevelParent(jdbc, context, boardId, request.parentTaskId());
             requireAssignableUser(jdbc, context, projectId, request.assigneeUserId());
             UUID taskId = UUID.randomUUID();
             BigDecimal position = request.position() == null ? nextTaskPosition(jdbc, context, request.columnId()) : request.position();
             jdbc.update("""
                     INSERT INTO tasks(id,tenant_id,project_id,board_id,board_column_id,parent_task_id,title,description,
-                                      priority,assignee_user_id,due_at,position,created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                      priority,assignee_user_id,due_at,position,created_by,custom_data)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,CAST(? AS jsonb))
                     """, taskId, context.tenantId(), projectId, boardId, request.columnId(), request.parentTaskId(),
                     request.title().trim(), request.description(), request.priority().name(), request.assigneeUserId(),
-                    timestamp(request.dueAt()), position, context.userId());
+                    timestamp(request.dueAt()), position, context.userId(),
+                    PooledKanbanService.encodeData(jdbc, context, objectMapper, request.customData()));
             TaskView createdTask = findTask(jdbc, context, taskId);
             auditAndOutbox(jdbc, context, "TASK_CREATED", "Task", taskId,
                     taskEventPayload(createdTask));
@@ -472,13 +485,15 @@ public class ProjectApplicationService {
                 ApprovalService.invalidatePending(jdbc, context, taskId, "TASK_CONTENT_CHANGED", objectMapper);
             }
             ApprovalService.assertCompletionMoveAllowed(jdbc, context, taskId, request.columnId());
+            PooledKanbanService.checkWip(jdbc, context, objectMapper, existing.boardId(), request.columnId(), taskId);
             BigDecimal position = request.position() == null ? existing.position() : request.position();
             int updated = jdbc.update("""
                     UPDATE tasks SET board_column_id=?,title=?,description=?,priority=?,assignee_user_id=?,due_at=?,position=?,
-                                     version=version+1,updated_at=now()
+                                     version=version+1,updated_at=now(),custom_data=COALESCE(CAST(? AS jsonb),custom_data)
                     WHERE tenant_id=? AND id=? AND version=?
                     """, request.columnId(), request.title().trim(), request.description(), request.priority().name(),
                     request.assigneeUserId(), timestamp(request.dueAt()), position,
+                    request.customData() == null ? null : PooledKanbanService.encodeData(jdbc, context, objectMapper, request.customData()),
                     context.tenantId(), taskId, request.version());
             if (updated == 0) throw staleTaskConflict(jdbc, context, taskId);
             TaskView updatedTask = findTask(jdbc, context, taskId);
@@ -502,6 +517,7 @@ public class ProjectApplicationService {
             requireActiveProject(jdbc, context, existing.projectId());
             requireColumn(jdbc, context, boardId, request.targetColumnId());
             ApprovalService.assertCompletionMoveAllowed(jdbc, context, taskId, request.targetColumnId());
+            PooledKanbanService.checkWip(jdbc, context, objectMapper, boardId, request.targetColumnId(), taskId);
             int updated = jdbc.update("""
                     UPDATE tasks SET board_column_id=?,position=?,version=version+1,updated_at=now()
                     WHERE tenant_id=? AND board_id=? AND id=? AND version=?
@@ -526,6 +542,7 @@ public class ProjectApplicationService {
                     != request.items().size()) {
                 throw new ConflictException("Task order cannot contain duplicate tasks");
             }
+            jdbc.queryForObject("SELECT id FROM boards WHERE tenant_id=? AND id=? FOR UPDATE", UUID.class, context.tenantId(), boardId);
             for (ReorderTaskItem item : request.items()) {
                 TaskView existing = findTask(jdbc, context, item.taskId());
                 if (!existing.boardId().equals(boardId)) throw new NotFoundException("Task not found in board");
@@ -542,6 +559,9 @@ public class ProjectApplicationService {
                 payload.put("position", movedTask.position());
                 payload.put("version", movedTask.version());
                 auditAndOutbox(jdbc, context, "TASK_MOVED", "Task", item.taskId(), payload);
+            }
+            for (ReorderTaskItem item : request.items()) {
+                PooledKanbanService.checkWip(jdbc, context, objectMapper, boardId, item.targetColumnId(), item.taskId());
             }
             return findBoard(jdbc, context, boardId);
         });
@@ -642,11 +662,16 @@ public class ProjectApplicationService {
                         rs.getString("name"), rs.getLong("version")) : null,
                 context.tenantId(), boardId);
         if (header == null) throw new NotFoundException("Board not found");
+        var kanbanSettings = PooledKanbanService.load(jdbc, context, objectMapper);
+        BigDecimal firstPosition = jdbc.queryForObject("SELECT min(position) FROM board_columns WHERE tenant_id=? AND board_id=?",
+                BigDecimal.class, context.tenantId(), boardId);
         List<ColumnView> columns = jdbc.query(
                 "SELECT id,name,position,completed FROM board_columns WHERE tenant_id=? AND board_id=? ORDER BY position",
                 (rs, rowNum) -> new ColumnView(
                         rs.getObject("id", UUID.class), rs.getString("name"),
-                        rs.getBigDecimal("position"), rs.getBoolean("completed")),
+                        rs.getBigDecimal("position"), rs.getBoolean("completed"),
+                        rs.getBoolean("completed") || rs.getBigDecimal("position").compareTo(firstPosition) == 0
+                                || kanbanSettings.wipMode().equals("OFF") ? null : kanbanSettings.wipLimit()),
                 context.tenantId(), boardId);
         List<TaskView> tasks = jdbc.query("""
                 SELECT t.*,
@@ -759,7 +784,8 @@ public class ProjectApplicationService {
                 dueAt == null ? null : dueAt.toInstant(),
                 rs.getBigDecimal("position"), rs.getLong("version"),
                 rs.getLong("subtask_count"), rs.getLong("completed_subtask_count"), rs.getLong("comment_count"),
-                rs.getTimestamp("created_at").toInstant(), rs.getTimestamp("updated_at").toInstant());
+                rs.getTimestamp("created_at").toInstant(), rs.getTimestamp("updated_at").toInstant(),
+                vn.edu.ctu.saas.common.JsonSupport.read(objectMapper, rs.getString("custom_data"), new com.fasterxml.jackson.core.type.TypeReference<Map<String,Object>>() {}));
     }
 
     private UUID boardProject(JdbcTemplate jdbc, TenantContext context, UUID boardId) {
@@ -937,7 +963,7 @@ public class ProjectApplicationService {
             Map<String, ?> payload) {
         String json;
         try {
-            json = objectMapper.writeValueAsString(payload);
+            json = vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, payload);
         } catch (Exception exception) {
             throw new IllegalStateException("Cannot serialize tenant event", exception);
         }

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -150,7 +150,7 @@ public class ApprovalService {
                     VALUES (?,?,?,?,?,?,?,?,'PENDING',1,CAST(? AS jsonb))
                     """, runId, context.tenantId(), workflow.id(), workflow.version(), workflow.projectId(),
                     workflow.completionColumnId(), taskId, context.userId(),
-                    objectMapper.writeValueAsString(task.snapshot()));
+                    vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, task.snapshot()));
             for (StepView step : effectiveSteps) {
                 UUID runStepId = UUID.randomUUID();
                 jdbc.update("""
@@ -368,7 +368,7 @@ public class ApprovalService {
                     id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
                 VALUES (?,?,?,?,?,?,?,CAST(? AS jsonb))
                 """, UUID.randomUUID(), context.tenantId(), context.userId(), "TASK_APPROVAL_INVALIDATED",
-                "Task", taskId, context.correlationId(), objectMapper.writeValueAsString(Map.of("reason", reason)));
+                "Task", taskId, context.correlationId(), vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, Map.of("reason", reason)));
     }
 
     private void finishRun(JdbcTemplate jdbc, TenantContext context, RunBase run, String status, long expectedVersion) {
@@ -575,7 +575,7 @@ public class ApprovalService {
     private void auditAndOutbox(
             JdbcTemplate jdbc, TenantContext context, String eventType, String aggregateType,
             UUID aggregateId, Map<String, ?> details) {
-        String json = objectMapper.writeValueAsString(details);
+        String json = vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, details);
         jdbc.update("""
                 INSERT INTO audit_events(
                     id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)

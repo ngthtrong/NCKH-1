@@ -27,7 +27,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -111,7 +111,7 @@ class CustomizationIntegrationTest {
         });
         capabilities = mock(TenantCapabilityService.class);
         memberships = mock(TenantMembershipRepository.class);
-        mapper = JsonMapper.builder().build();
+        mapper = JsonMapper.builder().findAndAddModules().build();
         when(capabilities.effective(eq(TENANT), any())).thenReturn(true);
         doNothing().when(capabilities).require(eq(TENANT), any());
         when(memberships.findAllByTenantIdAndActiveTrue(TENANT)).thenReturn(List.of(

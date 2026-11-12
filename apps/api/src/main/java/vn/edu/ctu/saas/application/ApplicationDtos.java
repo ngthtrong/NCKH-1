@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import vn.edu.ctu.saas.tenant.ProjectRole;
 import vn.edu.ctu.saas.tenant.ProjectStatus;
@@ -44,7 +45,7 @@ public final class ApplicationDtos {
             List<ColumnView> columns,
             List<TaskView> tasks) {}
     public record BoardSummaryView(UUID id, UUID projectId, String name, long version, Instant createdAt) {}
-    public record ColumnView(UUID id, String name, BigDecimal position, boolean completed) {}
+    public record ColumnView(UUID id, String name, BigDecimal position, boolean completed, Integer taskLimit) {}
     public record CreateBoardRequest(@NotBlank @Size(max = 160) String name) {}
     public record UpdateBoardRequest(
             @NotBlank @Size(max = 160) String name,
@@ -78,7 +79,7 @@ public final class ApplicationDtos {
             long completedSubtaskCount,
             long commentCount,
             Instant createdAt,
-            Instant updatedAt) {}
+            Instant updatedAt, Map<String,Object> customData) {}
     public record CreateTaskRequest(
             @NotNull UUID columnId,
             UUID parentTaskId,
@@ -87,7 +88,12 @@ public final class ApplicationDtos {
             @NotNull TaskPriority priority,
             UUID assigneeUserId,
             Instant dueAt,
-            BigDecimal position) {}
+            BigDecimal position, Map<String,Object> customData) {
+        public CreateTaskRequest(UUID columnId, UUID parentTaskId, String title, String description,
+                TaskPriority priority, UUID assigneeUserId, Instant dueAt, BigDecimal position) {
+            this(columnId, parentTaskId, title, description, priority, assigneeUserId, dueAt, position, Map.of());
+        }
+    }
     public record UpdateTaskRequest(
             @NotNull UUID columnId,
             @NotBlank @Size(max = 240) String title,
@@ -96,7 +102,12 @@ public final class ApplicationDtos {
             UUID assigneeUserId,
             Instant dueAt,
             BigDecimal position,
-            long version) {}
+            long version, Map<String,Object> customData) {
+        public UpdateTaskRequest(UUID columnId, String title, String description, TaskPriority priority,
+                UUID assigneeUserId, Instant dueAt, BigDecimal position, long version) {
+            this(columnId, title, description, priority, assigneeUserId, dueAt, position, version, null);
+        }
+    }
     public record MoveTaskRequest(@NotNull UUID targetColumnId, @NotNull BigDecimal targetPosition, long version) {}
     public record ReorderTaskItem(
             @NotNull UUID taskId,

@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.control.PaymentStatus;
 import vn.edu.ctu.saas.control.PaymentTransactionEntity;
@@ -195,7 +195,7 @@ class PaymentServiceTest {
         TenantEntity tenant = new TenantEntity();
         tenant.setId(tenantId);
         tenant.setStatus(TenantStatus.PENDING_PAYMENT);
-        provider = new FakePaymentProvider(JsonMapper.builder().build(), TestAppProperties.create());
+        provider = new FakePaymentProvider(JsonMapper.builder().findAndAddModules().build(), TestAppProperties.create());
         service = new PaymentService(
                 provider, payments, events, tenants, memberships, provisioning,
                 idempotencyLock, hasher, TestAppProperties.create());

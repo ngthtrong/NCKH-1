@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_11_enterprise_profile" name="Hình 2.11 · Enterprise / Regulated Profile">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1440" pageHeight="1195">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Hình 2.11 · Enterprise / Regulated Profile" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1380" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="App Instance, Cache và Database dành riêng; mã tùy biến chạy trong sandbox." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1380" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Enterprise Client Request" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="440" y="130" width="560" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Dedicated API Gateway / Ingress" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="440" y="260" width="560" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="VÙNG THỰC THI DÀNH RIÊNG" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#F0ECFA;swimlaneFillColor=#ffffff;strokeColor=#8263B1;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="350" y="425" width="740" height="275" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Dedicated App Instance&#10;Hạn ngạch CPU / RAM riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="6">
+          <mxGeometry x="30" y="70" width="680" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Custom Script Runner · Sandbox" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="6">
+          <mxGeometry x="120" y="185" width="500" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="DỊCH VỤ VÀ LƯU TRỮ DÀNH RIÊNG" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#EAF6EE;swimlaneFillColor=#ffffff;strokeColor=#39845A;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="30" y="820" width="1380" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Dedicated Cache A" style="shape=cylinder3;size=15;boundedLbl=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="9">
+          <mxGeometry x="20" y="70" width="420" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Dedicated Database A&#10;Mã hóa bằng khóa khách hàng quản lý" style="shape=cylinder3;size=15;boundedLbl=1;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="9">
+          <mxGeometry x="500" y="70" width="850" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Dinh tuyen toi Instance" edge="1" parent="1" source="5" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontSize=14;labelBackgroundColor=#ffffff;endArrow=block;exitX=0.5;exitY=1;entryX=0;entryY=0.25;">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="720" y="375" /><mxPoint x="320" y="375" /><mxPoint x="320" y="512.5" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="14" value="" edge="1" parent="1" source="7" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Truy cập Cache" edge="1" parent="1" source="7" target="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0;exitY=0.5;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="530" />
+              <mxPoint x="310" y="760" />
+              <mxPoint x="260" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" value="Truy cập dữ liệu" edge="1" parent="1" source="7" target="11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0.7;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1140" y="530" />
+              <mxPoint x="1140" y="760" />
+              <mxPoint x="1125" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="17" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1050" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="1050" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="1050" width="820" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Namespace quản lý tài nguyên; runtime và hạn ngạch CPU/RAM thực thi cô lập tiến trình. Cache/Database riêng không bảo đảm miễn nhiễm mọi sự cố.&#10;Custom code cần sandbox và quyền tối thiểu; loại hạ tầng và chính sách cô lập phải được nêu trong triển khai." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1105" width="1380" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

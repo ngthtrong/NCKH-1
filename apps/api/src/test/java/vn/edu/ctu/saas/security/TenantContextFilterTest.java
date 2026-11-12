@@ -18,7 +18,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.control.TenantEntity;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -46,7 +46,7 @@ class TenantContextFilterTest {
         placements = mock(TenantPlacementRepository.class);
         filter = new TenantContextFilter(
                 tenants, memberships, placements,
-                new TenantHostResolver(TestAppProperties.create()), JsonMapper.builder().build());
+                new TenantHostResolver(TestAppProperties.create()), JsonMapper.builder().findAndAddModules().build());
     }
 
     @AfterEach

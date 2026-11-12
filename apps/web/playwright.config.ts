@@ -22,6 +22,9 @@ export default defineConfig({
     timeout: 10_000,
   },
   use: {
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
+      : {},
     baseURL:
       process.env.E2E_ACCOUNTS_URL ??
       process.env.PUBLIC_ACCOUNTS_URL ??

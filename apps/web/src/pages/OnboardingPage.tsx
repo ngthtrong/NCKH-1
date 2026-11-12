@@ -103,6 +103,14 @@ export function OnboardingPage() {
   const [slug, setSlug] = useState('');
   const [slugTouched, setSlugTouched] = useState(false);
   const [tier, setTier] = useState<TenantTier>('STARTER');
+  const [reportMode, setReportMode] = useState(Boolean(tenantsApi.architecture));
+  useEffect(() => {
+    let active = true;
+    if (tenantsApi.architecture) void tenantsApi.architecture().then(value => {
+      if (active) setReportMode(value.mode === 'POOL');
+    }).catch(() => { /* Keep the conservative shared-data option on lookup failure. */ });
+    return () => { active = false; };
+  }, []);
   const [placement, setPlacement] = useState<TenantPlacement>('POOL');
   const [onboarding, setOnboarding] = useState<OnboardingView | null>(null);
   const [loading, setLoading] = useState(Boolean(tenantId));
@@ -323,16 +331,15 @@ export function OnboardingPage() {
                           onChange={(event) => setPlacement(event.target.value as TenantPlacement)}
                         >
                           <MenuItem value="POOL">Dùng chung hạ tầng</MenuItem>
-                          <MenuItem value="SCHEMA_PER_TENANT">Lược đồ dữ liệu riêng</MenuItem>
-                          <MenuItem value="SILO_DATABASE">Cơ sở dữ liệu riêng</MenuItem>
+                          {!reportMode && <MenuItem value="SCHEMA_PER_TENANT">Lược đồ dữ liệu riêng</MenuItem>}
+                          {!reportMode && <MenuItem value="SILO_DATABASE">Cơ sở dữ liệu riêng</MenuItem>}
                         </Select>
                       </FormControl>
                     </Stack>
                     <Box mt={2}>
-                      <Typography fontWeight={700}>So sánh ba mô hình</Typography>
+                      <Typography fontWeight={700}>{reportMode ? 'Một nền tảng dùng chung, cấu hình riêng cho từng tổ chức' : 'So sánh ba mô hình'}</Typography>
                       <Typography variant="body2" color="text.secondary" mb={1.5}>
-                        Pool là mặc định của bản demo, không phải kết luận mô hình tối ưu. Kết luận chỉ được đưa
-                        ra sau khi đo trên cùng workload và điều kiện triển khai.
+                        {reportMode ? 'Mọi workspace dùng chung ứng dụng và lớp dữ liệu. Quy trình, nhận diện và các trường công việc được cấu hình riêng.' : 'Pool là mặc định của bản demo, không phải kết luận mô hình tối ưu. Kết luận chỉ được đưa ra sau khi đo trên cùng workload và điều kiện triển khai.'}
                       </Typography>
                       <Box
                         sx={{
@@ -341,7 +348,7 @@ export function OnboardingPage() {
                           gap: 1.5,
                         }}
                       >
-                        {(Object.keys(placementCharacteristics) as TenantPlacement[]).map((option) => {
+                        {((reportMode ? ['POOL'] : Object.keys(placementCharacteristics)) as TenantPlacement[]).map((option) => {
                           const characteristic = placementCharacteristics[option];
                           const selected = option === placement;
                           return (

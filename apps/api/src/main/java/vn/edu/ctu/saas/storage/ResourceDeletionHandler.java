@@ -1,7 +1,7 @@
 package vn.edu.ctu.saas.storage;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import vn.edu.ctu.saas.notification.TenantEvent;
 
@@ -27,7 +27,7 @@ public class ResourceDeletionHandler {
         }
         JsonNode payload;
         try {
-            payload = objectMapper.readTree(event.payloadJson());
+            payload = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, event.payloadJson());
         } catch (Exception exception) {
             throw new IllegalArgumentException("Invalid resource deletion event payload", exception);
         }

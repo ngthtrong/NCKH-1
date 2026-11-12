@@ -1,6 +1,6 @@
 package vn.edu.ctu.saas.security;
 
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +30,8 @@ import vn.edu.ctu.saas.tenant.TenantStatus;
 
 @Component
 public class TenantContextFilter extends OncePerRequestFilter {
+    @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}")
+    private boolean reportMode;
     private final TenantRepository tenantRepository;
     private final TenantMembershipRepository membershipRepository;
     private final TenantPlacementRepository placementRepository;
@@ -63,11 +65,11 @@ public class TenantContextFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (TenantVerificationException exception) {
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(reportMode ? HttpServletResponse.SC_UNAUTHORIZED : HttpServletResponse.SC_FORBIDDEN);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             objectMapper.writeValue(response.getOutputStream(), Map.of(
                     "timestamp", Instant.now().toString(),
-                    "status", 403,
+                    "status", reportMode ? 401 : 403,
                     "code", "TENANT_CONTEXT_REJECTED",
                     "message", exception.getMessage(),
                     "path", request.getRequestURI(),

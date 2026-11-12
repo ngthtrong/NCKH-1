@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="Electron">
+  <diagram id="FtcNLbeVRgkX7cGuzEtX" name="Hình 2.12 · Global Hyper-Scale Cell-Based Profile">
+    <mxGraphModel grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="0" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" style="" />
+        <mxCell id="1" parent="0" style="" />
+        <UserObject label="CELL 01 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1 -&gt; 1.000)" mermaidId="n:Cell_01" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#e8f5e9;strokeColor=#2e7d32;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="CELL 01 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1 -&gt; 1.000)" id="2">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#e8f5e9;strokeColor=#2e7d32;fontColor=#213047;fontFamily=Arial;fontSize=16;dashed=1;dashPattern=5 5;" vertex="1">
+            <mxGeometry height="132" width="505" x="30.0" y="337.0" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="App Cluster 1" mermaidId="n:AppCell1" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="App Cluster 1" id="3">
+          <mxCell parent="2" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="156" x="35" y="52" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Database Cluster 1" mermaidId="n:DBCell1" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Database Cluster 1" id="4">
+          <mxCell parent="2" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="149" x="321" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:AppCell1-&gt;DBCell1#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" mermaidBaseValue="" id="17">
+          <mxCell edge="1" parent="2" source="3" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" target="4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="CELL 02 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1.001 -&gt; 2.000)" mermaidId="n:Cell_02" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#e1f5fe;strokeColor=#0288d1;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="CELL 02 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 1.001 -&gt; 2.000)" id="5">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#e1f5fe;strokeColor=#0288d1;fontColor=#213047;fontFamily=Arial;fontSize=16;dashed=1;dashPattern=5 5;" vertex="1">
+            <mxGeometry height="132" width="505" x="585.0" y="337.0" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="App Cluster 2" mermaidId="n:AppCell2" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="App Cluster 2" id="6">
+          <mxCell parent="5" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="156" x="35" y="52" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Database Cluster 2" mermaidId="n:DBCell2" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Database Cluster 2" id="7">
+          <mxCell parent="5" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="149" x="321" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:AppCell2-&gt;DBCell2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" mermaidBaseValue="" id="18">
+          <mxCell edge="1" parent="5" source="6" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" target="7">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="CELL 03 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 2.001 -&gt; 3.000)" mermaidId="n:Cell_03" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#fff3e0;strokeColor=#e65100;fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="CELL 03 (STAMP ĐỘC LẬP - PHỤC VỤ TENANT 2.001 -&gt; 3.000)" id="8">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=2;verticalAlign=top;fillColor=#fff3e0;strokeColor=#e65100;fontColor=#213047;fontFamily=Arial;fontSize=16;dashed=1;dashPattern=5 5;" vertex="1">
+            <mxGeometry height="132" width="505" x="1140.0" y="337.0" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="App Cluster 3" mermaidId="n:AppCell3" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="App Cluster 3" id="9">
+          <mxCell parent="8" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="156" x="35" y="52" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Database Cluster 3" mermaidId="n:DBCell3" mermaidBaseStyle="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Database Cluster 3" id="10">
+          <mxCell parent="8" style="html=1;shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=1;whiteSpace=wrap;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="67" width="149" x="321" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:AppCell3-&gt;DBCell3#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" mermaidBaseValue="" id="19">
+          <mxCell edge="1" parent="8" source="9" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.51;" target="10">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Người dùng Toàn cầu" mermaidId="n:GlobalUsers" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Người dùng Toàn cầu" id="11">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="211" x="732.0" y="110.0" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Global API Gateway / Cell Router&#10;Tra bảng ánh xạ tenant → cell" mermaidId="n:GlobalRouter" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Global API Gateway / Cell Router&#10;Tra bảng ánh xạ tenant → cell" id="12">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=#213047;fontFamily=Arial;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="276" x="700.0" y="214.0" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:GlobalUsers-&gt;GlobalRouter#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="" id="13">
+          <mxCell edge="1" parent="1" source="11" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="12">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tenant 1–1.000 → Cell 01" mermaidId="e:GlobalRouter-&gt;Cell_01#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.78;entryX=0.5;entryY=0;" mermaidBaseValue="Tenant 1–1.000 → Cell 01" id="14">
+          <mxCell edge="1" parent="1" source="12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;endArrow=block;exitX=0.15;exitY=1;entryX=0;entryY=0.5;" target="3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="741.4" y="292.0" />
+                <mxPoint x="10.0" y="292.0" />
+                <mxPoint x="10.0" y="416.0" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tenant 1.001–2.000 → Cell 02" mermaidId="e:GlobalRouter-&gt;Cell_02#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="Tenant 1.001–2.000 → Cell 02" id="15">
+          <mxCell edge="1" parent="1" source="12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;endArrow=block;exitX=0.5;exitY=1;entryX=0;entryY=0.5;" target="6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="838.0" y="292.0" />
+                <mxPoint x="565.0" y="292.0" />
+                <mxPoint x="565.0" y="416.0" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tenant 2.001–3.000 → Cell 03" mermaidId="e:GlobalRouter-&gt;Cell_03#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.78;entryX=0.5;entryY=0;" mermaidBaseValue="Tenant 2.001–3.000 → Cell 03" id="16">
+          <mxCell edge="1" parent="1" source="12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;endArrow=block;exitX=0.85;exitY=1;entryX=0;entryY=0.5;" target="9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="934.6" y="292.0" />
+                <mxPoint x="1120.0" y="292.0" />
+                <mxPoint x="1120.0" y="416.0" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="reference-title" value="Hình 2.12 · Global Hyper-Scale Cell-Based Profile" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=24;fontStyle=1;">
+          <mxGeometry x="30" y="20" width="1615.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="reference-footer" value="Định tuyến theo bảng ánh xạ tenant → cell, phù hợp các dải tenant ghi trong khung. Không dùng tenant_id % 3 cho các dải liên tiếp này.&#10;Mỗi cell có ứng dụng và dữ liệu riêng; Router/Registry vẫn là phụ thuộc chung. Dải 1.000 tenant chỉ là ví dụ sức chứa." vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=14;fontStyle=0;">
+          <mxGeometry x="30" y="499.0" width="1615.0" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -21,6 +21,8 @@ import vn.edu.ctu.saas.control.UserAccountRepository;
 
 @Service
 public class TenantManagementService {
+    @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}")
+    private boolean reportMode;
     private final TenantRepository tenantRepository;
     private final TenantPlacementRepository placementRepository;
     private final TenantMembershipRepository membershipRepository;
@@ -42,6 +44,9 @@ public class TenantManagementService {
 
     @Transactional
     public TenantView create(UUID ownerId, String slugInput, String name, String tier, TenantPlacement placementType) {
+        if (reportMode && placementType != TenantPlacement.POOL) {
+            throw new IllegalArgumentException("This deployment uses a shared database and schema for all tenants (Pool)");
+        }
         String slug = slugInput.trim().toLowerCase(Locale.ROOT);
         if (!slug.matches("[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")) {
             throw new IllegalArgumentException("Slug must be a valid DNS label");

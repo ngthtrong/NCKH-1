@@ -1,0 +1,74 @@
+[
+  {
+    "stem": "hinh_2_1_master_blueprint",
+    "title": "Hình 2.1 · Hệ quy chiếu 9 tầng"
+  },
+  {
+    "stem": "hinh_2_2_silo_model",
+    "title": "Hình 2.2 · Silo: ngăn xếp dành riêng cho từng tenant"
+  },
+  {
+    "stem": "hinh_2_3_pool_model",
+    "title": "Hình 2.3 · Pool: tài nguyên dùng chung, dữ liệu tách logic"
+  },
+  {
+    "stem": "hinh_2_4_bridge_model",
+    "title": "Hình 2.4 · Bridge: app chung, schema riêng"
+  },
+  {
+    "stem": "hinh_2_5_hybrid_model",
+    "title": "Hình 2.5 · Hybrid: Pool và Silo cùng tồn tại"
+  },
+  {
+    "stem": "hinh_2_6_compute_isolated_shared_data",
+    "title": "Hình 2.6 · Compute-Isolated / Shared-Data"
+  },
+  {
+    "stem": "hinh_2_7_cell_based",
+    "title": "Hình 2.7 · Cell-Based / Deployment Stamps"
+  },
+  {
+    "stem": "hinh_2_8_smb_profile",
+    "title": "Hình 2.8 · SMB / Startup Profile"
+  },
+  {
+    "stem": "hinh_2_9_enterprise_profile",
+    "title": "Hình 2.9 · Enterprise / Regulated Profile"
+  },
+  {
+    "stem": "hinh_2_10_tiered_platform",
+    "title": "Hình 2.10 · Tiered Platform: Hybrid + Cell-Based"
+  },
+  {
+    "stem": "hinh_2_11_context_feature_flags",
+    "title": "Hình 2.11 · TenantContext xuyên luồng và feature flags"
+  },
+  {
+    "stem": "hinh_2_12_set_local_sequence",
+    "title": "Hình 2.12 · SET LOCAL và tái sử dụng connection"
+  },
+  {
+    "stem": "hinh_2_13_two_tier_caching",
+    "title": "Hình 2.13 · Two-Tier Cache: đọc dữ liệu và admission"
+  },
+  {
+    "stem": "hinh_2_14_decision_tree",
+    "title": "Hình 2.14 · Cây quyết định kiến trúc"
+  },
+  {
+    "stem": "bo-sung/bs_01_dedicated_database",
+    "title": "Bổ sung 01 · Tách DBMS theo tenant"
+  },
+  {
+    "stem": "bo-sung/bs_02_rls_engine",
+    "title": "Bổ sung 02 · PostgreSQL RLS và fail-closed"
+  },
+  {
+    "stem": "bo-sung/bs_03_schema_namespace",
+    "title": "Bổ sung 03 · Schema namespace và tùy biến dữ liệu"
+  },
+  {
+    "stem": "bo-sung/bs_04_customer_segmentation",
+    "title": "Bổ sung 04 · Resolve tenant, tier và đích triển khai"
+  }
+]

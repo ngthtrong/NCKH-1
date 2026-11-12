@@ -4,6 +4,38 @@
  */
 
 export interface paths {
+    "/architecture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getArchitecture"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenant-settings/kanban": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getKanbanConfiguration"];
+        put: operations["updateKanbanConfiguration"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -1500,12 +1532,16 @@ export interface components {
             role: components["schemas"]["ProjectRole"];
         };
         ColumnView: {
+            taskLimit?: number | null;
             id: components["schemas"]["UUID"];
             name: string;
             position: number;
             completed: boolean;
         };
         TaskView: {
+            customData?: {
+                [key: string]: unknown;
+            };
             id: components["schemas"]["UUID"];
             projectId: components["schemas"]["UUID"];
             boardId: components["schemas"]["UUID"];
@@ -1566,6 +1602,9 @@ export interface components {
             version: number;
         };
         CreateTaskRequest: {
+            customData?: {
+                [key: string]: unknown;
+            };
             columnId: components["schemas"]["UUID"];
             parentTaskId?: components["schemas"]["UUID"] | null;
             title: string;
@@ -1576,6 +1615,9 @@ export interface components {
             position?: number | null;
         };
         UpdateTaskRequest: {
+            customData?: {
+                [key: string]: unknown;
+            };
             columnId: components["schemas"]["UUID"];
             title: string;
             description?: string | null;
@@ -1824,6 +1866,24 @@ export interface components {
             accentColor: string;
             /** Format: int64 */
             version: number;
+        };
+        KanbanConfiguration: {
+            version: number;
+            settings: {
+                /** @enum {string} */
+                wipMode: "STRICT" | "WARN" | "OFF";
+                wipLimit: number;
+                /** @enum {string} */
+                cardStyle: "FULL" | "COMPACT";
+                defaultColumns: string[];
+                fields: {
+                    key: string;
+                    label: string;
+                    /** @enum {string} */
+                    type: "STRING" | "NUMBER" | "BOOLEAN";
+                    required: boolean;
+                }[];
+            };
         };
         TenantSettingsView: {
             capabilities: components["schemas"]["CapabilityView"][];
@@ -2090,6 +2150,79 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getArchitecture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public deployment architecture and experiment switches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        mode: "POOL" | "BRIDGE";
+                        /** @constant */
+                        maturityLevel: 3;
+                        rateLimitEnabled: boolean;
+                        cacheEnabled: boolean;
+                    };
+                };
+            };
+        };
+    };
+    getKanbanConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant-scoped Kanban metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KanbanConfiguration"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    updateKanbanConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KanbanConfiguration"];
+            };
+        };
+        responses: {
+            /** @description Updated settings; Owner/Admin only; stale version returns 409 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KanbanConfiguration"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     login: {
         parameters: {
             query?: never;

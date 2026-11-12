@@ -1,6 +1,14 @@
 # NCKH-1 — Multi-tenant SaaS Task Management
 
-Monorepo phục vụ đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**. Hệ thống hướng tới mô hình Bridge ba placement: tenant Pool dùng chung PostgreSQL database/schema/bảng, tenant Schema-per-tenant dùng schema riêng trong database chung và tenant Silo dùng database riêng; control plane, mã API/worker/frontend và quy trình vận hành được dùng chung.
+Monorepo phục vụ đề tài **Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao**.
+Bản demo mặc định bám `Report (1).docx`: **mức 3, Pool**, cùng một API,
+database/schema/bảng cho các tenant; tùy biến theo cấu hình JSONB. Stack dùng
+React 18, Spring Boot 3 / Java 21, PostgreSQL 16, Redis 7 và Caffeine.
+Mã Bridge ba placement cũ được giữ như biến thể đối chứng, không phải bản demo mặc định.
+
+**Chạy và kiểm tra theo báo cáo:** [hướng dẫn và KB-1–KB-4](experiments/report/README.md).
+`scripts/dev-up.sh` tạo stack riêng `nckh-report`, giữ dữ liệu Bridge cũ trong volume riêng.
+Nếu stack cũ đang chiếm cổng, dừng bằng `APP_VARIANT=bridge bash scripts/dev-down.sh` trước.
 
 > Điểm tiếp tục mới nhất nằm tại [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md). Đọc tài liệu này trước khi phát triển tiếp; các cổng thực nghiệm chưa được đánh dấu đạt nếu chưa có số đo thật.
 
@@ -18,10 +26,12 @@ Monorepo phục vụ đề tài **Xây dựng ứng dụng quản lý công vi�
 Yêu cầu Docker Engine/Desktop có Compose v2. Từ thư mục gốc:
 
 ```bash
-scripts/dev-up.sh
+bash scripts/dev-up.sh
 ```
 
-Script sẽ tạo `infra/.env` từ mẫu chuẩn [infra/.env.example](infra/.env.example) nếu file chưa tồn tại, kiểm tra Compose, build và khởi động stack. Các giá trị `change-me` chỉ dùng trên máy local cô lập.
+Script tạo `infra/.env` từ mẫu nếu chưa tồn tại, kiểm tra Compose, build và khởi động
+stack Pool có dữ liệu Acme–Lotus. Giá trị `change-me` chỉ dùng local. File tài nguyên
+dùng adapter filesystem và volume chung API/worker; không phụ thuộc image MinIO để chạy demo.
 
 Hướng dẫn từng bước, tài khoản demo, luồng kiểm thử và xử lý lỗi nằm tại
 [docs/RUN_APPLICATION.md](docs/RUN_APPLICATION.md).
@@ -30,12 +40,14 @@ Sau khi health check thành công:
 
 - Trang đăng nhập: `http://accounts.localhost:8080`
 - Tenant Pool mẫu: `http://pool-demo.localhost:8080`
-- Tenant Schema-per-tenant mẫu: `http://schema-demo.localhost:8080`
-- Tenant Silo mẫu: `http://silo-demo.localhost:8080`
+- Acme (STRICT): `http://t-acme.localhost:8080`
+- Lotus (WARN): `http://t-lotus.localhost:8080`
 - Mailpit: `http://127.0.0.1:8025`
-- MinIO console: `http://127.0.0.1:9001`
-- Grafana: `http://127.0.0.1:3000`
 - Prometheus: `http://127.0.0.1:9090`
+
+MinIO/Grafana và hai tenant Schema/Silo thuộc stack Bridge tùy chọn:
+`APP_VARIANT=bridge bash scripts/dev-up.sh`. Hướng dẫn cũ bên dưới và trong
+`docs/RUN_APPLICATION.md` cần được đọc theo đúng biến thể, không trộn kết quả.
 
 Tài khoản seed local được cấu hình trong `infra/.env`. Không dùng credential mẫu trên môi trường Internet.
 

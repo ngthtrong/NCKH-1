@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_9_enterprise_profile" name="Hình 2.9 · Enterprise / Regulated Profile">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="899">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Hình 2.9 · Enterprise / Regulated Profile" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Minh họa VM riêng Level 2 + Pod/sandbox Level 3; DB, cache và queue dành riêng cho tenant." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Enterprise request → xác thực → Ingress → tenant registry → VM / Pod riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="180" y="120" width="840" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="TẦNG" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="192" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="9. App Instance" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="230" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="App riêng + Custom Script Runner (sandbox)" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="8. App Server / runtime" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="286" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Runtime riêng · Pod CPU/RAM requests + limits" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="286" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="7. Middleware" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="342" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Dedicated Redis Cluster + Dedicated Queue" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="342" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="6. DB Schema" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="398" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Schema / bảng riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="398" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="5. Database" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="454" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Dedicated database · mã hóa bằng khóa khách hàng quản lý" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="454" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="4. DB Server / DBMS" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="510" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Dedicated PostgreSQL instance · pool kết nối riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="510" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="3. Operating System" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="566" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Guest OS riêng trong VM" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="566" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="2. VM / Container" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="622" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="VM riêng · Pod runtime / gVisor theo yêu cầu" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="622" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="1. Hardware" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="678" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="Host vật lý nhà cung cấp có thể dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="250" y="678" width="900" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="754" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="754" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="754" width="580" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="Kubernetes namespace là phạm vi quản lý API; RBAC + NetworkPolicy + ResourceQuota là các cấu hình bổ sung.&#10;Cgroups giới hạn tài nguyên container; VM riêng và thiết kế phụ thuộc quyết định mức cô lập. Tuân thủ cần đánh giá riêng." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="809" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

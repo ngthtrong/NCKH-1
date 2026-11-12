@@ -12,4 +12,8 @@ fi
 
 # Volumes are deliberately preserved. Follow infra/runbooks/local-development.md
 # for the explicit destructive reset command.
-docker compose --env-file "$environment_file" -f "$compose_file" down --remove-orphans
+if [[ "${APP_VARIANT:-report}" == "report" ]]; then
+  docker compose --project-name nckh-report --env-file "$environment_file" -f "$compose_file" -f "$repository_root/infra/compose.report.yaml" down --remove-orphans
+else
+  docker compose --env-file "$environment_file" -f "$compose_file" down --remove-orphans
+fi

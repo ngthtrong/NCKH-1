@@ -18,6 +18,10 @@ import vn.edu.ctu.saas.tenant.TenantAccessDeniedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(vn.edu.ctu.saas.customization.WipLimitException.class)
+    ResponseEntity<ApiError> wipLimit(vn.edu.ctu.saas.customization.WipLimitException exception, HttpServletRequest request) {
+        return error(HttpStatus.UNPROCESSABLE_ENTITY, "WIP_LIMIT_EXCEEDED", exception.getMessage(), request, Map.of());
+    }
     @ExceptionHandler(NotFoundException.class)
     ResponseEntity<ApiError> notFound(NotFoundException exception, HttpServletRequest request) {
         return error(HttpStatus.NOT_FOUND, "NOT_FOUND", exception.getMessage(), request, Map.of());

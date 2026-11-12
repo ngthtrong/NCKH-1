@@ -65,7 +65,6 @@ export function LoginPage() {
           <Typography className="brand__name">TenantFlow</Typography>
         </Box>
         <Box className="auth-story__content">
-          <Typography className="eyebrow eyebrow--light">Quản trị đa thuê bao an toàn</Typography>
           <Typography variant="h2" component="h1">
             Một nơi để đội ngũ biến kế hoạch thành kết quả.
           </Typography>
@@ -152,9 +151,6 @@ export function LoginPage() {
                   }
                   label={<Typography variant="body2">Hiện mật khẩu</Typography>}
                 />
-                <Typography variant="caption" color="text.secondary">
-                  Khôi phục mật khẩu chưa có trong bản local
-                </Typography>
               </Stack>
               <Button
                 type="submit"
@@ -167,10 +163,6 @@ export function LoginPage() {
               </Button>
             </Stack>
           </Box>
-          <Typography variant="caption" color="text.secondary" display="block" mt={3}>
-            Access token chỉ được giữ trong bộ nhớ của tab. Phiên làm việc được khôi phục bằng
-            cookie bảo mật.
-          </Typography>
           <Typography variant="body2" color="text.secondary" mt={2}>
             Chưa có tài khoản?{' '}
             <Link component={RouterLink} to="/register" underline="hover">

@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
 import vn.edu.ctu.saas.notification.TenantEvent;
 import vn.edu.ctu.saas.tenant.TenantContext;
@@ -195,7 +195,7 @@ public class AutomationEventHandler {
     private UUID destinationColumn(TenantEvent event, UUID currentColumn) {
         if (!"TASK_MOVED".equals(event.eventType())) return currentColumn;
         try {
-            JsonNode value = objectMapper.readTree(event.payloadJson()).path("columnId");
+            JsonNode value = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, event.payloadJson()).path("columnId");
             return value.isMissingNode() || value.isNull() ? currentColumn : UUID.fromString(value.asText());
         } catch (RuntimeException exception) {
             throw new IllegalArgumentException("Invalid task-moved event payload", exception);

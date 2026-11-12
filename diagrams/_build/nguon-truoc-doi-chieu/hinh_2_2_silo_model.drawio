@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_2_silo_model" name="Hình 2.2 · Silo: ngăn xếp dành riêng cho từng tenant">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="899">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Hình 2.2 · Silo: ngăn xếp dành riêng cho từng tenant" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Minh họa Silo vật lý Level 1. Với Silo VM Level 2, hardware có thể dùng chung nhưng VM/guest OS riêng." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="DNS / Gateway định tuyến theo tenant đã xác thực" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="330" y="120" width="540" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="TENANT A" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=17;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="195" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="TENANT B" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=17;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="195" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="TẦNG" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="192" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="9. App Instance" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="230" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="App Instance A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="App Instance B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="230" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="8. App Server / runtime" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="286" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="App runtime A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="286" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="App runtime B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="286" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="7. Middleware" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="342" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Redis + Queue A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="342" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="Redis + Queue B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="342" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="6. DB Schema" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="398" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Schema A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="398" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Schema B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="398" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="5. Database" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="454" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="Database A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="454" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="Database B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="454" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="4. DB Server / DBMS" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="510" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="DBMS A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="510" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="DBMS B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="510" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="3. Operating System" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="566" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="OS A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="566" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="OS B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="566" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="2. VM / Container" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="622" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="VM riêng A (nếu dùng VM)" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="622" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="VM riêng B (nếu dùng VM)" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="622" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="1. Hardware" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="678" width="210" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="Máy chủ vật lý A" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="250" y="678" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="Máy chủ vật lý B" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="678" width="430" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="754" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="754" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="754" width="580" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="38" value="Tài nguyên của A/B độc lập trong cấu hình minh họa. Gateway, DNS và mặt phẳng điều khiển vẫn có thể là phụ thuộc chung;&#10;phạm vi sự cố cần được đánh giá theo từng loại lỗi." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="809" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

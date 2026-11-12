@@ -45,7 +45,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
@@ -89,7 +89,7 @@ class ProjectAuthorizationIntegrationTest {
     private static final UUID RESOURCE_B = UUID.fromString("90000000-0000-0000-0000-000000000002");
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:18-alpine")
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:16-alpine")
             .withDatabaseName("project_authorization")
             .withUsername("postgres")
             .withPassword("postgres");
@@ -127,7 +127,7 @@ class ProjectAuthorizationIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        adminJdbc.execute("TRUNCATE TABLE projects, resources, audit_events, outbox_events CASCADE");
+        adminJdbc.execute("TRUNCATE TABLE tenant_kanban_settings, projects, resources, audit_events, outbox_events CASCADE");
         seedProject(TENANT_A, PROJECT_A, BOARD_A, COLUMN_A, TASK_A, MANAGER, "Alpha project", "Alpha task");
         seedProject(TENANT_B, PROJECT_B, BOARD_B, COLUMN_B, TASK_B, FOREIGN_MANAGER, "Beta project", "Beta task");
         seedProjectMembership(TENANT_A, PROJECT_A, MEMBER, ProjectRole.MEMBER);
@@ -150,7 +150,7 @@ class ProjectAuthorizationIntegrationTest {
                 // The fixed Testcontainer data source has no per-tenant cache to evict.
             }
         });
-        service = new ProjectApplicationService(tenantExecutor, JsonMapper.builder().build(), tenantMemberships);
+        service = new ProjectApplicationService(tenantExecutor, JsonMapper.builder().findAndAddModules().build(), tenantMemberships);
         resourceStorage = mock(ResourceStorage.class);
         when(resourceStorage.createDownloadUrl(anyString(), any())).thenAnswer(invocation ->
                 "https://storage.example.test/" + invocation.getArgument(0, String.class));
@@ -641,6 +641,96 @@ class ProjectAuthorizationIntegrationTest {
         useContext(MEMBER, TenantRole.MEMBER);
         notifications.removePushSubscription(first.id());
         assertThat(notifications.pushSubscriptions()).isEmpty();
+    }
+
+
+    @Test
+    void pooledMetadataIsTypedAndStoredOnTheSharedTaskTable() {
+        useContext(MANAGER, TenantRole.OWNER);
+        configureKanban("OFF", 2);
+        var task = service.createTask(BOARD_A, new CreateTaskRequest(COLUMN_A, null, "Typed metadata", null,
+                TaskPriority.MEDIUM, null, null, null, java.util.Map.of("story_points", 5)));
+        assertThat(task.customData()).containsEntry("story_points", 5);
+        assertThatThrownBy(() -> service.createTask(BOARD_A, new CreateTaskRequest(COLUMN_A, null, "Bad metadata", null,
+                TaskPriority.MEDIUM, null, null, null, java.util.Map.of("story_points", "not a number"))))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.createTask(BOARD_A, new CreateTaskRequest(COLUMN_A, null, "Foreign schema", null,
+                TaskPriority.MEDIUM, null, null, null, java.util.Map.of("channel", "web"))))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(count("SELECT count(*) FROM tasks WHERE tenant_id=?", TENANT_A)).isEqualTo(2);
+        assertThat(new JdbcTemplate(applicationDataSource).queryForObject(
+                "SELECT count(*) FROM tenant_kanban_settings", Long.class)).isZero();
+    }
+
+    @Test
+    void strictWipBlocksThirdTaskAndWarnAllowsIt() {
+        useContext(MANAGER, TenantRole.OWNER);
+        UUID doing = UUID.randomUUID();
+        adminJdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,2000)",
+                doing, TENANT_A, BOARD_A, "In Dev");
+        configureKanban("STRICT", 2);
+        for (int i=0; i<2; i++) service.createTask(BOARD_A,
+                new CreateTaskRequest(doing,null,"Task " + i,null,TaskPriority.MEDIUM,null,null,null));
+        assertThatThrownBy(() -> service.createTask(BOARD_A,
+                new CreateTaskRequest(doing,null,"Third",null,TaskPriority.MEDIUM,null,null,null)))
+                .isInstanceOf(vn.edu.ctu.saas.customization.WipLimitException.class);
+        configureKanban("WARN", 2);
+        service.createTask(BOARD_A,new CreateTaskRequest(doing,null,"Allowed warning",null,TaskPriority.MEDIUM,null,null,null));
+        assertThat(count("SELECT count(*) FROM tasks WHERE board_column_id=?", doing)).isEqualTo(3);
+    }
+
+    @Test
+    void concurrentCreatesCannotExceedStrictWip() throws Exception {
+        UUID doing = UUID.randomUUID();
+        adminJdbc.update("INSERT INTO board_columns(id,tenant_id,board_id,name,position) VALUES (?,?,?,?,2000)",
+                doing,TENANT_A,BOARD_A,"In Dev");
+        configureKanban("STRICT", 1);
+        var threads = java.util.concurrent.Executors.newFixedThreadPool(2);
+        var start = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.Callable<Boolean> create = () -> {
+            useContext(MANAGER,TenantRole.OWNER);
+            try {
+                start.await();
+                service.createTask(BOARD_A,new CreateTaskRequest(doing,null,"Concurrent",null,TaskPriority.MEDIUM,null,null,null));
+                return true;
+            } catch (vn.edu.ctu.saas.customization.WipLimitException expected) { return false; }
+            finally { TenantContextHolder.clear(); }
+        };
+        try {
+            var one=threads.submit(create); var two=threads.submit(create); start.countDown();
+            assertThat(java.util.List.of(one.get(20,java.util.concurrent.TimeUnit.SECONDS),two.get(20,java.util.concurrent.TimeUnit.SECONDS)))
+                    .containsExactlyInAnyOrder(true,false);
+        } finally { threads.shutdownNow(); }
+        assertThat(count("SELECT count(*) FROM tasks WHERE board_column_id=?",doing)).isOne();
+    }
+
+    @Test
+    void settingsRejectStaleUpdatesAndDoNotCrossTenantBoundaries() {
+        var cache = new vn.edu.ctu.saas.customization.TenantConfigurationCache(
+                mock(org.springframework.beans.factory.ObjectProvider.class), false);
+        var settings = new vn.edu.ctu.saas.customization.PooledKanbanService(
+                tenantExecutor,JsonMapper.builder().findAndAddModules().build(),cache);
+        useContext(MANAGER,TenantRole.OWNER);
+        var first = settings.update(new vn.edu.ctu.saas.customization.PooledKanbanService.View(
+                new vn.edu.ctu.saas.customization.KanbanSettings("STRICT",2,"FULL",
+                        java.util.List.of("Backlog","In Dev","Done"),java.util.List.of()),0));
+        assertThat(first.version()).isEqualTo(1);
+        assertThatThrownBy(() -> settings.update(new vn.edu.ctu.saas.customization.PooledKanbanService.View(first.settings(),0)))
+                .isInstanceOf(ConflictException.class);
+        useContext(MEMBER,TenantRole.MEMBER);
+        assertThatThrownBy(() -> settings.update(new vn.edu.ctu.saas.customization.PooledKanbanService.View(first.settings(),1)))
+                .isInstanceOf(TenantAccessDeniedException.class);
+        TenantContextHolder.set(new TenantContext(FOREIGN_MANAGER,TENANT_B,"beta","STARTER",TenantPlacement.POOL,
+                Set.of(TenantRole.OWNER),"request-b","correlation-b"));
+        assertThat(settings.get().settings().wipMode()).isEqualTo("OFF");
+    }
+
+    private void configureKanban(String mode, int limit) {
+        String json = "{\"wipMode\":\"" + mode + "\",\"wipLimit\":" + limit
+                + ",\"cardStyle\":\"FULL\",\"defaultColumns\":[\"Backlog\",\"In Dev\",\"Done\"],"
+                + "\"fields\":[{\"key\":\"story_points\",\"label\":\"Story points\",\"type\":\"NUMBER\",\"required\":false}]}";
+        adminJdbc.update("INSERT INTO tenant_kanban_settings(tenant_id,settings) VALUES (?,CAST(? AS jsonb)) "
+                + "ON CONFLICT (tenant_id) DO UPDATE SET settings=EXCLUDED.settings,version=tenant_kanban_settings.version+1",TENANT_A,json);
     }
 
     private static void seedProject(

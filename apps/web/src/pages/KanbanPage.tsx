@@ -1,3 +1,5 @@
+import { PooledTaskFields } from '../components/PooledTaskFields';
+import { kanbanSettingsApi } from '../api/kanbanSettings';
 import {
   closestCorners,
   DndContext,
@@ -289,6 +291,9 @@ export function KanbanPage() {
   const [snackbar, setSnackbar] = useState<string | null>(null);
   const [taskDialogColumn, setTaskDialogColumn] = useState<UUID | null>(null);
   const [taskParentId, setTaskParentId] = useState<UUID | undefined>();
+  const kanbanConfiguration = useQuery({ queryKey: ['kanban-settings'], queryFn: kanbanSettingsApi.get });
+  const [newCustomData, setNewCustomData] = useState<Record<string, unknown>>({});
+  const [detailCustomData, setDetailCustomData] = useState<Record<string, unknown>>({});
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskPriority, setTaskPriority] = useState<TaskPriority>('MEDIUM');
@@ -432,6 +437,7 @@ export function KanbanPage() {
         dueDate: taskDueAt ? new Date(taskDueAt).toISOString() : undefined,
         parentTaskId: taskParentId,
         priority: taskPriority,
+        customData: newCustomData,
       }),
     onSuccess: (updatedBoard) => {
       setBoard(updatedBoard);
@@ -439,6 +445,7 @@ export function KanbanPage() {
       setTaskDialogColumn(null);
       setTaskParentId(undefined);
       setTaskTitle('');
+    setNewCustomData({});
       setTaskDescription('');
       setTaskPriority('MEDIUM');
       setTaskDueAt('');
@@ -531,6 +538,7 @@ export function KanbanPage() {
         title: detailTitle.trim(),
         description: detailDescription.trim() || undefined,
         priority: detailPriority,
+        customData: detailCustomData,
         assigneeId: detailAssigneeId || undefined,
         dueDate: detailDueAt ? new Date(detailDueAt).toISOString() : undefined,
         position: task.position,
@@ -695,6 +703,7 @@ export function KanbanPage() {
     setTaskDialogColumn(columnId);
     setTaskParentId(parentTaskId);
     setTaskTitle('');
+    setNewCustomData({});
     setTaskDescription('');
     setTaskPriority('MEDIUM');
     setTaskDueAt('');
@@ -707,6 +716,7 @@ export function KanbanPage() {
     if (!task) return;
     setSelectedTaskId(taskId);
     setDetailTitle(task.title);
+    setDetailCustomData(task.customData ?? {});
     setDetailDescription(task.description ?? '');
     setDetailPriority(task.priority);
     setDetailDueAt(task.dueDate ? localDateTimeValue(task.dueDate) : '');
@@ -762,7 +772,7 @@ export function KanbanPage() {
   };
 
   return (
-    <Box className="page-container page-container--wide">
+    <Box className={`page-container page-container--wide ${kanbanConfiguration.data?.settings.cardStyle === 'COMPACT' ? 'kanban-view--compact' : ''}`}>
       <PageHeader
         breadcrumbs={selectedProject ? (
           <Breadcrumbs aria-label="Điều hướng bảng Kanban">
@@ -906,6 +916,8 @@ export function KanbanPage() {
           <DragOverlay>{activeTask ? <TaskCardView task={activeTask} overlay /> : null}</DragOverlay>
         </DndContext>
       ) : null}
+      {kanbanConfiguration.data?.settings.wipMode === 'WARN' && board?.columns.some(column => column.taskLimit && column.tasks.length > column.taskLimit) &&
+        <Alert severity="warning">Một cột đang vượt giới hạn WIP. Bạn vẫn có thể tiếp tục; hãy hoàn thành bớt công việc trước khi nhận thêm.</Alert>}
       <Dialog open={Boolean(taskDialogColumn)} onClose={() => setTaskDialogColumn(null)} fullWidth maxWidth="sm">
         <Box component="form" onSubmit={submitTask}>
           <DialogTitle>{taskParentId ? 'Thêm công việc con' : 'Thêm công việc'}</DialogTitle>
@@ -927,6 +939,7 @@ export function KanbanPage() {
                 minRows={3}
                 inputProps={{ maxLength: 10_000 }}
               />
+              <PooledTaskFields fields={kanbanConfiguration.data?.settings.fields ?? []} values={newCustomData} onChange={setNewCustomData} />
               <TextField
                 label="Hạn hoàn thành"
                 type="datetime-local"
@@ -1023,6 +1036,7 @@ export function KanbanPage() {
                 minRows={3}
                 inputProps={{ maxLength: 10_000 }}
               />
+              <PooledTaskFields fields={kanbanConfiguration.data?.settings.fields ?? []} values={detailCustomData} onChange={setDetailCustomData} disabled={!canEditTasks} />
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
                   label="Hạn hoàn thành"

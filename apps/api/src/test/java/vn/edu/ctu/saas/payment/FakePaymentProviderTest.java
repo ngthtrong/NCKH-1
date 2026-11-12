@@ -9,13 +9,13 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import vn.edu.ctu.saas.support.TestAppProperties;
 
 class FakePaymentProviderTest {
     private static final String SECRET = "test-payment-webhook-secret";
     private final FakePaymentProvider provider = new FakePaymentProvider(
-            JsonMapper.builder().build(), TestAppProperties.create());
+            JsonMapper.builder().findAndAddModules().build(), TestAppProperties.create());
 
     @Test
     void acceptsAuthenticWebhookAndRejectsForgery() throws Exception {

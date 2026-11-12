@@ -28,6 +28,49 @@ tags:
   - name: Approvals
   - name: Automation
 paths:
+  /architecture:
+    get:
+      operationId: getArchitecture
+      security: []
+      responses:
+        '200':
+          description: Public deployment architecture and experiment switches
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mode, maturityLevel, rateLimitEnabled, cacheEnabled]
+                properties:
+                  mode: {type: string, enum: [POOL, BRIDGE]}
+                  maturityLevel: {type: integer, const: 3}
+                  rateLimitEnabled: {type: boolean}
+                  cacheEnabled: {type: boolean}
+  /tenant-settings/kanban:
+    get:
+      operationId: getKanbanConfiguration
+      tags: [Tenant customization]
+      responses:
+        '200':
+          description: Tenant-scoped Kanban metadata
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/KanbanConfiguration'}
+        default: {$ref: '#/components/responses/Error'}
+    put:
+      operationId: updateKanbanConfiguration
+      tags: [Tenant customization]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/KanbanConfiguration'}
+      responses:
+        '200':
+          description: Updated settings; Owner/Admin only; stale version returns 409
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/KanbanConfiguration'}
+        default: {$ref: '#/components/responses/Error'}
   /auth/login:
     post:
       tags: [Auth]
@@ -1888,6 +1931,7 @@ components:
       type: object
       required: [id, name, position, completed]
       properties:
+        taskLimit: {type: [integer, 'null'], minimum: 1}
         id: {$ref: '#/components/schemas/UUID'}
         name: {type: string}
         position: {type: number}
@@ -1896,6 +1940,7 @@ components:
       type: object
       required: [id, projectId, boardId, columnId, title, priority, position, version, subtaskCount, completedSubtaskCount, commentCount, createdAt, updatedAt]
       properties:
+        customData: {type: object, additionalProperties: true}
         id: {$ref: '#/components/schemas/UUID'}
         projectId: {$ref: '#/components/schemas/UUID'}
         boardId: {$ref: '#/components/schemas/UUID'}
@@ -1965,6 +2010,7 @@ components:
       type: object
       required: [columnId, title, priority]
       properties:
+        customData: {type: object, additionalProperties: true}
         columnId: {$ref: '#/components/schemas/UUID'}
         parentTaskId: {anyOf: [{$ref: '#/components/schemas/UUID'}, {type: 'null'}]}
         title: {type: string, maxLength: 240}
@@ -1977,6 +2023,7 @@ components:
       type: object
       required: [columnId, title, priority, version]
       properties:
+        customData: {type: object, additionalProperties: true}
         columnId: {$ref: '#/components/schemas/UUID'}
         title: {type: string, maxLength: 240}
         description: {type: [string, 'null'], maxLength: 10000}
@@ -2270,6 +2317,30 @@ components:
         primaryColor: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
         accentColor: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
         version: {type: integer, format: int64, minimum: 0}
+    KanbanConfiguration:
+      type: object
+      required: [settings, version]
+      properties:
+        version: {type: integer, minimum: 0}
+        settings:
+          type: object
+          required: [wipMode, wipLimit, cardStyle, defaultColumns, fields]
+          properties:
+            wipMode: {type: string, enum: [STRICT, WARN, 'OFF']}
+            wipLimit: {type: integer, minimum: 1, maximum: 10000}
+            cardStyle: {type: string, enum: [FULL, COMPACT]}
+            defaultColumns: {type: array, minItems: 2, maxItems: 12, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 120}}
+            fields:
+              type: array
+              maxItems: 30
+              items:
+                type: object
+                required: [key, label, type, required]
+                properties:
+                  key: {type: string, pattern: '^[a-z][a-z0-9_]{0,39}$'}
+                  label: {type: string, minLength: 1, maxLength: 120}
+                  type: {type: string, enum: [STRING, NUMBER, BOOLEAN]}
+                  required: {type: boolean}
     TenantSettingsView:
       type: object
       required: [capabilities, branding]

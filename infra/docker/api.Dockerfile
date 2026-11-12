@@ -2,10 +2,8 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
 COPY apps/api/pom.xml ./
-RUN mvn -B -ntp -DskipTests dependency:go-offline
-
 COPY apps/api/src src
-RUN mvn -B -ntp -DskipTests package \
+RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp -Dmaven.test.skip=true package \
     && find target -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*.original' -exec cp '{}' /workspace/application.jar \; \
     && test -s /workspace/application.jar
 

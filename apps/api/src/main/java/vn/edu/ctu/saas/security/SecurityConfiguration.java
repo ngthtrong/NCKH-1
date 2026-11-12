@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/resources/content").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/resources/content", "/api/v1/architecture").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/invitations/*").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login", "/api/v1/auth/register",

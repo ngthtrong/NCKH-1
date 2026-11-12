@@ -1,5 +1,11 @@
 # Hướng dẫn khởi chạy và kiểm thử ứng dụng local
 
+> Cập nhật 12/11/2026: `scripts/dev-up.sh` mặc định chạy **Pool mức 3 theo báo cáo**,
+> project Compose `nckh-report`, PostgreSQL 16, Redis 7, hai tenant `t-acme`/`t-lotus`.
+> Xem [hướng dẫn hiện hành và kịch bản thực nghiệm](../experiments/report/README.md).
+> Phần hướng dẫn ba placement/MinIO bên dưới áp dụng cho biến thể Bridge,
+> chạy với `APP_VARIANT=bridge`. Không dùng nó để kết luận bản Pool đã khớp báo cáo.
+
 Hướng dẫn này dùng cho môi trường phát triển hoặc kiểm thử thủ công trên một máy. Cách chạy được hỗ
 trợ chính thức là Docker Compose; không cần cài PostgreSQL, MinIO, Java hay Node trực tiếp trên máy.
 
@@ -226,4 +232,3 @@ Không sửa trực tiếp metadata placement trong database.
 - [Backup và restore](../infra/runbooks/backup-restore.md)
 - [Triển khai Internet/VPS](../infra/runbooks/deployment.md)
 - [Checkpoint hiện tại](PROJECT_STATUS.md)
-

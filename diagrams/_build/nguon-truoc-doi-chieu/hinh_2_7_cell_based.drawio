@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_7_cell_based" name="Hình 2.7 · Cell-Based / Deployment Stamps">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="955">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Hình 2.7 · Cell-Based / Deployment Stamps" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Tenant registry lưu ánh xạ ổn định tenant → cell. Mỗi cell có giới hạn sức chứa và một ngăn xếp độc lập." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Global Router → Tenant Registry (tenant_id → cell_id)" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="300" y="120" width="600" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="CELL 01 · biên Level 2/3" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#EAF2FF;swimlaneFillColor=#ffffff;strokeColor=#527CB8;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="30" y="270" width="340" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="8–9 · App Cluster&#10;Nhiều tenant / cell" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="65" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="7 · Cache + Queue&#10;Quota / tenant scope" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="143" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="4–6 · DB riêng của cell&#10;Shared tables + RLS Level 5" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="221" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="2–3 · VM/Container runtime&#10;OS/kernel tùy mức cô lập" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="299" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="registry → cell_01" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.25;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="220" />
+              <mxPoint x="200" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" value="Ví dụ: ≤ 1.000 tenant / cell" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="685" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="CELL 02 · biên Level 2/3" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#EAF6EE;swimlaneFillColor=#ffffff;strokeColor=#39845A;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="430" y="270" width="340" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="8–9 · App Cluster&#10;Nhiều tenant / cell" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="12">
+          <mxGeometry x="20" y="65" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="7 · Cache + Queue&#10;Quota / tenant scope" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="12">
+          <mxGeometry x="20" y="143" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="4–6 · DB riêng của cell&#10;Shared tables + RLS Level 5" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="12">
+          <mxGeometry x="20" y="221" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="2–3 · VM/Container runtime&#10;OS/kernel tùy mức cô lập" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="12">
+          <mxGeometry x="20" y="299" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="registry → cell_02" edge="1" parent="1" source="4" target="12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Ví dụ: ≤ 1.000 tenant / cell" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="430" y="685" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="CELL 03 · biên Level 2/3" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#F0ECFA;swimlaneFillColor=#ffffff;strokeColor=#8263B1;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="830" y="270" width="340" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="8–9 · App Cluster&#10;Nhiều tenant / cell" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="19">
+          <mxGeometry x="20" y="65" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="7 · Cache + Queue&#10;Quota / tenant scope" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="19">
+          <mxGeometry x="20" y="143" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="4–6 · DB riêng của cell&#10;Shared tables + RLS Level 5" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF6EE;strokeColor=#39845A;strokeWidth=1.6;" vertex="1" parent="19">
+          <mxGeometry x="20" y="221" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="2–3 · VM/Container runtime&#10;OS/kernel tùy mức cô lập" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="19">
+          <mxGeometry x="20" y="299" width="300" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="registry → cell_03" edge="1" parent="1" source="4" target="19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.75;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="220" />
+              <mxPoint x="1000" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="25" value="Ví dụ: ≤ 1.000 tenant / cell" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="685" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="1 · Hardware có thể dùng chung; tách Cell không đồng nghĩa tách máy chủ vật lý." style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="740" width="1140" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="810" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="810" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="810" width="580" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="Không tính lại tenant_id % số_cell khi thêm cell: di chuyển tenant cần kế hoạch chuyển dữ liệu và cập nhật registry.&#10;Cell giới hạn nhiều lỗi của data plane; Router/Registry/control plane chung vẫn cần HA và đánh giá sự cố riêng." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="865" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

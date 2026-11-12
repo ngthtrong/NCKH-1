@@ -1,7 +1,7 @@
 package vn.edu.ctu.saas.payment;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -43,7 +43,7 @@ public class FakePaymentProvider implements PaymentProvider {
             throw new IllegalArgumentException("Invalid payment webhook signature");
         }
         try {
-            JsonNode payload = objectMapper.readTree(rawBody);
+            JsonNode payload = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, rawBody);
             String reference = payload.path("reference").asText();
             String eventId = payload.path("eventId").asText();
             long amountMinor = payload.path("amountMinor").asLong(-1);
@@ -71,7 +71,7 @@ public class FakePaymentProvider implements PaymentProvider {
             throw new IllegalArgumentException("Payment amount and currency are invalid");
         }
         try {
-            String body = objectMapper.writeValueAsString(Map.of(
+            String body = vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, Map.of(
                     "reference", reference,
                     "eventId", "local-checkout-" + reference,
                     "status", "SUCCEEDED",

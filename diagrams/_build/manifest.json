@@ -1,0 +1,66 @@
+[
+  {
+    "stem": "hinh_2_1_master_blueprint",
+    "title": "Hình 2.1 · Sơ đồ gốc 9 tầng ngăn xếp hệ thống"
+  },
+  {
+    "stem": "hinh_2_2_silo_model",
+    "title": "Hình 2.2 · Mô hình Silo"
+  },
+  {
+    "stem": "hinh_2_3_pool_model",
+    "title": "Hình 2.3 · Mô hình Pool"
+  },
+  {
+    "stem": "hinh_2_4_bridge_model",
+    "title": "Hình 2.4 · Mô hình Bridge"
+  },
+  {
+    "stem": "hinh_2_5_hybrid_model",
+    "title": "Hình 2.5 · Mô hình Hybrid"
+  },
+  {
+    "stem": "hinh_2_6_data_isolation",
+    "title": "Hình 2.6 · Trọng tâm cô lập dữ liệu"
+  },
+  {
+    "stem": "hinh_2_7_tco_rls_engine",
+    "title": "Hình 2.7 · Trọng tâm TCO và RLS Engine"
+  },
+  {
+    "stem": "hinh_2_8_schema_namespace",
+    "title": "Hình 2.8 · Trọng tâm tùy biến cấu trúc"
+  },
+  {
+    "stem": "hinh_2_9_customer_segmentation",
+    "title": "Hình 2.9 · Trọng tâm phân khúc khách hàng"
+  },
+  {
+    "stem": "hinh_2_10_smb_profile",
+    "title": "Hình 2.10 · SMB / Startup Profile"
+  },
+  {
+    "stem": "hinh_2_11_enterprise_profile",
+    "title": "Hình 2.11 · Enterprise / Regulated Profile"
+  },
+  {
+    "stem": "hinh_2_12_cell_based_profile",
+    "title": "Hình 2.12 · Global Hyper-Scale Cell-Based Profile"
+  },
+  {
+    "stem": "hinh_2_13_feature_flags_sequence",
+    "title": "Hình 2.13 · Lan truyền ngữ cảnh và cờ tính năng"
+  },
+  {
+    "stem": "hinh_2_14_set_local_sequence",
+    "title": "Hình 2.14 · SET LOCAL và tái sử dụng Connection Pool"
+  },
+  {
+    "stem": "hinh_2_15_two_tier_caching",
+    "title": "Hình 2.15 · Two-Tier Caching và W-TinyLFU"
+  },
+  {
+    "stem": "hinh_2_16_decision_tree",
+    "title": "Hình 2.16 · Cây quyết định kiến trúc"
+  }
+]

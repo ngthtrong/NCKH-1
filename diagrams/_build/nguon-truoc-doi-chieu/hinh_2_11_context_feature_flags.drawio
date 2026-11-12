@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile>
+  <diagram id="seqlayout" name="Hình 2.11 · TenantContext xuyên luồng và feature flags">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gw" value="Gateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="140" y="140" width="190" height="925" as="geometry" />
+        </mxCell>
+        <mxCell id="be" value="Backend Filter / Service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="500" y="140" width="190" height="925" as="geometry" />
+        </mxCell>
+        <mxCell id="wk" value="Async Worker" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="860" y="140" width="190" height="925" as="geometry" />
+        </mxCell>
+        <mxCell id="ff" value="Local Flag Provider" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;size=65;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="140" width="190" height="925" as="geometry" />
+        </mxCell>
+        <mxCell id="m0" value="HTTP + thông tin định danh tin cậy" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.1243;entryX=0.5;entryY=0.1243;" edge="1" parent="1" source="gw" target="be">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="Xác thực tenant; tạo immutable context" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.2;entryX=0.5;entryY=0.2324;" edge="1" parent="1" source="be" target="be">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="655" y="325" />
+              <mxPoint x="655" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="TaskDecorator: capture + restore context" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.2919;entryX=0.5;entryY=0.2919;" edge="1" parent="1" source="be" target="wk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="Evaluate(flag, tenant, tier)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.3676;entryX=0.5;entryY=0.3676;" edge="1" parent="1" source="wk" target="ff">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="Giá trị flag từ bộ nhớ" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.4432;entryX=0.5;entryY=0.4432;" edge="1" parent="1" source="ff" target="wk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="Xử lý nghiệp vụ theo quyền / flag" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.5189;entryX=0.5;entryY=0.5514;" edge="1" parent="1" source="wk" target="wk">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1015" y="620" />
+              <mxPoint x="1015" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="finally: clear / restore worker context" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.6108;entryX=0.5;entryY=0.6432;" edge="1" parent="1" source="wk" target="wk">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1015" y="705" />
+              <mxPoint x="1015" y="735" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="Kết quả hoặc lỗi" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.7027;entryX=0.5;entryY=0.7027;" edge="1" parent="1" source="wk" target="be">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m8" value="finally: clear request context" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.7784;entryX=0.5;entryY=0.8108;" edge="1" parent="1" source="be" target="be">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="655" y="860" />
+              <mxPoint x="655" y="890" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="HTTP response" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;curved=0;rounded=0;strokeColor=#999999;fontColor=#999999;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0.8703;entryX=0.5;entryY=0.8703;" edge="1" parent="1" source="be" target="gw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="Hình 2.11 · TenantContext xuyên luồng và feature flags" vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;">
+          <mxGeometry x="30" y="20" width="1380.0" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="JVM minh họa: Gateway và Backend là hai process; ThreadLocal chỉ có hiệu lực trong process/thread tương ứng." vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;">
+          <mxGeometry x="30" y="70" width="1380.0" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" value="TaskDecorator dọn context ở worker cả khi lỗi; Filter dọn context request trong finally. Local provider là lựa chọn triển khai,&#10;OpenFeature không bảo đảm không có network call hoặc độ trễ &lt;1ms. Truy cập DB tuân thủ Hình 2.12." vertex="1" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;">
+          <mxGeometry x="30" y="1090.0" width="1380.0" height="115" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

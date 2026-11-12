@@ -1,0 +1,63 @@
+{
+  "architecture": {
+    "mode": "POOL",
+    "maturityLevel": 3,
+    "rateLimitEnabled": true,
+    "cacheEnabled": true
+  },
+  "readiness": {
+    "status": "UP"
+  },
+  "tenants": [
+    {
+      "slug": "pool-demo",
+      "status": "ACTIVE",
+      "placement": "POOL",
+      "database": "pool_db",
+      "schema": "public",
+      "schemaVersion": "14"
+    },
+    {
+      "slug": "t-acme",
+      "status": "ACTIVE",
+      "placement": "POOL",
+      "database": "pool_db",
+      "schema": "public",
+      "schemaVersion": "14"
+    },
+    {
+      "slug": "t-lotus",
+      "status": "ACTIVE",
+      "placement": "POOL",
+      "database": "pool_db",
+      "schema": "public",
+      "schemaVersion": "14"
+    }
+  ],
+  "roles": [
+    {
+      "name": "control_api",
+      "superuser": false,
+      "bypassRls": false,
+      "createDb": false
+    },
+    {
+      "name": "pool_api",
+      "superuser": false,
+      "bypassRls": false,
+      "createDb": false
+    }
+  ],
+  "rls": [
+    {
+      "table": "tasks",
+      "enabled": true,
+      "forced": true
+    },
+    {
+      "table": "tenant_kanban_settings",
+      "enabled": true,
+      "forced": true
+    }
+  ]
+}

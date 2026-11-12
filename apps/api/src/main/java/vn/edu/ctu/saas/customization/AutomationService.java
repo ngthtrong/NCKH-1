@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.common.ConflictException;
 import vn.edu.ctu.saas.common.NotFoundException;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -202,7 +202,7 @@ public class AutomationService {
                     id,tenant_id,actor_user_id,event_type,aggregate_type,aggregate_id,correlation_id,details_json)
                 VALUES (?,?,?,?,?,?,?,CAST(? AS jsonb))
                 """, UUID.randomUUID(), context.tenantId(), context.userId(), eventType, "AutomationRule",
-                aggregateId, context.correlationId(), objectMapper.writeValueAsString(details));
+                aggregateId, context.correlationId(), vn.edu.ctu.saas.common.JsonSupport.write(objectMapper, details));
     }
 
     private TenantContext contextWithCapability() {

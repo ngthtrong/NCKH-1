@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="drawio" version="32.6.10">
+  <diagram id="hinh_2_5_hybrid_model" name="Hình 2.5 · Hybrid: Pool và Silo cùng tồn tại">
+    <mxGraphModel grid="1" gridSize="10" page="0" background="#ffffff" math="0" shadow="0" pageWidth="1200" pageHeight="980">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Hình 2.5 · Hybrid: Pool và Silo cùng tồn tại" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=25;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="20" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Định tuyến động theo tenant và tier; phối hợp ranh giới Level 5 và Level 2/3." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=15;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="65" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Dynamic API Gateway · xác thực JWT + tenant/tier → registry đích" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#FFF2E2;strokeColor=#BF7A28;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="260" y="120" width="680" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="FREE / PRO · POOL" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#EAF2FF;swimlaneFillColor=#ffffff;strokeColor=#527CB8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="30" y="245" width="540" height="510" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="9 · Shared app instances" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="65" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="8 · Shared runtime + feature flags" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="117" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="7 · Redis/Queue + tenant quota" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="169" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="6 · Shared schema / tables + RLS" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="221" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="5 · Shared database" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="273" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="4 · PostgreSQL engine" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="325" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="3 · OS/kernel của vùng Pool" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="377" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="2 · VM/Container của vùng Pool" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#EAF2FF;strokeColor=#527CB8;strokeWidth=1.6;" vertex="1" parent="5">
+          <mxGeometry x="20" y="429" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="tenant → Pool" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.25;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="ENTERPRISE · SILO" style="swimlane;html=1;whiteSpace=wrap;startSize=48;horizontal=1;container=1;pointerEvents=0;collapsible=0;fontFamily=Arial;fontColor=#213047;fontSize=16;fontStyle=1;fillColor=#F0ECFA;swimlaneFillColor=#ffffff;strokeColor=#8263B1;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="630" y="245" width="540" height="510" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="9 · App / custom script riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="65" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="8 · Runtime / sandbox riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="117" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="7 · Dedicated Redis + Queue" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="169" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="6 · Schema riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="221" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="5 · Dedicated DB + BYOK" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="273" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="4 · Dedicated PostgreSQL instance" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="325" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="3 · Guest OS riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="377" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="2 · VM riêng + Pod limits" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F0ECFA;strokeColor=#8263B1;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="15">
+          <mxGeometry x="20" y="429" width="500" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="tenant → Silo" edge="1" parent="1" source="4" target="15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;labelBackgroundColor=#ffffff;strokeColor=#53647C;strokeWidth=1.6;endArrow=block;endFill=1;exitX=0.75;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="1 · Hardware nhà cung cấp có thể dùng chung; mức cô lập trong hình được tạo bằng VM/Container." style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="775" width="1140" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="Khung liền: dùng chung" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="835" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="Khung đứt: dành riêng" style="rounded=1;arcSize=12;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=10;fontFamily=Arial;fontColor=#213047;fontSize=16;fillColor=#F3F5F8;strokeColor=#8592A4;strokeWidth=1.6;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="310" y="835" width="260" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="Kiểu nét áp dụng cho khung vùng tài nguyên; mũi tên biểu diễn luồng hoặc phụ thuộc." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=13;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="835" width="580" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Pool dùng chung giữa các tenant tiêu chuẩn (Level 5); vùng Enterprise cấp riêng theo tenant (Level 2/3).&#10;Mô hình minh họa Silo VM: hardware vẫn có thể được chia sẻ; không đồng nhất “dedicated instance” với bare metal." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;fontFamily=Arial;fontColor=#213047;fontSize=16;fontSize=14;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="30" y="890" width="1140" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.notification.TenantEvent;
 import vn.edu.ctu.saas.support.TestAppProperties;
 

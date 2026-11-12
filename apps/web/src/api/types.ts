@@ -82,6 +82,7 @@ export type ProjectMember = ApiSchemas['ProjectMemberView'];
 export type TaskPriority = ApiSchemas['TaskPriority'];
 
 export interface TaskCard {
+  customData?: Record<string, unknown>;
   id: UUID;
   columnId: UUID;
   parentTaskId?: UUID;
@@ -122,6 +123,7 @@ export type UpdateColumnRequest = ApiSchemas['UpdateColumnRequest'];
 export type ReorderColumnsRequest = ApiSchemas['ReorderColumnsRequest'];
 
 export interface CreateTaskRequest {
+  customData?: Record<string, unknown>;
   title: string;
   description?: string;
   priority: TaskPriority;
@@ -131,6 +133,7 @@ export interface CreateTaskRequest {
 }
 
 export interface UpdateTaskRequest {
+  customData?: Record<string, unknown>;
   columnId: UUID;
   title: string;
   description?: string;

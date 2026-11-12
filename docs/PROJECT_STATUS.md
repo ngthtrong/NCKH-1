@@ -1,5 +1,11 @@
 # Điểm khôi phục triển khai đề tài
 
+> **Cập nhật phạm vi 12/11/2026:** người dùng yêu cầu lấy `Report (1).docx` làm chuẩn,
+> chạy/sửa ứng dụng và xây dựng KB-1–KB-4. Bản mặc định chuyển sang Pool mức 3;
+> Bridge giữ thành biến thể. Hướng dẫn và giới hạn bằng chứng hiện hành tại
+> [`experiments/report/README.md`](../experiments/report/README.md).
+> Các checkpoint bên dưới là lịch sử; không chứng minh các thay đổi mới đã nghiệm thu.
+
 **Cập nhật:** 2026-09-19 (UTC+7)
 **Nhánh đang làm:** `an_upgrade_features`
 **Checkpoint mã nguồn P-App:** `c226676` (`p-app`)

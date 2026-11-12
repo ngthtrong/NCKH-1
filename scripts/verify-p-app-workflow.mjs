@@ -232,6 +232,9 @@ async function bestEffort(path, method) {
 }
 
 async function jsonRequest(path, options) {
+  if (options?.method === 'POST' && /^\/api\/v1\/boards\/[^/]+\/tasks$/.test(path)) {
+    options = { ...options, body: { priority: 'MEDIUM', ...options.body } };
+  }
   const response = await request(path, options);
   const body = await response.text();
   if (!body) throw new Error(`${options.method || 'GET'} ${path} returned an empty JSON body`);

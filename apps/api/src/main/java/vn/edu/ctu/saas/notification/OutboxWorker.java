@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import vn.edu.ctu.saas.control.TenantEntity;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -324,7 +324,7 @@ public class OutboxWorker {
 
     private UUID payloadUuid(TenantEvent event, String field) {
         try {
-            JsonNode value = objectMapper.readTree(event.payloadJson()).path(field);
+            JsonNode value = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, event.payloadJson()).path(field);
             return value.isMissingNode() || value.isNull() || value.asText().isBlank()
                     ? null
                     : UUID.fromString(value.asText());
@@ -335,7 +335,7 @@ public class OutboxWorker {
 
     private Instant payloadInstant(TenantEvent event, String field) {
         try {
-            JsonNode value = objectMapper.readTree(event.payloadJson()).path(field);
+            JsonNode value = vn.edu.ctu.saas.common.JsonSupport.tree(objectMapper, event.payloadJson()).path(field);
             return value.isMissingNode() || value.isNull() || value.asText().isBlank()
                     ? null
                     : Instant.parse(value.asText());

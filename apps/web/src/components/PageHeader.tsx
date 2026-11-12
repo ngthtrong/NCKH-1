@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 
 export function PageHeader({
   breadcrumbs,
-  eyebrow,
   title,
   description,
   actions,
@@ -24,7 +23,6 @@ export function PageHeader({
     >
       <Box>
         {breadcrumbs && <Box className="page-breadcrumbs">{breadcrumbs}</Box>}
-        {eyebrow && <Typography className="eyebrow">{eyebrow}</Typography>}
         <Typography component="h1" variant="h4">
           {title}
         </Typography>

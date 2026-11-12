@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+if [[ "${APP_VARIANT:-report}" == "report" ]]; then
+  exec bash "$(dirname -- "${BASH_SOURCE[0]}")/report-up.sh"
+fi
+
 repository_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 compose_file="$repository_root/infra/compose.yaml"
 environment_file="${ENV_FILE:-$repository_root/infra/.env}"
