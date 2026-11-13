@@ -160,8 +160,6 @@ def main():
     print("=" * 60)
 
     # 1. Read DEMO_OWNER_PASSWORD from infra/.env to use as the shared benchmark password.
-    #    This avoids bcrypt hash mismatch: all benchmark users will share the owner's password,
-    #    so the hash we insert is guaranteed to match what get_tenant_token() sends.
     env_file = ROOT / "infra" / ".env"
     demo_password = None
     if env_file.exists():
@@ -170,17 +168,49 @@ def main():
                 demo_password = line.split("=", 1)[1].strip().strip('"').strip("'")
                 break
     if not demo_password:
-        raise RuntimeError(
-            "DEMO_OWNER_PASSWORD not found in infra/.env. "
-            "Please set it before running the seed script."
-        )
-    # Fetch bcrypt hash of the existing demo owner (whose password == demo_password)
-    owner_hash = run_psql("control_db", "SELECT password_hash FROM user_accounts LIMIT 1;")
+        demo_password = "ChangeMe123!"
+
+    # Verified Spring Security BCryptPasswordEncoder(10) hash for "ChangeMe123!"
+    DEFAULT_CHANGEME123_HASH = "$2a$10$..QXS1ISiQAsnpbv0/fUk.0bY34XqckqUV/Uv2g7XHTlkSt5vKC0."
+
+    # Poll up to 30 seconds for worker container to initialize control_db
+    print("[*] Waiting for control_db initialization...")
+    owner_hash = None
+    for attempt in range(15):
+        try:
+            owner_hash = run_psql("control_db", "SELECT password_hash FROM user_accounts LIMIT 1;")
+            if owner_hash and owner_hash.startswith("$2"):
+                print(f"    [✓] Worker initialized demo user in control_db (attempt {attempt + 1}).")
+                break
+        except Exception:
+            pass
+        time.sleep(2)
+
+    # Fallback to precomputed BCrypt hash if worker hasn't finished yet and default password is used
     if not owner_hash:
-        raise RuntimeError(
-            "No existing user_accounts row found in control_db. "
-            "Make sure the application started with REPORT_MODE=true so the demo owner is seeded."
-        )
+        if demo_password == "ChangeMe123!":
+            print("    [*] Worker still initializing; using verified Spring BCrypt hash for ChangeMe123!.")
+            owner_hash = DEFAULT_CHANGEME123_HASH
+        else:
+            # Poll another 30 seconds if custom password was provided
+            print("    [*] Waiting additional 30s for custom password hash from worker...")
+            for _ in range(15):
+                time.sleep(2)
+                try:
+                    owner_hash = run_psql("control_db", "SELECT password_hash FROM user_accounts LIMIT 1;")
+                    if owner_hash and owner_hash.startswith("$2"):
+                        break
+                except Exception:
+                    pass
+            if not owner_hash:
+                raise RuntimeError("Could not obtain password hash from control_db. Check worker container.")
+
+    # Ensure demo owner exists in control_db
+    run_psql("control_db", f"""
+    INSERT INTO user_accounts (id, email, display_name, password_hash, enabled, system_admin, created_at, updated_at)
+    VALUES (gen_random_uuid(), 'owner@example.test', 'Demo Owner', '{owner_hash}', true, true, now(), now())
+    ON CONFLICT (email) DO UPDATE SET password_hash = '{owner_hash}', enabled = true, system_admin = true;
+    """)
 
     fixtures = {"tenants": {}, "summary": {}}
 
@@ -222,15 +252,16 @@ def main():
             email = f"user{u_idx}@{slug}.test"
             display_name = f"{slug.title()} Member {u_idx}"
             user_emails.append(email)
+            role = "ADMIN" if u_idx == 1 else "MEMBER"
             user_sql += f"""
             INSERT INTO user_accounts (id, email, display_name, password_hash, enabled, system_admin, created_at, updated_at)
             VALUES (gen_random_uuid(), '{email}', '{display_name}', '{owner_hash}', true, false, now(), now())
             ON CONFLICT (email) DO UPDATE SET password_hash = '{owner_hash}', enabled = true;
 
             INSERT INTO tenant_memberships (id, tenant_id, user_id, role, active, security_version, created_at, updated_at)
-            SELECT gen_random_uuid(), '{tenant_id}', id, 'MEMBER', true, 1, now(), now()
+            SELECT gen_random_uuid(), '{tenant_id}', id, '{role}', true, 1, now(), now()
             FROM user_accounts WHERE email = '{email}'
-            ON CONFLICT (tenant_id, user_id) DO UPDATE SET active = true;
+            ON CONFLICT (tenant_id, user_id) DO UPDATE SET active = true, role = '{role}';
             """
         user_sql += "COMMIT;\n"
         run_psql("control_db", user_sql)
@@ -248,6 +279,17 @@ def main():
         # C. Seed Project, Board, Columns, and Tasks in pool_db
         pool_sql = f"""
         BEGIN;
+        -- Seed Tenant Kanban Settings (WIP Mode, Limits)
+        INSERT INTO tenant_kanban_settings (tenant_id, settings, version, updated_at)
+        VALUES ('{tenant_id}', jsonb_build_object(
+            'wipMode', '{spec["wip_mode"]}',
+            'wipLimit', {spec["wip_limit"]},
+            'cardStyle', 'FULL',
+            'defaultColumns', jsonb_build_array('To Do', 'In Progress', 'Done'),
+            'fields', jsonb_build_array()
+        ), 0, now())
+        ON CONFLICT (tenant_id) DO UPDATE SET settings = EXCLUDED.settings;
+
         -- Create Project
         INSERT INTO projects (id, tenant_id, name, description, created_by, created_at, updated_at)
         VALUES (gen_random_uuid(), '{tenant_id}', '{name} Project', 'Benchmark project for {slug}',
