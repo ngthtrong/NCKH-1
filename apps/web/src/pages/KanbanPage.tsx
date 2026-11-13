@@ -67,6 +67,8 @@ import type { Board, BoardColumn, Comment, ProjectRole, TaskCard, TaskPriority, 
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
+import { KanbanFilterBar, type KanbanFilterState } from '../components/kanban/KanbanFilterBar';
+import { QuickAddTaskInline } from '../components/kanban/QuickAddTaskInline';
 import { moveBoardTask } from './boardState';
 
 const priorityLabel: Record<TaskPriority, string> = {
@@ -180,9 +182,12 @@ function KanbanColumn({
   column,
   disabled,
   canManageColumns,
+  canEditTasks,
   columnIndex,
   columnCount,
+  filters,
   onAdd,
+  onQuickAdd,
   onRename,
   onDelete,
   onMove,
@@ -191,9 +196,12 @@ function KanbanColumn({
   column: BoardColumn;
   disabled: boolean;
   canManageColumns: boolean;
+  canEditTasks: boolean;
   columnIndex: number;
   columnCount: number;
+  filters: KanbanFilterState;
   onAdd: (columnId: UUID) => void;
+  onQuickAdd: (columnId: UUID, title: string) => Promise<unknown> | unknown;
   onRename: (column: BoardColumn) => void;
   onDelete: (column: BoardColumn) => void;
   onMove: (columnId: UUID, direction: -1 | 1) => void;
@@ -201,13 +209,38 @@ function KanbanColumn({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id, disabled });
   const atLimit = Boolean(column.taskLimit && column.tasks.length >= column.taskLimit);
+
+  const isFiltered = filters.search.trim() !== '' || filters.priority !== 'ALL' || filters.assigneeId !== 'ALL';
+  const visibleTasks = column.tasks.filter((task) => {
+    if (filters.search.trim()) {
+      const q = filters.search.trim().toLowerCase();
+      const matchTitle = task.title.toLowerCase().includes(q);
+      const matchDesc = task.description?.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc) return false;
+    }
+    if (filters.priority !== 'ALL' && task.priority !== filters.priority) {
+      return false;
+    }
+    if (filters.assigneeId !== 'ALL') {
+      if (filters.assigneeId === 'UNASSIGNED') {
+        if (task.assignee) return false;
+      } else if (task.assignee?.id !== filters.assigneeId) {
+        return false;
+      }
+    }
+    return true;
+  });
+
   return (
     <Box className={`kanban-column ${isOver ? 'kanban-column--over' : ''}`} ref={setNodeRef}>
       <Stack direction="row" alignItems="center" gap={1} className="kanban-column__header">
         <span className="kanban-column__dot" />
         <Typography fontWeight={750}>{column.name}</Typography>
         {column.completed && <Chip label="Hoàn tất" size="small" color="success" variant="outlined" />}
-        <Chip label={column.tasks.length} size="small" />
+        <Chip
+          label={isFiltered ? `${visibleTasks.length}/${column.tasks.length}` : column.tasks.length}
+          size="small"
+        />
         <Box flex={1} />
         {column.taskLimit && (
           <Typography variant="caption" color={atLimit ? 'error' : 'text.secondary'}>
@@ -251,9 +284,9 @@ function KanbanColumn({
           </Stack>
         )}
       </Stack>
-      <SortableContext items={column.tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={visibleTasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
         <Stack spacing={1.25} className="kanban-column__tasks">
-          {column.tasks.map((task) => (
+          {visibleTasks.map((task) => (
             <SortableTaskCard
               key={task.id}
               task={task}
@@ -261,20 +294,23 @@ function KanbanColumn({
               onOpen={() => onOpenTask(task.id)}
             />
           ))}
-          {column.tasks.length === 0 && (
-            <Box className="kanban-column__empty">Thả công việc vào đây</Box>
+          {visibleTasks.length === 0 && (
+            <Box className="kanban-column__empty">
+              {column.tasks.length === 0 ? 'Thả công việc vào đây' : 'Không có thẻ phù hợp'}
+            </Box>
           )}
         </Stack>
       </SortableContext>
-      <Button
-        fullWidth
-        startIcon={<Add />}
-        color="inherit"
-        disabled={disabled || atLimit}
-        onClick={() => onAdd(column.id)}
-      >
-        Thêm công việc
-      </Button>
+      {canEditTasks && (
+        <Box sx={{ mt: 1 }}>
+          <QuickAddTaskInline
+            columnId={column.id}
+            disabled={disabled || atLimit}
+            onAddTask={onQuickAdd}
+            onOpenFullDialog={() => onAdd(column.id)}
+          />
+        </Box>
+      )}
     </Box>
   );
 }
@@ -286,6 +322,11 @@ export function KanbanPage() {
   const queryClient = useQueryClient();
   const { session } = useAuth();
   const [board, setBoard] = useState<Board | null>(null);
+  const [filters, setFilters] = useState<KanbanFilterState>({
+    search: '',
+    priority: 'ALL',
+    assigneeId: 'ALL',
+  });
   const [selectedProjectId, setSelectedProjectId] = useState<UUID | ''>('');
   const [activeTaskId, setActiveTaskId] = useState<UUID | null>(null);
   const [snackbar, setSnackbar] = useState<string | null>(null);
@@ -351,16 +392,16 @@ export function KanbanPage() {
   }, [board, searchParams, setSearchParams]);
 
   const selectedProject = projects.data?.find((project) => project.id === selectedProjectId);
-  const needProjectPeople = Boolean(taskDialogColumn || selectedTaskId);
+  const needProjectPeople = Boolean(selectedProjectId);
   const projectMembers = useQuery({
     queryKey: ['project-members', selectedProjectId],
     queryFn: () => projectsApi.members(selectedProjectId as UUID),
-    enabled: Boolean(selectedProjectId && needProjectPeople),
+    enabled: Boolean(selectedProjectId),
   });
   const tenantMembers = useQuery({
     queryKey: ['members'],
     queryFn: membersApi.list,
-    enabled: needProjectPeople,
+    enabled: Boolean(selectedProjectId),
   });
   const comments = useQuery({
     queryKey: ['task-comments', selectedTaskId],
@@ -420,11 +461,31 @@ export function KanbanPage() {
     }) => boardsApi.moveTask(boardId!, taskId, { targetColumnId, targetPosition, version }),
     onSuccess: acceptBoard,
     onError: (cause) => {
-      setSnackbar(
-        (cause as { status?: number }).status === 409
-          ? 'Công việc đã được người khác cập nhật. Bảng đang được tải lại.'
-          : errorMessage(cause),
-      );
+      const status = (cause as { status?: number }).status;
+      if (status === 422) {
+        setSnackbar('Không thể chuyển công việc: vi phạm giới hạn WIP (chế độ nghiêm ngặt).');
+      } else if (status === 409) {
+        setSnackbar('Công việc đã được người khác cập nhật. Bảng đang được tải lại.');
+      } else {
+        setSnackbar(errorMessage(cause));
+      }
+      void queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+  const quickCreateTask = useMutation({
+    mutationFn: ({ columnId, title }: { columnId: UUID; title: string }) =>
+      boardsApi.createTask(boardId!, columnId, {
+        title: title.trim(),
+        priority: 'MEDIUM',
+      }),
+    onSuccess: acceptBoard,
+    onError: (cause) => {
+      const status = (cause as { status?: number }).status;
+      if (status === 422) {
+        setSnackbar('Không thể thêm công việc: vi phạm giới hạn WIP của cột.');
+      } else {
+        setSnackbar(errorMessage(cause));
+      }
       void queryClient.invalidateQueries({ queryKey: ['board', boardId] });
     },
   });
@@ -641,9 +702,10 @@ export function KanbanPage() {
     setActiveTaskId(null);
     if (!board || !over || active.id === over.id || moveTask.isPending) return;
     const previous = board;
-    const result = moveBoardTask(board, String(active.id), String(over.id));
+    const currentWipMode = kanbanConfiguration.data?.settings.wipMode ?? 'STRICT';
+    const result = moveBoardTask(board, String(active.id), String(over.id), currentWipMode);
     if (!result) {
-      setSnackbar('Không thể chuyển công việc: cột đích đã đầy hoặc vị trí không hợp lệ.');
+      setSnackbar('Không thể chuyển công việc: cột đích đã đạt giới hạn WIP.');
       return;
     }
     setBoard(result.board);
@@ -654,7 +716,15 @@ export function KanbanPage() {
         targetPosition: result.targetPosition,
         version: result.version,
       },
-      { onError: () => setBoard(previous) },
+      {
+        onError: (cause) => {
+          setBoard(previous);
+          const status = (cause as { status?: number }).status;
+          if (status === 422) {
+            setSnackbar('Không thể chuyển công việc: vi phạm giới hạn WIP (chế độ nghiêm ngặt).');
+          }
+        },
+      },
     );
   };
 
@@ -688,7 +758,7 @@ export function KanbanPage() {
   }));
   const columnMutationPending =
     createColumn.isPending || renameColumn.isPending || reorderColumns.isPending || deleteColumn.isPending;
-  const boardInteractionDisabled = moveTask.isPending || columnMutationPending;
+  const boardInteractionDisabled = moveTask.isPending || quickCreateTask.isPending || columnMutationPending;
   const orderedColumns = board
     ? [...board.columns].sort((left, right) => left.position - right.position)
     : [];
@@ -875,6 +945,13 @@ export function KanbanPage() {
           Dự án đã lưu trữ: bảng và nội dung chỉ đọc cho đến khi được khôi phục.
         </Alert>
       )}
+      {board && (
+        <KanbanFilterBar
+          filters={filters}
+          onFilterChange={setFilters}
+          assignees={assignableMembers}
+        />
+      )}
       {!boardId ? (
         projects.isLoading ? (
           <SectionLoader />
@@ -898,20 +975,25 @@ export function KanbanPage() {
         >
           <Box className="kanban-board">
             {orderedColumns.map((column, columnIndex) => (
-                <KanbanColumn
-                  key={column.id}
-                  column={column}
-                  disabled={boardInteractionDisabled || !canEditTasks}
-                  canManageColumns={canManageColumns}
-                  columnIndex={columnIndex}
-                  columnCount={orderedColumns.length}
-                  onAdd={(columnId) => openCreateTask(columnId)}
-                  onRename={openRenameColumn}
-                  onDelete={setDeleteColumnTarget}
-                  onMove={moveColumn}
-                  onOpenTask={openTask}
-                />
-              ))}
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                disabled={boardInteractionDisabled}
+                canManageColumns={canManageColumns}
+                canEditTasks={Boolean(canEditTasks)}
+                columnIndex={columnIndex}
+                columnCount={orderedColumns.length}
+                filters={filters}
+                onAdd={(columnId) => openCreateTask(columnId)}
+                onQuickAdd={async (columnId, title) => {
+                  await quickCreateTask.mutateAsync({ columnId, title });
+                }}
+                onRename={openRenameColumn}
+                onDelete={setDeleteColumnTarget}
+                onMove={moveColumn}
+                onOpenTask={openTask}
+              />
+            ))}
           </Box>
           <DragOverlay>{activeTask ? <TaskCardView task={activeTask} overlay /> : null}</DragOverlay>
         </DndContext>

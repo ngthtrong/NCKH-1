@@ -18,6 +18,7 @@ experiments/spikes/isolation-harness/target/
 *.log
 
 # Node
+node_modules/
 apps/web/node_modules/
 apps/web/dist/
 apps/web/coverage/

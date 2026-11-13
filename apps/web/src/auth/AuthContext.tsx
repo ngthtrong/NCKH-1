@@ -18,6 +18,7 @@ type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
 interface AuthContextValue {
   status: AuthStatus;
   session: Session | null;
+  currentTenant?: TenantSummary;
   tenants: TenantSummary[];
   login: (credentials: LoginRequest) => Promise<TenantSummary[]>;
   register: (details: RegisterRequest) => Promise<void>;
@@ -170,6 +171,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     () => ({
       status,
       session,
+      currentTenant: session?.activeTenant,
       tenants,
       login,
       register,

@@ -62,7 +62,7 @@ describe('moveBoardTask', () => {
     expect(result?.targetPosition).toBe(1);
   });
 
-  it('refuses a move into a column at its WIP limit', () => {
+  it('refuses a move into a column at its WIP limit when wipMode is STRICT (or default)', () => {
     const constrained: Board = {
       ...board,
       columns: [
@@ -71,5 +71,33 @@ describe('moveBoardTask', () => {
       ],
     };
     expect(moveBoardTask(constrained, 'task-1', 'doing')).toBeNull();
+    expect(moveBoardTask(constrained, 'task-1', 'doing', 'STRICT')).toBeNull();
+  });
+
+  it('allows optimistic drop into a column at its WIP limit when wipMode is WARN', () => {
+    const constrained: Board = {
+      ...board,
+      columns: [
+        board.columns[0],
+        { ...board.columns[1], taskLimit: 1, tasks: [board.columns[0].tasks[1]] },
+      ],
+    };
+    const result = moveBoardTask(constrained, 'task-1', 'doing', 'WARN');
+    expect(result).not.toBeNull();
+    expect(result?.board.columns[1].tasks.map((t) => t.id)).toEqual(['task-2', 'task-1']);
+    expect(result?.board.columns[1].tasks[1].wipWarning).toBe(true);
+  });
+
+  it('allows drop into a column at its WIP limit when wipMode is OFF', () => {
+    const constrained: Board = {
+      ...board,
+      columns: [
+        board.columns[0],
+        { ...board.columns[1], taskLimit: 1, tasks: [board.columns[0].tasks[1]] },
+      ],
+    };
+    const result = moveBoardTask(constrained, 'task-1', 'doing', 'OFF');
+    expect(result).not.toBeNull();
+    expect(result?.board.columns[1].tasks.map((t) => t.id)).toEqual(['task-2', 'task-1']);
   });
 });

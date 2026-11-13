@@ -1,4 +1,6 @@
+import Add from '@mui/icons-material/Add';
 import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
+import Check from '@mui/icons-material/Check';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import FolderOutlined from '@mui/icons-material/FolderOutlined';
 import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
@@ -15,6 +17,7 @@ import {
   Badge,
   Box,
   Button,
+  CircularProgress,
   Divider,
   Drawer,
   IconButton,
@@ -48,6 +51,12 @@ const primaryNavigation = [
   { label: 'Tùy biến dự án', to: '/customization', icon: <TuneOutlined /> },
 ];
 
+const tierLabels: Record<string, string> = {
+  STARTER: 'Khởi đầu',
+  PROFESSIONAL: 'Chuyên nghiệp',
+  ENTERPRISE: 'Doanh nghiệp',
+};
+
 function initials(name: string): string {
   return name
     .split(/\s+/)
@@ -62,10 +71,12 @@ export function AppShell() {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountAnchor, setAccountAnchor] = useState<HTMLElement | null>(null);
-  const { session, logout } = useAuth();
+  const [tenantAnchor, setTenantAnchor] = useState<HTMLElement | null>(null);
+  const [switchingTenantId, setSwitchingTenantId] = useState<string | null>(null);
+  const { session, logout, tenants, currentTenant, selectTenant } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const tenant = session?.activeTenant;
+  const tenant = currentTenant ?? session?.activeTenant;
   const canAdministerTenant = tenant && ['OWNER', 'ADMIN'].includes(tenant.role);
   const canAdministerSystem = session?.user.platformRoles.includes('SYSTEM_ADMIN');
   const { data: notifications = [] } = useQuery({
@@ -119,24 +130,155 @@ export function AppShell() {
           <Typography className="brand__caption">Không gian làm việc</Typography>
         </Box>
       </Box>
-      <Box className="tenant-switcher">
+      <Box
+        className="tenant-switcher"
+        data-testid="tenant-switcher"
+        onClick={(event) => setTenantAnchor(event.currentTarget)}
+        sx={{
+          cursor: 'pointer',
+          userSelect: 'none',
+          transition: 'background-color 150ms ease, border-color 150ms ease',
+          '&:hover': {
+            backgroundColor: '#f0f4fa',
+            borderColor: '#c6d2e5',
+          },
+        }}
+      >
         <Avatar variant="rounded" className="tenant-switcher__avatar">
           {tenant ? initials(tenant.name) : '—'}
         </Avatar>
         <Box minWidth={0} flex={1}>
-          <Typography fontWeight={600} sx={{ fontSize: 13, overflowWrap: 'anywhere' }}>
-            {tenant?.name}
+          <Typography fontWeight={600} sx={{ fontSize: 13, overflowWrap: 'anywhere' }} noWrap>
+            {tenant?.name ?? 'Chọn không gian'}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {tenant?.role === 'OWNER' ? 'Chủ sở hữu' : tenant?.role === 'ADMIN' ? 'Quản trị viên' : 'Thành viên'}
+          <Typography variant="caption" color="text.secondary" display="block" noWrap>
+            {tenant?.tier
+              ? (tierLabels[tenant.tier] ?? tenant.tier)
+              : (tenant?.role === 'OWNER' ? 'Chủ sở hữu' : tenant?.role === 'ADMIN' ? 'Quản trị viên' : 'Thành viên')}
           </Typography>
         </Box>
-        <Tooltip title="Đổi không gian">
-          <IconButton size="small" onClick={() => navigate('/select-tenant')}>
-            <KeyboardArrowDown fontSize="small" />
+        <Tooltip title="Đổi không gian làm việc">
+          <IconButton
+            size="small"
+            aria-label="Đổi không gian làm việc"
+            onClick={(event) => {
+              event.stopPropagation();
+              setTenantAnchor((event.currentTarget.closest('.tenant-switcher') as HTMLElement | null) ?? event.currentTarget);
+            }}
+          >
+            <KeyboardArrowDown
+              fontSize="small"
+              sx={{
+                transform: Boolean(tenantAnchor) ? 'rotate(180deg)' : 'none',
+                transition: 'transform 200ms ease',
+              }}
+            />
           </IconButton>
         </Tooltip>
       </Box>
+      <Menu
+        anchorEl={tenantAnchor}
+        open={Boolean(tenantAnchor)}
+        onClose={() => setTenantAnchor(null)}
+        PaperProps={{
+          sx: {
+            minWidth: drawerWidth - 24,
+            maxWidth: 320,
+            borderRadius: 2,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            py: 0.5,
+          },
+        }}
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+      >
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography
+            variant="caption"
+            fontWeight={700}
+            color="text.secondary"
+            sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+          >
+            Không gian làm việc
+          </Typography>
+        </Box>
+        {tenants.map((t) => {
+          const isSelected = t.id === tenant?.id;
+          const isSwitching = switchingTenantId === t.id;
+          return (
+            <MenuItem
+              key={t.id}
+              selected={isSelected}
+              disabled={isSwitching}
+              onClick={async () => {
+                if (isSelected) {
+                  setTenantAnchor(null);
+                  return;
+                }
+                try {
+                  setSwitchingTenantId(t.id);
+                  await selectTenant(t);
+                  setTenantAnchor(null);
+                } catch (err) {
+                  console.error('Failed to switch workspace', err);
+                } finally {
+                  setSwitchingTenantId(null);
+                }
+              }}
+              sx={{
+                py: 1,
+                px: 2,
+                gap: 1.5,
+                alignItems: 'center',
+              }}
+            >
+              <Avatar
+                variant="rounded"
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  bgcolor: isSelected ? 'primary.main' : '#eef1f5',
+                  color: isSelected ? 'primary.contrastText' : '#475569',
+                }}
+              >
+                {initials(t.name)}
+              </Avatar>
+              <Box flex={1} minWidth={0}>
+                <Typography variant="body2" fontWeight={isSelected ? 700 : 500} noWrap>
+                  {t.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block">
+                  {tierLabels[t.tier] ?? t.tier}
+                </Typography>
+              </Box>
+              {isSwitching ? (
+                <CircularProgress size={16} />
+              ) : isSelected ? (
+                <Check fontSize="small" color="primary" />
+              ) : null}
+            </MenuItem>
+          );
+        })}
+        <Divider sx={{ my: 0.5 }} />
+        <MenuItem
+          onClick={() => {
+            setTenantAnchor(null);
+            closeDrawer();
+            navigate('/onboarding');
+          }}
+          sx={{ py: 1, px: 2, color: 'primary.main', fontWeight: 600, fontSize: 13 }}
+        >
+          <ListItemIcon sx={{ color: 'primary.main', minWidth: 28 }}>
+            <Add fontSize="small" />
+          </ListItemIcon>
+          <ListItemText
+            primary="+ Tạo không gian làm việc mới"
+            primaryTypographyProps={{ fontSize: 13, fontWeight: 600 }}
+          />
+        </MenuItem>
+      </Menu>
       <Typography className="nav-label">Không gian làm việc</Typography>
       <List className="app-nav">
         {primaryNavigation

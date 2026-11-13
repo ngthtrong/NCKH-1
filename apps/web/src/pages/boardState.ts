@@ -9,7 +9,14 @@ export interface MoveResult {
   version: number;
 }
 
-export function moveBoardTask(board: Board, taskId: UUID, overId: UUID): MoveResult | null {
+export type WipMode = 'OFF' | 'WARN' | 'STRICT';
+
+export function moveBoardTask(
+  board: Board,
+  taskId: UUID,
+  overId: UUID,
+  wipMode: WipMode = 'STRICT',
+): MoveResult | null {
   const sourceColumn = board.columns.find((column) =>
     column.tasks.some((task) => task.id === taskId),
   );
@@ -47,13 +54,19 @@ export function moveBoardTask(board: Board, taskId: UUID, overId: UUID): MoveRes
     };
   }
 
-  if (targetColumn.taskLimit && targetColumn.tasks.length >= targetColumn.taskLimit) return null;
+  if (wipMode === 'STRICT' && targetColumn.taskLimit && targetColumn.tasks.length >= targetColumn.taskLimit) {
+    return null;
+  }
   if (targetIndex < 0) targetIndex = targetColumn.tasks.length;
   const sourceTasks = sourceColumn.tasks
     .filter((item) => item.id !== taskId)
     .map((item, index) => ({ ...item, position: index }));
   const targetTasks = [...targetColumn.tasks];
-  targetTasks.splice(targetIndex, 0, { ...task, columnId: targetColumn.id });
+  targetTasks.splice(targetIndex, 0, {
+    ...task,
+    columnId: targetColumn.id,
+    wipWarning: wipMode === 'WARN' && Boolean(targetColumn.taskLimit && targetColumn.tasks.length >= targetColumn.taskLimit),
+  });
 
   return {
     board: {
