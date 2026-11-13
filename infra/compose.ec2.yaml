@@ -1,0 +1,74 @@
+# Compose overlay specifically optimized for AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM)
+# Balances resource allocation across Spring Boot 3 API, PostgreSQL 16, Redis 7, and Web/Caddy
+# Leaves ~3 GiB RAM and ~0.5 vCPU for the host OS and k6 load generator.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    cpus: 0.50
+    mem_limit: 1536m
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=384MB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "max_connections=120"
+      - "-c"
+      - "effective_cache_size=1GB"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  redis:
+    image: redis:7-alpine
+    cpus: 0.25
+    mem_limit: 512m
+    command:
+      - "redis-server"
+      - "--maxmemory"
+      - "256mb"
+      - "--maxmemory-policy"
+      - "volatile-lru"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  api:
+    cpus: 1.25
+    mem_limit: 2560m
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms1024m -Xmx1792m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
+      SERVER_TOMCAT_THREADS_MAX: "60"
+      SERVER_TOMCAT_THREADS_MIN_SPARE: "10"
+      SERVER_TOMCAT_ACCEPT_COUNT: "100"
+      POOL_DB_POOL_SIZE: "25"
+      CONTROL_DB_POOL_SIZE: "10"
+      REPORT_MODE: "true"
+      REDIS_ENABLED: "true"
+      REDIS_HOST: "redis"
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      # Bug 3 fix: extend token TTL so pre-fetched tokens survive the full benchmark run.
+      # Default PT10M would expire mid-run when seeding 80 users + running 2× 60s phases.
+      ACCESS_TOKEN_TTL: "PT4H"
+      REFRESH_TOKEN_TTL: "P7D"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  caddy:
+    cpus: 0.25
+    mem_limit: 256m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  web:
+    cpus: 0.25
+    mem_limit: 256m
