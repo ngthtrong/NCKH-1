@@ -14,6 +14,10 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    # PostgreSQL is reachable by the app over the private Compose network.
+    # Do not publish 5432 on the EC2 host: another service may already own it,
+    # and the database should not need a host port for this deployment.
+    ports: !override []
     cpus: 0.50
     mem_limit: 1536m
     command:
