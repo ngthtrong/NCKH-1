@@ -3,6 +3,13 @@
 # Leaves ~3 GiB RAM and ~0.5 vCPU for the host OS and k6 load generator.
 
 services:
+  ec2-storage-init:
+    image: postgres:16-alpine
+    user: "0:0"
+    entrypoint: ["sh", "-ec", "mkdir -p /resources/files && chown 10001:10001 /resources/files && chmod 700 /resources/files"]
+    volumes: ["ec2-resources:/resources"]
+    restart: "no"
+
   postgres:
     image: postgres:16-alpine
     cpus: 0.50
@@ -40,6 +47,13 @@ services:
   api:
     cpus: 1.25
     mem_limit: 2560m
+    depends_on: !override
+      ec2-storage-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       JAVA_TOOL_OPTIONS: "-Xms1024m -Xmx1792m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
       SERVER_TOMCAT_THREADS_MAX: "60"
@@ -52,14 +66,43 @@ services:
       REDIS_HOST: "redis"
       RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
       CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      RESOURCE_STORAGE_TYPE: filesystem
+      RESOURCE_FILESYSTEM_ROOT: /verification-resources/files
+      BASE_DOMAIN: ${BASE_DOMAIN:-localhost}
+      ACCOUNTS_SUBDOMAIN: ${ACCOUNTS_SUBDOMAIN:-accounts}
+      PUBLIC_ACCOUNTS_URL: ${PUBLIC_ACCOUNTS_URL:-http://accounts.${BASE_DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      PUBLIC_TENANT_URL_TEMPLATE: ${PUBLIC_TENANT_URL_TEMPLATE:-http://%s.${BASE_DOMAIN:-localhost}:${HTTP_PORT:-8080}}
       # Bug 3 fix: extend token TTL so pre-fetched tokens survive the full benchmark run.
       # Default PT10M would expire mid-run when seeding 80 users + running 2× 60s phases.
       ACCESS_TOKEN_TTL: "PT4H"
       REFRESH_TOKEN_TTL: "P7D"
+    volumes:
+      - "ec2-resources:/verification-resources"
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
+
+  worker:
+    cpus: 0.5
+    mem_limit: 512m
+    depends_on: !override
+      ec2-storage-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      REPORT_MODE: "true"
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      RESOURCE_STORAGE_TYPE: filesystem
+      RESOURCE_FILESYSTEM_ROOT: /verification-resources/files
+      BASE_DOMAIN: ${BASE_DOMAIN:-localhost}
+    volumes:
+      - "ec2-resources:/verification-resources"
 
   caddy:
     cpus: 0.25
@@ -72,3 +115,6 @@ services:
   web:
     cpus: 0.25
     mem_limit: 256m
+
+volumes:
+  ec2-resources:

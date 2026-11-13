@@ -3,7 +3,7 @@
     admin off
 }
 
-http://accounts.localhost, http://*.localhost {
+:80 {
     encode zstd gzip
 
     @api path /api/* /actuator/health /actuator/health/*
