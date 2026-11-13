@@ -4,7 +4,10 @@
 # Evaluates 3 to 5 Tenants with 10 to 20 Concurrent Users per Tenant (80 VUs total)
 # Generates exact tables for Chapter 5 (Report (1).docx)
 # ==============================================================================
-set -Eeuo pipefail
+set -Euo pipefail
+# Note: NOT using -e (errexit) for the whole script because k6 exits with code 99
+# when thresholds are crossed — that is EXPECTED for the baseline phase and must
+# not abort the run before Phase 2 and result aggregation complete.
 
 REPOSITORY_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPOSITORY_ROOT"
@@ -13,6 +16,13 @@ DURATION="${1:-60s}"
 ENV_FILE="$REPOSITORY_ROOT/infra/.env"
 RESULTS_DIR="$REPOSITORY_ROOT/experiments/results/ec2"
 mkdir -p "$RESULTS_DIR"
+# Fix: Grant write permission to ALL users so the k6 Docker container (runs as root)
+# can write summary JSON files into this directory.
+chmod -R 777 "$RESULTS_DIR"
+
+# Current user id/gid used to run k6 container with same permissions as host user.
+HOST_UID="$(id -u)"
+HOST_GID="$(id -g)"
 
 echo "======================================================================"
 echo "    NCKH BENCHMARK ON AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM)     "
@@ -79,9 +89,13 @@ python3 experiments/ec2/seed-tenants.py
 # Function to run k6
 run_k6() {
   local summary_file="$1"
+  local phase_label="${2:-}"
   if [[ "$USE_DOCKER_K6" == "true" ]]; then
+    # --user: run container as current user so it can write to host-owned result files.
+    # --network host: k6 accesses the API on 127.0.0.1:8080 directly.
     docker run --rm -i \
       --network host \
+      --user "${HOST_UID}:${HOST_GID}" \
       -v "$REPOSITORY_ROOT:/workspace" \
       -w /workspace \
       -e TARGET_HOST="127.0.0.1" \
@@ -89,11 +103,19 @@ run_k6() {
       -e BENCH_DURATION="$DURATION" \
       grafana/k6:0.57.0 run \
       --summary-export="/workspace/$summary_file" \
-      experiments/k6/ec2-proposal-benchmark.js
+      experiments/k6/ec2-proposal-benchmark.js \
+      || echo "[!] k6 exited with threshold failures (expected for baseline phase)."
   else
     TARGET_HOST="127.0.0.1" TARGET_PORT="8080" BENCH_DURATION="$DURATION" \
-      k6 run --summary-export="$REPOSITORY_ROOT/$summary_file" experiments/k6/ec2-proposal-benchmark.js
+      k6 run --summary-export="$REPOSITORY_ROOT/$summary_file" experiments/k6/ec2-proposal-benchmark.js \
+      || echo "[!] k6 exited with threshold failures (expected for baseline phase)."
   fi
+  # Verify the file was actually written
+  if [[ ! -f "$REPOSITORY_ROOT/$summary_file" ]]; then
+    echo "[!] ERROR: summary file was not created: $summary_file" >&2
+    exit 1
+  fi
+  echo "    [✓] Results saved: $summary_file"
 }
 
 # 6. Phase 1: Baseline (Unprotected / Before)
