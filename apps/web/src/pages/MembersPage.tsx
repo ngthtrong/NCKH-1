@@ -14,11 +14,13 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
   Paper,
   Select,
+  Snackbar,
   Stack,
   Table,
   TableBody,
@@ -29,6 +31,7 @@ import {
   Tab,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -61,6 +64,8 @@ export function MembersPage() {
   const [role, setRole] = useState<Exclude<TenantRole, 'OWNER'>>('MEMBER');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [createdInvitation, setCreatedInvitation] = useState<InvitationCreatedView | null>(null);
+  const [inviteLinks, setInviteLinks] = useState<Record<string, string>>({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const members = useQuery({ queryKey: ['members'], queryFn: membersApi.list });
   const invitations = useQuery({
     queryKey: ['member-invitations'],
@@ -74,6 +79,8 @@ export function MembersPage() {
       setEmail('');
       setRole('MEMBER');
       setCreatedInvitation(created);
+      const fullUrl = new URL(created.acceptancePath, window.location.origin).toString();
+      setInviteLinks((prev) => ({ ...prev, [created.invitation.id]: fullUrl }));
       setFeedback('Đã tạo lời mời. Hãy gửi liên kết local bên dưới cho đúng người nhận.');
       setTab('invitations');
       await queryClient.invalidateQueries({ queryKey: ['member-invitations'] });
@@ -147,11 +154,13 @@ export function MembersPage() {
     ? new URL(createdInvitation.acceptancePath, window.location.origin).toString()
     : null;
 
-  const copyInvitation = async () => {
-    if (!invitationUrl) return;
+  const copyInvitation = async (url?: string) => {
+    const targetUrl = url || invitationUrl;
+    if (!targetUrl) return;
     try {
-      await navigator.clipboard.writeText(invitationUrl);
-      setFeedback('Đã sao chép liên kết lời mời.');
+      await navigator.clipboard.writeText(targetUrl);
+      setSnackbarOpen(true);
+      setFeedback('Đã sao chép liên kết mời vào bộ nhớ tạm!');
     } catch {
       setFeedback('Không thể sao chép tự động. Hãy chọn và sao chép liên kết thủ công.');
     }
@@ -185,9 +194,9 @@ export function MembersPage() {
               color="inherit"
               size="small"
               startIcon={<ContentCopy />}
-              onClick={() => void copyInvitation()}
+              onClick={() => void copyInvitation(invitationUrl)}
             >
-              Sao chép
+              Sao chép liên kết mời
             </Button>
           )}
           onClose={() => setCreatedInvitation(null)}
@@ -229,14 +238,32 @@ export function MembersPage() {
                       <TableCell>{new Date(invitation.expiresAt).toLocaleString('vi-VN')}</TableCell>
                       <TableCell><StatusChip status={invitation.status} /></TableCell>
                       <TableCell align="right">
-                        <Button
-                          color="error"
-                          size="small"
-                          disabled={invitation.status !== 'PENDING' || revokeInvitation.isPending}
-                          onClick={() => revokeInvitation.mutate(invitation.id)}
-                        >
-                          Thu hồi
-                        </Button>
+                        <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
+                          {invitation.status === 'PENDING' && (
+                            <Tooltip title="Sao chép liên kết mời">
+                              <IconButton
+                                size="small"
+                                aria-label={`Sao chép liên kết mời cho ${invitation.email}`}
+                                onClick={() => {
+                                  const link = inviteLinks[invitation.id]
+                                    || (createdInvitation?.invitation.id === invitation.id ? invitationUrl : null)
+                                    || `${window.location.origin}/invitations/${invitation.id}`;
+                                  void copyInvitation(link);
+                                }}
+                              >
+                                <ContentCopy fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          <Button
+                            color="error"
+                            size="small"
+                            disabled={invitation.status !== 'PENDING' || revokeInvitation.isPending}
+                            onClick={() => revokeInvitation.mutate(invitation.id)}
+                          >
+                            Thu hồi
+                          </Button>
+                        </Stack>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -419,6 +446,13 @@ export function MembersPage() {
           </DialogActions>
         </Box>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message="Đã sao chép liên kết mời vào bộ nhớ tạm!"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Box>
   );
 }

@@ -6,6 +6,7 @@ import PeopleOutline from '@mui/icons-material/PeopleOutline';
 import TrendingDown from '@mui/icons-material/TrendingDown';
 import TrendingUp from '@mui/icons-material/TrendingUp';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -13,8 +14,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
   LinearProgress,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -26,6 +31,7 @@ import { dashboardApi, projectsApi } from '../api/endpoints';
 import { errorMessage } from '../api/client';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
+import { applyProjectTemplate, projectTemplates, type ProjectTemplateId } from '../components/ProjectTemplates';
 
 const metricIcons = [<FolderOpenOutlined />, <CheckCircleOutline />, <PeopleOutline />];
 
@@ -43,14 +49,22 @@ export function DashboardPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [template, setTemplate] = useState<ProjectTemplateId>('STANDARD');
   const [formError, setFormError] = useState<string | null>(null);
   const dashboard = useQuery({ queryKey: ['dashboard'], queryFn: dashboardApi.get });
   const createProject = useMutation({
-    mutationFn: projectsApi.create,
+    mutationFn: async (payload: { name: string; description?: string }) => {
+      const created = await projectsApi.create(payload);
+      if (created.boardId && template !== 'STANDARD') {
+        await applyProjectTemplate(created.boardId, template);
+      }
+      return created;
+    },
     onSuccess: async () => {
       setDialogOpen(false);
       setName('');
       setDescription('');
+      setTemplate('STANDARD');
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
         queryClient.invalidateQueries({ queryKey: ['projects'] }),
@@ -204,6 +218,43 @@ export function DashboardPage() {
                 autoFocus
                 inputProps={{ maxLength: 120 }}
               />
+              <FormControl fullWidth size="small">
+                <InputLabel id="dashboard-project-template-label">Mẫu dự án (Template)</InputLabel>
+                <Select
+                  labelId="dashboard-project-template-label"
+                  label="Mẫu dự án (Template)"
+                  value={template}
+                  onChange={(event) => setTemplate(event.target.value as ProjectTemplateId)}
+                >
+                  {projectTemplates.map((t) => (
+                    <MenuItem key={t.id} value={t.id}>
+                      <Box sx={{ py: 0.5 }}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Typography fontWeight={600} variant="body2">{t.name}</Typography>
+                          {t.badge && (
+                            <Typography variant="caption" sx={{ px: 0.8, py: 0.2, bgcolor: 'action.hover', borderRadius: 1, fontSize: 11 }}>
+                              {t.badge}
+                            </Typography>
+                          )}
+                        </Stack>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          {t.description}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {template !== 'STANDARD' && (
+                <Alert severity="info" sx={{ py: 0.5, fontSize: 13 }}>
+                  <Typography variant="caption" fontWeight={600} display="block">
+                    Cột Kanban theo mô hình:
+                  </Typography>
+                  <Typography variant="caption">
+                    {projectTemplates.find((t) => t.id === template)?.stages.join(' → ')}
+                  </Typography>
+                </Alert>
+              )}
               <TextField
                 label="Mô tả"
                 value={description}

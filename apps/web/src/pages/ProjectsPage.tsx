@@ -41,6 +41,7 @@ import { membersApi, projectsApi } from '../api/endpoints';
 import type { Member, ProjectRole, ProjectSummary, UUID } from '../api/types';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
+import { applyProjectTemplate, projectTemplates, type ProjectTemplateId } from '../components/ProjectTemplates';
 import { StatusChip } from '../components/StatusChip';
 
 const roleLabels: Record<ProjectRole, string> = {
@@ -59,6 +60,7 @@ export function ProjectsPage() {
   const [editing, setEditing] = useState<ProjectSummary | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [template, setTemplate] = useState<ProjectTemplateId>('STANDARD');
   const [managedProject, setManagedProject] = useState<ProjectSummary | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<UUID | ''>('');
   const [selectedRole, setSelectedRole] = useState<ProjectRole>('MEMBER');
@@ -96,15 +98,23 @@ export function ProjectsPage() {
   };
 
   const saveProject = useMutation({
-    mutationFn: () => editing
-      ? projectsApi.update(editing.id, { name: name.trim(), description: description.trim() || null })
-      : projectsApi.create({ name: name.trim(), description: description.trim() || undefined }),
+    mutationFn: async () => {
+      if (editing) {
+        return projectsApi.update(editing.id, { name: name.trim(), description: description.trim() || null });
+      }
+      const created = await projectsApi.create({ name: name.trim(), description: description.trim() || undefined });
+      if (created.boardId && template !== 'STANDARD') {
+        await applyProjectTemplate(created.boardId, template);
+      }
+      return created;
+    },
     onSuccess: async () => {
       setEditorOpen(false);
       setEditing(null);
       setName('');
       setDescription('');
-      setFeedback(editing ? 'Đã cập nhật dự án.' : 'Đã tạo dự án và bảng Kanban mặc định.');
+      setTemplate('STANDARD');
+      setFeedback(editing ? 'Đã cập nhật dự án.' : 'Đã tạo dự án và bảng Kanban.');
       await refreshProjects();
     },
     onError: (cause) => setFeedback(errorMessage(cause)),
@@ -194,6 +204,7 @@ export function ProjectsPage() {
     setEditing(null);
     setName('');
     setDescription('');
+    setTemplate('STANDARD');
     setEditorOpen(true);
   };
   const openEdit = (project: ProjectSummary) => {
@@ -396,6 +407,45 @@ export function ProjectsPage() {
                 required
                 autoFocus
               />
+              {!editing && (
+                <FormControl fullWidth size="small">
+                  <InputLabel id="project-template-select-label">Mẫu dự án (Template)</InputLabel>
+                  <Select
+                    labelId="project-template-select-label"
+                    label="Mẫu dự án (Template)"
+                    value={template}
+                    onChange={(event) => setTemplate(event.target.value as ProjectTemplateId)}
+                  >
+                    {projectTemplates.map((t) => (
+                      <MenuItem key={t.id} value={t.id}>
+                        <Box sx={{ py: 0.5 }}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <Typography fontWeight={600} variant="body2">{t.name}</Typography>
+                            {t.badge && (
+                              <Typography variant="caption" sx={{ px: 0.8, py: 0.2, bgcolor: 'action.hover', borderRadius: 1, fontSize: 11 }}>
+                                {t.badge}
+                              </Typography>
+                            )}
+                          </Stack>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {t.description}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              {!editing && template !== 'STANDARD' && (
+                <Alert severity="info" sx={{ py: 0.5, fontSize: 13 }}>
+                  <Typography variant="caption" fontWeight={600} display="block">
+                    Cột Kanban theo mô hình:
+                  </Typography>
+                  <Typography variant="caption">
+                    {projectTemplates.find((t) => t.id === template)?.stages.join(' → ')}
+                  </Typography>
+                </Alert>
+              )}
               <TextField
                 label="Mô tả"
                 value={description}

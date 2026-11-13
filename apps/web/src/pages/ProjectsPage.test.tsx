@@ -112,4 +112,55 @@ describe('ProjectsPage', () => {
     await waitFor(() => expect(screen.queryByText('Alpha project')).not.toBeInTheDocument());
     expect(screen.getByText('Beta archive')).toBeVisible();
   });
+
+  it('allows selecting an educational or scrum project template when creating a project', async () => {
+    api.list.mockResolvedValue([]);
+    api.create.mockResolvedValue({
+      id: '40000000-0000-0000-0000-000000000003',
+      name: 'Nghiên cứu Deep Learning IoT',
+      description: 'Mẫu NCKH',
+      status: 'ACTIVE',
+      role: 'MANAGER',
+      boardId: '50000000-0000-0000-0000-000000000003',
+      memberCount: 1,
+      taskCount: 0,
+      completedTaskCount: 0,
+      updatedAt: '2026-09-01T00:00:00Z',
+    });
+    const user = userEvent.setup();
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
+    render(
+      <ThemeProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <ProjectsPage />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </ThemeProvider>,
+    );
+
+    const createBtn = await screen.findByRole('button', { name: 'Dự án mới' });
+    await user.click(createBtn);
+
+    expect(await screen.findByRole('dialog')).toBeVisible();
+    expect(screen.getByRole('combobox', { name: /Mẫu dự án/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: /Mẫu dự án/i }));
+    expect(screen.getByRole('option', { name: /Đề tài NCKH Sinh viên/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /Đồ án môn học \/ Capstone/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /Kanban tiêu chuẩn/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('option', { name: /Đề tài NCKH Sinh viên/i }));
+    expect(screen.getByText(/Tổng quan tài liệu → Thiết kế thực nghiệm → Thu thập dữ liệu → Viết báo cáo → Nghiệm thu/i)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Tên dự án *'), 'Nghiên cứu Deep Learning IoT');
+    await user.click(screen.getByRole('button', { name: 'Lưu' }));
+
+    await waitFor(() => {
+      expect(api.create).toHaveBeenCalledWith(expect.objectContaining({
+        name: 'Nghiên cứu Deep Learning IoT',
+      }));
+    });
+  });
 });
