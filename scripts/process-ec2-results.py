@@ -25,7 +25,7 @@ def load_json(path):
 def extract_metric(metrics, name):
     if name not in metrics:
         return {"avg": 0, "med": 0, "p(95)": 0, "p(99)": 0}
-    vals = metrics[name].get("values", {})
+    vals = metrics[name].get("values", metrics[name])
     return {
         "avg": vals.get("avg", 0),
         "med": vals.get("med", 0),
@@ -36,12 +36,15 @@ def extract_metric(metrics, name):
 def extract_rate(metrics, name):
     if name not in metrics:
         return 0.0
-    return metrics[name].get("values", {}).get("rate", 0.0) * 100
+    vals = metrics[name].get("values", metrics[name])
+    rate = vals.get("rate", vals.get("value", 0.0))
+    return rate * 100
 
 def extract_counter(metrics, name):
     if name not in metrics:
         return 0
-    return int(metrics[name].get("values", {}).get("count", 0))
+    vals = metrics[name].get("values", metrics[name])
+    return int(vals.get("count", 0))
 
 def main():
     base_file = EC2_RESULTS / "baseline_summary.json"
@@ -82,12 +85,14 @@ def main():
         # Baseline
         b_trend = extract_metric(base_metrics, metric_key)
         b_rate = extract_rate(base_metrics, "success_rate_normal" if role != "aggressor" else "success_rate_aggressor")
-        b_rps = base_metrics.get("http_reqs", {}).get("values", {}).get("rate", 0) / 5.0 if base_metrics else 0
+        b_reqs = base_metrics.get("http_reqs", {})
+        b_rps = (b_reqs.get("values", b_reqs).get("rate", 0)) / 5.0 if base_metrics else 0
 
         # Proposed
         p_trend = extract_metric(prop_metrics, metric_key)
         p_rate = extract_rate(prop_metrics, "success_rate_normal" if role != "aggressor" else "success_rate_aggressor")
-        p_rps = prop_metrics.get("http_reqs", {}).get("values", {}).get("rate", 0) / 5.0
+        p_reqs = prop_metrics.get("http_reqs", {})
+        p_rps = (p_reqs.get("values", p_reqs).get("rate", 0)) / 5.0
         p_blocked = extract_counter(prop_metrics, "blocked_429_count") if role == "aggressor" else 0
 
         # Format rows
