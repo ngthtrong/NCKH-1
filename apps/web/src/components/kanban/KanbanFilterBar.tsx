@@ -54,8 +54,11 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
       sx={{
         p: 1.5,
         mb: 2.5,
-        borderRadius: 2,
+        borderRadius: 2.5,
         bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        boxShadow: 'none',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
@@ -63,13 +66,27 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
       }}
     >
       <TextField
-        placeholder="Tìm kiếm theo tiêu đề thẻ…"
+        placeholder="Tìm kiếm thẻ công việc..."
         value={filters.search}
         onChange={(event) => onFilterChange({ ...filters, search: event.target.value })}
         size="small"
         sx={{
           minWidth: { xs: '100%', sm: 260 },
           flex: { sm: 1 },
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 2.5,
+            bgcolor: '#f8fafc',
+            transition: 'all 0.2s ease',
+            '& fieldset': {
+              borderColor: '#e2e8f0',
+            },
+            '&:hover fieldset': {
+              borderColor: '#cbd5e1',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'primary.main',
+            },
+          },
         }}
         InputProps={{
           startAdornment: (
@@ -93,7 +110,25 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
       />
 
       <Stack direction="row" spacing={1.5} flexWrap="wrap" alignItems="center">
-        <FormControl size="small" sx={{ minWidth: 160 }}>
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: 160,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 5,
+              bgcolor: '#f8fafc',
+              '& fieldset': {
+                borderColor: '#e2e8f0',
+              },
+              '&:hover fieldset': {
+                borderColor: '#cbd5e1',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main',
+              },
+            },
+          }}
+        >
           <InputLabel id="filter-priority-label">Mức ưu tiên</InputLabel>
           <Select
             labelId="filter-priority-label"
@@ -102,6 +137,7 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
             onChange={(event) =>
               onFilterChange({ ...filters, priority: event.target.value as TaskPriority | 'ALL' })
             }
+            sx={{ borderRadius: 5 }}
           >
             {priorityOptions.map((item) => (
               <MenuItem key={item.value} value={item.value}>
@@ -111,7 +147,25 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
           </Select>
         </FormControl>
 
-        <FormControl size="small" sx={{ minWidth: 200 }}>
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: 200,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 5,
+              bgcolor: '#f8fafc',
+              '& fieldset': {
+                borderColor: '#e2e8f0',
+              },
+              '&:hover fieldset': {
+                borderColor: '#cbd5e1',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main',
+              },
+            },
+          }}
+        >
           <InputLabel id="filter-assignee-label">Người thực hiện</InputLabel>
           <Select
             labelId="filter-assignee-label"
@@ -120,6 +174,7 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
             onChange={(event) =>
               onFilterChange({ ...filters, assigneeId: event.target.value as string | 'ALL' })
             }
+            sx={{ borderRadius: 5 }}
           >
             <MenuItem value="ALL">Tất cả thành viên</MenuItem>
             <MenuItem value="UNASSIGNED">Chưa giao</MenuItem>
@@ -134,10 +189,19 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
         {isFiltered && (
           <Button
             size="small"
-            color="inherit"
+            variant="text"
             startIcon={<FilterAltOff fontSize="small" />}
             onClick={handleReset}
-            sx={{ textTransform: 'none', color: 'text.secondary' }}
+            sx={{
+              textTransform: 'none',
+              borderRadius: 5,
+              px: 1.5,
+              color: 'text.secondary',
+              '&:hover': {
+                bgcolor: 'action.hover',
+                color: 'text.primary',
+              },
+            }}
           >
             Đặt lại bộ lọc
           </Button>

@@ -63,7 +63,7 @@ export function QuickAddTaskInline({
     return (
       <Button
         fullWidth
-        startIcon={<Add />}
+        startIcon={<Add fontSize="small" />}
         color="inherit"
         size="small"
         disabled={disabled}
@@ -71,10 +71,12 @@ export function QuickAddTaskInline({
         sx={{
           justifyContent: 'flex-start',
           textTransform: 'none',
+          fontWeight: 500,
           color: 'text.secondary',
-          py: 0.75,
-          px: 1.25,
-          borderRadius: 1.5,
+          py: 0.85,
+          px: 1.5,
+          borderRadius: 2,
+          transition: 'all 0.2s ease',
           '&:hover': {
             bgcolor: 'action.hover',
             color: 'text.primary',
@@ -89,12 +91,13 @@ export function QuickAddTaskInline({
   return (
     <Box
       sx={{
-        p: 1,
-        borderRadius: 1.5,
-        bgcolor: 'background.paper',
+        p: 1.25,
+        borderRadius: 2,
+        bgcolor: '#ffffff',
         border: '1px solid',
         borderColor: 'primary.main',
-        boxShadow: (theme) => `0 2px 8px ${theme.palette.action.focus}`,
+        boxShadow: '0 2px 8px rgba(59, 130, 246, 0.12)',
+        transition: 'all 0.2s ease',
       }}
     >
       <TextField
@@ -110,7 +113,17 @@ export function QuickAddTaskInline({
         sx={{
           '& .MuiOutlinedInput-root': {
             fontSize: '0.875rem',
-            bgcolor: 'background.paper',
+            bgcolor: '#ffffff',
+            borderRadius: 1.5,
+            '& fieldset': {
+              borderColor: '#e2e8f0',
+            },
+            '&:hover fieldset': {
+              borderColor: '#cbd5e1',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'primary.main',
+            },
           },
         }}
       />
@@ -120,21 +133,38 @@ export function QuickAddTaskInline({
           size="small"
           disabled={!title.trim() || isSubmitting}
           onClick={() => void handleSave()}
-          sx={{ minWidth: 80, height: 32 }}
+          aria-label="Thêm thẻ"
+          sx={{
+            minWidth: 70,
+            height: 32,
+            borderRadius: 1.5,
+            fontWeight: 600,
+            textTransform: 'none',
+            boxShadow: 'none',
+          }}
         >
-          {isSubmitting ? 'Đang thêm…' : 'Thêm thẻ'}
+          {isSubmitting ? 'Đang thêm…' : 'Thêm'}
         </Button>
-        <Tooltip title="Hủy (Esc)">
-          <IconButton
-            size="small"
-            aria-label="Hủy tạo thẻ"
-            disabled={isSubmitting}
-            onClick={handleCancel}
-            sx={{ width: 32, height: 32 }}
-          >
-            <Close fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <Button
+          variant="text"
+          size="small"
+          color="inherit"
+          disabled={isSubmitting}
+          onClick={handleCancel}
+          aria-label="Hủy tạo thẻ"
+          sx={{
+            height: 32,
+            borderRadius: 1.5,
+            textTransform: 'none',
+            color: 'text.secondary',
+            '&:hover': {
+              bgcolor: 'action.hover',
+              color: 'text.primary',
+            },
+          }}
+        >
+          Hủy
+        </Button>
         {onOpenFullDialog && (
           <Tooltip title="Mở bảng nhập chi tiết">
             <IconButton

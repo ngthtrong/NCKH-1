@@ -26,12 +26,17 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import AttachFile from '@mui/icons-material/AttachFile';
 import CalendarTodayOutlined from '@mui/icons-material/CalendarTodayOutlined';
 import ChatBubbleOutline from '@mui/icons-material/ChatBubbleOutline';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import Close from '@mui/icons-material/Close';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
 import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
 import DragIndicator from '@mui/icons-material/DragIndicator';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import ForumOutlined from '@mui/icons-material/ForumOutlined';
+import InsertLink from '@mui/icons-material/InsertLink';
+import OpenInNew from '@mui/icons-material/OpenInNew';
+import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked';
 import TaskAlt from '@mui/icons-material/TaskAlt';
 import {
   Alert,
@@ -50,6 +55,7 @@ import {
   FormControl,
   FormControlLabel,
   IconButton,
+  InputAdornment,
   InputLabel,
   LinearProgress,
   Link,
@@ -59,6 +65,7 @@ import {
   Snackbar,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -107,6 +114,13 @@ export function formatRelativeTime(value: string): string {
   return date.toLocaleDateString('vi-VN');
 }
 
+const priorityPastelConfig: Record<TaskPriority, { bg: string; color: string; border: string }> = {
+  URGENT: { bg: '#fee2e2', color: '#dc2626', border: '#fecaca' },
+  HIGH: { bg: '#ffedd5', color: '#ea580c', border: '#fed7aa' },
+  MEDIUM: { bg: '#e0e7ff', color: '#4338ca', border: '#c7d2fe' },
+  LOW: { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' },
+};
+
 function TaskCardView({
   task,
   overlay = false,
@@ -116,6 +130,13 @@ function TaskCardView({
   overlay?: boolean;
   onOpen?: () => void;
 }) {
+  const isOverdue = task.dueDate ? new Date(task.dueDate).getTime() < Date.now() : false;
+  const isDueSoon = task.dueDate
+    ? !isOverdue && new Date(task.dueDate).getTime() - Date.now() < 24 * 60 * 60 * 1000
+    : false;
+  const dueDateColor = isOverdue ? '#dc2626' : isDueSoon ? '#ea580c' : 'text.secondary';
+  const isSubtasksComplete = task.subtaskCount > 0 && task.completedSubtaskCount === task.subtaskCount;
+
   return (
     <Paper
       className={`task-card ${overlay ? 'task-card--overlay' : ''}`}
@@ -126,44 +147,140 @@ function TaskCardView({
       onKeyDown={(event) => {
         if (onOpen && (event.key === 'Enter' || event.key === ' ')) onOpen();
       }}
+      sx={{
+        borderRadius: 2.5,
+        p: 1.5,
+        bgcolor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+        cursor: onOpen ? 'pointer' : 'default',
+        '&:hover': onOpen
+          ? {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+              borderColor: '#cbd5e1',
+            }
+          : undefined,
+      }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
         <Chip
           size="small"
           label={priorityLabel[task.priority]}
           className={`priority priority--${task.priority.toLowerCase()}`}
+          sx={{
+            bgcolor: priorityPastelConfig[task.priority].bg,
+            color: priorityPastelConfig[task.priority].color,
+            border: `1px solid ${priorityPastelConfig[task.priority].border}`,
+            fontWeight: 600,
+            borderRadius: 1.5,
+            height: 22,
+            fontSize: '0.75rem',
+          }}
         />
-        {!overlay && <DragIndicator className="task-card__handle-icon" fontSize="small" />}
+        {!overlay && (
+          <DragIndicator
+            className="task-card__handle-icon"
+            fontSize="small"
+            sx={{ color: 'text.disabled', opacity: 0.6 }}
+          />
+        )}
       </Stack>
-      <Typography fontWeight={700} mt={1.25} className="task-card__title">
+      <Typography
+        fontWeight={700}
+        fontSize="0.9375rem"
+        mt={1.25}
+        sx={{ color: '#0f172a', lineHeight: 1.35 }}
+        className="task-card__title"
+      >
         {task.title}
       </Typography>
       {task.description && (
-        <Typography variant="body2" color="text.secondary" mt={0.5} className="line-clamp-2">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          mt={0.5}
+          className="line-clamp-2"
+          sx={{ fontSize: '0.8125rem' }}
+        >
           {task.description}
         </Typography>
       )}
       <Stack direction="row" alignItems="center" gap={1.5} mt={1.5} color="text.secondary">
         {task.dueDate && (
-          <Box className="task-meta">
-            <CalendarTodayOutlined /> {shortDate(task.dueDate)}
-          </Box>
+          <Tooltip
+            title={
+              isOverdue
+                ? 'Đã quá hạn'
+                : isDueSoon
+                  ? 'Sắp đến hạn (trong vòng 24h)'
+                  : `Hạn: ${shortDate(task.dueDate)}`
+            }
+          >
+            <Box
+              className="task-meta"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: dueDateColor,
+                fontWeight: isOverdue || isDueSoon ? 600 : 500,
+                fontSize: '0.75rem',
+              }}
+            >
+              <CalendarTodayOutlined sx={{ fontSize: 13 }} /> {shortDate(task.dueDate)}
+            </Box>
+          </Tooltip>
         )}
         {task.subtaskCount > 0 && (
-          <Box className="task-meta">
-            <TaskAlt /> {task.completedSubtaskCount}/{task.subtaskCount}
-          </Box>
+          <Tooltip title={`Tiến độ subtask: ${task.completedSubtaskCount}/${task.subtaskCount}`}>
+            <Box
+              className="task-meta"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: isSubtasksComplete ? 'success.main' : 'text.secondary',
+                fontWeight: isSubtasksComplete ? 700 : 500,
+                fontSize: '0.75rem',
+              }}
+            >
+              <TaskAlt
+                sx={{
+                  fontSize: 13,
+                  color: isSubtasksComplete ? 'success.main' : 'inherit',
+                }}
+              />
+              {task.completedSubtaskCount}/{task.subtaskCount}
+            </Box>
+          </Tooltip>
         )}
         {task.commentCount > 0 && (
-          <Box className="task-meta">
-            <ChatBubbleOutline /> {task.commentCount}
+          <Box
+            className="task-meta"
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem' }}
+          >
+            <ChatBubbleOutline sx={{ fontSize: 13 }} /> {task.commentCount}
           </Box>
         )}
         <Box flex={1} />
         {task.assignee && (
-          <Avatar src={task.assignee.avatarUrl} sx={{ width: 25, height: 25 }}>
-            {task.assignee.displayName[0]}
-          </Avatar>
+          <Tooltip title={task.assignee.displayName}>
+            <Avatar
+              src={task.assignee.avatarUrl}
+              sx={{
+                width: 24,
+                height: 24,
+                fontSize: '0.7rem',
+                bgcolor: 'primary.light',
+                color: 'primary.dark',
+                fontWeight: 700,
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              {task.assignee.displayName[0]}
+            </Avatar>
+          </Tooltip>
         )}
       </Stack>
     </Paper>
@@ -197,6 +314,7 @@ function SortableTaskCard({
 
 function KanbanColumn({
   column,
+  wipMode,
   disabled,
   canManageColumns,
   canEditTasks,
@@ -211,6 +329,7 @@ function KanbanColumn({
   onOpenTask,
 }: {
   column: BoardColumn;
+  wipMode?: string;
   disabled: boolean;
   canManageColumns: boolean;
   canEditTasks: boolean;
@@ -226,6 +345,7 @@ function KanbanColumn({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id, disabled });
   const atLimit = Boolean(column.taskLimit && column.tasks.length >= column.taskLimit);
+  const isWipWarn = wipMode === 'WARN' && atLimit;
 
   const isFiltered = filters.search.trim() !== '' || filters.priority !== 'ALL' || filters.assigneeId !== 'ALL';
   const visibleTasks = column.tasks.filter((task) => {
@@ -248,19 +368,67 @@ function KanbanColumn({
     return true;
   });
 
+  const cardCountText = isFiltered
+    ? `${visibleTasks.length}/${column.tasks.length}`
+    : column.taskLimit
+      ? `${column.tasks.length}/${column.taskLimit}`
+      : `${column.tasks.length}`;
+
+  const countBadge = (
+    <Chip
+      label={cardCountText}
+      size="small"
+      sx={{
+        borderRadius: 4,
+        height: 22,
+        fontSize: '0.75rem',
+        fontWeight: isWipWarn ? 800 : 700,
+        ...(isWipWarn
+          ? {
+              bgcolor: '#fef3c7',
+              color: '#b45309',
+              border: '1px solid #fde68a',
+            }
+          : {
+              bgcolor: 'action.selected',
+              color: 'text.secondary',
+            }),
+      }}
+    />
+  );
+
   return (
     <Box className={`kanban-column ${isOver ? 'kanban-column--over' : ''}`} ref={setNodeRef}>
       <Stack direction="row" alignItems="center" gap={1} className="kanban-column__header">
         <span className="kanban-column__dot" />
-        <Typography fontWeight={750}>{column.name}</Typography>
-        {column.completed && <Chip label="Hoàn tất" size="small" color="success" variant="outlined" />}
-        <Chip
-          label={isFiltered ? `${visibleTasks.length}/${column.tasks.length}` : column.tasks.length}
-          size="small"
-        />
+        <Typography fontWeight={700} fontSize="0.9375rem" sx={{ color: 'text.primary' }}>
+          {column.name}
+        </Typography>
+        {column.completed && (
+          <Chip
+            label="Hoàn tất"
+            size="small"
+            color="success"
+            variant="outlined"
+            sx={{ borderRadius: 1.5, height: 20, fontSize: '0.7rem' }}
+          />
+        )}
+        {isWipWarn ? (
+          <Tooltip
+            title={`Cảnh báo: Cột đã đạt hoặc vượt giới hạn WIP (${column.tasks.length}/${column.taskLimit})`}
+          >
+            {countBadge}
+          </Tooltip>
+        ) : (
+          countBadge
+        )}
         <Box flex={1} />
-        {column.taskLimit && (
-          <Typography variant="caption" color={atLimit ? 'error' : 'text.secondary'}>
+        {column.taskLimit && !isWipWarn && (
+          <Typography
+            variant="caption"
+            color={atLimit ? 'error' : 'text.secondary'}
+            sx={{ fontWeight: 500 }}
+          >
             WIP {column.tasks.length}/{column.taskLimit}
           </Typography>
         )}
@@ -322,7 +490,7 @@ function KanbanColumn({
         <Box sx={{ mt: 1 }}>
           <QuickAddTaskInline
             columnId={column.id}
-            disabled={disabled || atLimit}
+            disabled={disabled || (atLimit && wipMode === 'STRICT')}
             onAddTask={onQuickAdd}
             onOpenFullDialog={() => onAdd(column.id)}
           />
@@ -363,6 +531,9 @@ export function KanbanPage() {
   const [detailPriority, setDetailPriority] = useState<TaskPriority>('MEDIUM');
   const [detailDueAt, setDetailDueAt] = useState('');
   const [detailAssigneeId, setDetailAssigneeId] = useState<UUID | ''>('');
+  const [detailColumnId, setDetailColumnId] = useState<UUID | ''>('');
+  const [quickSubtaskTitle, setQuickSubtaskTitle] = useState('');
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
   const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
   const [commentBody, setCommentBody] = useState('');
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
@@ -612,7 +783,7 @@ export function KanbanPage() {
         .find((candidate) => candidate.id === selectedTaskId);
       if (!task) throw new Error('Task not found');
       return boardsApi.updateTask(task.id, {
-        columnId: task.columnId,
+        columnId: (detailColumnId || task.columnId) as UUID,
         title: detailTitle.trim(),
         description: detailDescription.trim() || undefined,
         priority: detailPriority,
@@ -818,12 +989,57 @@ export function KanbanPage() {
       .find((candidate) => candidate.id === taskId);
     if (!task) return;
     setSelectedTaskId(taskId);
+    setDetailColumnId(task.columnId);
     setDetailTitle(task.title);
     setDetailCustomData(task.customData ?? {});
     setDetailDescription(task.description ?? '');
     setDetailPriority(task.priority);
     setDetailDueAt(task.dueDate ? localDateTimeValue(task.dueDate) : '');
     setDetailAssigneeId(task.assignee?.id ?? '');
+    setQuickSubtaskTitle('');
+  };
+
+  const handleQuickAddSubtask = async () => {
+    const trimmed = quickSubtaskTitle.trim();
+    if (!trimmed || !boardId || !selectedTask || isAddingSubtask) return;
+    try {
+      setIsAddingSubtask(true);
+      const targetColumnId = selectedTask.columnId;
+      const updatedBoard = await boardsApi.createTask(boardId, targetColumnId, {
+        title: trimmed,
+        priority: 'MEDIUM',
+        parentTaskId: selectedTask.id,
+      });
+      acceptBoard(updatedBoard);
+      setQuickSubtaskTitle('');
+    } catch (cause) {
+      setSnackbar(errorMessage(cause));
+    } finally {
+      setIsAddingSubtask(false);
+    }
+  };
+
+  const handleToggleSubtask = async (st: TaskCard & { isCompleted: boolean; columnName: string }) => {
+    if (!board || !boardId) return;
+    const completedCol = board.columns.find((c) => c.completed);
+    const nonCompletedCol = board.columns.find((c) => !c.completed);
+    const targetCol = st.isCompleted ? nonCompletedCol : (completedCol ?? board.columns[board.columns.length - 1]);
+    if (!targetCol || targetCol.id === st.columnId) return;
+
+    try {
+      const result = moveBoardTask(board, st.id, targetCol.id, 'OFF');
+      if (result) {
+        setBoard(result.board);
+        await moveTask.mutateAsync({
+          taskId: result.taskId,
+          targetColumnId: result.targetColumnId,
+          targetPosition: result.targetPosition,
+          version: result.version,
+        });
+      }
+    } catch (cause) {
+      setSnackbar(errorMessage(cause));
+    }
   };
 
   const selectProject = async (projectId: UUID) => {
@@ -1011,6 +1227,7 @@ export function KanbanPage() {
               <KanbanColumn
                 key={column.id}
                 column={column}
+                wipMode={kanbanConfiguration.data?.settings.wipMode}
                 disabled={boardInteractionDisabled}
                 canManageColumns={canManageColumns}
                 canEditTasks={Boolean(canEditTasks)}
@@ -1135,38 +1352,82 @@ export function KanbanPage() {
         PaperProps={{
           sx: {
             width: { xs: '100%', sm: 540, md: 620 },
-            p: 3,
+            p: { xs: 2, sm: 3 },
             boxSizing: 'border-box',
+            bgcolor: '#ffffff',
+            borderLeft: '1px solid #e2e8f0',
+            boxShadow: '-8px 0 32px rgba(15, 23, 42, 0.08)',
           },
         }}
       >
         {selectedTask && (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-              <Stack direction="row" alignItems="center" gap={1}>
-                <Typography variant="h6" fontWeight={750}>
-                  Chi tiết công việc
-                </Typography>
-                {selectedTask.parentTaskId && (
-                  <Chip label="Công việc con" size="small" color="primary" variant="outlined" />
-                )}
+            {/* Drawer Header */}
+            <Box sx={{ pb: 2, borderBottom: '1px solid #f1f5f9', mb: 2.5 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                <Breadcrumbs separator="›" sx={{ fontSize: '0.8125rem' }}>
+                  <Typography color="text.secondary" sx={{ fontSize: '0.8125rem', fontWeight: 500 }}>
+                    {board?.name ?? 'Bảng'}
+                  </Typography>
+                  <Typography color="text.primary" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                    {board?.columns.find((c) => c.id === (detailColumnId || selectedTask.columnId))?.name ?? 'Cột'}
+                  </Typography>
+                </Breadcrumbs>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Chip
+                    label={`#${selectedTask.id.slice(0, 8)}`}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 1.5,
+                      fontFamily: 'monospace',
+                      fontSize: '0.75rem',
+                      bgcolor: '#f8fafc',
+                      borderColor: '#e2e8f0',
+                      color: 'text.secondary',
+                    }}
+                  />
+                  {selectedTask.parentTaskId && (
+                    <Chip
+                      label="Công việc con"
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ borderRadius: 1.5, fontWeight: 600 }}
+                    />
+                  )}
+                  <IconButton
+                    aria-label="Đóng chi tiết"
+                    edge="end"
+                    size="small"
+                    onClick={() => setSelectedTaskId(null)}
+                    sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
+                  >
+                    <Close fontSize="small" />
+                  </IconButton>
+                </Stack>
               </Stack>
-              <IconButton
-                aria-label="Đóng chi tiết"
-                edge="end"
-                onClick={() => setSelectedTaskId(null)}
+              <Typography
+                variant="h5"
+                fontWeight={700}
+                sx={{ color: '#0f172a', mt: 1, wordBreak: 'break-word', lineHeight: 1.3 }}
               >
-                <Close />
-              </IconButton>
-            </Stack>
+                {detailTitle || selectedTask.title}
+              </Typography>
+            </Box>
+
+            {/* Scrollable Content */}
             <Box sx={{ flex: 1, overflowY: 'auto', pr: 0.5 }}>
-              <Stack spacing={2}>
+              <Stack spacing={2.5}>
+                {/* Title & Description inputs */}
                 <TextField
                   label="Tiêu đề"
                   value={detailTitle}
                   onChange={(event) => setDetailTitle(event.target.value)}
                   disabled={!canEditTasks}
                   required
+                  fullWidth
+                  size="small"
                   inputProps={{ maxLength: 240 }}
                 />
                 <TextField
@@ -1176,68 +1437,136 @@ export function KanbanPage() {
                   disabled={!canEditTasks}
                   multiline
                   minRows={3}
+                  fullWidth
+                  size="small"
+                  placeholder="Thêm mô tả chi tiết cho công việc này..."
                   inputProps={{ maxLength: 10_000 }}
                 />
+
+                {/* Metadata Grid Container */}
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    borderRadius: 2.5,
+                    bgcolor: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={700}
+                    color="text.secondary"
+                    sx={{ mb: 1.5, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}
+                  >
+                    Thuộc tính công việc
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                      gap: 1.5,
+                    }}
+                  >
+                    <FormControl fullWidth size="small" disabled={!canEditTasks}>
+                      <InputLabel id="detail-column-label">Cột trạng thái</InputLabel>
+                      <Select
+                        labelId="detail-column-label"
+                        label="Cột trạng thái"
+                        value={detailColumnId}
+                        onChange={(event) => setDetailColumnId(event.target.value as UUID)}
+                        sx={{ bgcolor: '#ffffff', borderRadius: 2 }}
+                      >
+                        {orderedColumns.map((col) => (
+                          <MenuItem key={col.id} value={col.id}>
+                            {col.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth size="small" disabled={!canEditTasks}>
+                      <InputLabel id="detail-assignee-label">Người thực hiện</InputLabel>
+                      <Select
+                        labelId="detail-assignee-label"
+                        label="Người thực hiện"
+                        value={detailAssigneeId}
+                        onChange={(event) => setDetailAssigneeId(event.target.value as UUID | '')}
+                        sx={{ bgcolor: '#ffffff', borderRadius: 2 }}
+                      >
+                        <MenuItem value="">Chưa giao</MenuItem>
+                        {assignableMembers.map((member) => (
+                          <MenuItem key={member.userId} value={member.userId}>
+                            {member.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth size="small" disabled={!canEditTasks}>
+                      <InputLabel id="detail-priority-label">Mức ưu tiên</InputLabel>
+                      <Select
+                        labelId="detail-priority-label"
+                        label="Mức ưu tiên"
+                        value={detailPriority}
+                        onChange={(event) => setDetailPriority(event.target.value as TaskPriority)}
+                        sx={{ bgcolor: '#ffffff', borderRadius: 2 }}
+                      >
+                        {(Object.keys(priorityLabel) as TaskPriority[]).map((priority) => (
+                          <MenuItem key={priority} value={priority}>
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  bgcolor: priorityPastelConfig[priority].color,
+                                }}
+                              />
+                              <span>{priorityLabel[priority]}</span>
+                            </Stack>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <TextField
+                      label="Hạn hoàn thành"
+                      type="datetime-local"
+                      size="small"
+                      value={detailDueAt}
+                      onChange={(event) => setDetailDueAt(event.target.value)}
+                      disabled={!canEditTasks}
+                      InputLabelProps={{ shrink: true }}
+                      fullWidth
+                      sx={{ bgcolor: '#ffffff', '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                    />
+                  </Box>
+                </Paper>
+
+                {/* Custom fields if any */}
                 <PooledTaskFields
                   fields={kanbanConfiguration.data?.settings.fields ?? []}
                   values={detailCustomData}
                   onChange={setDetailCustomData}
                   disabled={!canEditTasks}
                 />
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <TextField
-                    label="Hạn hoàn thành"
-                    type="datetime-local"
-                    value={detailDueAt}
-                    onChange={(event) => setDetailDueAt(event.target.value)}
-                    disabled={!canEditTasks}
-                    InputLabelProps={{ shrink: true }}
-                    fullWidth
-                  />
-                  <FormControl fullWidth disabled={!canEditTasks}>
-                    <InputLabel id="detail-assignee-label">Người thực hiện</InputLabel>
-                    <Select
-                      labelId="detail-assignee-label"
-                      label="Người thực hiện"
-                      value={detailAssigneeId}
-                      onChange={(event) => setDetailAssigneeId(event.target.value as UUID | '')}
-                    >
-                      <MenuItem value="">Chưa giao</MenuItem>
-                      {assignableMembers.map((member) => (
-                        <MenuItem key={member.userId} value={member.userId}>
-                          {member.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Stack>
-                <FormControl fullWidth disabled={!canEditTasks}>
-                  <InputLabel id="detail-priority-label">Mức ưu tiên</InputLabel>
-                  <Select
-                    labelId="detail-priority-label"
-                    label="Mức ưu tiên"
-                    value={detailPriority}
-                    onChange={(event) => setDetailPriority(event.target.value as TaskPriority)}
-                  >
-                    {(Object.keys(priorityLabel) as TaskPriority[]).map((priority) => (
-                      <MenuItem key={priority} value={priority}>
-                        {priorityLabel[priority]}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+
+                {/* Action buttons */}
                 {canEditTasks && (
-                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                  <Stack direction="row" spacing={1.5} alignItems="center">
                     <Button
                       variant="contained"
                       disabled={!detailTitle.trim() || updateTask.isPending}
                       onClick={() => updateTask.mutate()}
+                      sx={{ px: 2.5, py: 0.75, borderRadius: 2, fontWeight: 600, textTransform: 'none' }}
                     >
                       {updateTask.isPending ? 'Đang lưu…' : 'Lưu thay đổi'}
                     </Button>
                     {selectedProject?.role === 'MANAGER' && (
                       <Button
                         color="error"
+                        variant="text"
                         startIcon={<DeleteOutline />}
                         disabled={deleteTask.isPending}
                         onClick={() => {
@@ -1245,6 +1574,7 @@ export function KanbanPage() {
                             deleteTask.mutate();
                           }
                         }}
+                        sx={{ borderRadius: 2, textTransform: 'none' }}
                       >
                         Xóa
                       </Button>
@@ -1254,11 +1584,11 @@ export function KanbanPage() {
 
                 {/* Subtasks Section */}
                 {!selectedTask.parentTaskId && (
-                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#ffffff', borderColor: '#e2e8f0' }}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1.5}>
                       <Stack direction="row" alignItems="center" gap={1}>
                         <TaskAlt color="action" />
-                        <Typography variant="h6">
+                        <Typography variant="h6" fontWeight={700} fontSize="1rem">
                           Công việc con ({completedSubtasksCount}/{totalSubtasksCount})
                         </Typography>
                       </Stack>
@@ -1269,6 +1599,7 @@ export function KanbanPage() {
                           onClick={() => {
                             openCreateTask(selectedTask.columnId, selectedTask.id);
                           }}
+                          sx={{ textTransform: 'none', fontWeight: 600 }}
                         >
                           Thêm subtask
                         </Button>
@@ -1277,87 +1608,145 @@ export function KanbanPage() {
 
                     {totalSubtasksCount > 0 && (
                       <Box sx={{ mb: 2 }}>
-                        <Stack direction="row" justifyContent="space-between" mb={0.5}>
-                          <Typography variant="caption" color="text.secondary">
+                        <Stack direction="row" justifyContent="space-between" mb={0.75} alignItems="center">
+                          <Typography variant="caption" color="text.secondary" fontWeight={500}>
                             Tiến độ hoàn thành
                           </Typography>
-                          <Typography variant="caption" fontWeight={700}>
+                          <Typography variant="caption" fontWeight={700} color={subtasksPercent === 100 ? 'success.main' : 'text.primary'}>
                             {subtasksPercent}%
                           </Typography>
                         </Stack>
                         <LinearProgress
                           variant="determinate"
                           value={subtasksPercent}
-                          sx={{ height: 6, borderRadius: 3 }}
+                          sx={{ height: 6, borderRadius: 3, bgcolor: '#e2e8f0' }}
                           color={subtasksPercent === 100 ? 'success' : 'primary'}
                         />
                       </Box>
                     )}
 
+                    {/* Quick add subtask input on Enter */}
+                    {canEditTasks && (
+                      <Box sx={{ mb: 1.5 }}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          placeholder="Thêm công việc con (nhấn Enter để thêm)..."
+                          value={quickSubtaskTitle}
+                          onChange={(e) => setQuickSubtaskTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              void handleQuickAddSubtask();
+                            }
+                          }}
+                          disabled={isAddingSubtask}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Add fontSize="small" sx={{ color: 'text.secondary' }} />
+                              </InputAdornment>
+                            ),
+                          }}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              bgcolor: '#f8fafc',
+                            },
+                          }}
+                        />
+                      </Box>
+                    )}
+
+                    {/* Subtask checklist with circular checkboxes */}
                     <Stack spacing={1}>
                       {selectedTaskSubtasks.map((st) => (
                         <Paper
                           key={st.id}
                           variant="outlined"
-                          onClick={() => openTask(st.id)}
                           sx={{
-                            p: 1.25,
-                            cursor: 'pointer',
+                            p: 1,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            borderRadius: 1.5,
-                            bgcolor: 'background.paper',
+                            borderRadius: 2,
+                            bgcolor: st.isCompleted ? '#f8fafc' : '#ffffff',
+                            borderColor: '#e2e8f0',
+                            transition: 'all 0.15s ease',
                             '&:hover': {
                               bgcolor: 'action.hover',
-                              borderColor: 'primary.main',
+                              borderColor: 'primary.light',
                             },
                           }}
                         >
-                          <Stack direction="row" alignItems="center" gap={1} minWidth={0}>
-                            <Chip
+                          <Stack direction="row" alignItems="center" gap={1} minWidth={0} flex={1}>
+                            <Checkbox
                               size="small"
-                              label={st.columnName}
-                              color={st.isCompleted ? 'success' : 'default'}
-                              variant={st.isCompleted ? 'filled' : 'outlined'}
+                              icon={<RadioButtonUnchecked fontSize="small" />}
+                              checkedIcon={<CheckCircle fontSize="small" color="success" />}
+                              checked={st.isCompleted}
+                              onChange={() => void handleToggleSubtask(st)}
+                              disabled={!canEditTasks}
+                              sx={{ p: 0.5 }}
                             />
                             <Typography
                               variant="body2"
                               fontWeight={600}
                               noWrap
+                              onClick={() => openTask(st.id)}
                               sx={{
+                                cursor: 'pointer',
                                 textDecoration: st.isCompleted ? 'line-through' : 'none',
                                 color: st.isCompleted ? 'text.secondary' : 'text.primary',
+                                flex: 1,
+                                '&:hover': { color: 'primary.main' },
                               }}
                             >
                               {st.title}
                             </Typography>
                           </Stack>
-                          <Chip
-                            size="small"
-                            label={priorityLabel[st.priority]}
-                            className={`priority priority--${st.priority.toLowerCase()}`}
-                            sx={{ ml: 1 }}
-                          />
+                          <Stack direction="row" alignItems="center" spacing={1} sx={{ ml: 1, flexShrink: 0 }}>
+                            <Chip
+                              size="small"
+                              label={st.columnName}
+                              color={st.isCompleted ? 'success' : 'default'}
+                              variant={st.isCompleted ? 'filled' : 'outlined'}
+                              sx={{ height: 22, fontSize: '0.7rem', borderRadius: 1.5 }}
+                            />
+                            <Chip
+                              size="small"
+                              label={priorityLabel[st.priority]}
+                              className={`priority priority--${st.priority.toLowerCase()}`}
+                              sx={{
+                                height: 22,
+                                fontSize: '0.7rem',
+                                borderRadius: 1.5,
+                                bgcolor: priorityPastelConfig[st.priority].bg,
+                                color: priorityPastelConfig[st.priority].color,
+                                border: `1px solid ${priorityPastelConfig[st.priority].border}`,
+                              }}
+                            />
+                          </Stack>
                         </Paper>
                       ))}
                       {totalSubtasksCount === 0 && (
-                        <Typography variant="body2" color="text.secondary">
-                          Chưa có công việc con nào.
+                        <Typography variant="body2" color="text.secondary" sx={{ py: 0.5 }}>
+                          Chưa có công việc con nào. Nhập tiêu đề ở trên và nhấn Enter để thêm nhanh.
                         </Typography>
                       )}
                     </Stack>
                   </Paper>
                 )}
 
-                <Paper variant="outlined" sx={{ p: 2 }}>
+                {/* Resources Section formatted as neat cards with download/open button */}
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#ffffff', borderColor: '#e2e8f0' }}>
                   <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} mb={1.5}>
                     <Stack direction="row" alignItems="center" gap={1}>
                       <AttachFile color="action" />
                       <Box>
-                        <Typography variant="h6">Tài nguyên</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {attachedResources.length} file hoặc liên kết đã gắn
+                        <Typography variant="h6" fontWeight={700} fontSize="1rem">Tài nguyên</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {attachedResources.length} tệp hoặc liên kết đính kèm
                         </Typography>
                       </Box>
                     </Stack>
@@ -1365,8 +1754,9 @@ export function KanbanPage() {
                       component={RouterLink}
                       to={`/resources?task=${selectedTask.id}`}
                       size="small"
+                      sx={{ textTransform: 'none', fontWeight: 600 }}
                     >
-                      Mở kho
+                      Mở kho tài nguyên
                     </Button>
                   </Stack>
                   {resources.isLoading ? (
@@ -1378,38 +1768,78 @@ export function KanbanPage() {
                       Chưa có tài nguyên. Mở kho để gắn file hoặc liên kết vào công việc.
                     </Typography>
                   ) : (
-                    <Stack spacing={0.75}>
+                    <Stack spacing={1}>
                       {attachedResources.map((resource) => (
-                        <Stack
+                        <Paper
                           key={resource.id}
-                          direction="row"
-                          alignItems="center"
-                          justifyContent="space-between"
-                          gap={2}
-                          className="task-resource-row"
+                          variant="outlined"
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 1.5,
+                            bgcolor: '#f8fafc',
+                            borderColor: '#e2e8f0',
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              bgcolor: '#f1f5f9',
+                              borderColor: 'primary.light',
+                            },
+                          }}
                         >
-                          <Box minWidth={0}>
-                            <Typography fontWeight={700} noWrap>{resource.fileName}</Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {resource.kind === 'LINK' ? 'Liên kết' : resource.contentType}
-                            </Typography>
-                          </Box>
+                          <Stack direction="row" alignItems="center" spacing={1.25} minWidth={0} flex={1}>
+                            <Box
+                              sx={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: 1.5,
+                                bgcolor: resource.kind === 'LINK' ? '#eff6ff' : '#f1f5f9',
+                                color: resource.kind === 'LINK' ? '#2563eb' : '#64748b',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {resource.kind === 'LINK' ? <InsertLink fontSize="small" /> : <DescriptionOutlined fontSize="small" />}
+                            </Box>
+                            <Box minWidth={0} flex={1}>
+                              <Typography fontWeight={600} fontSize="0.875rem" noWrap>
+                                {resource.fileName}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {resource.kind === 'LINK' ? 'Liên kết ngoài' : (resource.contentType || 'Tệp đính kèm')}
+                              </Typography>
+                            </Box>
+                          </Stack>
                           <Button
                             size="small"
-                            startIcon={<DownloadOutlined />}
+                            variant="outlined"
+                            startIcon={resource.kind === 'LINK' ? <OpenInNew fontSize="small" /> : <DownloadOutlined fontSize="small" />}
                             disabled={downloadResource.isPending}
                             onClick={() => downloadResource.mutate(resource.id)}
+                            sx={{
+                              borderRadius: 1.5,
+                              textTransform: 'none',
+                              fontWeight: 600,
+                              bgcolor: '#ffffff',
+                              whiteSpace: 'nowrap',
+                            }}
                           >
-                            {resource.kind === 'LINK' ? 'Mở' : 'Tải'}
+                            {resource.kind === 'LINK' ? 'Mở' : 'Tải về'}
                           </Button>
-                        </Stack>
+                        </Paper>
                       ))}
                     </Stack>
                   )}
                 </Paper>
+
+                {/* Custom Capability Fields */}
                 {customCapability?.supported && taskCustom.data?.definition && (
-                  <Paper variant="outlined" sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom>Field mở rộng</Typography>
+                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#ffffff', borderColor: '#e2e8f0' }}>
+                    <Typography variant="h6" fontWeight={700} fontSize="1rem" gutterBottom>Field mở rộng</Typography>
                     {!customCapability.enabled && (
                       <Alert severity="info" sx={{ mb: 2 }}>Capability đã tắt; dữ liệu hiện có chỉ đọc.</Alert>
                     )}
@@ -1453,7 +1883,7 @@ export function KanbanPage() {
                           variant="outlined"
                           disabled={saveCustomValues.isPending}
                           onClick={() => saveCustomValues.mutate()}
-                          sx={{ alignSelf: 'flex-start' }}
+                          sx={{ alignSelf: 'flex-start', borderRadius: 1.5, textTransform: 'none' }}
                         >
                           Lưu field mở rộng
                         </Button>
@@ -1461,11 +1891,13 @@ export function KanbanPage() {
                     </Stack>
                   </Paper>
                 )}
+
+                {/* Approvals */}
                 {approvalCapability?.supported && (
-                  <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#ffffff', borderColor: '#e2e8f0' }}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
                       <Box>
-                        <Typography variant="h6">Phê duyệt</Typography>
+                        <Typography variant="h6" fontWeight={700} fontSize="1rem">Phê duyệt</Typography>
                         <Typography variant="body2" color="text.secondary">
                           {latestApproval
                             ? `${latestApproval.status} · bước ${latestApproval.currentStep}/${latestApproval.steps.length}`
@@ -1476,129 +1908,186 @@ export function KanbanPage() {
                     </Stack>
                     <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
                       {approvalCapability.enabled && canEditTasks && latestApproval && latestApproval.status !== 'PENDING' && (
-                        <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending}>Gửi duyệt</Button>
+                        <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending} sx={{ textTransform: 'none' }}>Gửi duyệt</Button>
                       )}
                       {approvalCapability.enabled && canEditTasks && !latestApproval && (
-                        <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending}>Gửi duyệt</Button>
+                        <Button variant="outlined" onClick={() => submitApproval.mutate()} disabled={submitApproval.isPending} sx={{ textTransform: 'none' }}>Gửi duyệt</Button>
                       )}
                       {approvalCapability.enabled && currentUserCanDecide && latestApproval && (
                         <>
-                          <Button color="success" variant="contained" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'APPROVED', version: latestApproval.version })}>Đồng ý</Button>
-                          <Button color="error" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'REJECTED', version: latestApproval.version })}>Từ chối</Button>
+                          <Button color="success" variant="contained" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'APPROVED', version: latestApproval.version })} sx={{ textTransform: 'none' }}>Đồng ý</Button>
+                          <Button color="error" disabled={decideApproval.isPending} onClick={() => decideApproval.mutate({ runId: latestApproval.id, decision: 'REJECTED', version: latestApproval.version })} sx={{ textTransform: 'none' }}>Từ chối</Button>
                         </>
                       )}
                       {approvalCapability.enabled && latestApproval?.status === 'PENDING' && (latestApproval.submittedBy === session?.user.id || selectedProject?.role === 'MANAGER') && (
-                        <Button disabled={withdrawApproval.isPending} onClick={() => withdrawApproval.mutate({ runId: latestApproval.id, version: latestApproval.version })}>Thu hồi lượt duyệt</Button>
+                        <Button disabled={withdrawApproval.isPending} onClick={() => withdrawApproval.mutate({ runId: latestApproval.id, version: latestApproval.version })} sx={{ textTransform: 'none' }}>Thu hồi lượt duyệt</Button>
                       )}
                     </Stack>
                   </Paper>
                 )}
-                <Divider />
-                <Stack direction="row" alignItems="center" gap={1}>
-                  <ForumOutlined color="action" />
-                  <Typography variant="h6">Bình luận</Typography>
-                </Stack>
-                {comments.isLoading ? (
-                  <SectionLoader />
-                ) : comments.isError ? (
-                  <ErrorState message={errorMessage(comments.error)} onRetry={() => void comments.refetch()} />
-                ) : !comments.data?.length ? (
-                  <Typography color="text.secondary">Chưa có bình luận.</Typography>
-                ) : (
-                  <Stack spacing={1.5}>
-                    {comments.data.map((comment) => {
-                      const canChange = canEditTasks && (
-                        selectedProject?.role === 'MANAGER' || comment.authorUserId === session?.user.id
-                      );
-                      const authorName = memberNameByUserId.get(comment.authorUserId) ?? comment.authorUserId;
-                      const initials = authorName
-                        .split(' ')
-                        .map((n) => n[0])
-                        .filter(Boolean)
-                        .slice(-2)
-                        .join('')
-                        .toUpperCase() || 'U';
 
-                      return (
-                        <Paper key={comment.id} variant="outlined" sx={{ p: 1.5, borderRadius: 2 }}>
-                          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={2}>
-                            <Stack direction="row" spacing={1.25} alignItems="flex-start" flex={1}>
+                <Divider sx={{ my: 1 }} />
+
+                {/* Comments Section with Timeline styling */}
+                <Box>
+                  <Stack direction="row" alignItems="center" gap={1} mb={2}>
+                    <ForumOutlined color="action" />
+                    <Typography variant="h6" fontWeight={700} fontSize="1rem">Bình luận trao đổi</Typography>
+                  </Stack>
+                  {comments.isLoading ? (
+                    <SectionLoader />
+                  ) : comments.isError ? (
+                    <ErrorState message={errorMessage(comments.error)} onRetry={() => void comments.refetch()} />
+                  ) : !comments.data?.length ? (
+                    <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+                      Chưa có bình luận nào cho công việc này.
+                    </Typography>
+                  ) : (
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        mb: 2.5,
+                        pl: 1,
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 16,
+                          bottom: 16,
+                          left: 20,
+                          width: '2px',
+                          bgcolor: '#f1f5f9',
+                          zIndex: 0,
+                        },
+                      }}
+                    >
+                      <Stack spacing={2}>
+                        {comments.data.map((comment) => {
+                          const canChange = canEditTasks && (
+                            selectedProject?.role === 'MANAGER' || comment.authorUserId === session?.user.id
+                          );
+                          const authorName = memberNameByUserId.get(comment.authorUserId) ?? comment.authorUserId;
+                          const initials = authorName
+                            .split(' ')
+                            .map((n) => n[0])
+                            .filter(Boolean)
+                            .slice(-2)
+                            .join('')
+                            .toUpperCase() || 'U';
+
+                          return (
+                            <Box key={comment.id} sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
                               <Avatar
                                 sx={{
                                   width: 32,
                                   height: 32,
-                                  fontSize: '0.8rem',
-                                  bgcolor: 'primary.light',
-                                  color: 'primary.dark',
+                                  fontSize: '0.75rem',
+                                  bgcolor: 'primary.main',
+                                  color: '#ffffff',
                                   fontWeight: 700,
+                                  border: '2px solid #ffffff',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                  flexShrink: 0,
                                 }}
                               >
                                 {initials}
                               </Avatar>
-                              <Box flex={1}>
-                                <Stack direction="row" alignItems="baseline" gap={1} flexWrap="wrap">
-                                  <Typography variant="subtitle2" fontWeight={700}>
-                                    {authorName}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {formatRelativeTime(comment.createdAt)}
-                                  </Typography>
+                              <Paper
+                                variant="outlined"
+                                sx={{
+                                  flex: 1,
+                                  p: 1.5,
+                                  borderRadius: 2.5,
+                                  bgcolor: '#f8fafc',
+                                  borderColor: '#e2e8f0',
+                                }}
+                              >
+                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
+                                  <Stack direction="row" alignItems="baseline" spacing={1} flexWrap="wrap">
+                                    <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                                      {authorName}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {formatRelativeTime(comment.createdAt)}
+                                    </Typography>
+                                  </Stack>
+                                  {canChange && (
+                                    <Stack direction="row">
+                                      <IconButton
+                                        size="small"
+                                        aria-label="Sửa bình luận"
+                                        onClick={() => {
+                                          setEditingComment(comment);
+                                          setEditingCommentBody(comment.body);
+                                        }}
+                                        sx={{ p: 0.5, color: 'text.secondary' }}
+                                      >
+                                        <EditOutlined fontSize="small" />
+                                      </IconButton>
+                                      <IconButton
+                                        size="small"
+                                        color="error"
+                                        aria-label="Xóa bình luận"
+                                        disabled={deleteComment.isPending}
+                                        onClick={() => deleteComment.mutate(comment.id)}
+                                        sx={{ p: 0.5 }}
+                                      >
+                                        <DeleteOutline fontSize="small" />
+                                      </IconButton>
+                                    </Stack>
+                                  )}
                                 </Stack>
-                                <Typography sx={{ whiteSpace: 'pre-wrap', mt: 0.5 }} variant="body2">
+                                <Typography sx={{ whiteSpace: 'pre-wrap', mt: 0.75, color: '#334155' }} variant="body2">
                                   {comment.body}
                                 </Typography>
-                              </Box>
-                            </Stack>
-                            {canChange && (
-                              <Stack direction="row">
-                                <IconButton
-                                  size="small"
-                                  aria-label="Sửa bình luận"
-                                  onClick={() => {
-                                    setEditingComment(comment);
-                                    setEditingCommentBody(comment.body);
-                                  }}
-                                >
-                                  <EditOutlined fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  aria-label="Xóa bình luận"
-                                  disabled={deleteComment.isPending}
-                                  onClick={() => deleteComment.mutate(comment.id)}
-                                >
-                                  <DeleteOutline fontSize="small" />
-                                </IconButton>
-                              </Stack>
-                            )}
-                          </Stack>
-                        </Paper>
-                      );
-                    })}
-                  </Stack>
-                )}
-                {canEditTasks && (
-                  <Stack direction="row" spacing={1} alignItems="flex-start">
-                    <TextField
-                      label="Viết bình luận"
-                      value={commentBody}
-                      onChange={(event) => setCommentBody(event.target.value)}
-                      multiline
-                      minRows={2}
-                      fullWidth
-                      inputProps={{ maxLength: 10_000 }}
-                    />
-                    <Button
-                      variant="contained"
-                      disabled={!commentBody.trim() || addComment.isPending}
-                      onClick={() => addComment.mutate()}
-                      sx={{ minHeight: 40 }}
+                              </Paper>
+                            </Box>
+                          );
+                        })}
+                      </Stack>
+                    </Box>
+                  )}
+
+                  {canEditTasks && (
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: '#ffffff',
+                        borderColor: '#e2e8f0',
+                      }}
                     >
-                      Gửi
-                    </Button>
-                  </Stack>
-                )}
+                      <TextField
+                        placeholder="Viết bình luận trao đổi về công việc..."
+                        value={commentBody}
+                        onChange={(event) => setCommentBody(event.target.value)}
+                        multiline
+                        minRows={2}
+                        fullWidth
+                        variant="standard"
+                        InputProps={{ disableUnderline: true }}
+                        inputProps={{ maxLength: 10_000, style: { fontSize: '0.875rem' } }}
+                        sx={{ mb: 1 }}
+                      />
+                      <Stack direction="row" justifyContent="flex-end">
+                        <Button
+                          variant="contained"
+                          size="small"
+                          disabled={!commentBody.trim() || addComment.isPending}
+                          onClick={() => addComment.mutate()}
+                          sx={{
+                            borderRadius: 1.5,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            px: 2,
+                          }}
+                        >
+                          Gửi bình luận
+                        </Button>
+                      </Stack>
+                    </Paper>
+                  )}
+                </Box>
               </Stack>
             </Box>
           </Box>

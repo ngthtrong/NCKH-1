@@ -25,7 +25,7 @@ describe('KanbanFilterBar', () => {
       </ThemeProvider>,
     );
 
-    expect(screen.getByPlaceholderText('Tìm kiếm theo tiêu đề thẻ…')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Tìm kiếm thẻ công việc...')).toBeInTheDocument();
     expect(screen.getByLabelText('Mức ưu tiên')).toBeInTheDocument();
     expect(screen.getByLabelText('Người thực hiện')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /đặt lại bộ lọc/i })).not.toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('KanbanFilterBar', () => {
       </ThemeProvider>,
     );
 
-    const input = screen.getByPlaceholderText('Tìm kiếm theo tiêu đề thẻ…');
+    const input = screen.getByPlaceholderText('Tìm kiếm thẻ công việc...');
     await user.type(input, 'A');
 
     expect(onFilterChange).toHaveBeenCalledWith({
