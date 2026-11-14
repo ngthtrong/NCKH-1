@@ -84,7 +84,7 @@ echo ""
 echo "[3/5] Seeding 5 Tenants & 80 Active User Accounts with JWT..."
 export POSTGRES_CONTAINER="nckh-ec2-postgres-1"
 export HTTP_PORT="8080"
-python3 experiments/ec2/seed-tenants.py
+python3 experiments/ec2/seed-tenants.py || { echo "[!] Seeding failed! Aborting benchmark." >&2; exit 1; }
 
 # Function to run k6
 run_k6() {

@@ -266,15 +266,23 @@ def main():
         user_sql += "COMMIT;\n"
         run_psql("control_db", user_sql)
 
-        # Resolve the first user's UUID from control_db BEFORE switching to pool_db.
-        # Bug 2 fix: user_accounts lives in control_db, NOT pool_db.
-        # We use the literal UUID in pool_db queries instead of a cross-db subquery.
-        first_user_id = run_psql(
-            "control_db",
-            f"SELECT id FROM user_accounts WHERE email = '{user_emails[0]}';"
+        # Resolve all user UUIDs from control_db for this tenant
+        all_user_ids = [
+            uid.strip()
+            for uid in run_psql(
+                "control_db",
+                f"SELECT user_id FROM tenant_memberships WHERE tenant_id = '{tenant_id}' AND active = true;"
+            ).splitlines()
+            if uid.strip()
+        ]
+        if not all_user_ids:
+            raise RuntimeError(f"Could not resolve user IDs for tenant {slug} in control_db")
+        first_user_id = all_user_ids[0]
+
+        pm_inserts = "\n            ".join(
+            f"INSERT INTO project_memberships (id, tenant_id, project_id, user_id, role, created_at, updated_at) VALUES (gen_random_uuid(), '{tenant_id}', p_id, '{uid}', 'MANAGER', now(), now()) ON CONFLICT (tenant_id, project_id, user_id) DO NOTHING;"
+            for uid in all_user_ids
         )
-        if not first_user_id:
-            raise RuntimeError(f"Could not resolve user id for {user_emails[0]} in control_db")
 
         # C. Seed Project, Board, Columns, and Tasks in pool_db
         pool_sql = f"""
@@ -296,7 +304,7 @@ def main():
                 '{first_user_id}', now(), now())
         ON CONFLICT (tenant_id, name) DO NOTHING;
 
-        -- Create Board
+        -- Create Board and Project Memberships
         DO $$
         DECLARE
             p_id uuid;
@@ -307,6 +315,9 @@ def main():
             b_idx int;
         BEGIN
             SELECT id INTO p_id FROM projects WHERE tenant_id = '{tenant_id}' AND name = '{name} Project';
+
+            -- Add all tenant users to project_memberships so they can access boards and tasks
+            {pm_inserts}
 
             FOR b_idx IN 1..{spec['boards_count']} LOOP
                 b_id := gen_random_uuid();
