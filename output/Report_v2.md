@@ -1418,7 +1418,7 @@ Môi trường thực nghiệm được thiết lập trên máy chủ điện t
 ![][image29]  
 *Hình 5.1: Sơ đồ kiến trúc môi trường thực nghiệm và luồng thu thập số liệu tự động bằng k6 và Prometheus.*
 
-Dữ liệu thử nghiệm được phân tầng thành ba nhóm tải bất đối xứng (nhỏ, vừa, lớn) cùng hai thuê bao đối chứng cấu hình ngược nhau (t-acme chế độ STRICT và t-lotus chế độ WARN), một thuê bao chuẩn (t-finance) và một thuê bao gây nhiễu (t-aggressor / t-noise phát sinh lưu lượng đột biến 168 RPS). Tổng cộng 80 tài khoản người dùng hoạt động đồng thời được mô phỏng qua k6. Khung đánh giá đa chiều gồm 4 nhóm kịch bản được tổng hợp tại Bảng 5.1:
+Cụ thể, tập dữ liệu hạt giống trên lược đồ dùng chung public được khởi tạo gồm 5 tổ chức thuê bao chia thành các nhóm quy mô: Nhóm thuê bao quy mô nhỏ (t-acme) gồm 15 tài khoản người dùng, 1 bảng Kanban và 200 thẻ; Nhóm thuê bao quy mô vừa (pool-demo) gồm 15 tài khoản người dùng, 4 bảng Kanban và 500 thẻ; Nhóm thuê bao quy mô lớn (t-lotus) gồm 20 tài khoản người dùng, 10 bảng Kanban và 1.000 thẻ kèm trường mở rộng JSONB; Nhóm thuê bao tiêu chuẩn (t-finance) gồm 10 tài khoản người dùng, 2 bảng và 300 thẻ; và Nhóm thuê bao gây nhiễu gồm 20 tài khoản hoạt động đồng thời. Tổng cộng 80 tài khoản người dùng hoạt động đồng thời được mô phỏng qua k6. Khung đánh giá đa chiều gồm 4 nhóm kịch bản được tổng hợp tại Bảng 5.1:
 
 *Bảng 5.1: Khung đánh giá đa chiều và bộ kịch bản kiểm định thực nghiệm.*
 
@@ -1456,12 +1456,12 @@ Mục này kiểm chứng năng lực bảo vệ hiệu năng trong kịch bản
 
 | Phân nhóm đo lường & Trạng thái cấu hình | Thông lượng đạt được | Độ trễ trung vị p50 | Độ trễ đuôi p95 / p99 | Tỷ lệ thành công / Tỷ lệ HTTP 429 | Tỷ lệ trúng đệm L1 / L2 | Thời gian thực thi SQL qua EXPLAIN ANALYZE |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| Thuê bao Nhỏ bình thường · Khi tắt bảo vệ | 39.49 RPS | 58.61 ms | 334.89 / 1690.35 ms | 23.1% / 0% | 0% / 0% | 0.85 ms |
-| Thuê bao Nhỏ bình thường · Khi bật bảo vệ | 70.31 RPS | 4.66 ms | 79.26 / 1901.99 ms | 100% / 0% | 79.25% / 0% | 0.12 ms |
-| Thuê bao Lớn nhiều dữ liệu · Khi tắt bảo vệ | 39.49 RPS | 58.98 ms | 343.69 / 1685.68 ms | 23.1% / 0% | 0% / 0% | 2.45 ms |
-| Thuê bao Lớn nhiều dữ liệu · Khi bật bảo vệ | 70.31 RPS | 10.55 ms | 159.22 / 1887.69 ms | 100% / 0% | 76.16% / 0.93% | 0.38 ms |
-| Thuê bao Gây nhiễu đột biến · Khi tắt bảo vệ | 39.49 RPS | 48.19 ms | 213.43 / 324.77 ms | 0% / 0% | 0% / 0% | 1.15 ms |
-| Thuê bao Gây nhiễu đột biến · Khi bật bảo vệ | 70.31 RPS | 3.57 ms | 43.88 / 75.34 ms | 0% / Bị chặn 19.071 req | 0% / 0% | 0.05 ms |
+| Thuê bao Nhỏ bình thường (t-acme, 15 VUs) · Khi tắt bảo vệ (Baseline) | 20.29 RPS | 233.33 ms | 1526.48 / 4786.42 ms | 99.2% / 0% | 0% / 0% | 0.85 ms |
+| Thuê bao Nhỏ bình thường (t-acme, 15 VUs) · Khi bật bảo vệ (Đề xuất) | 47.67 RPS | 64.57 ms | 1135.73 / 4234.58 ms | 99.3% / 0% | 79.25% / 0% | 0.12 ms |
+| Thuê bao Lớn nhiều dữ liệu (t-lotus, 20 VUs) · Khi tắt bảo vệ (Baseline) | 20.29 RPS | 189.25 ms | 1257.16 / 4500.38 ms | 99.2% / 0% | 0% / 0% | 2.45 ms |
+| Thuê bao Lớn nhiều dữ liệu (t-lotus, 20 VUs) · Khi bật bảo vệ (Đề xuất) | 47.67 RPS | 61.12 ms | 963.67 / 4023.69 ms | 99.3% / 0% | 76.16% / 0.93% | 0.38 ms |
+| Thuê bao Gây nhiễu đột biến (Aggressor, 20 VUs) · Khi tắt bảo vệ (Baseline) | 20.29 RPS | 156.54 ms | 556.55 / 1386.98 ms | 100.0% / 0% | 0% / 0% | 1.15 ms |
+| Thuê bao Gây nhiễu đột biến (Aggressor, 20 VUs) · Khi bật bảo vệ (Đề xuất) | 47.67 RPS | 13.44 ms | 124.54 / 613.79 ms | 10.1% / Bị chặn 11.190 req | 0% / 0% | 0.05 ms |
 
 ![][image30]
 
@@ -1480,7 +1480,7 @@ Mục này kiểm chứng năng lực bảo vệ hiệu năng trong kịch bản
 
 ![][image31]
 
-Kết quả Bảng 5.3 và 5.4 khẳng định: **(1) Bộ lọc Rate Limiting tại biên cắt cơn bão lưu lượng hiệu quả,** bảo toàn độ trễ đuôi p99 cho các thuê bao lân cận; **(2) Thuật toán W-TinyLFU chống ô nhiễm bộ nhớ đệm thành công,** duy trì tỷ lệ trúng đệm ổn định trên 90%; **(3) Động cơ tùy biến ba lớp vận hành mượt mà với chi phí nạp cấu hình dưới 1ms,** đồng bộ cấu hình tức thời qua Redis Pub/Sub.
+Kết quả Bảng 5.3 và 5.4 khẳng định: **(1) Bộ lọc Rate Limiting tại biên cắt cơn bão lưu lượng triệt để:** thuật toán Token Bucket trên Redis với hạn mức 1.200 req/phút (tốc độ nạp 20 token/giây, dung lượng bùng phát burst 120 token) đã khống chế chính xác lưu lượng đột biến của thuê bao gây nhiễu (~1.800–3.000 req/phút), chặn đứng 11.190 request bằng mã HTTP 429 và phản hồi cực nhanh (p50 = 13,44 ms); qua đó bảo toàn hoàn hảo cam kết SLA cho các thuê bao bình thường lân cận (độ trễ trung vị p50 giảm từ ~188–233 ms xuống 60–64 ms cho cả t-acme, pool-demo, t-lotus và t-finance, tỷ lệ thành công 99,3%, tỷ lệ HTTP 429 là 0%), nâng thông lượng toàn hệ thống tăng hơn gấp đôi từ 20,29 RPS lên 47,67 RPS; **(2) Thuật toán W-TinyLFU chống ô nhiễm bộ nhớ đệm thành công,** duy trì tỷ lệ trúng đệm ổn định trên 76–90% và bảo vệ cơ sở dữ liệu trước các truy vấn lặp; **(3) Động cơ tùy biến ba lớp vận hành mượt mà với chi phí nạp cấu hình dưới 1 ms,** đồng bộ và thu hồi cấu hình tức thời qua kênh Redis Pub/Sub.
 
 ## **5.4. Bàn luận Tổng hợp Kết quả Thực nghiệm**
 
@@ -1491,8 +1491,8 @@ Bảng 5.5 đối chiếu khép kín vòng lặp giữa bảy thách thức thi�
 | Thách thức cốt lõi từ Chương 1 | Giải pháp kiến trúc & Kỹ thuật tại Chương 2, 3, 4 | Kịch bản kiểm chứng tại Chương 5 | Đánh giá kết quả đạt được trên nguyên mẫu |
 | :---- | :---- | :---- | :---- |
 | Thách thức 1: Định danh và quản lý ngữ cảnh thuê bao | Đường ống JwtTenantFilter \+ ThreadLocal tự làm sạch với try/finally; xác thực JWT claims chống IDOR; đồng bộ nhãn nhật ký MDC và phản hồi tiêu đề X-Tenant-ID. | Kịch bản KB-1 | Đạt 0% yêu cầu bị rò rỉ hoặc lẫn lộn ngữ cảnh; 100% truy cập trái phép bị chặn với HTTP 401; toàn bộ dòng nhật ký và tiêu đề HTTP phản hồi mang đúng tenant\_id. |
-| Thách thức 2: Cô lập dữ liệu và kiểm soát bán kính sự cố | Rào chắn kép tại cơ sở dữ liệu: tài khoản app\_user quyền NOBYPASSRLS, biến phiên giao dịch SET LOCAL, chính sách cưỡng chế FORCE ROW LEVEL SECURITY đóng an toàn; phân vùng không gian tên khóa đệm tenant:{id}:\*. | Kịch bản KB-1 & KB-2 | Đạt 0 bản ghi rò rỉ chéo và 0 khóa cache bị lẫn lộn qua toàn bộ các ca kiểm thử tiêm lỗi bỏ sót WHERE, đoán mã UUID và truy vấn thiếu biến phiên; chi phí độ trễ kích hoạt RLS chỉ dưới 2.5% (tăng 0.45 ms). |
-| Thách thức 3: Quản trị hiệu năng và hạn chế hàng xóm ồn ào | Bộ lọc giới hạn tốc độ Token Bucket trên Redis 7 (ratelimit:tenant:{id}) kết hợp bộ nhớ đệm hai tầng L1 Caffeine W-TinyLFU \+ L2 Redis; chỉ mục tổ hợp B-Tree dẫn đầu bởi tenant\_id. | Kịch bản KB-3 | Khống chế kịp thời lưu lượng đột biến của thuê bao gây nhiễu bằng HTTP 429 (chặn 19.071 req); bảo vệ độ trễ p50 (4.66 ms) và p95 (79.26 ms) của các thuê bao láng giềng; tối ưu truy vấn thành Index Scan độc lập với kích thước bảng chung. |
+| Thách thức 2: Cô lập dữ liệu và kiểm soát bán kính sự cố | Rào chắn kép tại cơ sở dữ liệu: tài khoản app\_user quyền NOBYPASSRLS, biến phiên giao dịch SET LOCAL, chính sách cưỡng chế FORCE ROW LEVEL SECURITY đóng an toàn; phân vùng không gian tên khóa đệm tenant:{id}:\*. | Kịch bản KB-1 & KB-2 | Đạt 0 bản ghi rò rỉ chéo và 0 khóa cache bị lẫn lộn qua toàn bộ các ca kiểm thử tiêm lỗi bỏ sót WHERE, đoán mã UUID và truy vấn thiếu biến phiên; chi phí độ trễ kích hoạt RLS tăng 0,45 ms trong microbenchmark (~36% so với baseline 1,25 ms khi tắt RLS). |
+| Thách thức 3: Quản trị hiệu năng và hạn chế hàng xóm ồn ào | Bộ lọc giới hạn tốc độ Token Bucket trên Redis 7 (ratelimit:tenant:{id}) kết hợp bộ nhớ đệm hai tầng L1 Caffeine W-TinyLFU \+ L2 Redis; chỉ mục tổ hợp B-Tree dẫn đầu bởi tenant\_id. | Kịch bản KB-3 | Khống chế kịp thời lưu lượng đột biến của thuê bao gây nhiễu bằng HTTP 429 (chặn chính xác 11.190 request); bảo vệ độ trễ p50 (60–64 ms) và p95 (934–1.138 ms) của các thuê bao láng giềng; tối ưu truy vấn thành Index Scan độc lập với kích thước bảng chung. |
 | Thách thức 4: Khả năng tùy biến lúc chạy và quản trị tính năng | Động cơ thực thi tùy biến 3 lớp (Giao diện, Quy trình nghiệp vụ WIP, Trường mở rộng JSONB) dựa trên siêu dữ liệu; cơ chế đồng bộ và xóa đệm L1 tức thời qua Redis Pub/Sub. | Kịch bản KB-4 | Vận hành đồng thời hai thuê bao có cấu hình giao diện, quy tắc WIP (STRICT trả HTTP 422 vs WARN) và trường dữ liệu mở rộng trái ngược nhau trên cùng một tiến trình mã nguồn duy nhất mà không xung đột. |
 | Thách thức 5: Tự động hóa vòng đời thuê bao và Mặt phẳng điều khiển | Phân tách kiến trúc thành hai mặt phẳng (Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu); tự động hóa quy trình khởi tạo không gian làm việc, tài khoản quản trị và dữ liệu bảng Kanban mặc định theo giao dịch. | Toàn bộ quá trình thiết lập và vận hành KB-1 – KB-4 | Khởi tạo và kích hoạt thuê bao mới tự động, hoàn tất cấp phát cấu hình ban đầu chỉ trong vài giây mà không cần can thiệp thủ công vào hạ tầng. |
 | Thách thức 6: Sao lưu, phục hồi dữ liệu cấp thuê bao và nâng cấp không gián đoạn | Quản lý phiên bản và di trú lược đồ dùng chung tập trung duy nhất một lần qua công cụ Flyway; định hướng phân vùng dữ liệu theo tenant\_id cho các hoạt động trích xuất và sao lưu logic. | Toàn bộ quá trình triển khai KB-1 – KB-4 | Di trú và nâng cấp phiên bản ứng dụng đồng nhất cho toàn bộ các thuê bao mà không gây gián đoạn hệ thống; loại bỏ hiện tượng lệch phiên bản lược đồ (Schema Drift). |
@@ -1510,7 +1510,7 @@ Kết quả thực nghiệm khẳng định rằng: mô hình dùng chung toàn 
 
 ## **Hạn chế của đề tài**
 
-Bên cạnh các kết quả đạt được, nghiên cứu ghi nhận ba giới hạn khách quan: (1) Mô hình tải k6 là lưu lượng giả lập theo các kịch bản định trước, chưa phản ánh trọn vẹn toàn bộ các biến động ngẫu nhiên và hành vi phức tạp của người dùng thực tế trong thời gian dài; (2) Nguyên mẫu tập trung giải quyết bài toán quản lý tiến độ Kanban, cần tiếp tục kiểm chứng khi mở rộng sang các miền bài toán nghiệp vụ có quan hệ dữ liệu đa chiều hơn; (3) Môi trường kiểm thử đặt trên một cụm máy chủ cục bộ, chưa đo kiểm trên hạ tầng phân tán đa vùng (Multi-Region) để đánh giá độ trễ mạng diện rộng.
+Bên cạnh các kết quả đạt được, nghiên cứu ghi nhận ba giới hạn kỹ thuật khách quan: (1) Hệ thống thực nghiệm hiện được đo lường trên một thể hiện API duy nhất (Single API Instance); do đó chưa tiến hành đo đạc độ trễ lan truyền và tính nhất quán dữ liệu của cơ chế Pub/Sub nhằm hủy bộ nhớ đệm (Cache Invalidation) trên cụm ứng dụng đa thể hiện (Clustered API Instances) phân tán; (2) Quy trình cấp phát thuê bao (Provisioning) vận hành theo cơ chế bất đồng bộ (Transactional Outbox kết hợp Worker xử lý ngầm), nghiên cứu hiện mới xác nhận tính toàn vẹn chức năng tự động hóa mà chưa xây dựng bảng đo lường timeline định lượng chi tiết cho từng bước khởi tạo cơ sở dữ liệu và phân quyền; (3) Mô hình tải k6 là lưu lượng giả lập theo các kịch bản định trước với 80 VUs đồng thời trên máy chủ AWS EC2 (m7i-flex.large), dù đã tái hiện thành công tình huống tranh chấp tài nguyên và hiện tượng "hàng xóm ồn ào", vẫn chưa phản ánh trọn vẹn toàn bộ các biến động ngẫu nhiên của người dùng thực tế trên hạ tầng phân tán đa vùng (Multi-Region).
 
 ## **Kiến nghị**
 
