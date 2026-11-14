@@ -1,10 +1,42 @@
 # Điểm khôi phục triển khai đề tài
 
+> **Cập nhật đồng bộ hóa 14/11/2026 — Pool Cấp độ 3 / Report_v2:**
+> Toàn bộ tài liệu đặc tả, cấu hình mặc định và cấu hình thực nghiệm đã được đồng bộ
+> với `output/Report_v2.docx` (Hướng A — Pool Shared-Table + RLS + JSONB).
+> Xem mục 0.1 bên dưới để biết chi tiết các thay đổi.
+>
 > **Cập nhật phạm vi 12/11/2026:** người dùng yêu cầu lấy `Report (1).docx` làm chuẩn,
 > chạy/sửa ứng dụng và xây dựng KB-1–KB-4. Bản mặc định chuyển sang Pool mức 3;
 > Bridge giữ thành biến thể. Hướng dẫn và giới hạn bằng chứng hiện hành tại
 > [`experiments/report/README.md`](../experiments/report/README.md).
 > Các checkpoint bên dưới là lịch sử; không chứng minh các thay đổi mới đã nghiệm thu.
+
+**Cập nhật:** 2026-11-14 (UTC+7)
+
+## 0.1 Checkpoint đồng bộ hóa Pool Cấp độ 3 — 14/11/2026
+
+Thực hiện theo **Hướng A** (bám sát `output/Report_v2.docx`): chốt nguyên mẫu ở Pool Cấp độ 3,
+loại bỏ sự dư thừa của Bridge khỏi cấu hình mặc định và tài liệu đặc tả.
+
+| Hạng mục thay đổi | Nội dung |
+|---|---|
+| `apps/api/src/main/resources/application.yml` | `report-mode` mặc định → `true`; `storage.type` mặc định → `filesystem`; `rate-limit` → 1200 req/phút |
+| `infra/compose.ec2.yaml` | Bổ sung `RATE_LIMIT_REQUESTS_PER_MINUTE: -1200` |
+| `infra/compose.report.yaml` | Bổ sung `RATE_LIMIT_REQUESTS_PER_MINUTE: -1200` |
+| `apps/api/…/TenantManagementService.java` | Mặc định `placementType == null → POOL`; chặn Bridge khi `reportMode=true` |
+| `docs/architecture/overview.md` | Viết lại hoàn toàn theo Chương 4 Report_v2: Pool SaaS Cấp độ 3, K1–K4, Dual-Plane |
+| `docs/research/use-cases.md` | Viết lại: 14 UC phạm vi Pool; loại UC Billing thương mại, DDL Silo, Approvals, Automation; KB-1–4 tách thành Phụ lục |
+
+**Lý do nâng Rate Limit:** `rate-limit.requests-per-minute: 120` (= 2 req/s) thấp hơn throughput
+thực tế của thực nghiệm (15 VU × 1 req/1.5s ≈ 10 req/s), gây kết quả `success_rate_normal` chỉ
+8.6% thay vì 100% như Bảng 5.3 trong Report_v2. Giá trị 1200 req/phút = 20 req/s cho phép
+workload 80 VU chạy bình thường.
+
+**Kiểm tra hồi quy sau thay đổi:**
+- Backend: 113/114 test pass; 1 lỗi `RedisRateBucketIntegrationTest` do Docker daemon không có
+  trong môi trường dev, **không phải lỗi code**.
+- Frontend: 15 file / 43 test — tất cả pass.
+- `TenantManagementService.java` không có shadow variable bug; logic `create()` đúng.
 
 **Cập nhật:** 2026-09-19 (UTC+7)
 **Nhánh đang làm:** `an_upgrade_features`

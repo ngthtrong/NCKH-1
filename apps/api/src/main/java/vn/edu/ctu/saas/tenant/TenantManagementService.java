@@ -44,7 +44,8 @@ public class TenantManagementService {
 
     @Transactional
     public TenantView create(UUID ownerId, String slugInput, String name, String tier, TenantPlacement placementType) {
-        if (reportMode && placementType != TenantPlacement.POOL) {
+        TenantPlacement placement = placementType == null ? TenantPlacement.POOL : placementType;
+        if (reportMode && placement != TenantPlacement.POOL) {
             throw new IllegalArgumentException("This deployment uses a shared database and schema for all tenants (Pool)");
         }
         String slug = slugInput.trim().toLowerCase(Locale.ROOT);
@@ -66,17 +67,17 @@ public class TenantManagementService {
         tenant.setStatus(TenantStatus.PENDING_PAYMENT);
         tenantRepository.save(tenant);
 
-        TenantPlacementEntity placement = new TenantPlacementEntity();
-        placement.setTenantId(tenant.getId());
-        placement.setPlacementType(placementType);
-        placementRepository.save(placement);
+        TenantPlacementEntity placementEntity = new TenantPlacementEntity();
+        placementEntity.setTenantId(tenant.getId());
+        placementEntity.setPlacementType(placement);
+        placementRepository.save(placementEntity);
 
         TenantMembershipEntity membership = new TenantMembershipEntity();
         membership.setTenantId(tenant.getId());
         membership.setUserId(ownerId);
         membership.setRole(TenantRole.OWNER);
         membershipRepository.save(membership);
-        return view(tenant, placement, membership);
+        return view(tenant, placementEntity, membership);
     }
 
     @Transactional(readOnly = true)

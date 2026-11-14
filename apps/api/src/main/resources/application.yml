@@ -62,7 +62,7 @@ management:
 app:
   cache:
     enabled: ${CACHE_ENABLED:true}
-  report-mode: ${REPORT_MODE:false}
+  report-mode: ${REPORT_MODE:true}
   redis:
     enabled: ${REDIS_ENABLED:false}
   base-domain: ${BASE_DOMAIN:localhost}
@@ -99,7 +99,7 @@ app:
     provider: ${PAYMENT_PROVIDER:fake}
     webhook-secret: ${PAYMENT_WEBHOOK_SECRET:local-only-payment-secret}
   storage:
-    type: ${RESOURCE_STORAGE_TYPE:minio}
+    type: ${RESOURCE_STORAGE_TYPE:filesystem}
     endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
     public-endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:9000}
     region: ${MINIO_REGION:us-east-1}
@@ -110,7 +110,7 @@ app:
     signing-secret: ${RESOURCE_SIGNING_SECRET:local-only-resource-signing-secret}
   rate-limit:
     enabled: ${RATE_LIMIT_ENABLED:true}
-    requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE:120}
+    requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE:1200}
   seed:
     enabled: ${DEMO_DATA_ENABLED:false}
     owner-email: ${DEMO_OWNER_EMAIL:owner@example.test}
