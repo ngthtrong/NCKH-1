@@ -6,16 +6,16 @@
 
 | Phân nhóm đo lường & Trạng thái cấu hình | Thông lượng (RPS) | Độ trễ trung vị p50 (ms) | Độ trễ đuôi p95 / p99 (ms) | Tỷ lệ thành công | Tỷ lệ HTTP 429 | Ghi chú & Trạng thái |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| Thuê bao Nhỏ (Acme, 15 users) · **Khi tắt bảo vệ (Baseline)** | 2.52 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
-| Thuê bao Nhỏ (Acme, 15 users) · **Khi bật bảo vệ (Đề xuất)** | 2.47 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
-| Thuê bao Vừa (CTU Pool, 15 users) · **Khi tắt bảo vệ (Baseline)** | 2.52 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
-| Thuê bao Vừa (CTU Pool, 15 users) · **Khi bật bảo vệ (Đề xuất)** | 2.47 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
-| Thuê bao Lớn (Lotus, 20 users) · **Khi tắt bảo vệ (Baseline)** | 2.52 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
-| Thuê bao Lớn (Lotus, 20 users) · **Khi bật bảo vệ (Đề xuất)** | 2.47 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
-| Thuê bao Chuẩn (Finance, 10 users) · **Khi tắt bảo vệ (Baseline)** | 2.52 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
-| Thuê bao Chuẩn (Finance, 10 users) · **Khi bật bảo vệ (Đề xuất)** | 2.47 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
-| Thuê bao Gây nhiễu (Aggressor, 20 users) · **Khi tắt bảo vệ (Baseline)** | 2.52 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
-| Thuê bao Gây nhiễu (Aggressor, 20 users) · **Khi bật bảo vệ (Đề xuất)** | 2.47 RPS | 0.00 ms | 0.00 / 0.00 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
+| Thuê bao Nhỏ (Acme, 15 users) · **Khi tắt bảo vệ (Baseline)** | 151.64 RPS | 3.25 ms | 41.51 / 501.24 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
+| Thuê bao Nhỏ (Acme, 15 users) · **Khi bật bảo vệ (Đề xuất)** | 150.31 RPS | 3.35 ms | 42.28 / 572.93 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
+| Thuê bao Vừa (CTU Pool, 15 users) · **Khi tắt bảo vệ (Baseline)** | 151.64 RPS | 3.22 ms | 39.29 / 478.82 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
+| Thuê bao Vừa (CTU Pool, 15 users) · **Khi bật bảo vệ (Đề xuất)** | 150.31 RPS | 3.39 ms | 38.84 / 570.06 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
+| Thuê bao Lớn (Lotus, 20 users) · **Khi tắt bảo vệ (Baseline)** | 151.64 RPS | 3.09 ms | 40.10 / 547.06 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
+| Thuê bao Lớn (Lotus, 20 users) · **Khi bật bảo vệ (Đề xuất)** | 150.31 RPS | 3.37 ms | 39.56 / 603.25 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
+| Thuê bao Chuẩn (Finance, 10 users) · **Khi tắt bảo vệ (Baseline)** | 151.64 RPS | 3.45 ms | 40.69 / 497.94 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
+| Thuê bao Chuẩn (Finance, 10 users) · **Khi bật bảo vệ (Đề xuất)** | 150.31 RPS | 3.41 ms | 44.08 / 620.42 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
+| Thuê bao Gây nhiễu (Aggressor, 20 users) · **Khi tắt bảo vệ (Baseline)** | 151.64 RPS | 4.73 ms | 43.78 / 50.43 ms | 0.0% | 0% | Bị kéo dài độ trễ do tranh chấp DB |
+| Thuê bao Gây nhiễu (Aggressor, 20 users) · **Khi bật bảo vệ (Đề xuất)** | 150.31 RPS | 5.38 ms | 44.00 / 51.07 ms | 0.0% | 0% | Bảo toàn SLA mượt mà, trúng cache |
 
 ## Bảng 5.2: Kết quả kiểm định toàn vẹn ranh giới định danh & bảo mật (KB-1 & KB-2)
 
