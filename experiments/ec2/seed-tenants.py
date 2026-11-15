@@ -37,7 +37,11 @@ TENANTS_SPEC = [
         "tasks_per_board": 200,
         "custom_data": "jsonb_build_object('story_points', 8, 'sprint', 'Sprint 1')",
         "wip_mode": "STRICT",
-        "wip_limit": 2
+        "wip_limit": 2,
+        "fields": [
+            {"key": "story_points", "label": "Story Points", "type": "NUMBER", "required": False},
+            {"key": "sprint", "label": "Sprint", "type": "STRING", "required": False}
+        ]
     },
     {
         "slug": "pool-demo",
@@ -49,7 +53,8 @@ TENANTS_SPEC = [
         "tasks_per_board": 125,  # Total 500 tasks
         "custom_data": "'{}'::jsonb",
         "wip_mode": "WARN",
-        "wip_limit": 5
+        "wip_limit": 5,
+        "fields": []
     },
     {
         "slug": "t-lotus",
@@ -61,7 +66,11 @@ TENANTS_SPEC = [
         "tasks_per_board": 100,  # Total 1,000 tasks
         "custom_data": "jsonb_build_object('channel', 'Web', 'budget_usd', 800)",
         "wip_mode": "WARN",
-        "wip_limit": 10
+        "wip_limit": 10,
+        "fields": [
+            {"key": "channel", "label": "Marketing Channel", "type": "STRING", "required": False},
+            {"key": "budget_usd", "label": "Budget USD", "type": "NUMBER", "required": False}
+        ]
     },
     {
         "slug": "t-finance",
@@ -73,7 +82,11 @@ TENANTS_SPEC = [
         "tasks_per_board": 150,  # Total 300 tasks
         "custom_data": "jsonb_build_object('department', 'Risk', 'priority_score', 95)",
         "wip_mode": "STRICT",
-        "wip_limit": 4
+        "wip_limit": 4,
+        "fields": [
+            {"key": "department", "label": "Department", "type": "STRING", "required": False},
+            {"key": "priority_score", "label": "Priority Score", "type": "NUMBER", "required": False}
+        ]
     },
     {
         "slug": "t-aggressor",
@@ -85,7 +98,8 @@ TENANTS_SPEC = [
         "tasks_per_board": 100,
         "custom_data": "'{}'::jsonb",
         "wip_mode": "WARN",
-        "wip_limit": 10
+        "wip_limit": 10,
+        "fields": []
     }
 ]
 
@@ -285,6 +299,7 @@ def main():
         )
 
         # C. Seed Project, Board, Columns, and Tasks in pool_db
+        fields_json = json.dumps(spec.get("fields", []))
         pool_sql = f"""
         BEGIN;
         -- Seed Tenant Kanban Settings (WIP Mode, Limits)
@@ -294,7 +309,7 @@ def main():
             'wipLimit', {spec["wip_limit"]},
             'cardStyle', 'FULL',
             'defaultColumns', jsonb_build_array('To Do', 'In Progress', 'Done'),
-            'fields', jsonb_build_array()
+            'fields', '{fields_json}'::jsonb
         ), 0, now())
         ON CONFLICT (tenant_id) DO UPDATE SET settings = EXCLUDED.settings;
 

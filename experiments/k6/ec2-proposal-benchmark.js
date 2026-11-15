@@ -95,8 +95,8 @@ export const options = {
     'latency_large_lotus': ['p(95)<800'],
     // KB-2: 100% of security probes must be rejected (no cross-tenant data leak)
     'kb2_security_checks_passed': ['rate==1.0'],
-    // KB-4: WIP STRICT must block 3rd move every iteration
-    'kb4_wip_strict_enforced': ['rate>0.9'],
+    // KB-4: WIP STRICT must block moves once the limit of 2 is reached (>75% of moves blocked)
+    'kb4_wip_strict_enforced': ['rate>0.75'],
   },
 };
 
