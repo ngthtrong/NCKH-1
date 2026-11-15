@@ -132,15 +132,40 @@ def run_psql(db, sql_query):
         raise RuntimeError(f"PSQL Error ({db}): {res.stderr}\nQuery was:\n{sql_query[:300]}")
     return res.stdout.strip()
 
-def http_post(url, payload, headers):
+def wait_for_api_readiness():
+    print("[*] Waiting for API gateway (Caddy) and Spring Boot readiness...")
+    url = f"http://{API_HOST}:{API_PORT}/actuator/health"
+    headers = {"Host": ACCOUNTS_HOST}
+    for attempt in range(45):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                if resp.status == 200:
+                    print("    [✓] API gateway is healthy and ready.")
+                    return
+        except Exception:
+            pass
+        time.sleep(2)
+    print("    [!] Warning: API readiness check timed out, attempting to proceed anyway...")
+
+def http_post(url, payload, headers, retries=5):
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        err = e.read().decode("utf-8")
-        raise RuntimeError(f"HTTP {e.code} for {url}: {err}")
+    for attempt in range(retries):
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code in (502, 503, 504) and attempt < retries - 1:
+                time.sleep(3)
+                continue
+            err = e.read().decode("utf-8")
+            raise RuntimeError(f"HTTP {e.code} for {url}: {err}")
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(3)
+                continue
+            raise
 
 def get_tenant_token(email, password, tenant_slug):
     """Login and transfer to get tenant session token."""
@@ -243,6 +268,9 @@ def main():
     VALUES (gen_random_uuid(), 'owner@example.test', 'Demo Owner', '{owner_hash}', true, true, now(), now())
     ON CONFLICT (email) DO UPDATE SET password_hash = '{owner_hash}', enabled = true, system_admin = true;
     """)
+
+    # Ensure API gateway and Spring Boot are ready to accept login requests
+    wait_for_api_readiness()
 
     fixtures = {"tenants": {}, "summary": {}}
 
