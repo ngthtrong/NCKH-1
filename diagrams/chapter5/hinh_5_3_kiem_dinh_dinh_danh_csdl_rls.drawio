@@ -1,100 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-11-15T13:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
-  <diagram id="diag_8536555" name="Hình 5.3 · Kết quả kiểm định định danh, cô lập CSDL và chi phí RLS">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1000" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2026-11-15T14:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="diag_209034" name="Hình 5.3 · Kết quả kiểm định định danh, cô lập CSDL và chi phí RLS">
+    <mxGraphModel dx="1200" dy="750" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="frame_53" value="HÌNH 5.3: KẾT QUẢ KIỂM ĐỊNH ĐỊNH DANH (KB-1), CÔ LẬP CSDL FAIL-CLOSED (KB-2) VÀ CHI PHÍ THỰC THI RLS" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontSize=14;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="1">
-          <mxGeometry x="20" y="20" width="1360" height="680" as="geometry" />
+        <mxCell id="top_53" value="KẾT QUẢ KIỂM ĐỊNH ĐỊNH DANH (KB-1), CÔ LẬP CSDL (KB-2) VÀ CHI PHÍ RLS" style="text;html=1;fontSize=15;fontStyle=1;fontColor=#2C3E50;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1120" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="panel_a" value="Panel a: Kiểm định ranh giới ngữ cảnh luồng (KB-1)
-(Mặt phẳng Dữ liệu &amp; Hồ luồng Tomcat)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=1.5;fontSize=12;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="frame_53">
-          <mxGeometry x="50" y="75" width="400" height="590" as="geometry" />
+        <mxCell id="p_a" value="(a) Định danh &amp; Ngữ cảnh (KB-1)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAF1F7;strokeColor=#D8E0E7;strokeWidth=1;fontSize=13;fontStyle=1;fontColor=#2C3E50;align=center;verticalAlign=top;startSize=35;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="350" height="480" as="geometry" />
         </mxCell>
-        <mxCell id="pa_c1" value="Tiêm lỗi JWT hỏng / Không chữ ký
-• Số mẫu thử nghiệm: 500 yêu cầu
-• Kết quả: 500/500 bị chặn đứng ngay tại biên
-• Mã phản hồi: HTTP 401 Unauthorized
-• Tỷ lệ phòng vệ đúng: 100.0% (0 rò rỉ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="70" y="130" width="360" height="95" as="geometry" />
+        <mxCell id="a1" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#1E3A8A&#x27;&gt;500 / 500&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;Yêu cầu JWT lỗi → HTTP 401
+Chặn đứng ngay tại cổng biên&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_a">
+          <mxGeometry x="60" y="120" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pa_c2" value="Tiêm lỗi Host Header sai lệch định danh
-• Số mẫu thử nghiệm: 200 yêu cầu
-• Kết quả: 200/200 bị từ chối truy cập
-• Mã phản hồi: HTTP 403 Forbidden
-• Tỷ lệ phòng vệ đúng: 100.0% (0 rò rỉ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="70" y="245" width="360" height="95" as="geometry" />
+        <mxCell id="a2" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#1E3A8A&#x27;&gt;200 / 200&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;Yêu cầu Host lệch → HTTP 403
+Từ chối truy cập sai định danh&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_a">
+          <mxGeometry x="60" y="230" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pa_c3" value="Tải luân chuyển trên hồ luồng Tomcat (60 threads)
-• Áp lực tải: 1.500 yêu cầu đan xen từ 5 nhóm tenant
-• Kiểm tra khối try ... finally giải phóng ThreadLocal
-• Tỷ lệ khớp tenant_id yêu cầu, tiêu đề X-Tenant-ID
-  và nhãn MDC trong nhật ký: 100.0% (1.500 / 1.500)
-• Tỷ lệ nhiễm bẩn ngữ cảnh luồng: 0.0% Tuyệt đối" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#15803D;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="70" y="360" width="360" height="130" as="geometry" />
+        <mxCell id="a3" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#1E3A8A&#x27;&gt;1.500&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;Yêu cầu luân chuyển hồ luồng Tomcat
+Khớp 100% X-Tenant-ID &amp; MDC (0 rò rỉ)&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_a">
+          <mxGeometry x="60" y="340" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pa_sum" value="KẾT LUẬN PANEL A: Cơ chế phòng thủ biên kết hợp ThreadLocal try/finally bảo đảm ranh giới ngữ cảnh an toàn 100%." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9C3;strokeColor=#CA8A04;strokeWidth=1;fontSize=10.5;fontStyle=1;align=center;" vertex="1" parent="frame_53">
-          <mxGeometry x="70" y="510" width="360" height="60" as="geometry" />
+        <mxCell id="a_foot" value="Xác thực biên và giải phóng ThreadLocal triệt để" style="text;html=1;fontSize=10;fontColor=#64748B;align=center;" vertex="1" parent="p_a">
+          <mxGeometry x="60" y="450" width="310" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="panel_b" value="Panel b: Rào chắn CSDL Fail-Closed (KB-2)
-(PostgreSQL 16 FORCE RLS &amp; NOBYPASSRLS)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=1.5;fontSize=12;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="frame_53">
-          <mxGeometry x="480" y="75" width="420" height="590" as="geometry" />
+        <mxCell id="p_b" value="(b) Rào chắn CSDL Fail-Closed (KB-2)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EDF4F0;strokeColor=#D8E0E7;strokeWidth=1;fontSize=13;fontStyle=1;fontColor=#2C3E50;align=center;verticalAlign=top;startSize=35;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="425" y="70" width="350" height="480" as="geometry" />
         </mxCell>
-        <mxCell id="pb_c1" value="Truy vấn cố tình bỏ mệnh đề WHERE tenant_id
-• Câu lệnh: SELECT * FROM cards;
-• Số mẫu tiêm lỗi: 200 truy vấn
-• Kết quả: FORCE RLS tự động chèn bộ lọc cấp nhân
-• Số bản ghi rò rỉ: 0 bản ghi (0 leak tuyệt đối)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="505" y="130" width="370" height="95" as="geometry" />
+        <mxCell id="b1" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#0D9488&#x27;&gt;0&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;SELECT bỏ WHERE bị rò rỉ (200 mẫu)
+FORCE RLS tự động chèn bộ lọc&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_b">
+          <mxGeometry x="445" y="120" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pb_c2" value="Tấn công IDOR đoán UUID thẻ chéo tenant
-• Kịch bản: t-acme gọi API với UUID thuộc t-lotus
-• Số mẫu thử nghiệm: 300 lần thử
-• Kết quả: 300/300 bị vô hiệu hóa
-• Mã phản hồi: HTTP 404 Not Found hoặc 403 Forbidden
-• Tỷ lệ ngăn chặn: 100.0% (0 dữ liệu rò rỉ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#047857;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="505" y="245" width="370" height="105" as="geometry" />
+        <mxCell id="b2" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#0D9488&#x27;&gt;300 / 300&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;Mẫu thử IDOR UUID bị chặn
+Trả về HTTP 404 / 403&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_b">
+          <mxGeometry x="445" y="230" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pb_c3" value="Truy vấn HikariCP bị cố tình bỏ SET LOCAL
-• Kịch bản: Không tiêm biến phiên SET LOCAL app.tenant_id
-• Số mẫu kiểm thử: 100 truy vấn đối chứng
-• Kết quả: Cơ chế Fail-Closed kích hoạt an toàn mặc định
-• Dữ liệu trả về: Tập kết quả rỗng (0 dòng) | 0% rò rỉ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="505" y="370" width="370" height="95" as="geometry" />
+        <mxCell id="b3" value="&lt;b&gt;&lt;font style=&#x27;font-size: 20px;&#x27; color=&#x27;#0D9488&#x27;&gt;0 dòng&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;&lt;font color=&#x27;#475569&#x27;&gt;Khi thiếu SET LOCAL (100 mẫu)
+Cơ chế Fail-Closed trả về rỗng&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=130%;" vertex="1" parent="p_b">
+          <mxGeometry x="445" y="340" width="310" height="95" as="geometry" />
         </mxCell>
-        <mxCell id="pb_sum" value="KẾT LUẬN PANEL B: Cơ chế Fail-Closed bảo vệ dữ liệu thành công ngay cả khi lập trình viên bỏ sót WHERE hoặc bị tấn công IDOR." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9C3;strokeColor=#CA8A04;strokeWidth=1;fontSize=10.5;fontStyle=1;align=center;" vertex="1" parent="frame_53">
-          <mxGeometry x="505" y="510" width="370" height="60" as="geometry" />
+        <mxCell id="b_foot" value="PostgreSQL 16 bảo vệ an toàn ngay tại nhân CSDL" style="text;html=1;fontSize=10;fontColor=#64748B;align=center;" vertex="1" parent="p_b">
+          <mxGeometry x="445" y="450" width="310" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="panel_c" value="Panel c: Chi phí Vi mô Thực thi RLS
-(Đo lường qua EXPLAIN ANALYZE, N=500 mẫu)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FAF5FF;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=12;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="frame_53">
-          <mxGeometry x="930" y="75" width="420" height="590" as="geometry" />
+        <mxCell id="p_c" value="(c) Chi phí Vi mô Thực thi RLS" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F3F5F7;strokeColor=#D8E0E7;strokeWidth=1;fontSize=13;fontStyle=1;fontColor=#2C3E50;align=center;verticalAlign=top;startSize=35;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="810" y="70" width="350" height="480" as="geometry" />
         </mxCell>
-        <mxCell id="pc_bar1" value="TRẠNG THÁI CƠ SỞ (TẮT RLS):
-Độ trễ trung bình: 1.25 ± 0.32 ms
-(Chỉ lọc WHERE thủ công ở tầng ứng dụng)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E2E8F0;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="frame_53">
-          <mxGeometry x="960" y="140" width="360" height="60" as="geometry" />
+        <mxCell id="c_title" value="Độ trễ truy vấn trung bình (N=500 mẫu)" style="text;html=1;fontSize=11;fontStyle=1;fontColor=#334155;align=center;" vertex="1" parent="p_c">
+          <mxGeometry x="830" y="120" width="310" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="pc_bar2" value="TRẠNG THÁI BẬT ĐẦY ĐỦ RLS (ĐỀ XUẤT):
-Độ trễ trung bình: 1.70 ± 0.41 ms
-(Bật SET LOCAL app.tenant_id + FORCE RLS hai lớp)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DDD6FE;strokeColor=#6D28D9;strokeWidth=2;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="frame_53">
-          <mxGeometry x="960" y="220" width="360" height="65" as="geometry" />
+        <mxCell id="bar_no_rls" value="Không RLS (WHERE thủ công):  1,25 ms" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#E2E8F0;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;fontColor=#334155;align=left;spacingLeft=15;" vertex="1" parent="p_c">
+          <mxGeometry x="835" y="160" width="230" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="pc_delta" value="PHỤ TRỘI ĐỘ TRỄ VI MÔ:
-Δ = +0.45 ms (~36% trong microbenchmark)
-• Tối ưu hóa bởi chỉ mục tổ hợp B-Tree: (tenant_id, id)
-• Hoàn toàn không gây nút thắt cổ chai hệ thống
-• Thỏa mãn ngưỡng NFR-03 về chi phí bảo mật" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="960" y="310" width="360" height="105" as="geometry" />
+        <mxCell id="bar_rls" value="Có RLS (SET LOCAL + FORCE RLS):  1,70 ms" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#DCECE7;strokeColor=#0D9488;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#0F766E;align=left;spacingLeft=15;" vertex="1" parent="p_c">
+          <mxGeometry x="835" y="225" width="290" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="pc_cache" value="PHÂN VÙNG BỘ NHỚ ĐỆM (KB-2.6):
-• Kiểm tra tiền tố khóa: tenant:{tenant_id}:*
-• 300 lần thử nghiệm thu hồi và kiểm tra chéo
-• Kết quả: Cách ly hoàn toàn, 0 rò rỉ khóa giữa các tenant" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_53">
-          <mxGeometry x="960" y="435" width="360" height="85" as="geometry" />
+        <mxCell id="c_delta" value="&lt;b&gt;&lt;font style=&#x27;font-size: 18px;&#x27; color=&#x27;#B45309&#x27;&gt;+0,45 ms&lt;/font&gt;&lt;/b&gt;&lt;br/&gt;Phụ trội độ trễ vi mô (~36%)&lt;br/&gt;&lt;font color=&#x27;#64748B&#x27;&gt;Tối ưu bởi chỉ mục B-Tree (tenant_id)&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=11;align=center;lineHeight=140%;" vertex="1" parent="p_c">
+          <mxGeometry x="835" y="295" width="300" height="85" as="geometry" />
         </mxCell>
-        <mxCell id="pc_sum" value="KẾT LUẬN PANEL C: Chi phí bảo mật RLS được giữ ở mức vi mô rất nhỏ (+0.45 ms) và thỏa mãn NFR-03." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9C3;strokeColor=#CA8A04;strokeWidth=1;fontSize=10.5;fontStyle=1;align=center;" vertex="1" parent="frame_53">
-          <mxGeometry x="960" y="540" width="360" height="50" as="geometry" />
+        <mxCell id="c_note" value="Số đo vi mô trên tập mẫu thử nghiệm, cần đối chiếu với ngưỡng NFR về hiệu năng tương ứng." style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D8E0E7;strokeWidth=1;fontSize=10;fontColor=#64748B;align=center;spacing=8;" vertex="1" parent="p_c">
+          <mxGeometry x="835" y="400" width="300" height="55" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
