@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-11-15T13:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="diag_6685705" name="Hình 5.5 · Quy trình tùy biến cấu hình động và kết quả kiểm chứng JSONB, WIP Strict">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="frame_55" value="HÌNH 5.5: QUY TRÌNH TÙY BIẾN CẤU HÌNH ĐỘNG VÀ KẾT QUẢ KIỂM CHỨNG THỰC NGHIỆM JSONB, WIP STRICT (KB-4)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;fontSize=14;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="1360" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="p55_a" value="Panel a: Chu trình 6 bước trong Vòng đời Cấu hình Động và Đồng bộ Bộ đệm Đa tầng" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FAF5FF;strokeColor=#7E22CE;strokeWidth=1.5;fontSize=12;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="frame_55">
+          <mxGeometry x="50" y="75" width="620" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="step_125" value="&lt;b&gt;Bước 1: Quản trị viên thay đổi cấu hình&lt;/b&gt;&lt;br/&gt;Thao tác trên Mặt phẳng Điều khiển (Control Plane), thay đổi chế độ WIP STRICT/WARN hoặc bổ sung trường dữ liệu mở rộng." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="125" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_205" value="&lt;b&gt;Bước 2: Ghi nhận an toàn vào CSDL Postgres&lt;/b&gt;&lt;br/&gt;Giao dịch commit an toàn vào bảng tenant_settings trong CSDL PostgreSQL 16 theo cơ chế bất đồng bộ khép kín." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="205" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_285" value="&lt;b&gt;Bước 3: Vô hiệu hóa đệm L1 &amp; Bắn Redis Pub/Sub&lt;/b&gt;&lt;br/&gt;Instance API thực hiện vô hiệu hóa key cục bộ và phát thông điệp Pub/Sub qua kênh tenant:config:invalidate." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE9FE;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="285" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_365" value="&lt;b&gt;Bước 4: Lan truyền xóa đệm toàn cụm API&lt;/b&gt;&lt;br/&gt;Toàn bộ các API instances nhận thông điệp và xóa đệm L1 Caffeine trong thời gian cực nhanh: 2.45 ± 0.65 ms." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF08A;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="365" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_445" value="&lt;b&gt;Bước 5: Nạp lại đệm L1 Caffeine theo cơ chế Lazy&lt;/b&gt;&lt;br/&gt;Yêu cầu nghiệp vụ kế tiếp nạp cấu hình mới vào L1 chỉ mất 0.12 ms (nhanh hơn gấp 150 lần so với đọc DB vật lý 18.5 ms)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF08A;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="445" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_525" value="&lt;b&gt;Bước 6: Giao diện React &amp; Backend áp dụng tức thời&lt;/b&gt;&lt;br/&gt;Xác thực tức thời quy tắc WIP và hiển thị chính xác các trường mở rộng JSONB động mà không cần biên dịch hay khởi động lại." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBF7D0;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10.5;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="525" width="570" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="step_sum" value="Thời gian lan truyền Pub/Sub: 2.45 ± 0.65 ms | Nạp L1 Caffeine: 0.12 ms vs Đọc CSDL: 18.5 ms." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=1.5;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="frame_55">
+          <mxGeometry x="75" y="610" width="570" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p55_b" value="Panel b: Bằng chứng Thực nghiệm Kiểm chứng Khả năng Tùy biến Động (KB-4)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F0FDFA;strokeColor=#0D9488;strokeWidth=1.5;fontSize=12;fontStyle=1;align=center;verticalAlign=top;startSize=35;" vertex="1" parent="frame_55">
+          <mxGeometry x="700" y="75" width="630" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="res_get" value="1. TRUY XUẤT CẤU HÌNH KANBAN (GET /tenant-settings/kanban):
+• Tổng số lần kiểm tra: 19/19 lần thành công tuyệt đối (100% HTTP 200)
+• Phản ánh chính xác wipMode và danh mục fields tùy biến đã định nghĩa
+• Đọc từ L1 Caffeine: 0.12 ± 0.03 ms (nhanh gấp 150 lần truy vấn CSDL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCFBF1;strokeColor=#0F766E;strokeWidth=1.5;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="725" y="125" width="580" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="res_jsonb" value="2. ĐỘNG CƠ SIÊU DỮ LIỆU &amp; TRƯỜNG MỞ RỘNG JSONB:
+• Thao tác: POST /boards/{id}/tasks kèm customData theo schema
+• t-acme ({story_points: 5, sprint: &#x27;Sprint Load&#x27;}): 19/19 thành công 100% (HTTP 201 Created)
+• t-lotus ({channel: &#x27;Web&#x27;, budget_usd: 800}): 19/19 thành công 100% (HTTP 201 Created)
+• Trường lạ ngoài schema: Bị chặn đứng với HTTP 422 MetadataValidationException
+• Độ trễ thực thi trung bình: 22.30 ± 4.15 ms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCFBF1;strokeColor=#0F766E;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="725" y="230" width="580" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="res_wip" value="3. THỰC THI QUY TẮC NGHIỆP VỤ ĐỘNG (WIP STRICT ENFORCEMENT):
+• Kịch bản: Di chuyển thẻ PATCH /tasks/{id}/position vào cột In Dev có limit = 2 (t-acme)
+• Lượt 1 &amp; 2: Chấp thuận với HTTP 200 (đạt trần hạn mức limit = 2)
+• Lượt 3 đến 19: Chặn đứng 17/17 yêu cầu vi phạm với HTTP 422 Unprocessable Entity
+• Tỷ lệ thực thi đúng luật STRICT: 89.5% (17/19 mẫu chặn chính xác, 2/19 mẫu lấp đầy)
+• Độ trễ phản hồi: 12.15 ± 2.20 ms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="frame_55">
+          <mxGeometry x="725" y="375" width="580" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="res_sum" value="KẾT LUẬN PANEL B: Động cơ tùy biến ba lớp vận hành hoàn hảo, cho phép chạy đồng thời các tổ chức có quy tắc trái ngược nhau trên cùng một phiên bản mã nguồn." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=1.5;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="frame_55">
+          <mxGeometry x="725" y="530" width="580" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
