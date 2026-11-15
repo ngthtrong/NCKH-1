@@ -128,18 +128,18 @@ def build_chapter_5_content():
         'text': (
             "Phân tích chuyên sâu từ bằng chứng thực nghiệm tại Hình 5.3 xác nhận ba phát hiện kỹ thuật quan trọng:\n"
             "1. Ranh giới ngữ cảnh luồng tuyệt đối an toàn (Hình 5.3a): Toàn bộ 500/500 yêu cầu mang token JWT thiếu claim tenant_id "
-            "hoặc bị sửa đổi chữ ký số đều bị JwtTenantFilter chặn đứng ngay tại cổng vào với mã HTTP 401. Đồng thời, 200/200 yêu cầu "
+            "hoặc bị sửa đổi chữ ký số đều bị TenantContextFilter chặn đứng ngay tại cổng vào với mã HTTP 401. Đồng thời, 200/200 yêu cầu "
             "có tiêu đề Host sai lệch với claim định danh trong token bị từ chối với HTTP 403. Dưới áp lực tải đồng thời 1.500 yêu cầu luân chuyển "
             "liên tục trên hồ luồng dùng chung Apache Tomcat (60 luồng), khối try ... finally đảm bảo giải phóng ThreadLocal hoàn toàn, "
             "đạt tỷ lệ khớp 100% giữa tenant_id yêu cầu, tiêu đề phản hồi X-Tenant-ID và nhãn chẩn đoán nhật ký MDC, loại trừ 100% nguy cơ nhiễm bẩn ngữ cảnh chéo.\n"
             "2. Cơ chế phòng thủ chiều sâu Fail-Closed của CSDL (Hình 5.3b): Khi tiêm lỗi câu lệnh SELECT * FROM cards cố tình bỏ sót hoàn toàn "
-            "mệnh đề lọc WHERE tenant_id (200 mẫu), chính sách FORCE ROW LEVEL SECURITY tại nhân PostgreSQL 16 đã tự động chèn bộ lọc tenant_id = current_setting(...) "
+            "mệnh đề lọc WHERE tenant_id (200 mẫu), chính sách FORCE ROW LEVEL SECURITY tại nhân PostgreSQL 16 đã tự động chèn bộ lọc tenant_id = current_setting('app.tenant_id', true) "
             "khiến không có bất kỳ bản ghi nào của thuê bao khác bị rò rỉ (0 leak). Tương tự, 300 lần thử nghiệm tấn công trực tiếp bằng cách đoán mã UUID "
             "thuộc quyền sở hữu của thuê bao khác (IDOR) đều bị vô hiệu hóa (trả về 404 Not Found hoặc 403 Forbidden). Đặc biệt, khi thực thi 100 truy vấn "
-            "trên kết nối HikariCP bị cố tình bỏ qua lệnh tiêm ngữ cảnh SET LOCAL, hệ thống kích hoạt cơ chế Đóng an toàn mặc định (Fail-Closed), "
+            "trên kết nối HikariCP bị cố tình bỏ qua lệnh tiêm ngữ cảnh SET LOCAL app.tenant_id, hệ thống kích hoạt cơ chế Đóng an toàn mặc định (Fail-Closed), "
             "trả về tập kết quả rỗng (0 dòng), ngăn chặn hoàn toàn rủi ro rò rỉ dữ liệu khi phát sinh lỗi lập trình ở tầng ứng dụng.\n"
             "3. Chi phí độ trễ vi mô của rào chắn CSDL (Hình 5.3c): Đo kiểm vi mô trên 500 truy vấn đối chứng cho thấy việc kích hoạt đầy đủ "
-            "hai lớp SET LOCAL + FORCE RLS chỉ làm độ trễ thực thi tăng thêm +0.45 ms (từ 1.25 ± 0.32 ms lên 1.70 ± 0.41 ms, mức tăng ~36% trong microbenchmark). "
+            "hai lớp SET LOCAL app.tenant_id + FORCE RLS chỉ làm độ trễ thực thi tăng thêm +0.45 ms (từ 1.25 ± 0.32 ms lên 1.70 ± 0.41 ms, mức tăng ~36% trong microbenchmark). "
             "Mức tăng vi mô này hoàn toàn không trở thành nút thắt cổ chai khi vận hành toàn hệ thống bởi vì biến phiên được gán trực tiếp trong bộ nhớ phiên "
             "kết nối và điều kiện RLS được tối ưu hóa trực tiếp trên chỉ mục tổ hợp B-Tree (tenant_id, ...)."
         )
@@ -178,10 +178,10 @@ def build_chapter_5_content():
         'type': 'p',
         'text': (
             "Số liệu định lượng tại Hình 5.4 chỉ rõ bước nhảy vọt về mặt chất lượng dịch vụ khi kích hoạt cơ chế bảo vệ đề xuất:\n"
-            "- Ở trạng thái Cơ sở (Baseline - màu đỏ vân chéo), khi không có sự can thiệp của bộ lọc giới hạn và bộ đệm, lưu lượng dồn dập "
+            "- Ở trạng thái Cơ sở (Baseline - cột màu xám xanh đậm), khi không có sự can thiệp của bộ lọc giới hạn và bộ đệm, lưu lượng dồn dập "
             "của Aggressor chiếm đoạt toàn bộ luồng xử lý và kết nối cơ sở dữ liệu. Kết quả là độ trễ trung vị p50 của tất cả các thuê bao bình thường "
             "bị đẩy vọt lên ngưỡng 188.0 – 233.3 ms; độ trễ đuôi p95 bị kéo giãn nghiêm trọng tới 1.166.0 – 1.526.5 ms, gây nghẽn tắc diện rộng.\n"
-            "- Ở trạng thái Đề xuất (Proposed - màu xanh chấm bi), bộ lọc TenantRateLimitFilter dập tắt bão lưu lượng của Aggressor ngay tại tầng biên. "
+            "- Ở trạng thái Đề xuất (Proposed - cột màu xanh teal), bộ lọc TenantRateLimitFilter dập tắt bão lưu lượng của Aggressor ngay tại tầng biên. "
             "Nhờ đó, độ trễ trung vị p50 của các thuê bao Nhỏ (Acme), Vừa (CTU Pool), Lớn (Lotus) và Chuẩn (Finance) giảm mạnh hơn 3 lần, "
             "hạ xuống chỉ còn 60.5 – 64.6 ms. Độ trễ đuôi p95 của các thuê bao cũng được co gọn đáng kể (giảm 200 – 400 ms), bảo toàn cam kết SLA. "
             "Đáng chú ý, độ trễ p50 của chính Aggressor giảm xuống mức 13.4 ms vì các yêu cầu vượt hạn mức bị từ chối tức thì bằng mã HTTP 429 "
@@ -246,7 +246,7 @@ def build_chapter_5_content():
         'caption': (
             "Hình 5.6: Vòng đời tùy biến cấu hình động và đồng bộ bộ nhớ đệm đa tầng (KB-4).\n"
             "(Chu trình 6 bước khép kín: Quản trị viên đổi cấu hình → Commit CSDL Postgres an toàn → Vô hiệu hóa đệm L1 cục bộ & Bắn Pub/Sub → "
-            "Lan truyền cụm API qua kênh tenant-events [2.45 ± 0.65 ms] → Nạp lại đệm L1 theo cơ chế Lazy [0.12 ms vs 18.5 ms đọc DB] → "
+            "Lan truyền cụm API qua kênh tenant:config:invalidate [2.45 ± 0.65 ms] → Nạp lại đệm L1 theo cơ chế Lazy [0.12 ms vs 18.5 ms đọc DB] → "
             "Áp dụng tức thời trên UI React với kiểm tra luật STRICT / WARN và trường động JSONB; Nguồn: run manifest commit 7c43e4e)."
         )
     })
@@ -258,7 +258,7 @@ def build_chapter_5_content():
             "- Thao tác đọc đệm siêu tốc: Khi cấu hình được nạp sẵn trên bộ nhớ L1 Caffeine (tenant:{id}:config), thời gian nạp cấu hình chỉ mất 0.12 ms "
             "(nhanh hơn gấp 150 lần so với truy vấn CSDL vật lý mất 18.5 ms). Chính sách thu hồi W-TinyLFU đảm bảo tỷ lệ trúng đệm duy trì ở mức cao 76% – 97%.\n"
             "- Đồng bộ sự kiện thời gian thực: Khi Quản trị viên thay đổi chế độ WIP từ STRICT sang WARN, giao dịch được commit bền vững vào PostgreSQL "
-            "và ngay lập tức phát sự kiện thu hồi qua kênh Redis Pub/Sub tenant-events. Độ trễ lan truyền thông điệp tới toàn bộ các thể hiện API "
+            "bảng tenant_kanban_settings (cột settings jsonb) và ngay lập tức phát sự kiện thu hồi qua kênh Redis Pub/Sub tenant:config:invalidate. Độ trễ lan truyền thông điệp tới toàn bộ các thể hiện API "
             "chỉ mất 2.45 ± 0.65 ms, đảm bảo toàn bộ cụm dịch vụ được làm sạch đệm đồng nhất.\n"
             "- Thực thi nghiệp vụ chuẩn xác: Yêu cầu kế tiếp của người dùng kích hoạt cơ chế nạp đệm lười (Lazy Reload) từ CSDL. Giao diện người dùng "
             "áp dụng ngay lập tức quy tắc mới: tại t-acme (chế độ STRICT), thao tác kéo thẻ vượt hạn mức bị chặn với HTTP 422; tại t-lotus (chế độ WARN), "
@@ -278,11 +278,11 @@ def build_chapter_5_content():
         'text': (
             "Dựa trên chuỗi bằng chứng thực nghiệm thu thập từ Hình 5.1 đến Hình 5.6, nghiên cứu tổng kết mức độ giải quyết "
             "bảy thách thức thiết kế cốt lõi đã đặt ra từ Chương 1, chứng minh tính toàn vẹn và vượt trội của mô hình SaaS Kanban Cấp độ 3:\n"
-            "1. Thách thức 1 (Định danh và quản lý ngữ cảnh luồng): Được giải quyết trọn vẹn thông qua đường ống lọc kép JwtTenantFilter kết hợp "
+            "1. Thách thức 1 (Định danh và quản lý ngữ cảnh luồng): Được giải quyết trọn vẹn thông qua đường ống lọc kép TenantContextFilter kết hợp "
             "ThreadLocal tự dọn dẹp bằng khối try ... finally. Kết quả kiểm chứng tại Hình 5.3a khẳng định tỷ lệ chặn truy cập sai lệch đạt 100% "
             "và tỷ lệ rò rỉ ngữ cảnh đạt 0% tuyệt đối dưới áp lực 1.500 yêu cầu luân chuyển trên hồ luồng dùng chung.\n"
             "2. Thách thức 2 (Cô lập dữ liệu và kiểm soát bán kính sự cố): Được phòng thủ vững chắc nhờ cơ chế rào chắn hai lớp tại nhân CSDL "
-            "(tài khoản NOBYPASSRLS, biến phiên SET LOCAL, chính sách FORCE ROW LEVEL SECURITY) kết hợp phân vùng tiền tố khóa bộ đệm. "
+            "(tài khoản NOBYPASSRLS, biến phiên SET LOCAL app.tenant_id, chính sách FORCE ROW LEVEL SECURITY) kết hợp phân vùng tiền tố khóa bộ đệm. "
             "Hình 5.3b chứng minh cơ chế Fail-Closed bảo vệ dữ liệu thành công (0 leak) ngay cả khi lập trình viên bỏ sót mệnh đề WHERE hoặc bị tấn công IDOR; "
             "trong khi Hình 5.3c xác nhận chi phí vi mô của RLS chỉ tăng thêm 0.45 ms.\n"
             "3. Thách thức 3 (Quản trị hiệu năng và hạn chế hàng xóm ồn ào): Được giải quyết triệt để nhờ sự phối hợp giữa bộ lọc Token Bucket tại biên "

@@ -5,431 +5,394 @@ import matplotlib.patches as patches
 import numpy as np
 import textwrap
 
+# Set global academic styling
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Segoe UI', 'Helvetica']
-plt.rcParams['axes.edgecolor'] = '#CBD5E1'
+plt.rcParams['axes.edgecolor'] = '#94A3B8'
 plt.rcParams['axes.linewidth'] = 0.8
+plt.rcParams['text.color'] = '#1E293B'
+plt.rcParams['axes.labelcolor'] = '#1E293B'
+plt.rcParams['xtick.color'] = '#475569'
+plt.rcParams['ytick.color'] = '#475569'
+
+# Shared Academic Palette
+C_BASELINE = '#64748B'    # Slate grey
+C_PROPOSED = '#0D9488'    # Teal
+C_WARNING  = '#D97706'    # Amber / Orange
+C_DANGER   = '#DC2626'    # Red
+C_PUBSUB   = '#7C3AED'    # Violet (for Pub/Sub only)
+C_BLUE     = '#2563EB'    # Subdued blue
 
 # ==============================================================================
-# HÌNH 5.1: Môi trường và pipeline đo lường
+# HÌNH 5.1: Môi trường và pipeline đo lường (Tối giản, 3 tông màu, 15-16cm)
 # ==============================================================================
 def draw_figure_5_1():
-    fig, ax = plt.subplots(figsize=(14.5, 7.5), dpi=300)
-    ax.set_xlim(0, 145)
-    ax.set_ylim(0, 75)
+    fig, ax = plt.subplots(figsize=(10.5, 5.4), dpi=300)
+    ax.set_xlim(0, 105)
+    ax.set_ylim(0, 54)
     ax.axis('off')
 
-    # Bọc ngoài: AWS EC2
-    box_ec2 = patches.FancyBboxPatch((2, 2), 141, 71, boxstyle="round,pad=1,rounding_size=1.5",
-                                    facecolor="#F8FAFC", edgecolor="#475569", linewidth=1.5, linestyle="--")
+    # Bọc ngoài: AWS EC2 (Viền xám mảnh)
+    box_ec2 = patches.FancyBboxPatch((1.5, 1.5), 102, 51, boxstyle="round,pad=0.8,rounding_size=1.0",
+                                     facecolor="#FAFAFA", edgecolor="#94A3B8", linewidth=1.0, linestyle="--")
     ax.add_patch(box_ec2)
-    ax.text(5, 70, "MÁY CHỦ THỰC NGHIỆM: AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM, OS: Ubuntu 24.04 LTS)", 
-            fontsize=11.5, fontweight='bold', color="#0F172A")
+    ax.text(3.5, 50.2, "MÁY CHỦ THỰC NGHIỆM: AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM, OS Ubuntu 24.04)", 
+            fontsize=9.2, fontweight='bold', color="#334155")
 
-    # Cột 1: Bộ sinh tải k6 (x = 4.5 -> 37, w = 32.5)
-    box_k6 = patches.FancyBboxPatch((4.5, 14), 32.5, 52, boxstyle="round,pad=0.8,rounding_size=1",
-                                    facecolor="#EFF6FF", edgecolor="#2563EB", linewidth=1.4)
+    # Cột 1: Nguồn sinh tải k6 (x = 2.5 -> 27.5, w = 25.0)
+    box_k6 = patches.FancyBboxPatch((2.5, 6), 25.0, 42, boxstyle="round,pad=0.6,rounding_size=0.8",
+                                    facecolor="#F1F5F9", edgecolor="#64748B", linewidth=1.1)
     ax.add_patch(box_k6)
-    ax.text(20.75, 62.5, "Bộ sinh tải k6 (v0.50)", fontsize=11, fontweight='bold', color="#1E40AF", ha='center')
-    ax.text(20.75, 59.2, "80 VUs đồng thời · 5 Nhóm Thuê bao", fontsize=8.0, fontweight='bold', color="#2563EB", ha='center')
+    ax.text(15.0, 45.2, "Sinh tải k6 (v0.50)", fontsize=10, fontweight='bold', color="#0F172A", ha='center')
+    ax.text(15.0, 42.5, "80 VUs · 5 Nhóm Thuê bao", fontsize=8.0, color="#475569", ha='center')
 
-    tenants_lines = [
-        ("• t-acme (Nhỏ): 15 VUs (STRICT)", "#1E3A8A"),
-        ("• pool-demo (Vừa): 15 VUs (WARN)", "#1E3A8A"),
-        ("• t-lotus (Lớn): 20 VUs (JSONB)", "#1E3A8A"),
-        ("• t-finance (Chuẩn): 10 VUs (STRICT)", "#1E3A8A"),
-        ("• t-aggressor (Nhiễu): 20 VUs dồn dập", "#DC2626"),
-        ("  (Tải đột biến ~1.800–3.000 req/phút)", "#B91C1C")
+    tenants = [
+        "• t-acme (Nhỏ): 15 VUs, STRICT",
+        "• pool-demo (Vừa): 15 VUs, WARN",
+        "• t-lotus (Lớn): 20 VUs, JSONB",
+        "• t-finance: 10 VUs (STRICT)",
+        "• t-aggressor: 20 VUs dồn dập\n  (Bão tải 1.800–3.000 req/phút)"
     ]
-    for idx, (txt, clr) in enumerate(tenants_lines):
-        ax.text(6.2, 54.0 - idx * 4.4, txt, fontsize=8.0, color=clr, fontweight='bold' if 'aggressor' in txt else 'normal')
+    y_t = 38.5
+    for t in tenants:
+        clr = C_DANGER if "aggressor" in t else "#334155"
+        fw = "bold" if "aggressor" in t else "normal"
+        ax.text(3.8, y_t, t, fontsize=7.6, color=clr, fontweight=fw)
+        y_t -= 3.6 if "\n" not in t else 4.6
 
-    box_protocol = patches.FancyBboxPatch((6.5, 16.5), 28.5, 10.5, boxstyle="round,pad=0.5,rounding_size=0.5",
-                                          facecolor="#DBEAFE", edgecolor="#3B82F6", linewidth=0.8)
-    ax.add_patch(box_protocol)
-    ax.text(20.75, 24.5, "Quy trình đo lường chuẩn hóa:", fontsize=8.2, fontweight='bold', color="#1E40AF", ha='center')
-    ax.text(20.75, 21.5, "30s warmup → 60s đo chính thức (n=5)", fontsize=8, color="#1E3A8A", ha='center')
-    ax.text(20.75, 18.5, "25s cooldown làm sạch đệm & kết nối", fontsize=8, color="#1E3A8A", ha='center')
+    # Quy trình đo chuẩn
+    box_proto = patches.FancyBboxPatch((3.8, 7.5), 22.4, 9.0, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                       facecolor="#FFFFFF", edgecolor="#CBD5E1", linewidth=0.8)
+    ax.add_patch(box_proto)
+    ax.text(15.0, 14.0, "Quy trình đo chuẩn (n=5):", fontsize=7.8, fontweight='bold', color="#0F172A", ha='center')
+    ax.text(15.0, 11.5, "30s warmup → 60s đo chính thức", fontsize=7.4, color="#475569", ha='center')
+    ax.text(15.0, 9.2, "25s cooldown làm sạch đệm", fontsize=7.4, color="#475569", ha='center')
 
-    # Cột 2: Cụm Docker Compose (x = 42 -> 96, w = 54)
-    box_compose = patches.FancyBboxPatch((42, 14), 54, 52, boxstyle="round,pad=0.8,rounding_size=1",
-                                         facecolor="#F0FDF4", edgecolor="#16A34A", linewidth=1.4)
+    # Cột 2: Cụm Docker Compose (x = 32.5 -> 74.5, w = 42.0)
+    box_compose = patches.FancyBboxPatch((32.5, 6), 42.0, 42, boxstyle="round,pad=0.6,rounding_size=0.8",
+                                         facecolor="#F0FDFA", edgecolor="#0D9488", linewidth=1.2)
     ax.add_patch(box_compose)
-    ax.text(69, 62.5, "Hạ tầng Docker Compose (Tài nguyên ghim cứng)", fontsize=11, fontweight='bold', color="#166534", ha='center')
-    ax.text(69, 59.2, "Mạng cô lập nội bộ: nckh-ec2-net", fontsize=8.8, color="#15803D", ha='center')
+    ax.text(53.5, 45.2, "Hạ tầng Docker Compose (Tài nguyên ghim cứng)", fontsize=9.0, fontweight='bold', color="#0F766E", ha='center')
+    ax.text(53.5, 42.5, "Mạng nội bộ: nckh-ec2-net", fontsize=7.8, color="#115E59", ha='center')
 
-    # kanban-web
-    box_web = patches.FancyBboxPatch((45, 47), 48, 10, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                     facecolor="#FFFFFF", edgecolor="#0284C7", linewidth=1.2)
+    # Container 1: Web
+    box_web = patches.FancyBboxPatch((34.5, 33.5), 38.0, 7.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                     facecolor="#FFFFFF", edgecolor="#0D9488", linewidth=0.9)
     ax.add_patch(box_web)
-    ax.text(47, 53.8, "kanban-web (React 18 + Caddy Reverse Proxy)", fontsize=9.5, fontweight='bold', color="#0369A1")
-    ax.text(47, 49.8, "Port 80/443 | Giới hạn cứng: 0.25 vCPU · 256 MB RAM", fontsize=8.5, color="#334155")
+    ax.text(53.5, 38.5, "kanban-web (React 18 + Caddy Reverse Proxy)", fontsize=8.6, fontweight='bold', color="#0F172A", ha='center')
+    ax.text(53.5, 35.5, "Port 80/443 | 0.25 vCPU · 256 MB RAM", fontsize=7.6, color="#475569", ha='center')
 
-    # kanban-api
-    box_api = patches.FancyBboxPatch((45, 31.5), 48, 12.5, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                     facecolor="#FEF3C7", edgecolor="#D97706", linewidth=1.2)
+    # Container 2: API
+    box_api = patches.FancyBboxPatch((34.5, 20.0), 38.0, 11.0, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                     facecolor="#FFFFFF", edgecolor="#0D9488", linewidth=1.1)
     ax.add_patch(box_api)
-    ax.text(47, 40.5, "kanban-api (Spring Boot 3, Java 21, Tomcat)", fontsize=9.5, fontweight='bold', color="#92400E")
-    ax.text(47, 37.2, "JwtTenantFilter, ThreadLocal MDC, L1 Caffeine, RateLimitFilter", fontsize=8.2, color="#475569")
-    ax.text(47, 34.0, "Giới hạn: 1.25 vCPU · 2.560 MB RAM · Pool max 25", fontsize=8.2, fontweight='bold', color="#B45309")
+    ax.text(53.5, 28.2, "kanban-api (Spring Boot 3, Java 21)", fontsize=9.0, fontweight='bold', color="#0F766E", ha='center')
+    ax.text(53.5, 25.4, "TenantContextFilter · RateLimitFilter · L1 Caffeine", fontsize=7.6, color="#334155", ha='center')
+    ax.text(53.5, 22.4, "1.25 vCPU · 2.560 MB RAM · HikariCP max 25", fontsize=7.6, fontweight='bold', color="#0F766E", ha='center')
 
-    # redis & postgres
-    box_redis = patches.FancyBboxPatch((45, 16.5), 22.5, 12.5, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                       facecolor="#FAF5FF", edgecolor="#9333EA", linewidth=1.2)
+    # Container 3 & 4: Redis & Postgres
+    box_redis = patches.FancyBboxPatch((34.5, 7.5), 18.0, 10.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                       facecolor="#FFFFFF", edgecolor="#64748B", linewidth=0.9)
     ax.add_patch(box_redis)
-    ax.text(46.5, 25.5, "redis-cache (Redis 7)", fontsize=9, fontweight='bold', color="#6B21A8")
-    ax.text(46.5, 22.8, "Token Bucket 1.200/min", fontsize=8, color="#475569")
-    ax.text(46.5, 20.3, "L2 Cache + Pub/Sub", fontsize=8, color="#475569")
-    ax.text(46.5, 17.8, "0.25 vCPU · 512 MB RAM", fontsize=8, fontweight='bold', color="#7E22CE")
+    ax.text(43.5, 15.2, "redis-cache (Redis 7)", fontsize=8.2, fontweight='bold', color="#0F172A", ha='center')
+    ax.text(43.5, 12.6, "Token Bucket · L2", fontsize=7.4, color="#475569", ha='center')
+    ax.text(43.5, 9.6, "0.25 vCPU · 512 MB", fontsize=7.4, color="#64748B", fontweight='bold', ha='center')
 
-    box_pg = patches.FancyBboxPatch((70.5, 16.5), 22.5, 12.5, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                    facecolor="#F0FDF4", edgecolor="#15803D", linewidth=1.2)
+    box_pg = patches.FancyBboxPatch((54.5, 7.5), 18.0, 10.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                    facecolor="#FFFFFF", edgecolor="#0D9488", linewidth=0.9)
     ax.add_patch(box_pg)
-    ax.text(72, 25.5, "postgres-db (PG 16)", fontsize=9, fontweight='bold', color="#166534")
-    ax.text(72, 22.8, "FORCE RLS · Pool schema", fontsize=8, color="#475569")
-    ax.text(72, 20.3, "SET LOCAL current_tenant", fontsize=8, color="#475569")
-    ax.text(72, 17.8, "0.50 vCPU · 1.536 MB RAM", fontsize=8, fontweight='bold', color="#15803D")
+    ax.text(63.5, 15.2, "postgres-db (PG 16)", fontsize=8.2, fontweight='bold', color="#0F766E", ha='center')
+    ax.text(63.5, 12.6, "FORCE RLS · app.tenant_id", fontsize=7.4, color="#475569", ha='center')
+    ax.text(63.5, 9.6, "0.50 vCPU · 1.536 MB", fontsize=7.4, color="#0D9488", fontweight='bold', ha='center')
 
-    # Cột 3: Giám sát & Bộ phân tích (x = 102 -> 139, w = 37)
-    box_mon = patches.FancyBboxPatch((102, 14), 37, 52, boxstyle="round,pad=0.8,rounding_size=1",
-                                     facecolor="#FFF7ED", edgecolor="#EA580C", linewidth=1.4)
+    # Cột 3: Giám sát & Báo cáo (x = 78.0 -> 102.0, w = 24.0)
+    box_mon = patches.FancyBboxPatch((78.0, 6), 24.0, 42, boxstyle="round,pad=0.6,rounding_size=0.8",
+                                     facecolor="#FFF7ED", edgecolor="#EA580C", linewidth=1.1)
     ax.add_patch(box_mon)
-    ax.text(120.5, 62.5, "Giám sát & Pipeline Thu thập", fontsize=11, fontweight='bold', color="#C2410C", ha='center')
-    ax.text(120.5, 59.2, "Bóc tách tự động & Kiểm chứng", fontsize=8.8, color="#EA580C", ha='center')
+    ax.text(90.0, 45.2, "Giám sát & Phân tích", fontsize=10, fontweight='bold', color="#C2410C", ha='center')
+    ax.text(90.0, 42.5, "Thu thập metric tự động", fontsize=7.8, color="#9A3412", ha='center')
 
-    box_prom = patches.FancyBboxPatch((105, 44), 31, 13.5, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                      facecolor="#FFFFFF", edgecolor="#FB923C", linewidth=1.1)
+    box_prom = patches.FancyBboxPatch((79.7, 29.5), 20.6, 11.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                      facecolor="#FFFFFF", edgecolor="#F97316", linewidth=0.8)
     ax.add_patch(box_prom)
-    ax.text(107, 53.8, "Prometheus & Actuator", fontsize=9.5, fontweight='bold', color="#9A3412")
-    ax.text(107, 50.5, "• hikaricp_connections_active", fontsize=8.2, color="#475569")
-    ax.text(107, 48.0, "• http_req_duration, rate", fontsize=8.2, color="#475569")
-    ax.text(107, 45.5, "• CPU / RAM cAdvisor metrics", fontsize=8.2, color="#475569")
+    ax.text(90.0, 38.0, "Prometheus & Actuator", fontsize=8.4, fontweight='bold', color="#9A3412", ha='center')
+    ax.text(90.0, 34.8, "• hikaricp_active", fontsize=7.4, color="#475569", ha='center')
+    ax.text(90.0, 32.0, "• http_req_duration, rate", fontsize=7.4, color="#475569", ha='center')
 
-    box_analyzer = patches.FancyBboxPatch((105, 28), 31, 13.5, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                          facecolor="#FFFFFF", edgecolor="#EA580C", linewidth=1.1)
-    ax.add_patch(box_analyzer)
-    ax.text(107, 37.8, "Bộ phân tích Tự động", fontsize=9.5, fontweight='bold', color="#9A3412")
-    ax.text(107, 34.5, "• process-ec2-results.py", fontsize=8.2, color="#475569")
-    ax.text(107, 31.8, "• Bóc tách p50, p95, p99 theo tenant", fontsize=8.2, color="#475569")
-    ax.text(107, 29.2, "• Xuất summary JSON & bảng số liệu", fontsize=8.2, color="#475569")
+    box_proc = patches.FancyBboxPatch((79.7, 17.0), 20.6, 10.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                      facecolor="#FFFFFF", edgecolor="#EA580C", linewidth=0.8)
+    ax.add_patch(box_proc)
+    ax.text(90.0, 24.5, "Bộ phân tích Tự động", fontsize=8.4, fontweight='bold', color="#9A3412", ha='center')
+    ax.text(90.0, 21.5, "• process-ec2-results.py", fontsize=7.4, color="#475569", ha='center')
+    ax.text(90.0, 19.0, "• Bóc tách p50, p95 per tenant", fontsize=7.4, color="#475569", ha='center')
 
-    box_report = patches.FancyBboxPatch((105, 16.5), 31, 9.0, boxstyle="round,pad=0.5,rounding_size=0.6",
-                                        facecolor="#FEF2F2", edgecolor="#DC2626", linewidth=1)
-    ax.add_patch(box_report)
-    ax.text(120.5, 22.5, "Báo cáo Thực nghiệm (Chương 5)", fontsize=9, fontweight='bold', color="#991B1B", ha='center')
-    ax.text(120.5, 19.0, "Report_v2.docx (Bảng & Biểu đồ)", fontsize=8, color="#7F1D1D", ha='center')
+    box_rep = patches.FancyBboxPatch((79.7, 7.5), 20.6, 7.5, boxstyle="round,pad=0.4,rounding_size=0.5",
+                                     facecolor="#FFFFFF", edgecolor="#DC2626", linewidth=0.8)
+    ax.add_patch(box_rep)
+    ax.text(90.0, 12.5, "Báo cáo Thực nghiệm", fontsize=8.2, fontweight='bold', color="#991B1B", ha='center')
+    ax.text(90.0, 9.8, "Chương 5 (Report_v2.docx)", fontsize=7.4, color="#7F1D1D", ha='center')
 
     # Mũi tên kết nối
-    ax.annotate("", xy=(44.5, 52), xytext=(37.5, 52),
-                arrowprops=dict(arrowstyle="->", lw=2, color="#2563EB"))
-    ax.text(41.0, 53.5, "HTTP/1.1", fontsize=7.5, fontweight='bold', color="#2563EB", ha='center')
-
-    ax.annotate("", xy=(69, 44.5), xytext=(69, 46.5),
-                arrowprops=dict(arrowstyle="->", lw=1.8, color="#0284C7"))
-
-    ax.annotate("", xy=(56, 29.5), xytext=(56, 31.2),
-                arrowprops=dict(arrowstyle="<->", lw=1.6, color="#7C3AED"))
-
-    ax.annotate("", xy=(82, 29.5), xytext=(82, 31.2),
-                arrowprops=dict(arrowstyle="<->", lw=1.6, color="#15803D"))
-
-    ax.annotate("", xy=(104.5, 51), xytext=(93.5, 41),
-                arrowprops=dict(arrowstyle="->", lw=1.6, color="#EA580C", linestyle=":"))
-    ax.text(99, 48, "Scrape", fontsize=8, fontweight='bold', color="#EA580C", rotation=35)
-
-    ax.annotate("", xy=(120.5, 41.8), xytext=(120.5, 43.8),
-                arrowprops=dict(arrowstyle="->", lw=1.6, color="#EA580C"))
-
-    # k6 summary JSON router
-    ax.plot([37.0, 37.0, 99, 99, 104.5], [20, 8.5, 8.5, 34, 34], color="#2563EB", lw=1.5, linestyle="--")
-    ax.annotate("", xy=(104.5, 34), xytext=(102, 34),
+    ax.annotate("", xy=(34.5, 37.2), xytext=(27.5, 37.2),
                 arrowprops=dict(arrowstyle="->", lw=1.5, color="#2563EB"))
-    ax.text(68, 6.0, "Truyền k6 summary raw JSON (baseline_summary.json / proposed_summary.json)", 
-            fontsize=8.5, color="#1E40AF", ha='center', style='italic')
+    ax.text(30.0, 38.5, "HTTP", fontsize=7.2, fontweight='bold', color="#2563EB", ha='center')
 
-    ax.annotate("", xy=(120.5, 25.8), xytext=(120.5, 27.8),
-                arrowprops=dict(arrowstyle="->", lw=1.6, color="#DC2626"))
+    ax.annotate("", xy=(53.5, 31.0), xytext=(53.5, 33.5),
+                arrowprops=dict(arrowstyle="->", lw=1.4, color="#0D9488"))
+
+    ax.annotate("", xy=(43.5, 18.0), xytext=(43.5, 20.0),
+                arrowprops=dict(arrowstyle="<->", lw=1.2, color="#64748B"))
+
+    ax.annotate("", xy=(63.5, 18.0), xytext=(63.5, 20.0),
+                arrowprops=dict(arrowstyle="<->", lw=1.2, color="#0D9488"))
+
+    ax.annotate("", xy=(79.7, 35.0), xytext=(72.5, 26.0),
+                arrowprops=dict(arrowstyle="->", lw=1.2, color="#EA580C", linestyle=":"))
+    ax.text(76.2, 31.5, "Scrape", fontsize=7.0, fontweight='bold', color="#EA580C")
+
+    # Đường k6 summary JSON
+    ax.plot([27.5, 27.5, 76.0, 76.0, 79.7], [12.0, 3.5, 3.5, 22.0, 22.0], color="#64748B", lw=1.0, linestyle="--")
+    ax.annotate("", xy=(79.7, 22.0), xytext=(77.5, 22.0),
+                arrowprops=dict(arrowstyle="->", lw=1.0, color="#64748B"))
+    ax.text(51.0, 2.0, "Truyền raw k6 summary JSON sang bộ phân tích", fontsize=7.2, color="#475569", ha='center', style='italic')
 
     plt.savefig('output/hinh_5_1_pipeline_thuc_nghiem.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
     print("✓ Successfully generated: output/hinh_5_1_pipeline_thuc_nghiem.png")
 
 # ==============================================================================
-# HÌNH 5.2: Bản đồ thiết kế thực nghiệm KB-1 đến KB-4
+# HÌNH 5.2: Bản đồ thiết kế thực nghiệm KB-1 đến KB-4 (Cô đọng, 4 mục/cột)
 # ==============================================================================
 def draw_figure_5_2():
-    fig, ax = plt.subplots(figsize=(15.5, 12.5), dpi=300)
-    ax.set_xlim(0, 155)
-    ax.set_ylim(0, 125)
+    fig, ax = plt.subplots(figsize=(10.5, 6.2), dpi=300)
+    ax.set_xlim(0, 105)
+    ax.set_ylim(0, 62)
     ax.axis('off')
 
-    # Main Header Box
-    box_header = patches.FancyBboxPatch((15, 110), 125, 11, boxstyle="round,pad=0.6,rounding_size=1",
-                                        facecolor="#1E293B", edgecolor="#0F172A", linewidth=1.5)
-    ax.add_patch(box_header)
-    ax.text(77.5, 116.8, "BẢN ĐỒ THIẾT KẾ THỰC NGHIỆM ĐA CHIỀU (KỊCH BẢN KB-1 ĐẾN KB-4)", 
-            fontsize=12.5, fontweight='bold', color="#FFFFFF", ha='center')
-    ax.text(77.5, 112.5, "Kiểm chứng toàn diện 4 Khía cạnh Kỹ thuật K1–K4 & Đối ứng Yêu cầu Phi chức năng NFR-01 đến NFR-06", 
-            fontsize=9.5, color="#94A3B8", ha='center')
+    # Main Header
+    box_hdr = patches.FancyBboxPatch((12, 55.5), 81, 5.5, boxstyle="round,pad=0.4,rounding_size=0.6",
+                                     facecolor="#1E293B", edgecolor="#0F172A", linewidth=1.0)
+    ax.add_patch(box_hdr)
+    ax.text(52.5, 58.8, "BẢN ĐỒ THIẾT KẾ THỰC NGHIỆM ĐA CHIỀU (KB-1 ĐẾN KB-4)", 
+            fontsize=10.5, fontweight='bold', color="#FFFFFF", ha='center')
+    ax.text(52.5, 56.6, "Kiểm chứng 4 Khía cạnh Kỹ thuật K1–K4 & Đối ứng 6 Yêu cầu Phi chức năng NFR-01 đến NFR-06", 
+            fontsize=7.6, color="#94A3B8", ha='center')
 
     kbs = [
         {
             "id": "KB-1",
             "title": "Định danh & Ngữ cảnh",
-            "sub": "K1 / NFR-01, NFR-06",
-            "bg": "#EFF6FF", "border": "#3B82F6", "hdr_bg": "#2563EB",
-            "goal": "Xác thực biên và chống rò rỉ ranh giới định danh đa thuê bao.",
-            "inputs": [
-                "• Gửi yêu cầu thiếu JWT hoặc chữ ký sai.",
-                "• Gửi Host sai lệch với tenant claim.",
-                "• 80 user đồng thời luân chuyển trên hồ luồng dùng chung Tomcat."
-            ],
-            "mechanisms": [
-                "• JwtTenantFilter bóc tách claims.",
-                "• ThreadLocal try-finally dọn dẹp sạch.",
-                "• Đồng bộ nhãn nhật ký chẩn đoán MDC."
+            "sub": "K1 · NFR-01, 06",
+            "bg": "#F8FAFC", "border": "#64748B", "hdr": "#334155",
+            "goal": "Xác thực biên và chống rò rỉ ranh giới ngữ cảnh luồng.",
+            "interventions": [
+                "• TenantContextFilter bóc tách claims.",
+                "• ThreadLocal try-finally dọn sạch; MDC."
             ],
             "metrics": [
-                "• Tỷ lệ từ chối sai lệch: 100% (HTTP 401)",
-                "• Tỷ lệ rò rỉ ngữ cảnh: 0% tuyệt đối",
-                "• Khớp MDC & X-Tenant-ID: 100%"
-            ]
+                "• Chặn sai lệch: 100% (HTTP 401/403)",
+                "• Rò rỉ ngữ cảnh: 0% trên 1.500 req"
+            ],
+            "conclusion": "Toàn vẹn định danh đa luồng"
         },
         {
             "id": "KB-2",
             "title": "Cô lập Dữ liệu CSDL",
-            "sub": "K2 / NFR-02, NFR-03",
-            "bg": "#F0FDF4", "border": "#16A34A", "hdr_bg": "#15803D",
-            "goal": "Phòng thủ chiều sâu tại nhân CSDL, kiểm soát bán kính sự cố.",
-            "inputs": [
-                "• Tiêm lỗi câu lệnh SELECT bỏ sót WHERE.",
-                "• Gửi UUID thẻ của tenant khác (IDOR).",
-                "• Thực thi truy vấn cố tình bỏ SET LOCAL.",
-                "• Đo kiểm vi mô bật/tắt chính sách RLS."
-            ],
-            "mechanisms": [
-                "• Cưỡng chế FORCE ROW LEVEL SECURITY.",
-                "• Tài khoản DB: NOBYPASSRLS.",
-                "• Gán biến phiên cục bộ SET LOCAL.",
-                "• Phân vùng không gian tên cache."
+            "sub": "K2 · NFR-02, 03",
+            "bg": "#F0FDFA", "border": "#0D9488", "hdr": "#0F766E",
+            "goal": "Phòng thủ chiều sâu CSDL, cô lập bán kính sự cố.",
+            "interventions": [
+                "• FORCE ROW LEVEL SECURITY.",
+                "• SET LOCAL app.tenant_id = UUID."
             ],
             "metrics": [
-                "• Số bản ghi rò rỉ chéo: 0 bản ghi",
-                "• Cơ chế Fail-Closed: 100% (0 dòng)",
+                "• Chặn bỏ WHERE & IDOR: 100% (0 leak)",
                 "• Chi phí RLS vi mô: +0,45 ms (~36%)"
-            ]
+            ],
+            "conclusion": "Cơ chế Fail-Closed tuyệt đối"
         },
         {
             "id": "KB-3",
             "title": "Hiệu năng & Kháng Nhiễu",
-            "sub": "K3 / NFR-04",
-            "bg": "#FFFBEB", "border": "#D97706", "hdr_bg": "#B45309",
-            "goal": "Bảo toàn SLA và dập tắt bão lưu lượng của hàng xóm ồn ào.",
-            "inputs": [
-                "• 80 VUs tải dồn dập trên 5 nhóm tenant.",
-                "• Aggressor xả tải đột biến 1.800–3.000 req/m.",
-                "• Đo đạc 4 cấu hình kiểm soát tài nguyên."
-            ],
-            "mechanisms": [
-                "• TenantRateLimitFilter tại cổng biên.",
-                "• Token Bucket (1.200 req/phút, refill 20/s, burst 120) trên Redis.",
-                "• Đệm 2 tầng L1 Caffeine + L2 Redis."
+            "sub": "K3 · NFR-04",
+            "bg": "#FFFBEB", "border": "#D97706", "hdr": "#B45309",
+            "goal": "Bảo toàn SLA và dập tắt bão tải hàng xóm ồn ào.",
+            "interventions": [
+                "• TenantRateLimitFilter (Token Bucket).",
+                "• Bộ đệm 2 tầng L1 Caffeine + L2 Redis."
             ],
             "metrics": [
-                "• p50: giảm từ ~200 ms xuống 60–64 ms",
-                "• Thông lượng: tăng từ 20,29 lên 47,67 RPS",
-                "• Chặn Aggressor: 11.190 req (HTTP 429)",
-                "• Tỷ lệ trúng đệm L1: 76% – 97%"
-            ]
+                "• p50 tenant chuẩn: giảm còn 60–64 ms",
+                "• Thông lượng: tăng +135% (47,67 RPS)"
+            ],
+            "conclusion": "Dập bão tải, giữ vững SLA"
         },
         {
             "id": "KB-4",
             "title": "Tùy biến & Đồng bộ Đệm",
-            "sub": "K4 / NFR-05",
-            "bg": "#FAF5FF", "border": "#9333EA", "hdr_bg": "#7E22CE",
-            "goal": "Thực thi 3 lớp tùy biến không sửa mã nguồn, đồng bộ tức thời.",
-            "inputs": [
-                "• Đổi giao diện, nhận diện thương hiệu.",
-                "• Kéo thẻ vượt WIP ở 2 tenant: STRICT vs WARN.",
-                "• Tạo thẻ kèm trường mở rộng JSONB.",
-                "• Admin đổi quy tắc WIP lúc đang chạy."
-            ],
-            "mechanisms": [
-                "• Động cơ 3 lớp dựa trên siêu dữ liệu.",
-                "• Lưu đệm L1 Caffeine tenant:{id}:config.",
-                "• Kênh Redis Pub/Sub phát sự kiện hủy đệm.",
-                "• Trường động JSONB kiểm tra lúc chạy."
+            "sub": "K4 · NFR-05",
+            "bg": "#FAF5FF", "border": "#9333EA", "hdr": "#7E22CE",
+            "goal": "Thực thi 3 lớp tùy biến không sửa mã, đồng bộ tức thời.",
+            "interventions": [
+                "• Động cơ siêu dữ liệu + JSONB động.",
+                "• Redis Pub/Sub tenant:config:invalidate."
             ],
             "metrics": [
                 "• Nạp đệm L1: 0,12 ms (vs 18,5 ms DB)",
-                "• Lan truyền Pub/Sub: 2,45 ± 0,65 ms",
-                "• WIP: STRICT chặn 422, WARN kèm cảnh báo"
-            ]
+                "• Lan truyền Pub/Sub: 2,45 ± 0,65 ms"
+            ],
+            "conclusion": "Tùy biến động, đồng bộ tức thời"
         }
     ]
 
-    col_w = 34.5
-    gap = 2.8
-    start_x = 4.0
+    col_w = 23.5
+    gap = 2.0
+    start_x = 2.5
 
     for i, kb in enumerate(kbs):
         cx = start_x + i * (col_w + gap)
-        
-        # Outer Card
-        card = patches.FancyBboxPatch((cx, 4), col_w, 100, boxstyle="round,pad=0.7,rounding_size=0.8",
-                                      facecolor=kb["bg"], edgecolor=kb["border"], linewidth=1.3)
+
+        # Card
+        card = patches.FancyBboxPatch((cx, 2.5), col_w, 50.5, boxstyle="round,pad=0.5,rounding_size=0.6",
+                                      facecolor=kb["bg"], edgecolor=kb["border"], linewidth=1.1)
         ax.add_patch(card)
 
-        # Header pill
-        hdr = patches.FancyBboxPatch((cx + 1, 96.5), col_w - 2, 7.0, boxstyle="round,pad=0.4,rounding_size=0.5",
-                                     facecolor=kb["hdr_bg"], edgecolor=kb["hdr_bg"])
+        # Header Pill
+        hdr = patches.FancyBboxPatch((cx + 0.5, 47.8), col_w - 1.0, 4.6, boxstyle="round,pad=0.2,rounding_size=0.4",
+                                     facecolor=kb["hdr"], edgecolor=kb["hdr"])
         ax.add_patch(hdr)
-        ax.text(cx + col_w/2, 101.2, f"{kb['id']} · {kb['title']}", fontsize=9.5, fontweight='bold', color="#FFFFFF", ha='center')
-        ax.text(cx + col_w/2, 98.0, kb['sub'], fontsize=8.2, color="#E2E8F0", ha='center')
+        ax.text(cx + col_w/2, 50.7, f"{kb['id']} · {kb['title']}", fontsize=6.8, fontweight='bold', color="#FFFFFF", ha='center')
+        ax.text(cx + col_w/2, 48.8, kb['sub'], fontsize=6.3, color="#E2E8F0", ha='center')
 
-        # Arrow from header to card
-        ax.annotate("", xy=(cx + col_w/2, 104.5), xytext=(77.5, 110),
-                    arrowprops=dict(arrowstyle="->", lw=1.2, color="#475569"))
+        # Connect line from main header
+        ax.annotate("", xy=(cx + col_w/2, 52.8), xytext=(52.5, 55.5),
+                    arrowprops=dict(arrowstyle="->", lw=0.9, color="#94A3B8"))
 
         # Section 1: Mục tiêu
-        y_cur = 92.5
-        ax.text(cx + 1.8, y_cur, "MỤC TIÊU CỐT LÕI:", fontsize=8.2, fontweight='bold', color="#0F172A")
-        y_cur -= 3.0
-        wrapped_goal = textwrap.fill(kb["goal"], width=34)
-        ax.text(cx + 1.8, y_cur, wrapped_goal, fontsize=7.8, color="#334155", va='top')
-        y_cur -= (wrapped_goal.count('\n') + 1) * 2.4 + 3.0
+        y_cur = 45.5
+        ax.text(cx + 1.2, y_cur, "1. MỤC TIÊU:", fontsize=7.4, fontweight='bold', color="#0F172A")
+        y_cur -= 2.4
+        wrapped_goal = textwrap.fill(kb["goal"], width=27)
+        ax.text(cx + 1.2, y_cur, wrapped_goal, fontsize=7.2, color="#334155", va='top')
+        y_cur -= (wrapped_goal.count('\n') + 1) * 2.2 + 2.0
 
-        # Section 2: Kịch bản thử nghiệm
-        ax.text(cx + 1.8, y_cur, "KỊCH BẢN THỬ NGHIỆM / TIÊM LỖI:", fontsize=8.2, fontweight='bold', color="#0F172A")
-        y_cur -= 3.0
-        for inp in kb["inputs"]:
-            wrapped_inp = textwrap.fill(inp, width=34)
-            lines_cnt = wrapped_inp.count('\n') + 1
-            ax.text(cx + 1.8, y_cur, wrapped_inp, fontsize=7.6, color="#334155", va='top')
-            y_cur -= lines_cnt * 2.3 + 0.8
-        y_cur -= 2.5
+        # Section 2: Can thiệp kỹ thuật
+        ax.text(cx + 1.2, y_cur, "2. CAN THIỆP KỸ THUẬT:", fontsize=7.4, fontweight='bold', color="#0F172A")
+        y_cur -= 2.4
+        for itv in kb["interventions"]:
+            wrapped_itv = textwrap.fill(itv, width=27)
+            lines_cnt = wrapped_itv.count('\n') + 1
+            ax.text(cx + 1.2, y_cur, wrapped_itv, fontsize=7.0, color="#334155", va='top')
+            y_cur -= lines_cnt * 2.1 + 0.8
+        y_cur -= 1.8
 
-        # Section 3: Cơ chế can thiệp
-        ax.text(cx + 1.8, y_cur, "CƠ CHẾ KIỂM SOÁT KỸ THUẬT:", fontsize=8.2, fontweight='bold', color="#0F172A")
-        y_cur -= 3.0
-        for mech in kb["mechanisms"]:
-            wrapped_mech = textwrap.fill(mech, width=34)
-            lines_cnt = wrapped_mech.count('\n') + 1
-            ax.text(cx + 1.8, y_cur, wrapped_mech, fontsize=7.6, color="#334155", va='top')
-            y_cur -= lines_cnt * 2.3 + 0.8
-
-        # Section 4: Kết quả đạt được (hộp riêng biệt dưới chân card)
-        p_res = patches.FancyBboxPatch((cx + 1, 5.5), col_w - 2, 25.5, boxstyle="round,pad=0.4,rounding_size=0.5",
-                                      facecolor="#FFFFFF", edgecolor=kb["border"], linewidth=0.9)
-        ax.add_patch(p_res)
-        ax.text(cx + 2, 28.5, "KẾT QUẢ ĐẠT ĐƯỢC:", fontsize=8.2, fontweight='bold', color="#0F172A")
-        y_res = 25.8
+        # Section 3: Chỉ số đo
+        ax.text(cx + 1.2, y_cur, "3. CHỈ SỐ ĐO CHÍNH:", fontsize=7.4, fontweight='bold', color="#0F172A")
+        y_cur -= 2.4
         for met in kb["metrics"]:
-            wrapped_met = textwrap.fill(met, width=33)
+            wrapped_met = textwrap.fill(met, width=27)
             lines_cnt = wrapped_met.count('\n') + 1
-            ax.text(cx + 2, y_res, wrapped_met, fontsize=7.5,
-                    fontweight='bold' if any(k in met for k in ['100%', '0%', '60–64', '47,67']) else 'normal',
-                    color="#047857" if any(k in met for k in ['0%', '100%']) else "#1E293B", va='top')
-            y_res -= lines_cnt * 2.3 + 0.8
+            ax.text(cx + 1.2, y_cur, wrapped_met, fontsize=7.0, fontweight='bold', color=C_PROPOSED if '100%' in met or '0%' in met or '60–64' in met or '0,12' in met else "#1E293B", va='top')
+            y_cur -= lines_cnt * 2.1 + 0.8
+
+        # Section 4: Kết luận (Hộp nổi bật ở đáy)
+        p_conc = patches.FancyBboxPatch((cx + 1.0, 3.8), col_w - 2.0, 5.0, boxstyle="round,pad=0.3,rounding_size=0.4",
+                                       facecolor="#FFFFFF", edgecolor=kb["border"], linewidth=0.8)
+        ax.add_patch(p_conc)
+        ax.text(cx + col_w/2, 6.6, "KẾT LUẬN:", fontsize=6.8, fontweight='bold', color="#475569", ha='center')
+        ax.text(cx + col_w/2, 4.8, kb["conclusion"], fontsize=7.2, fontweight='bold', color=kb["hdr"], ha='center')
 
     plt.savefig('output/hinh_5_2_thiet_ke_kb1_kb4.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
     print("✓ Successfully generated: output/hinh_5_2_thiet_ke_kb1_kb4.png")
 
 # ==============================================================================
-# HÌNH 5.3: Bằng chứng cô lập K1–K2 (3 vertical rows)
+# HÌNH 5.3: Bằng chứng cô lập K1–K2 (Label trực tiếp, không legend, solid nhã nhặn)
 # ==============================================================================
 def draw_figure_5_3():
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(13.0, 10.5), dpi=300)
-    plt.subplots_adjust(top=0.95, bottom=0.08, hspace=0.38, left=0.28, right=0.96)
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(9.5, 7.0), dpi=300)
+    plt.subplots_adjust(top=0.94, bottom=0.10, hspace=0.48, left=0.30, right=0.96)
 
-    # Panel 1: KB-1
+    # Panel 1: KB-1 (Biên định danh)
     cases_k1 = [
-        "Tomcat thread pool (1.500 req)",
-        "Host vs JWT claim lệch (200 req)",
+        "Tomcat pool (1.500 req)",
+        "Host lệch JWT claim (200 req)",
         "Thiếu JWT / Sai chữ ký (500 req)"
     ]
     y1 = np.arange(len(cases_k1))
-    total_k1 = [1500, 200, 500]
-    blocked_k1 = [1500, 200, 500]
+    vals_k1 = [1500, 200, 500]
 
-    ax1.barh(y1, total_k1, height=0.45, color="#DBEAFE", edgecolor="#3B82F6", hatch="//", label="Tổng số mẫu kiểm thử")
-    rects1 = ax1.barh(y1, blocked_k1, height=0.45, color="#2563EB", edgecolor="#1D4ED8", hatch="..", alpha=0.85, label="Bị chặn / Cô lập đúng (100%)")
-    
+    bars1 = ax1.barh(y1, vals_k1, height=0.42, color="#0D9488", edgecolor="#0F766E", linewidth=0.8)
     ax1.set_yticks(y1)
-    ax1.set_yticklabels(cases_k1, fontsize=9.2, fontweight='500')
-    ax1.set_xlabel("Số lượng mẫu kiểm định (mẫu)", fontsize=9.2, fontweight='bold', labelpad=4)
-    ax1.set_title("(a) Mặt phẳng Định danh & Ranh giới Ngữ cảnh Luồng (KB-1)", fontsize=10.5, fontweight='bold', pad=6)
-    ax1.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax1.set_xlim(0, 2150)
+    ax1.set_yticklabels(cases_k1, fontsize=8.2, fontweight='500')
+    ax1.set_xlabel("Số lượng mẫu kiểm định (mẫu)", fontsize=8.0, fontweight='bold', labelpad=2)
+    ax1.set_title("(a) Mặt phẳng Định danh & Ranh giới Ngữ cảnh Luồng (KB-1)", fontsize=8.8, fontweight='bold', pad=4)
+    ax1.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax1.set_xlim(0, 2100)
 
-    for i, rect in enumerate(rects1):
+    for i, rect in enumerate(bars1):
         w = rect.get_width()
-        tag = "Khớp 100% MDC (0% leak)" if i == 0 else "HTTP 403 (100% chặn)" if i == 1 else "HTTP 401 (100% chặn)"
+        tag = "Khớp 100% MDC (0% leak)" if i == 0 else "HTTP 403 (Chặn 100%)" if i == 1 else "HTTP 401 (Chặn 100%)"
         ax1.text(w + 35, rect.get_y() + rect.get_height()/2, f"{w} / {w} mẫu ({tag})", 
-                 va='center', ha='left', fontsize=8.8, fontweight='bold', color="#1E40AF")
-    ax1.legend(loc='center right', fontsize=8.5, framealpha=0.95)
+                 va='center', ha='left', fontsize=7.8, fontweight='bold', color="#0F766E")
 
-    # Panel 2: KB-2
+    # Panel 2: KB-2 (Rào chắn CSDL Fail-Closed)
     cases_k2 = [
         "HikariCP thiếu SET LOCAL (100 mẫu)",
-        "Đoán UUID thẻ của tenant khác (300 mẫu)",
-        "SELECT bỏ sót WHERE tenant_id (200 mẫu)"
+        "Đoán UUID thẻ khác - IDOR (300 mẫu)",
+        "SELECT bỏ sót WHERE (200 mẫu)"
     ]
     y2 = np.arange(len(cases_k2))
-    total_k2 = [100, 300, 200]
-    defended_k2 = [100, 300, 200]
+    vals_k2 = [100, 300, 200]
 
-    ax2.barh(y2, total_k2, height=0.45, color="#DCFCE7", edgecolor="#16A34A", hatch="//", label="Tổng số kịch bản tiêm lỗi")
-    rects2 = ax2.barh(y2, defended_k2, height=0.45, color="#15803D", edgecolor="#14532D", hatch="xx", alpha=0.85, label="Cơ chế Fail-Closed chặn (100%)")
-
+    bars2 = ax2.barh(y2, vals_k2, height=0.42, color="#0D9488", edgecolor="#0F766E", linewidth=0.8)
     ax2.set_yticks(y2)
-    ax2.set_yticklabels(cases_k2, fontsize=9.2, fontweight='500')
-    ax2.set_xlabel("Số lượng mẫu tiêm lỗi (mẫu)", fontsize=9.2, fontweight='bold', labelpad=4)
-    ax2.set_title("(b) Rào chắn CSDL PostgreSQL Fail-Closed & RLS (KB-2)", fontsize=10.5, fontweight='bold', pad=6)
-    ax2.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax2.set_xlim(0, 680)
+    ax2.set_yticklabels(cases_k2, fontsize=8.2, fontweight='500')
+    ax2.set_xlabel("Số lượng mẫu tiêm lỗi (mẫu)", fontsize=8.0, fontweight='bold', labelpad=2)
+    ax2.set_title("(b) Rào chắn CSDL PostgreSQL Fail-Closed & RLS (KB-2)", fontsize=8.8, fontweight='bold', pad=4)
+    ax2.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax2.set_xlim(0, 520)
 
-    for i, rect in enumerate(rects2):
+    for i, rect in enumerate(bars2):
         w = rect.get_width()
         tag = "Trả về 0 dòng an toàn (0 leak)" if i == 0 else "HTTP 404/403 (0 leak)" if i == 1 else "FORCE RLS chặn chéo (0 leak)"
         ax2.text(w + 10, rect.get_y() + rect.get_height()/2, f"{w} / {w} mẫu ({tag})", 
-                 va='center', ha='left', fontsize=8.8, fontweight='bold', color="#166534")
-    ax2.legend(loc='lower right', fontsize=8.5, framealpha=0.95)
+                 va='center', ha='left', fontsize=7.8, fontweight='bold', color="#0F766E")
 
     # Panel 3: Micro-benchmark RLS Overhead
     y3 = np.array([0, 1])
     rls_configs = [
-        "Bật đầy đủ SET LOCAL + FORCE RLS hai lớp (KB-2.5)",
-        "Tắt FORCE RLS, chỉ lọc thủ công WHERE ở tầng App (KB-2.4)"
+        "Bật SET LOCAL app.tenant_id + FORCE RLS (KB-2.5)",
+        "Tắt FORCE RLS, chỉ lọc thủ công WHERE (KB-2.4)"
     ]
     latencies = [1.70, 1.25]
     errors = [0.41, 0.32]
 
-    bars = ax3.barh(y3, latencies, xerr=errors, height=0.45, capsize=5,
-                    color=['#059669', '#64748B'], edgecolor=['#047857', '#334155'], hatch=['..', '//'])
+    bars3 = ax3.barh(y3, latencies, xerr=errors, height=0.42, capsize=4,
+                     color=['#0D9488', '#64748B'], edgecolor=['#0F766E', '#475569'], linewidth=0.8)
     ax3.set_yticks(y3)
-    ax3.set_yticklabels(rls_configs, fontsize=9.2, fontweight='500')
+    ax3.set_yticklabels(rls_configs, fontsize=8.2, fontweight='500')
     ax3.invert_yaxis()
-    ax3.set_xlabel("Thời gian thực thi truy vấn trung bình (ms) ± Độ lệch chuẩn", fontsize=9.2, fontweight='bold', labelpad=4)
-    ax3.set_title("(c) Đo lường Vi mô Chi phí Độ trễ của Rào chắn CSDL (RLS Overhead Microbenchmark)", fontsize=10.5, fontweight='bold', pad=6)
-    ax3.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax3.set_xlim(0, 2.85)
+    ax3.set_xlabel("Thời gian thực thi truy vấn trung bình (ms) ± Độ lệch chuẩn", fontsize=8.0, fontweight='bold', labelpad=2)
+    ax3.set_title("(c) Đo lường Vi mô Chi phí Độ trễ Rào chắn CSDL (RLS Overhead Microbenchmark)", fontsize=8.8, fontweight='bold', pad=4)
+    ax3.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax3.set_xlim(0, 2.7)
 
-    ax3.text(1.25 + 0.38, 1, "1,25 ± 0,32 ms (Baseline chuẩn)", va='center', ha='left', fontsize=8.8, fontweight='bold', color="#334155")
-    ax3.text(1.70 + 0.46, 0, "1,70 ± 0,41 ms (Tăng 0,45 ms ~ 36% trong microbenchmark)", va='center', ha='left', fontsize=8.8, fontweight='bold', color="#047857")
+    ax3.text(1.25 + 0.38, 1, "1,25 ± 0,32 ms (Baseline chuẩn)", va='center', ha='left', fontsize=7.8, fontweight='bold', color="#475569")
+    ax3.text(1.70 + 0.46, 0, "1,70 ± 0,41 ms (+0,45 ms ~ 36% vi mô)", va='center', ha='left', fontsize=7.8, fontweight='bold', color="#0D9488")
 
-    fig.text(0.5, 0.02, "* Ghi chú: Mức tăng 0,45 ms là chi phí vi mô cục bộ đo trên tập 500 mẫu truy vấn microbenchmark; không đại diện cho chi phí chung cho mọi quy mô tải.",
-             fontsize=8.5, style='italic', color="#475569", ha='center')
+    fig.text(0.5, 0.018, "* Ghi chú: Mức tăng 0,45 ms là chi phí vi mô cục bộ đo trên tập 500 mẫu truy vấn microbenchmark; tối ưu hóa qua chỉ mục B-Tree (tenant_id).",
+             fontsize=7.2, style='italic', color="#64748B", ha='center')
 
     plt.savefig('output/hinh_5_3_bang_chung_co_lap_k1_k2.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
     print("✓ Successfully generated: output/hinh_5_3_bang_chung_co_lap_k1_k2.png")
 
 # ==============================================================================
-# HÌNH 5.4, 5.5, 5.6: Kept exact as verified
+# HÌNH 5.4: Noisy neighbor - Phân tích độ trễ từng tenant (2 panels XẾP DỌC)
 # ==============================================================================
 def draw_figure_5_4():
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.5, 5.2), dpi=300, constrained_layout=True)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9.5, 6.5), dpi=300)
+    plt.subplots_adjust(top=0.90, bottom=0.08, hspace=0.38, left=0.28, right=0.96)
 
     categories = [
         'Gây nhiễu (Aggressor, 20 VUs)',
@@ -439,7 +402,7 @@ def draw_figure_5_4():
         'Nhỏ (Acme, 15 VUs)'
     ]
     y_pos = np.arange(len(categories))
-    bar_height = 0.36
+    bar_h = 0.36
 
     p50_base = [156.54, 211.34, 189.25, 187.99, 233.33]
     p50_prop = [13.44, 63.99, 61.12, 60.55, 64.57]
@@ -447,58 +410,57 @@ def draw_figure_5_4():
     p95_base = [556.55, 1291.25, 1257.16, 1166.02, 1526.48]
     p95_prop = [124.54, 1138.35, 963.67, 934.57, 1135.73]
 
-    rects1 = ax1.barh(y_pos - bar_height/2, p50_base, bar_height,
-                      label='Baseline (Tắt Cache & Rate Limit)', color='#EF4444', edgecolor='#B91C1C', hatch='//', alpha=0.85)
-    rects2 = ax1.barh(y_pos + bar_height/2, p50_prop, bar_height,
-                      label='Đề xuất (Bật Cache 2 tầng & Rate Limit)', color='#10B981', edgecolor='#047857', hatch='..', alpha=0.9)
+    # Panel (a): Độ trễ trung vị p50
+    ax1.barh(y_pos - bar_h/2, p50_base, bar_h, label='Baseline (Tắt Cache & Rate Limit)', 
+             color='#64748B', edgecolor='#475569', linewidth=0.8)
+    ax1.barh(y_pos + bar_h/2, p50_prop, bar_h, label='Đề xuất (Bật Cache 2 tầng & Rate Limit)', 
+             color='#0D9488', edgecolor='#0F766E', linewidth=0.8)
 
     ax1.set_yticks(y_pos)
-    ax1.set_yticklabels(categories, fontsize=9.5)
+    ax1.set_yticklabels(categories, fontsize=8.2)
     ax1.invert_yaxis()
-    ax1.set_xlabel('Độ trễ trung vị p50 (ms) - Càng thấp càng tốt', fontsize=9.5, fontweight='bold', labelpad=6)
-    ax1.set_title('(a) Độ trễ trung vị p50 (Median Latency)', fontsize=11, fontweight='bold', pad=8)
-    ax1.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax1.set_xlim(0, 310)
+    ax1.set_xlabel('Độ trễ trung vị p50 (ms) — Càng thấp càng tốt', fontsize=8.0, fontweight='bold', labelpad=2)
+    ax1.set_title('(a) Độ trễ trung vị p50 (Median Latency)', fontsize=8.8, fontweight='bold', pad=4)
+    ax1.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax1.set_xlim(0, 275)
 
-    for rect in rects1:
-        w = rect.get_width()
-        ax1.text(w + 3.5, rect.get_y() + rect.get_height()/2, f"{w:.1f} ms",
-                 va='center', ha='left', fontsize=8.8, color='#B91C1C', fontweight='bold')
-    for rect in rects2:
-        w = rect.get_width()
-        ax1.text(w + 3.5, rect.get_y() + rect.get_height()/2, f"{w:.1f} ms",
-                 va='center', ha='left', fontsize=8.8, color='#047857', fontweight='bold')
-    ax1.legend(loc='upper right', fontsize=8.5, framealpha=0.95)
+    for i in range(len(categories)):
+        ax1.text(p50_base[i] + 4, y_pos[i] - bar_h/2, f"{p50_base[i]:.1f} ms", va='center', ha='left', fontsize=7.4, color='#475569', fontweight='bold')
+        ax1.text(p50_prop[i] + 4, y_pos[i] + bar_h/2, f"{p50_prop[i]:.1f} ms", va='center', ha='left', fontsize=7.4, color='#0F766E', fontweight='bold')
 
-    rects3 = ax2.barh(y_pos - bar_height/2, p95_base, bar_height,
-                      label='Baseline (Độ trễ đuôi bị kéo dài do tranh chấp)', color='#F87171', edgecolor='#DC2626', hatch='//', alpha=0.85)
-    rects4 = ax2.barh(y_pos + bar_height/2, p95_prop, bar_height,
-                      label='Đề xuất (Bảo toàn cam kết SLA đuôi mượt mà)', color='#059669', edgecolor='#064E3B', hatch='..', alpha=0.9)
+    # Panel (b): Độ trễ đuôi p95
+    ax2.barh(y_pos - bar_h/2, p95_base, bar_h, label='Baseline (Tắt Cache & Rate Limit)', 
+             color='#64748B', edgecolor='#475569', linewidth=0.8)
+    ax2.barh(y_pos + bar_h/2, p95_prop, bar_h, label='Đề xuất (Bật Cache 2 tầng & Rate Limit)', 
+             color='#0D9488', edgecolor='#0F766E', linewidth=0.8)
 
     ax2.set_yticks(y_pos)
-    ax2.set_yticklabels(categories, fontsize=9.5)
+    ax2.set_yticklabels(categories, fontsize=8.2)
     ax2.invert_yaxis()
-    ax2.set_xlabel('Độ trễ phân vị đuôi p95 (ms) - Càng thấp càng tốt', fontsize=9.5, fontweight='bold', labelpad=6)
-    ax2.set_title('(b) Độ trễ phân vị đuôi p95 (Tail Latency)', fontsize=11, fontweight='bold', pad=8)
-    ax2.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax2.set_xlim(0, 2050)
+    ax2.set_xlabel('Độ trễ phân vị đuôi p95 (ms) — Càng thấp càng tốt', fontsize=8.0, fontweight='bold', labelpad=2)
+    ax2.set_title('(b) Độ trễ phân vị đuôi p95 (Tail Latency - Bảo toàn cam kết SLA)', fontsize=8.8, fontweight='bold', pad=4)
+    ax2.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax2.set_xlim(0, 1800)
 
-    for rect in rects3:
-        w = rect.get_width()
-        ax2.text(w + 25, rect.get_y() + rect.get_height()/2, f"{w:.1f} ms",
-                 va='center', ha='left', fontsize=8.8, color='#B91C1C', fontweight='bold')
-    for rect in rects4:
-        w = rect.get_width()
-        ax2.text(w + 25, rect.get_y() + rect.get_height()/2, f"{w:.1f} ms",
-                 va='center', ha='left', fontsize=8.8, color='#065F46', fontweight='bold')
-    ax2.legend(loc='upper right', fontsize=8.5, framealpha=0.95)
+    for i in range(len(categories)):
+        ax2.text(p95_base[i] + 25, y_pos[i] - bar_h/2, f"{p95_base[i]:.1f} ms", va='center', ha='left', fontsize=7.4, color='#475569', fontweight='bold')
+        ax2.text(p95_prop[i] + 25, y_pos[i] + bar_h/2, f"{p95_prop[i]:.1f} ms", va='center', ha='left', fontsize=7.4, color='#0F766E', fontweight='bold')
+
+    # Single unified figure legend at top
+    handles, labels = ax1.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.62, 0.985), ncol=2, 
+               fontsize=8.0, frameon=True, edgecolor='#CBD5E1', facecolor='#F8FAFC')
 
     plt.savefig('output/hinh_5_4_noisy_neighbor_latency.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
     print("✓ Successfully generated: output/hinh_5_4_noisy_neighbor_latency.png")
 
+# ==============================================================================
+# HÌNH 5.5: Đối sánh cấu hình kiểm soát tài nguyên (3 panels XẾP DỌC)
+# ==============================================================================
 def draw_figure_5_5():
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15.2, 4.8), dpi=300, constrained_layout=True)
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(9.5, 7.2), dpi=300)
+    plt.subplots_adjust(top=0.94, bottom=0.07, hspace=0.48, left=0.22, right=0.96)
 
     configs = [
         'Đầy đủ (Đề xuất)',
@@ -507,189 +469,172 @@ def draw_figure_5_5():
         'Baseline'
     ]
     y_pos = np.arange(len(configs))
-    bar_height = 0.52
+    bar_h = 0.52
+    colors = ['#0D9488', '#3B82F6', '#D97706', '#64748B']
+    edge_colors = ['#0F766E', '#1D4ED8', '#B45309', '#475569']
 
+    # Panel 1: Throughput RPS
     tps = [47.67, 35.80, 28.50, 20.29]
-    colors1 = ['#059669', '#3B82F6', '#D97706', '#64748B']
-    hatches = ['..', 'xx', '\\\\', '//']
-
-    rects1 = ax1.barh(y_pos, tps, bar_height, color=colors1, edgecolor='#0F172A', hatch=hatches, alpha=0.9)
+    rects1 = ax1.barh(y_pos, tps, bar_h, color=colors, edgecolor=edge_colors, linewidth=0.8)
     ax1.set_yticks(y_pos)
-    ax1.set_yticklabels(configs, fontsize=9.5, fontweight='500')
+    ax1.set_yticklabels(configs, fontsize=8.2, fontweight='500')
     ax1.invert_yaxis()
-    ax1.set_xlabel('Thông lượng giao dịch an toàn (RPS)', fontsize=9.5, fontweight='bold', labelpad=6)
-    ax1.set_title('(a) Thông lượng xử lý (Throughput)', fontsize=10.5, fontweight='bold', pad=8)
-    ax1.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
+    ax1.set_xlabel('Thông lượng giao dịch an toàn (RPS)', fontsize=8.0, fontweight='bold', labelpad=2)
+    ax1.set_title('(a) Thông lượng xử lý giao dịch an toàn (Throughput)', fontsize=8.8, fontweight='bold', pad=4)
+    ax1.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
     ax1.set_xlim(0, 60)
 
     for i, rect in enumerate(rects1):
         w = rect.get_width()
         tag = " (+135%)" if i == 0 else ""
         ax1.text(w + 1.2, rect.get_y() + rect.get_height()/2, f"{w:.2f} RPS{tag}",
-                 va='center', ha='left', fontsize=8.8, fontweight='bold', color=colors1[i])
+                 va='center', ha='left', fontsize=7.8, fontweight='bold', color=colors[i])
 
+    # Panel 2: HikariCP Active Conns
     active_conns = [4, 12, 18, 25]
-    colors2 = ['#059669', '#3B82F6', '#D97706', '#EF4444']
-
-    rects2 = ax2.barh(y_pos, active_conns, bar_height, color=colors2, edgecolor='#0F172A', hatch=hatches, alpha=0.9)
+    rects2 = ax2.barh(y_pos, active_conns, bar_h, color=colors, edgecolor=edge_colors, linewidth=0.8)
     ax2.set_yticks(y_pos)
-    ax2.set_yticklabels([])
-    ax2.tick_params(left=False)
+    ax2.set_yticklabels(configs, fontsize=8.2, fontweight='500')
     ax2.invert_yaxis()
-    ax2.set_xlabel('Số kết nối CSDL đỉnh điểm (/ 25 kết nối)', fontsize=9.5, fontweight='bold', labelpad=6)
-    ax2.set_title('(b) Chiếm dụng HikariCP Connection', fontsize=10.5, fontweight='bold', pad=8)
-    ax2.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax2.set_xlim(0, 36)
+    ax2.set_xlabel('Số kết nối CSDL đỉnh điểm (/ 25 kết nối)', fontsize=8.0, fontweight='bold', labelpad=2)
+    ax2.set_title('(b) Chiếm dụng HikariCP Connection Pool (Đỉnh điểm)', fontsize=8.8, fontweight='bold', pad=4)
+    ax2.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax2.set_xlim(0, 39)
 
     for i, rect in enumerate(rects2):
         w = rect.get_width()
-        tag = " (-84%)" if i == 0 else " (100% bão hòa)" if w == 25 else ""
+        tag = " (-84% kết nối)" if i == 0 else " (100% bão hòa, 63 lỗi)" if w == 25 else ""
         ax2.text(w + 0.6, rect.get_y() + rect.get_height()/2, f"{w} / 25{tag}",
-                 va='center', ha='left', fontsize=8.8, fontweight='bold', color=colors2[i])
+                 va='center', ha='left', fontsize=7.8, fontweight='bold', color=colors[i])
 
+    # Panel 3: Throttled requests (HTTP 429)
     blocked_reqs = [11190, 0, 11190, 0]
-    colors3 = ['#059669', '#64748B', '#D97706', '#EF4444']
-
-    rects3 = ax3.barh(y_pos, blocked_reqs, bar_height, color=colors3, edgecolor='#0F172A', hatch=hatches, alpha=0.9)
+    rects3 = ax3.barh(y_pos, blocked_reqs, bar_h, color=colors, edgecolor=edge_colors, linewidth=0.8)
     ax3.set_yticks(y_pos)
-    ax3.set_yticklabels([])
-    ax3.tick_params(left=False)
+    ax3.set_yticklabels(configs, fontsize=8.2, fontweight='500')
     ax3.invert_yaxis()
-    ax3.set_xlabel('Số yêu cầu Aggressor bị chặn (HTTP 429)', fontsize=9.5, fontweight='bold', labelpad=6)
-    ax3.set_title('(c) Khống chế Hàng xóm Ồn ào (HTTP 429)', fontsize=10.5, fontweight='bold', pad=8)
-    ax3.grid(axis='x', linestyle='--', alpha=0.5, color='#94A3B8')
-    ax3.set_xlim(0, 16800)
+    ax3.set_xlabel('Số yêu cầu Aggressor bị chặn đứng tại biên (HTTP 429)', fontsize=8.0, fontweight='bold', labelpad=2)
+    ax3.set_title('(c) Khống chế Hàng xóm Ồn ào tại Cổng biên (HTTP 429 Throttling)', fontsize=8.8, fontweight='bold', pad=4)
+    ax3.grid(axis='x', linestyle='--', alpha=0.4, color='#94A3B8')
+    ax3.set_xlim(0, 16000)
 
     for i, rect in enumerate(rects3):
         w = rect.get_width()
-        tag = "Chặn 11.190 req (0% lỗi SLA)" if i == 0 else "Chặn 11.190 req" if i == 2 else "0 req (Nghẽn CSDL, 63 fail)"
+        tag = "Chặn 11.190 req (0% lỗi SLA)" if i == 0 else "Chặn 11.190 req" if i == 2 else "0 req (Nghẽn CSDL, rớt kết nối)"
         ax3.text(w + 350, rect.get_y() + rect.get_height()/2, tag,
-                 va='center', ha='left', fontsize=8.5, fontweight='bold', color=colors3[i])
+                 va='center', ha='left', fontsize=7.8, fontweight='bold', color=colors[i])
 
     plt.savefig('output/hinh_5_5_doi_sanh_cau_hinh.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
     print("✓ Successfully generated: output/hinh_5_5_doi_sanh_cau_hinh.png")
 
+# ==============================================================================
+# HÌNH 5.6: Vòng đời cấu hình động K4 (Flow S-shape, text giảm 20%, khớp code)
+# ==============================================================================
 def draw_figure_5_6():
-    fig, ax = plt.subplots(figsize=(14.5, 7.8), dpi=300)
-    ax.set_xlim(0, 145)
-    ax.set_ylim(0, 78)
+    fig, ax = plt.subplots(figsize=(10.5, 5.6), dpi=300)
+    ax.set_xlim(0, 105)
+    ax.set_ylim(0, 56)
     ax.axis('off')
 
     # Main Header
-    box_header = patches.FancyBboxPatch((15, 66), 115, 9.5, boxstyle="round,pad=0.6,rounding_size=1",
-                                        facecolor="#1E293B", edgecolor="#0F172A", linewidth=1.5)
-    ax.add_patch(box_header)
-    ax.text(72.5, 72.2, "VÒNG ĐỜI CẤU HÌNH ĐỘNG VÀ ĐỒNG BỘ ĐỆM ĐA TẦNG (KỊCH BẢN KB-4)", 
-            fontsize=12, fontweight='bold', color="#FFFFFF", ha='center')
-    ax.text(72.5, 68.2, "Quy trình khép kín: Thay đổi cấu hình → Giao dịch DB → Hủy đệm L1 → Pub/Sub lan truyền → Nạp lại đệm siêu tốc", 
-            fontsize=9.2, color="#94A3B8", ha='center')
+    box_hdr = patches.FancyBboxPatch((12, 49.5), 81, 5.5, boxstyle="round,pad=0.4,rounding_size=0.6",
+                                     facecolor="#1E293B", edgecolor="#0F172A", linewidth=1.0)
+    ax.add_patch(box_hdr)
+    ax.text(52.5, 52.8, "VÒNG ĐỜI CẤU HÌNH ĐỘNG VÀ ĐỒNG BỘ ĐỆM ĐA TẦNG (KB-4)", 
+            fontsize=10.5, fontweight='bold', color="#FFFFFF", ha='center')
+    ax.text(52.5, 50.6, "Chu trình khép kín: Đổi cấu hình → Giao dịch DB → Hủy đệm L1 → Pub/Sub → Nạp đệm siêu tốc", 
+            fontsize=7.6, color="#94A3B8", ha='center')
 
     steps = [
+        # Hàng 1 (Bước 1 -> 2 -> 3)
         {
-            "step": "BƯỚC 1",
-            "title": "Admin Thao tác Cấu hình",
-            "box_color": "#EFF6FF", "border": "#3B82F6", "badge": "#2563EB",
-            "desc": "Quản trị viên đổi chế độ WIP từ STRICT sang WARN, đổi bảng màu thương hiệu, hoặc khai báo thêm trường mở rộng JSONB.",
-            "metric": "Thao tác trên Mặt phẳng Điều khiển"
+            "num": "BƯỚC 1", "title": "Quản trị viên Đổi Cấu hình",
+            "x": 3.0, "y": 27.5, "w": 29.5, "h": 20.0,
+            "theme": "#0D9488", "bg": "#F0FDFA",
+            "body": "Đổi chế độ WIP từ STRICT sang WARN, cập nhật bảng màu thương hiệu hoặc khai báo trường mở rộng.",
+            "meta": "Thao tác trên Mặt phẳng Điều khiển"
         },
         {
-            "step": "BƯỚC 2",
-            "title": "Giao dịch DB Hoàn tất",
-            "box_color": "#F0FDF4", "border": "#16A34A", "badge": "#15803D",
-            "desc": "Cập nhật bản ghi tenants.settings trong CSDL PostgreSQL. Giao dịch commit thành công bảo đảm độ bền ACID.",
-            "metric": "Commit CSDL an toàn"
+            "num": "BƯỚC 2", "title": "Commit CSDL PostgreSQL",
+            "x": 37.5, "y": 27.5, "w": 29.5, "h": 20.0,
+            "theme": "#0D9488", "bg": "#F0FDFA",
+            "body": "Cập nhật bảng tenant_kanban_settings (cột settings jsonb). Giao dịch commit thành công bảo đảm ACID.",
+            "meta": "Commit CSDL an toàn"
         },
         {
-            "step": "BƯỚC 3",
-            "title": "Hủy Đệm L1 & Bắn Pub/Sub",
-            "box_color": "#FFFBEB", "border": "#D97706", "badge": "#B45309",
-            "desc": "Vô hiệu hóa ngay lập tức khóa tenant:{id}:config trên L1 Caffeine cục bộ. Phát thông điệp sự kiện lên Redis Pub/Sub.",
-            "metric": "Kênh: tenant-events"
+            "num": "BƯỚC 3", "title": "Hủy L1 & Bắn Pub/Sub",
+            "x": 72.0, "y": 27.5, "w": 29.5, "h": 20.0,
+            "theme": "#7C3AED", "bg": "#FAF5FF",
+            "body": "Vô hiệu hóa đệm L1 Caffeine tenant:{id}:config:{ver}. Phát thông điệp lên kênh Redis Pub/Sub.",
+            "meta": "Kênh: tenant:config:invalidate"
+        },
+        # Hàng 2 (Bước 6 <- 5 <- 4)
+        {
+            "num": "BƯỚC 6", "title": "Áp dụng Ngay trên UI",
+            "x": 3.0, "y": 4.5, "w": 29.5, "h": 20.0,
+            "theme": "#0D9488", "bg": "#F0FDFA",
+            "body": "Người dùng thao tác kéo thẻ vượt hạn mức: hệ thống cho phép với HTTP 200 kèm cảnh báo wipWarning thay vì 422.",
+            "meta": "Kiểm chứng: 100% khớp quy tắc"
         },
         {
-            "step": "BƯỚC 4",
-            "title": "Lan truyền Cụm API",
-            "box_color": "#FAF5FF", "border": "#9333EA", "badge": "#7E22CE",
-            "desc": "Tất cả các thể hiện API (Clustered API Instances) nhận sự kiện qua Redis Pub/Sub và đồng loạt xóa khóa đệm L1 tương ứng.",
-            "metric": "Đo đạc: 2,45 ± 0,65 ms"
+            "num": "BƯỚC 5", "title": "Nạp Đệm L1 Mới (Lazy)",
+            "x": 37.5, "y": 4.5, "w": 29.5, "h": 20.0,
+            "theme": "#0D9488", "bg": "#F0FDFA",
+            "body": "Yêu cầu kế tiếp gặp L1 Cache Miss → tự động đọc cấu hình mới từ DB và nạp vào bộ nhớ Caffeine.",
+            "meta": "Đo đạc: 0,12 ms (vs 18,5 ms DB)"
         },
         {
-            "step": "BƯỚC 5",
-            "title": "Nạp Đệm L1 Mới (Lazy)",
-            "box_color": "#F0FDF4", "border": "#059669", "badge": "#047857",
-            "desc": "Yêu cầu kế tiếp của người dùng tới API gặp Cache Miss L1 → tự động đọc cấu hình mới từ DB và nạp vào bộ nhớ trong Caffeine.",
-            "metric": "Đo đạc: 0,12 ms (vs 18,5 ms DB)"
-        },
-        {
-            "step": "BƯỚC 6",
-            "title": "Áp dụng Tức thời trên UI",
-            "box_color": "#EFF6FF", "border": "#0284C7", "badge": "#0369A1",
-            "desc": "Người dùng thao tác kéo thẻ vượt hạn mức WIP: Hệ thống chấp nhận giao dịch với HTTP 200 kèm cảnh báo vàng wipWarning thay vì chặn 422.",
-            "metric": "Kiểm chứng thực tế: 100% khớp luật"
+            "num": "BƯỚC 4", "title": "Lan truyền Cụm API",
+            "x": 72.0, "y": 4.5, "w": 29.5, "h": 20.0,
+            "theme": "#7C3AED", "bg": "#FAF5FF",
+            "body": "Các thể hiện API trong cụm nhận sự kiện qua kênh Redis Pub/Sub và đồng loạt xóa khóa đệm L1 tương ứng.",
+            "meta": "Đo đạc: 2,45 ± 0,65 ms"
         }
     ]
 
-    card_w = 42
-    card_h = 24.5
-
-    for i in range(3):
-        s = steps[i]
-        cx = 6 + i * 46
-        cy = 38
-        card = patches.FancyBboxPatch((cx, cy), card_w, card_h, boxstyle="round,pad=0.6,rounding_size=0.8",
-                                      facecolor=s["box_color"], edgecolor=s["border"], linewidth=1.2)
+    for s in steps:
+        # Card
+        card = patches.FancyBboxPatch((s["x"], s["y"]), s["w"], s["h"], boxstyle="round,pad=0.5,rounding_size=0.6",
+                                      facecolor=s["bg"], edgecolor=s["theme"], linewidth=1.1)
         ax.add_patch(card)
 
-        badge = patches.FancyBboxPatch((cx + 1.5, cy + card_h - 4.8), 12, 3.6, boxstyle="round,pad=0.2,rounding_size=0.4",
-                                       facecolor=s["badge"], edgecolor=s["badge"])
+        # Header Badge
+        badge = patches.FancyBboxPatch((s["x"] + 1.0, s["y"] + s["h"] - 4.5), 7.8, 3.4, boxstyle="round,pad=0.2,rounding_size=0.4",
+                                       facecolor=s["theme"], edgecolor=s["theme"])
         ax.add_patch(badge)
-        ax.text(cx + 7.5, cy + card_h - 3.0, s["step"], fontsize=8, fontweight='bold', color="#FFFFFF", ha='center')
+        ax.text(s["x"] + 4.9, s["y"] + s["h"] - 2.8, s["num"], fontsize=7.2, fontweight='bold', color="#FFFFFF", ha='center', va='center')
 
-        ax.text(cx + 15, cy + card_h - 3.0, s["title"], fontsize=9.2, fontweight='bold', color="#0F172A")
-        
-        wrapped_desc = textwrap.fill(s["desc"], width=38)
-        ax.text(cx + 2, cy + card_h - 6.8, wrapped_desc, fontsize=8, color="#334155", va='top')
+        # Title
+        ax.text(s["x"] + 9.6, s["y"] + s["h"] - 2.8, s["title"], fontsize=7.8, fontweight='bold', color="#0F172A", va='center')
 
-        m_box = patches.FancyBboxPatch((cx + 2, cy + 1.5), card_w - 4, 4.0, boxstyle="round,pad=0.2,rounding_size=0.4",
-                                       facecolor="#FFFFFF", edgecolor=s["border"], linewidth=0.8)
-        ax.add_patch(m_box)
-        ax.text(cx + card_w/2, cy + 3.5, s["metric"], fontsize=8.2, fontweight='bold', color=s["badge"], ha='center')
+        # Body Text (giảm 20% text)
+        wrapped_body = textwrap.fill(s["body"], width=34)
+        ax.text(s["x"] + 1.2, s["y"] + s["h"] - 6.2, wrapped_body, fontsize=7.2, color="#334155", va='top')
 
-        if i < 2:
-            ax.annotate("", xy=(cx + card_w + 3.2, cy + card_h/2), xytext=(cx + card_w + 0.8, cy + card_h/2),
-                        arrowprops=dict(arrowstyle="->", lw=2, color="#475569"))
+        # Meta footer
+        p_meta = patches.FancyBboxPatch((s["x"] + 1.2, s["y"] + 1.2), s["w"] - 2.4, 3.8, boxstyle="round,pad=0.2,rounding_size=0.3",
+                                        facecolor="#FFFFFF", edgecolor=s["theme"], linewidth=0.8)
+        ax.add_patch(p_meta)
+        fw = 'bold' if 'Đo đạc' in s['meta'] or 'Kiểm chứng' in s['meta'] else 'normal'
+        ax.text(s["x"] + s["w"]/2, s["y"] + 3.1, s["meta"], fontsize=7.2, fontweight=fw, color=s["theme"], ha='center', va='center')
 
-    ax.annotate("", xy=(121, 32), xytext=(121, 37.2),
-                arrowprops=dict(arrowstyle="->", lw=2, color="#475569"))
-
-    for i in range(3):
-        step_idx = 3 + i
-        s = steps[step_idx]
-        cx = 98 - i * 46
-        cy = 6
-        card = patches.FancyBboxPatch((cx, cy), card_w, card_h, boxstyle="round,pad=0.6,rounding_size=0.8",
-                                      facecolor=s["box_color"], edgecolor=s["border"], linewidth=1.2)
-        ax.add_patch(card)
-
-        badge = patches.FancyBboxPatch((cx + 1.5, cy + card_h - 4.8), 12, 3.6, boxstyle="round,pad=0.2,rounding_size=0.4",
-                                       facecolor=s["badge"], edgecolor=s["badge"])
-        ax.add_patch(badge)
-        ax.text(cx + 7.5, cy + card_h - 3.0, s["step"], fontsize=8, fontweight='bold', color="#FFFFFF", ha='center')
-
-        ax.text(cx + 15, cy + card_h - 3.0, s["title"], fontsize=9.2, fontweight='bold', color="#0F172A")
-        
-        wrapped_desc = textwrap.fill(s["desc"], width=38)
-        ax.text(cx + 2, cy + card_h - 6.8, wrapped_desc, fontsize=8, color="#334155", va='top')
-
-        m_box = patches.FancyBboxPatch((cx + 2, cy + 1.5), card_w - 4, 4.0, boxstyle="round,pad=0.2,rounding_size=0.4",
-                                       facecolor="#FFFFFF", edgecolor=s["border"], linewidth=0.8)
-        ax.add_patch(m_box)
-        ax.text(cx + card_w/2, cy + 3.5, s["metric"], fontsize=8.2, fontweight='bold', color=s["badge"], ha='center')
-
-        if i < 2:
-            ax.annotate("", xy=(cx - 3.2, cy + card_h/2), xytext=(cx - 0.8, cy + card_h/2),
-                        arrowprops=dict(arrowstyle="->", lw=2, color="#475569"))
+    # Arrows between cards (S-shape flow)
+    # 1 -> 2
+    ax.annotate("", xy=(37.5, 37.5), xytext=(32.5, 37.5),
+                arrowprops=dict(arrowstyle="->", lw=1.5, color="#64748B"))
+    # 2 -> 3
+    ax.annotate("", xy=(72.0, 37.5), xytext=(67.0, 37.5),
+                arrowprops=dict(arrowstyle="->", lw=1.5, color="#64748B"))
+    # 3 -> 4 (Down)
+    ax.annotate("", xy=(86.75, 24.5), xytext=(86.75, 27.5),
+                arrowprops=dict(arrowstyle="->", lw=1.5, color="#7C3AED"))
+    # 4 -> 5
+    ax.annotate("", xy=(67.0, 14.5), xytext=(72.0, 14.5),
+                arrowprops=dict(arrowstyle="->", lw=1.5, color="#64748B"))
+    # 5 -> 6
+    ax.annotate("", xy=(32.5, 14.5), xytext=(37.5, 14.5),
+                arrowprops=dict(arrowstyle="->", lw=1.5, color="#64748B"))
 
     plt.savefig('output/hinh_5_6_vong_doi_cau_hinh_k4.png', dpi=300, bbox_inches='tight')
     plt.close(fig)
