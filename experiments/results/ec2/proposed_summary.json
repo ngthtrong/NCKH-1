@@ -1,267 +1,274 @@
 {
-    "metrics": {
-        "http_req_receiving": {
-            "avg": 5.571439388540586,
-            "min": 0.015935,
-            "med": 0.064437,
-            "max": 857.408127,
-            "p(90)": 5.7505820000000005,
-            "p(95)": 22.386756399999985,
-            "p(99)": 138.30299485999996
-        },
-        "latency_large_lotus": {
-            "p(95)": 963.6673910499977,
-            "p(99)": 4023.6891191199993,
-            "avg": 235.20688316279077,
-            "min": 4.060995,
-            "med": 61.117883500000005,
-            "max": 4601.314638,
-            "p(90)": 462.0604939000007,
-            "thresholds": {
-                "p(95)<800": true
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "KB-1 no JWT → 401": {
+                    "fails": 0,
+                    "name": "KB-1 no JWT → 401",
+                    "path": "::KB-1 no JWT → 401",
+                    "id": "e6101ad30d6ea3f308ac27af21155e7d",
+                    "passes": 29
+                },
+                "KB-2 cross-tenant board → 403/404": {
+                    "id": "c513831c8996dcc654f9218b20248bf7",
+                    "passes": 29,
+                    "fails": 0,
+                    "name": "KB-2 cross-tenant board → 403/404",
+                    "path": "::KB-2 cross-tenant board → 403/404"
+                },
+                "KB-4 GET /tenant-settings/kanban → 200": {
+                    "name": "KB-4 GET /tenant-settings/kanban → 200",
+                    "path": "::KB-4 GET /tenant-settings/kanban → 200",
+                    "id": "fbf4b09ca828d01acd7191fe4b8e24a6",
+                    "passes": 19,
+                    "fails": 0
+                },
+                "KB-4 settings has wipMode field": {
+                    "name": "KB-4 settings has wipMode field",
+                    "path": "::KB-4 settings has wipMode field",
+                    "id": "cb6194cb56cb298b40be5be441f0cb7a",
+                    "passes": 19,
+                    "fails": 0
+                },
+                "KB-2 /projects response does not leak lotus data": {
+                    "name": "KB-2 /projects response does not leak lotus data",
+                    "path": "::KB-2 /projects response does not leak lotus data",
+                    "id": "3f36b07b2bef752806c728efd398a57a",
+                    "passes": 29,
+                    "fails": 0
+                },
+                "KB-4 POST task with custom_data → 201": {
+                    "id": "42882701d4eb3d408cd64d9c89ea1462",
+                    "passes": 19,
+                    "fails": 0,
+                    "name": "KB-4 POST task with custom_data → 201",
+                    "path": "::KB-4 POST task with custom_data → 201"
+                },
+                "KB-4 PATCH task/position → 200 or 422 (WIP enforced)": {
+                    "name": "KB-4 PATCH task/position → 200 or 422 (WIP enforced)",
+                    "path": "::KB-4 PATCH task/position → 200 or 422 (WIP enforced)",
+                    "id": "d382da06955f803c6a1714162c8b13fd",
+                    "passes": 19,
+                    "fails": 0
+                }
             }
+    },
+    "metrics": {
+        "http_req_waiting": {
+            "avg": 25.50085340292808,
+            "min": 0.852524,
+            "med": 7.302402,
+            "max": 2930.542413,
+            "p(90)": 35.90342599999999,
+            "p(95)": 57.30632729999989,
+            "p(99)": 272.214799899999
         },
-        "kb4_settings_latency": {
-            "p(99)": 1605.10996968,
-            "avg": 182.24416758823526,
-            "min": 6.449583,
-            "med": 36.738184,
-            "max": 1836.313286,
-            "p(90)": 332.6302104,
-            "p(95)": 680.296704399999
+        "http_req_duration": {
+            "p(95)": 60.374083799999994,
+            "p(99)": 304.08743326,
+            "avg": 26.878603059540442,
+            "min": 0.906775,
+            "med": 7.559686,
+            "max": 3055.485042,
+            "p(90)": 37.24675499999998
         },
-        "http_reqs": {
-            "count": 14835,
-            "rate": 238.36169225866334
-        },
-        "http_req_blocked": {
-            "p(95)": 0.007372,
-            "p(99)": 0.04424699999999995,
-            "avg": 0.16233504341085278,
-            "min": 0.001499,
-            "med": 0.004982,
-            "max": 41.975119,
-            "p(90)": 0.006453
-        },
-        "http_req_duration{expected_response:true}": {
-            "avg": 256.5003109393512,
-            "min": 4.060995,
-            "med": 67.627826,
-            "max": 5091.592674,
-            "p(90)": 532.8159349000001,
-            "p(95)": 957.9796331999945,
-            "p(99)": 3978.5841664300006
-        },
-        "kb4_wip_strict_enforced": {
-            "passes": 0,
-            "fails": 0,
-            "thresholds": {
-                "rate>0.9": false
-            },
-            "value": 0
+        "latency_aggressor": {
+            "min": 0.906775,
+            "med": 6.564555,
+            "max": 2912.517032,
+            "p(90)": 27.486465600000017,
+            "p(95)": 43.393163099999974,
+            "p(99)": 195.24274237999953,
+            "avg": 16.79080840405136
         },
         "blocked_429_count": {
-            "rate": 179.7955737360595,
-            "count": 11190
+            "count": 16423,
+            "rate": 263.40282423450594
         },
         "http_req_sending": {
-            "min": 0.004298,
-            "med": 0.014498,
-            "max": 40.589762,
-            "p(90)": 0.0244432,
-            "p(95)": 0.060737999999999834,
-            "p(99)": 0.5094746599999997,
-            "avg": 0.03674996932928871
+            "p(95)": 0.11007829999999981,
+            "p(99)": 0.6049207799999992,
+            "avg": 0.04432262214170331,
+            "min": 0.004685,
+            "med": 0.015097,
+            "max": 33.45486,
+            "p(90)": 0.026020399999999996
         },
-        "http_req_connecting": {
-            "p(95)": 0,
+        "http_req_duration{expected_response:true}": {
+            "avg": 97.58073753783437,
+            "min": 2.485869,
+            "med": 25.679804,
+            "max": 3055.485042,
+            "p(90)": 162.8544284,
+            "p(95)": 309.4803395999997,
+            "p(99)": 2101.088537359998
+        },
+        "latency_medium_pool": {
+            "p(99)": 2026.8576626299987,
+            "avg": 91.21607240694009,
+            "min": 2.572508,
+            "med": 23.976833,
+            "max": 2724.301079,
+            "p(90)": 100.35515330000005,
+            "p(95)": 253.8754309000003,
+            "thresholds": {
+                "p(95)<500": false
+            }
+        },
+        "kb4_wip_strict_enforced": {
+            "passes": 17,
+            "fails": 2,
+            "thresholds": {
+                "rate>0.75": false
+            },
+            "value": 0.8947368421052632
+        },
+        "latency_large_lotus": {
+            "min": 2.630738,
+            "med": 22.8667825,
+            "max": 2817.25882,
+            "p(90)": 97.4619885,
+            "p(95)": 242.1690805499999,
+            "p(99)": 2160.1701745100013,
+            "avg": 90.91704691589867,
+            "thresholds": {
+                "p(95)<800": false
+            }
+        },
+        "http_req_tls_handshaking": {
             "p(99)": 0,
-            "avg": 0.1527544184024267,
+            "avg": 0,
             "min": 0,
             "med": 0,
-            "max": 41.90903,
-            "p(90)": 0
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
         },
         "http_req_failed": {
-            "passes": 11257,
-            "fails": 3578,
-            "value": 0.7588136164475902
+            "passes": 16498,
+            "fails": 3925,
+            "value": 0.8078147186995055
+        },
+        "checks": {
+            "passes": 163,
+            "fails": 0,
+            "value": 1
         },
         "vus_max": {
             "value": 82,
             "min": 82,
             "max": 82
         },
-        "http_req_tls_handshaking": {
-            "med": 0,
-            "max": 0,
-            "p(90)": 0,
-            "p(95)": 0,
-            "p(99)": 0,
-            "avg": 0,
-            "min": 0
+        "data_received": {
+            "count": 242277208,
+            "rate": 3885800.4527096655
+        },
+        "iterations": {
+            "count": 19736,
+            "rate": 316.5388868715953
+        },
+        "latency_standard_finance": {
+            "avg": 97.88055371596256,
+            "min": 2.8911,
+            "med": 25.4252055,
+            "max": 2546.483112,
+            "p(90)": 121.727013,
+            "p(95)": 276.83938175000003,
+            "p(99)": 1992.3686785
+        },
+        "http_reqs": {
+            "count": 20423,
+            "rate": 327.55744257086496
         },
         "success_rate_normal": {
-            "passes": 2291,
-            "fails": 17,
+            "passes": 2613,
+            "fails": 0,
             "thresholds": {
                 "rate>0.95": false
             },
-            "value": 0.99263431542461
-        },
-        "latency_small_acme": {
-            "p(95)": 1135.7254125499974,
-            "p(99)": 4234.57554755999,
-            "avg": 263.8487799857144,
-            "min": 4.293213,
-            "med": 64.569154,
-            "max": 5060.666736,
-            "p(90)": 487.70386420000006,
-            "thresholds": {
-                "p(95)<500": true
-            }
-        },
-        "http_req_duration": {
-            "p(99)": 1096.9800673199998,
-            "avg": 77.92537085311731,
-            "min": 1.397661,
-            "med": 16.749635,
-            "max": 5861.342408,
-            "p(90)": 111.67661160000007,
-            "p(95)": 302.8130713
-        },
-        "http_req_waiting": {
-            "min": 1.351395,
-            "med": 16.326091,
-            "max": 5859.319475,
-            "p(90)": 105.68904620000004,
-            "p(95)": 279.45519049999996,
-            "p(99)": 942.8013216599992,
-            "avg": 72.31718149524798
-        },
-        "vus": {
-            "min": 1,
-            "max": 82,
             "value": 1
         },
-        "latency_standard_finance": {
-            "p(95)": 1138.3525926499997,
-            "p(99)": 3507.595160490008,
-            "avg": 256.7901930779569,
-            "min": 4.261491,
-            "med": 63.991887,
-            "max": 4595.4557,
-            "p(90)": 531.3046513
+        "kb4_settings_latency": {
+            "min": 4.261003,
+            "med": 21.359636,
+            "max": 1514.170153,
+            "p(90)": 63.837941199999996,
+            "p(95)": 213.20651709999692,
+            "p(99)": 1253.9774258200005,
+            "avg": 100.90846784210525
+        },
+        "http_req_connecting": {
+            "p(99)": 0,
+            "avg": 0.09873786823679184,
+            "min": 0,
+            "med": 0,
+            "max": 38.687717,
+            "p(90)": 0,
+            "p(95)": 0
         },
         "iteration_duration": {
-            "min": 51.597509,
-            "med": 67.809669,
-            "max": 10740.933234,
-            "p(90)": 1489.5266836,
-            "p(95)": 2149.411126599999,
-            "p(99)": 3021.1587359200075,
-            "avg": 348.17691099193945
+            "med": 58.3583675,
+            "max": 5740.52523,
+            "p(90)": 1089.2121889999999,
+            "p(95)": 1841.1004460000001,
+            "p(99)": 2455.47833735,
+            "avg": 252.2362547036382,
+            "min": 51.11204
         },
-        "data_sent": {
-            "count": 11162208,
-            "rate": 179349.02515828717
+        "latency_small_acme": {
+            "max": 3055.485042,
+            "p(90)": 127.16789230000018,
+            "p(95)": 253.66629874999964,
+            "p(99)": 2446.454850140004,
+            "avg": 101.99888438694252,
+            "min": 2.485869,
+            "med": 26.9193615,
+            "thresholds": {
+                "p(95)<500": false
+            }
+        },
+        "vus": {
+            "value": 5,
+            "min": 5,
+            "max": 82
+        },
+        "success_rate_aggressor": {
+            "passes": 1300,
+            "fails": 16423,
+            "value": 0.07335101280821531
+        },
+        "http_req_receiving": {
+            "max": 239.395333,
+            "p(90)": 1.5025395999999998,
+            "p(95)": 4.250886999999996,
+            "p(99)": 30.359534659999856,
+            "avg": 1.333427034470937,
+            "min": 0.016305,
+            "med": 0.058902
         },
         "kb2_security_checks_passed": {
-            "passes": 75,
+            "passes": 87,
             "fails": 0,
             "thresholds": {
                 "rate==1.0": false
             },
             "value": 1
         },
-        "checks": {
-            "passes": 109,
-            "fails": 17,
-            "value": 0.8650793650793651
+        "http_req_blocked": {
+            "p(99)": 0.026081799999998535,
+            "avg": 0.10599651779856104,
+            "min": 0.00102,
+            "med": 0.003805,
+            "max": 38.729594,
+            "p(90)": 0.004628,
+            "p(95)": 0.005301
         },
-        "latency_medium_pool": {
-            "p(95)": 934.5657309,
-            "p(99)": 4380.169881590003,
-            "avg": 251.6144659119723,
-            "min": 4.747156,
-            "med": 60.551787000000004,
-            "max": 5091.592674,
-            "p(90)": 439.26966640000006,
-            "thresholds": {
-                "p(95)<500": true
-            }
-        },
-        "latency_aggressor": {
-            "max": 4586.56395,
-            "p(90)": 64.95707019999999,
-            "p(95)": 124.54086309999994,
-            "p(99)": 613.7889966099998,
-            "avg": 45.479274525216965,
-            "min": 1.397661,
-            "med": 13.4391105
-        },
-        "data_received": {
-            "count": 217847999,
-            "rate": 3500277.5663500912
-        },
-        "iterations": {
-            "count": 14265,
-            "rate": 229.20320458846192
-        },
-        "success_rate_aggressor": {
-            "passes": 1262,
-            "fails": 11190,
-            "value": 0.1013491808544812
+        "data_sent": {
+            "count": 15380085,
+            "rate": 246675.87078894
         }
-    },
-    "root_group": {
-        "id": "d41d8cd98f00b204e9800998ecf8427e",
-        "groups": {},
-        "checks": {
-                "KB-1 no JWT → 401": {
-                    "passes": 25,
-                    "fails": 0,
-                    "name": "KB-1 no JWT → 401",
-                    "path": "::KB-1 no JWT → 401",
-                    "id": "e6101ad30d6ea3f308ac27af21155e7d"
-                },
-                "KB-4 GET /tenant-settings/kanban → 200": {
-                    "name": "KB-4 GET /tenant-settings/kanban → 200",
-                    "path": "::KB-4 GET /tenant-settings/kanban → 200",
-                    "id": "fbf4b09ca828d01acd7191fe4b8e24a6",
-                    "passes": 17,
-                    "fails": 0
-                },
-                "KB-4 settings has wipMode field": {
-                    "path": "::KB-4 settings has wipMode field",
-                    "id": "cb6194cb56cb298b40be5be441f0cb7a",
-                    "passes": 17,
-                    "fails": 0,
-                    "name": "KB-4 settings has wipMode field"
-                },
-                "KB-2 cross-tenant board → 403/404": {
-                    "fails": 0,
-                    "name": "KB-2 cross-tenant board → 403/404",
-                    "path": "::KB-2 cross-tenant board → 403/404",
-                    "id": "c513831c8996dcc654f9218b20248bf7",
-                    "passes": 25
-                },
-                "KB-2 /projects response does not leak lotus data": {
-                    "fails": 0,
-                    "name": "KB-2 /projects response does not leak lotus data",
-                    "path": "::KB-2 /projects response does not leak lotus data",
-                    "id": "3f36b07b2bef752806c728efd398a57a",
-                    "passes": 25
-                },
-                "KB-4 POST task with custom_data → 201": {
-                    "name": "KB-4 POST task with custom_data → 201",
-                    "path": "::KB-4 POST task with custom_data → 201",
-                    "id": "42882701d4eb3d408cd64d9c89ea1462",
-                    "passes": 0,
-                    "fails": 17
-                }
-            },
-        "name": "",
-        "path": ""
     }
 }
