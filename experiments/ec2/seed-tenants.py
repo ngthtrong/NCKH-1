@@ -20,7 +20,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 os.chdir(ROOT)
 
-PG_CONTAINER = os.environ.get("POSTGRES_CONTAINER", "saas-research-postgres-1")
+def get_postgres_container():
+    if os.environ.get("POSTGRES_CONTAINER"):
+        return os.environ["POSTGRES_CONTAINER"]
+    for name in ["nckh-ec2-postgres-1", "saas-research-postgres-1", "nckh-ec2_postgres_1"]:
+        try:
+            r = subprocess.run(["docker", "ps", "-q", "-f", f"name={name}"], capture_output=True, text=True)
+            if r.returncode == 0 and r.stdout.strip():
+                return name
+        except Exception:
+            pass
+    try:
+        r = subprocess.run(["docker", "ps", "--filter", "name=postgres", "--format", "{{.Names}}"], capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip().splitlines()[0]
+    except Exception:
+        pass
+    return "nckh-ec2-postgres-1"
+
+PG_CONTAINER = get_postgres_container()
 API_HOST = os.environ.get("API_HOST", "127.0.0.1")
 API_PORT = os.environ.get("HTTP_PORT", "8080")
 ACCOUNTS_HOST = f"accounts.localhost:{API_PORT}"
