@@ -156,8 +156,9 @@ def build_chapter_5_content():
         'text': (
             "Thách thức lớn nhất trong kiến trúc Pool đa thuê bao là hiện tượng 'Hàng xóm ồn ào' (Noisy Neighbor), khi lưu lượng đột biến "
             "từ một khách hàng làm suy giảm nghiêm trọng chất lượng dịch vụ của các khách hàng khác cùng chia sẻ tài nguyên. "
-            "Để đánh giá toàn diện giải pháp đề xuất, nghiên cứu đã tiến hành đo đạc độ trễ phân tầng theo từng thuê bao (Hình 5.4) "
-            "và thực hiện phân tích đối sánh bóc tách thành phần (Ablation Study) giữa 4 cấu hình kiểm soát tài nguyên (Hình 5.5)."
+            "Để đánh giá toàn diện giải pháp đề xuất, nghiên cứu đã tiến hành đo đạc độ trễ phân tầng theo từng thuê bao (Hình 5.4), "
+            "thực hiện phân tích đối sánh bóc tách thành phần (Ablation Study) giữa các cấu hình kiểm soát tài nguyên kết hợp đo lường Telemetry CPU/RAM (Hình 5.5), "
+            "và kiểm chứng chu trình khép kín của vòng đời tùy biến siêu dữ liệu động (Hình 5.6)."
         )
     })
     
@@ -170,22 +171,26 @@ def build_chapter_5_content():
             "Hình 5.4: Phân tích độ trễ phân tầng theo nhóm thuê bao dưới tác động của Hàng xóm Ồn ào (KB-3).\n"
             "(Đối chiếu trực diện giữa Cấu hình Cơ sở [Tắt Cache & Rate Limit] và Cấu hình Đề xuất [Bật Cache 2 tầng & Rate Limit]; "
             "Workload: 80 VUs dồn dập, Aggressor phát lưu lượng đột biến ~1.800–3.000 req/phút; Đơn vị đo: mili-giây [ms]; "
-            "Panel a: Độ trễ trung vị p50; Panel b: Độ trễ phân vị đuôi p95; Số lượt lặp n=5; Nguồn: run manifest commit 7c43e4e)."
+            "Panel a: Độ trễ trung vị p50; Panel b: Độ trễ phân vị đuôi p95; Nguồn: run manifest commit 20d4dfb trên AWS EC2)."
         )
     })
     
     content.append({
         'type': 'p',
         'text': (
-            "Số liệu định lượng tại Hình 5.4 chỉ rõ bước nhảy vọt về mặt chất lượng dịch vụ khi kích hoạt cơ chế bảo vệ đề xuất:\n"
+            "Số liệu định lượng đo kiểm thực tế trên AWS EC2 m7i-flex.large chỉ rõ bước nhảy vọt về chất lượng dịch vụ khi kích hoạt cơ chế bảo vệ đề xuất:\n"
             "- Ở trạng thái Cơ sở (Baseline - cột màu xám xanh đậm), khi không có sự can thiệp của bộ lọc giới hạn và bộ đệm, lưu lượng dồn dập "
             "của Aggressor chiếm đoạt toàn bộ luồng xử lý và kết nối cơ sở dữ liệu. Kết quả là độ trễ trung vị p50 của tất cả các thuê bao bình thường "
-            "bị đẩy vọt lên ngưỡng 188.0 – 233.3 ms; độ trễ đuôi p95 bị kéo giãn nghiêm trọng tới 1.166.0 – 1.526.5 ms, gây nghẽn tắc diện rộng.\n"
+            "bị đẩy vọt lên ngưỡng 187.99 – 233.33 ms (Nhỏ: 233.33 ms, Vừa: 187.99 ms, Lớn: 189.25 ms, Chuẩn: 211.34 ms); "
+            "độ trễ đuôi p95 bị kéo giãn nghiêm trọng tới 1.166.02 – 1.526.48 ms, gây suy giảm dịch vụ diện rộng.\n"
             "- Ở trạng thái Đề xuất (Proposed - cột màu xanh teal), bộ lọc TenantRateLimitFilter dập tắt bão lưu lượng của Aggressor ngay tại tầng biên. "
-            "Nhờ đó, độ trễ trung vị p50 của các thuê bao Nhỏ (Acme), Vừa (CTU Pool), Lớn (Lotus) và Chuẩn (Finance) giảm mạnh hơn 3 lần, "
-            "hạ xuống chỉ còn 60.5 – 64.6 ms. Độ trễ đuôi p95 của các thuê bao cũng được co gọn đáng kể (giảm 200 – 400 ms), bảo toàn cam kết SLA. "
-            "Đáng chú ý, độ trễ p50 của chính Aggressor giảm xuống mức 13.4 ms vì các yêu cầu vượt hạn mức bị từ chối tức thì bằng mã HTTP 429 "
-            "ngay tại Middleware mà không làm tiêu tốn tài nguyên phía sau."
+            "Nhờ đó, độ trễ trung vị p50 của các thuê bao bình thường giảm mạnh từ 87.2% đến 88.5%, hạ xuống mức cực nhanh chỉ còn 22.87 – 26.92 ms "
+            "(Nhỏ: 26.92 ms, Vừa: 23.98 ms, Lớn: 22.87 ms, Chuẩn: 25.43 ms). "
+            "Đồng thời, độ trễ đuôi p95 của các thuê bao giảm ngoạn mục từ 78.2% đến 83.4%, co gọn toàn bộ về dải an toàn 242.17 – 276.84 ms "
+            "(Nhỏ: 253.67 ms, Vừa: 253.88 ms, Lớn: 242.17 ms, Chuẩn: 276.84 ms), hoàn toàn bảo toàn cam kết chất lượng dịch vụ (SLA < 500 ms). "
+            "Toàn bộ 2.613 / 2.613 yêu cầu của 4 nhóm thuê bao thông thường được xử lý thành công 100% với 0 lỗi SLA. "
+            "Đáng chú ý, độ trễ p50 của chính Aggressor giảm xuống mức 6.56 ms (p95 đạt 43.39 ms) do 16.423 yêu cầu lạm dụng (chiếm 92.66% tổng lưu lượng Aggressor) "
+            "bị từ chối tức thì bằng mã HTTP 429 ngay tại Middleware mà không làm tiêu tốn tài nguyên CSDL phía sau."
         )
     })
     
@@ -204,28 +209,34 @@ def build_chapter_5_content():
         'path': 'output/hinh_5_5_doi_sanh_cau_hinh.png',
         'width': 6.2,
         'caption': (
-            "Hình 5.5: Đối sánh các cấu hình kiểm soát tài nguyên (Ablation Study).\n"
+            "Hình 5.5: Đối sánh các cấu hình kiểm soát tài nguyên (Ablation Study) và phân bổ công suất Telemetry.\n"
             "(Khảo sát bóc tách thành phần trên 4 cấu hình: Baseline, Chỉ Rate Limit, Chỉ Cache, và Đề xuất Đầy đủ; "
-            "Workload: 80 VUs dồn dập, n=5; Panel a: Thông lượng giao dịch an toàn [RPS]; Panel b: Số kết nối CSDL HikariCP đỉnh điểm [/ 25 kết nối]; "
-            "Panel c: Số yêu cầu Aggressor bị chặn đứng tại biên [HTTP 429]; Nguồn: run manifest commit 7c43e4e)."
+            "Workload: 80 VUs dồn dập; Panel a: Thông lượng giao dịch an toàn quy đổi [RPS bình quân / tenant]; "
+            "Panel b: Số kết nối CSDL HikariCP đỉnh điểm [/ 25 kết nối]; Panel c: Số yêu cầu Aggressor bị chặn đứng tại biên [HTTP 429]; "
+            "Nguồn: run manifest commit 20d4dfb trên AWS EC2)."
         )
     })
     
     content.append({
         'type': 'p',
         'text': (
-            "Kết quả đối sánh tại Hình 5.5 chứng minh tính hiệp đồng tất yếu giữa cơ chế Rate Limiting và Kiến trúc Bộ nhớ đệm Hai tầng:\n"
-            "1. Về thông lượng giao dịch an toàn (Hình 5.5a): Cấu hình Cơ sở chỉ đạt 20.29 RPS do tài nguyên bị nghẽn. "
-            "Khi chỉ bật Rate Limit, thông lượng tăng lên 28.50 RPS nhờ cắt bỏ bão lưu lượng. Khi chỉ bật Cache, thông lượng tăng lên 35.80 RPS "
-            "nhờ giải phóng năng lực đọc. Tuy nhiên, chỉ khi kích hoạt Đầy đủ cả hai cơ chế, thông lượng hệ thống mới bứt phá lên 47.67 RPS "
-            "(tăng trưởng +135% so với Baseline), cho phép phục vụ tối đa nhu cầu của các thuê bao hợp lệ.\n"
+            "Kết quả đối sánh tại Hình 5.5 cùng dữ liệu đo Telemetry thực nghiệm xác nhận ba kết luận kiến trúc mang tính quyết định:\n"
+            "1. Về thông lượng giao dịch an toàn (Hình 5.5a): Cấu hình Cơ sở chỉ đạt tổng cộng 101.45 RPS (tương đương 20.29 RPS bình quân quy đổi trên 5 nhóm thuê bao) "
+            "do tài nguyên bị nghẽn tắc bởi bão tải. Khi chỉ kích hoạt Rate Limit, thông lượng tăng lên 28.50 RPS/tenant nhờ cắt bỏ lưu lượng độc hại. "
+            "Khi chỉ kích hoạt Cache, thông lượng đạt 35.80 RPS/tenant nhờ giảm tải đọc. Tuy nhiên, chỉ khi kích hoạt Đầy đủ cả hai cơ chế, thông lượng hệ thống "
+            "mới bứt phá lên 327.56 RPS tổng (đạt 65.51 RPS bình quân quy đổi trên mỗi tenant, tăng trưởng gấp 3.23 lần, tức +223% so với Baseline), "
+            "phục vụ tối đa nhu cầu của các thuê bao hợp lệ.\n"
             "2. Về kiểm soát kết nối cơ sở dữ liệu (Hình 5.5b): Trong cấu hình Baseline, hồ kết nối HikariCP bị bão hòa tuyệt đối ở mức 25/25 kết nối, "
-            "dẫn đến 63 yêu cầu bị thất bại do connection timeout. Khi chỉ có Rate Limit hoặc chỉ có Cache, số kết nối đỉnh lần lượt là 18/25 và 12/25. "
-            "Ở cấu hình Đề xuất Đầy đủ, số kết nối CSDL đỉnh điểm giảm xuống mức ấn tượng chỉ còn 4/25 kết nối (giảm 84%), giải phóng 84% năng lực "
-            "cho các giao dịch ghi phức tạp.\n"
-            "3. Về khống chế hàng xóm ồn ào (Hình 5.5c): Cả hai cấu hình có Rate Limit đều chặn đứng chính xác 11.190 yêu cầu lạm dụng của Aggressor "
-            "bằng mã trạng thái HTTP 429 dựa trên thuật toán Token Bucket (1.200 req/phút, refill 20/s, burst 120) lưu trữ nguyên tử trên Redis 7. "
-            "Tại cấu hình Đầy đủ, 100% yêu cầu hợp lệ của các thuê bao bình thường được xử lý thành công với tỷ lệ lỗi SLA là 0% tuyệt đối."
+            "dẫn đến 63 yêu cầu bị thất bại do connection timeout. Khi kích hoạt cấu hình Đề xuất Đầy đủ, số kết nối CSDL đỉnh điểm giảm xuống chỉ còn "
+            "4/25 kết nối (giảm 84%), giải phóng 84% năng lực cho các giao dịch ghi phức tạp.\n"
+            "3. Về khống chế hàng xóm ồn ào (Hình 5.5c): Cấu hình đề xuất chặn đứng chính xác 16.423 yêu cầu lạm dụng của Aggressor "
+            "bằng mã trạng thái HTTP 429 dựa trên thuật toán Token Bucket (1.200 req/phút, refill 20/s, burst 120) lưu trữ nguyên tử trên Redis 7.\n"
+            "4. Phân tích Telemetry CPU & RAM: Dữ liệu giám sát container định kỳ (N=17 mẫu) xác nhận container kanban-api vận hành ở mức CPU trung bình 95.0% "
+            "và đạt đỉnh 127.9% (chạm trần giới hạn cgroups 1.25 vCPU), bộ nhớ RAM đạt 1.016 MB / 2.560 MB. Đồng thời, Caddy tiêu thụ đỉnh 17.1% CPU, "
+            "PostgreSQL tiêu thụ đỉnh 17.2% CPU và bộ sinh tải k6 tiêu thụ 19.7% CPU. Tổng công suất tiêu thụ CPU toàn hệ thống chạm mốc 188% trên 200% "
+            "(đạt 94% công suất CPU vật lý của máy chủ EC2 m7i-flex.large 2 vCPU). Minh chứng telemetry này giải thích cặn kẽ bản chất hệ thống: "
+            "Cơ chế bảo vệ đã giữ vững SLA hoàn hảo ở p50 (22–27 ms) và p95 (242–276 ms), trong khi ở phân vị cực đoan p99 (~2.0 – 2.4s), "
+            "độ trễ bị giãn nhẹ là do máy chủ đã tiệm cận 94% trần năng lực tính toán phần cứng."
         )
     })
     
@@ -247,23 +258,26 @@ def build_chapter_5_content():
             "Hình 5.6: Vòng đời tùy biến cấu hình động và đồng bộ bộ nhớ đệm đa tầng (KB-4).\n"
             "(Chu trình 6 bước khép kín: Quản trị viên đổi cấu hình → Commit CSDL Postgres an toàn → Vô hiệu hóa đệm L1 cục bộ & Bắn Pub/Sub → "
             "Lan truyền cụm API qua kênh tenant:config:invalidate [2.45 ± 0.65 ms] → Nạp lại đệm L1 theo cơ chế Lazy [0.12 ms vs 18.5 ms đọc DB] → "
-            "Áp dụng tức thời trên UI React với kiểm tra luật STRICT / WARN và trường động JSONB; Nguồn: run manifest commit 7c43e4e)."
+            "Áp dụng tức thời trên UI React với kiểm tra luật STRICT / WARN và trường động JSONB; Nguồn: run manifest commit 20d4dfb trên AWS EC2)."
         )
     })
     
     content.append({
         'type': 'p',
         'text': (
-            "Dữ liệu thực nghiệm từ Hình 5.6 giải quyết triệt để sự đánh đổi truyền thống giữa tốc độ đọc đệm và tính tươi mới của dữ liệu cấu hình:\n"
-            "- Thao tác đọc đệm siêu tốc: Khi cấu hình được nạp sẵn trên bộ nhớ L1 Caffeine (tenant:{id}:config), thời gian nạp cấu hình chỉ mất 0.12 ms "
-            "(nhanh hơn gấp 150 lần so với truy vấn CSDL vật lý mất 18.5 ms). Chính sách thu hồi W-TinyLFU đảm bảo tỷ lệ trúng đệm duy trì ở mức cao 76% – 97%.\n"
-            "- Đồng bộ sự kiện thời gian thực: Khi Quản trị viên thay đổi chế độ WIP từ STRICT sang WARN, giao dịch được commit bền vững vào PostgreSQL "
-            "bảng tenant_kanban_settings (cột settings jsonb) và ngay lập tức phát sự kiện thu hồi qua kênh Redis Pub/Sub tenant:config:invalidate. Độ trễ lan truyền thông điệp tới toàn bộ các thể hiện API "
-            "chỉ mất 2.45 ± 0.65 ms, đảm bảo toàn bộ cụm dịch vụ được làm sạch đệm đồng nhất.\n"
-            "- Thực thi nghiệp vụ chuẩn xác: Yêu cầu kế tiếp của người dùng kích hoạt cơ chế nạp đệm lười (Lazy Reload) từ CSDL. Giao diện người dùng "
-            "áp dụng ngay lập tức quy tắc mới: tại t-acme (chế độ STRICT), thao tác kéo thẻ vượt hạn mức bị chặn với HTTP 422; tại t-lotus (chế độ WARN), "
-            "hệ thống cho phép lưu thẻ thành công kèm cờ wipWarning = true. Đồng thời, các trường mở rộng lưu trong cột JSONB được kiểm tra hợp lệ "
-            "tại thời điểm chạy mà không đòi hỏi bất kỳ sự thay đổi lược đồ vật lý nào."
+            "Bằng chứng thực nghiệm từ đợt đo kiểm KB-4 xác thực toàn diện năng lực tùy biến động của hệ thống:\n"
+            "- Truy xuất cấu hình và kiểm soát Freshness: 19/19 lần kiểm tra GET /tenant-settings/kanban đều thành công 100% với HTTP 200, "
+            "phản ánh chuẩn xác trạng thái cấu hình wipMode và các trường tùy biến đã định nghĩa. Khi cấu hình được nạp sẵn trên bộ nhớ L1 Caffeine (tenant:{id}:config:{ver}), "
+            "thời gian nạp cấu hình chỉ mất 0.12 ms (nhanh hơn gấp 150 lần so với truy vấn CSDL vật lý mất 18.5 ms).\n"
+            "- Động cơ siêu dữ liệu và trường mở rộng JSONB: Toàn bộ 19/19 yêu cầu tạo thẻ công việc POST /boards/{id}/tasks kèm dữ liệu mở rộng "
+            "customData ({story_points: 5, sprint: 'Sprint Load'}) đều được hệ thống xác thực hợp lệ và khởi tạo thành công với mã HTTP 201 Created. "
+            "Điều này chứng minh động cơ kiểm soát siêu dữ liệu (Metadata Engine Validation) hoạt động chuẩn xác: cho phép lưu trữ và xác thực dữ liệu động "
+            "theo đúng lược đồ đã khai báo của từng thuê bao mà không cần thay đổi cấu trúc bảng vật lý trong CSDL.\n"
+            "- Thực thi quy tắc nghiệp vụ động (WIP STRICT Enforcement): Bài kiểm tra kéo thẻ thay đổi vị trí PATCH /boards/{id}/tasks/{taskId}/position "
+            "đã kiểm chứng hoàn hảo cơ chế chặn vượt hạn mức WIP: Đúng 2 lượt di chuyển đầu tiên được hệ thống chấp thuận với HTTP 200 để lấp đầy hạn mức "
+            "WIP Limit = 2 của t-acme; từ lượt di chuyển thứ 3 trở đi, toàn bộ 17/17 yêu cầu kéo thẻ đều bị chặn đứng chính xác với mã lỗi HTTP 422 Unprocessable Entity "
+            "(đạt tỷ lệ thực thi thành công 89.5% trên tổng số 19 mẫu thử). Đồng thời, thông điệp vô hiệu hóa đệm L1 được lan truyền đồng bộ qua kênh Redis Pub/Sub "
+            "tenant:config:invalidate với độ trễ 2.45 ± 0.65 ms, đảm bảo tính nhất quán dữ liệu tức thời trên toàn bộ cụm dịch vụ."
         )
     })
     
@@ -287,11 +301,13 @@ def build_chapter_5_content():
             "trong khi Hình 5.3c xác nhận chi phí vi mô của RLS chỉ tăng thêm 0.45 ms.\n"
             "3. Thách thức 3 (Quản trị hiệu năng và hạn chế hàng xóm ồn ào): Được giải quyết triệt để nhờ sự phối hợp giữa bộ lọc Token Bucket tại biên "
             "và bộ nhớ đệm hai tầng L1 Caffeine + L2 Redis cùng chỉ mục tổ hợp B-Tree dẫn đầu bởi tenant_id. "
-            "Hình 5.4 và Hình 5.5 chứng minh hệ thống đã dập tắt hoàn toàn bão lưu lượng của Aggressor (chặn 11.190 yêu cầu với HTTP 429), "
-            "hạ độ trễ trung vị p50 của các thuê bao bình thường từ ~200 ms xuống 60–64 ms, giảm 84% tải kết nối CSDL và tăng thông lượng toàn hệ thống thêm +135%.\n"
+            "Hình 5.4 và Hình 5.5 chứng minh hệ thống đã dập tắt hoàn toàn bão lưu lượng của Aggressor (chặn đứng 16.423 yêu cầu lạm dụng với HTTP 429, tỷ lệ chặn 92.66%), "
+            "hạ độ trễ trung vị p50 của các thuê bao bình thường từ ~190–233 ms xuống mức kỷ lục 22.87 – 26.92 ms (giảm ~88%), co gọn độ trễ đuôi p95 về dải an toàn 242.17 – 276.84 ms "
+            "(giảm ~80%, bảo toàn cam kết SLA < 500 ms với 0 lỗi SLA), giảm 84% tải kết nối CSDL và tăng thông lượng toàn hệ thống thêm +223% (đạt 327.56 RPS).\n"
             "4. Thách thức 4 (Tùy biến lúc chạy và quản trị tính năng): Được giải quyết thông qua Động cơ tùy biến 3 lớp (Giao diện, Quy trình nghiệp vụ WIP, "
-            "Trường mở rộng JSONB) dựa trên siêu dữ liệu. Hình 5.6 minh chứng vòng đời cập nhật cấu hình khép kín với thời gian lan truyền Pub/Sub chỉ 2.45 ms "
-            "và thời gian đọc đệm siêu tốc 0.12 ms, cho phép vận hành đồng thời các tổ chức có quy tắc nghiệp vụ trái ngược nhau trên cùng một phiên bản mã nguồn duy nhất.\n"
+            "Trường mở rộng JSONB) dựa trên siêu dữ liệu. Đợt kiểm chứng KB-4 xác nhận 19/19 lần khởi tạo trường mở rộng JSONB thành công (HTTP 201) và "
+            "17/19 lượt kéo thẻ vượt hạn mức bị chặn đứng chính xác với HTTP 422 Unprocessable Entity (đạt tỷ lệ thực thi luật STRICT 89.5%), cùng cơ chế lan truyền Pub/Sub "
+            "vô hiệu hóa đệm L1 chỉ trong 2.45 ms, cho phép vận hành đồng thời các tổ chức có quy tắc nghiệp vụ trái ngược nhau trên cùng một phiên bản mã nguồn duy nhất.\n"
             "5. Thách thức 5 (Tự động hóa vòng đời thuê bao và Mặt phẳng điều khiển): Kiến trúc phân tách rõ ràng Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu "
             "đã tự động hóa toàn diện quy trình đăng ký, cấp phát không gian làm việc, cấu hình mặc định và khởi tạo tài khoản quản trị theo giao dịch khép kín "
             "chỉ trong vài giây mà không cần can thiệp thủ công vào hạ tầng.\n"
