@@ -242,8 +242,8 @@ select {
 .project-table-progress__track { height: 4px; margin-top: 8px; background: #edf0f5; border-radius: 4px; overflow: hidden; }
 .project-table-progress__track > div { height: 100%; background: #1d4ed8; }
 .projects-panel { padding: 24px; }
-@media (max-width: 1000px) { .tenant-card { grid-template-columns: 48px 1fr auto; gap: 16px; } .tenant-card__membership { grid-column: 2; } .tenant-card__status { grid-column: 3; grid-row: 1; } .tenant-card > .MuiButton-root { grid-column: 3; grid-row: 2; } }
-@media (max-width: 600px) { .tenant-card { grid-template-columns: 42px 1fr; padding: 18px; gap: 14px; } .tenant-card__status { grid-column: 2; grid-row: 2; } .tenant-card__membership { grid-row: 3; } .tenant-card > .MuiButton-root { grid-column: 1 / -1; grid-row: 4; } .selection-heading { flex-direction: column !important; align-items: stretch !important; gap: 20px; } .selection-heading > .MuiStack-root { justify-content: space-between; } .selection-heading .MuiButton-root { white-space: nowrap; } .projects-panel { padding: 16px; } }
+@media (max-width: 1000px) { .tenant-card { grid-template-columns: 48px 1fr auto; gap: 16px; } .tenant-card__membership { grid-column: 2; } .tenant-card__status { grid-column: 3; grid-row: 1; } .tenant-card > .MuiButton-root, .tenant-card__actions { grid-column: 3; grid-row: 2 / 4; } }
+@media (max-width: 600px) { .tenant-card { grid-template-columns: 42px 1fr; padding: 18px; gap: 14px; } .tenant-card__status { grid-column: 2; grid-row: 2; } .tenant-card__membership { grid-row: 3; } .tenant-card > .MuiButton-root, .tenant-card__actions { grid-column: 1 / -1; grid-row: 4; } .selection-heading { flex-direction: column !important; align-items: stretch !important; gap: 20px; } .selection-heading > .MuiStack-root { justify-content: space-between; } .selection-heading .MuiButton-root { white-space: nowrap; } .projects-panel { padding: 16px; } }
 
 /* Local tenant onboarding */
 .onboarding-page {
@@ -993,6 +993,14 @@ select {
   border-radius: 14px;
   background: #fff;
 }
+.tenant-customization-header { padding: 24px; background: #fff; border-bottom: 1px solid #dfe4eb; }
+.tenant-customization-content { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.tenant-customization-header, .tenant-customization-footer { flex-shrink: 0; }
+.tenant-branding-panel { border: 1px solid #dfe4eb; border-radius: 14px; background: #fff; padding: 20px; }
+.tenant-customization-footer { padding: 16px 24px; background: #fff; }
+.tenant-customization-field { padding: 12px; border: 1px solid #e3e8ef; border-radius: 10px; background: #f8fafc; }
+.tenant-customization-drawer .workspace-configuration { padding: 20px; gap: 16px; }
+.tenant-customization-advanced summary { cursor: pointer; color: #475569; }
 .kanban-view--compact .task-card { padding: 10px 12px; }
 .kanban-view--compact .task-card .line-clamp-2,
 .kanban-view--compact .task-card .task-meta { display: none; }
@@ -1004,4 +1012,8 @@ select {
 :focus-visible { outline: 2px solid #245db6; outline-offset: 3px; }
 @media (max-width: 600px) {
   .workspace-configuration { gap: 20px; padding: 20px 16px; }
+  .tenant-customization-header { padding: 20px 16px; }
+  .tenant-customization-content { padding: 16px; }
+  .tenant-branding-panel, .tenant-customization-drawer .workspace-configuration { padding: 20px 16px; }
+  .tenant-customization-footer { padding: 12px 16px; }
 }

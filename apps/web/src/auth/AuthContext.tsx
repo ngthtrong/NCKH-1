@@ -23,7 +23,7 @@ interface AuthContextValue {
   login: (credentials: LoginRequest) => Promise<TenantSummary[]>;
   register: (details: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
-  selectTenant: (tenant: TenantSummary) => Promise<void>;
+  selectTenant: (tenant: TenantSummary, intent?: 'customize') => Promise<void>;
   exchangeTenantCode: (code: string) => Promise<void>;
   reloadTenants: () => Promise<void>;
 }
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, [commitSession, queryClient]);
 
-  const selectTenant = useCallback(async (tenant: TenantSummary) => {
+  const selectTenant = useCallback(async (tenant: TenantSummary, intent?: 'customize') => {
     const transfer = await authApi.createTenantTransfer(tenant.slug);
     const target = new URL(transfer.redirectUrl, window.location.origin);
     const currentHost = window.location.hostname;
@@ -149,6 +149,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     ) {
       throw new Error('Backend trả về địa chỉ tenant không hợp lệ.');
     }
+    if (intent === 'customize') target.searchParams.set('customize', '1');
     window.location.assign(target.toString());
   }, []);
 

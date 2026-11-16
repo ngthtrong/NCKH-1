@@ -2,11 +2,13 @@ import Add from '@mui/icons-material/Add';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import Logout from '@mui/icons-material/Logout';
 import Refresh from '@mui/icons-material/Refresh';
+import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import {
   Alert,
   Avatar,
   Box,
   Button,
+  Chip,
   IconButton,
   Paper,
   Stack,
@@ -21,7 +23,7 @@ import { useAuth } from '../auth/AuthContext';
 import { EmptyState } from '../components/AsyncState';
 import { StatusChip } from '../components/StatusChip';
 
-const tierLabels: Record<string, string> = { STARTER: 'Khởi đầu', PROFESSIONAL: 'Chuyên nghiệp', ENTERPRISE: 'Doanh nghiệp' };
+const tierLabels: Record<string, string> = { STARTER: 'Starter', PROFESSIONAL: 'Pro', ENTERPRISE: 'Enterprise' };
 
 const roleLabels: Record<TenantSummary['role'], string> = {
   OWNER: 'Chủ sở hữu',
@@ -35,11 +37,12 @@ export function TenantSelectionPage() {
   const [openingSlug, setOpeningSlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const openTenant = async (tenant: TenantSummary) => {
+  const openTenant = async (tenant: TenantSummary, customize = false) => {
     setOpeningSlug(tenant.slug);
     setError(null);
     try {
-      await selectTenant(tenant);
+      if (customize) await selectTenant(tenant, 'customize');
+      else await selectTenant(tenant);
     } catch (cause) {
       setError(errorMessage(cause));
       setOpeningSlug(null);
@@ -72,7 +75,7 @@ export function TenantSelectionPage() {
               Chọn tổ chức để tiếp tục
             </Typography>
             <Typography color="text.secondary" mt={1}>
-              Chọn không gian làm việc của bạn.
+              Chọn không gian làm việc của bạn. Quản trị viên có thể tùy chỉnh tổ chức trước khi vào Kanban.
             </Typography>
           </Box>
           <Stack direction="row" gap={1}>
@@ -107,10 +110,11 @@ export function TenantSelectionPage() {
                   </Box>
                   <Box className="tenant-card__membership">
                     <Typography variant="body2" fontWeight={600}>{roleLabels[tenant.role]}</Typography>
-                    <Typography variant="body2" color="text.secondary">{tierLabels[tenant.tier] ?? tenant.tier}</Typography>
+                    <Chip size="small" variant="outlined" label={`${tierLabels[tenant.tier] ?? tenant.tier} Tier`} sx={{ mt: 0.75, alignSelf: 'flex-start' }} />
                   </Box>
                   <Box className="tenant-card__status"><StatusChip status={tenant.status} /></Box>
                   {canOpen ? (
+                    <Stack className="tenant-card__actions" spacing={1}>
                     <Button
                       variant="contained"
                       endIcon={<ArrowForward />}
@@ -119,6 +123,13 @@ export function TenantSelectionPage() {
                     >
                       {openingSlug === tenant.slug ? 'Đang chuyển hướng…' : 'Mở không gian'}
                     </Button>
+                    {['OWNER', 'ADMIN'].includes(tenant.role) && <Button
+                      size="small"
+                      startIcon={<TuneOutlined />}
+                      disabled={openingSlug !== null}
+                      onClick={() => void openTenant(tenant, true)}
+                    >Cấu hình tenant</Button>}
+                    </Stack>
                   ) : ['PENDING_PAYMENT', 'PROVISIONING', 'FAILED'].includes(tenant.status) &&
                     (tenant.role === 'OWNER' || tenant.role === 'ADMIN') ? (
                     <Button

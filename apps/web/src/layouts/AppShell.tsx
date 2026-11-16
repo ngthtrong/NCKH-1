@@ -37,9 +37,10 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { notificationsApi, tenantSettingsApi } from '../api/endpoints';
 import { useAuth } from '../auth/AuthContext';
+import { TenantCustomizationDrawer } from '../components/TenantCustomizationDrawer';
 
 const drawerWidth = 240;
 
@@ -76,6 +77,14 @@ export function AppShell() {
   const { session, logout, tenants, currentTenant, selectTenant } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const customizationOpen = searchParams.get('customize') === 'tenant';
+  const setCustomizationOpen = (open: boolean) => {
+    const next = new URLSearchParams(searchParams);
+    if (open) next.set('customize', 'tenant');
+    else next.delete('customize');
+    setSearchParams(next, { replace: true });
+  };
   const tenant = currentTenant ?? session?.activeTenant;
   const canAdministerTenant = tenant && ['OWNER', 'ADMIN'].includes(tenant.role);
   const canAdministerSystem = session?.user.platformRoles.includes('SYSTEM_ADMIN');
@@ -688,6 +697,12 @@ export function AppShell() {
 
             <Box flex={1} />
 
+            {canAdministerTenant && <Tooltip title="Cấu hình tenant">
+              <IconButton aria-label="Cấu hình tenant" onClick={() => setCustomizationOpen(true)} sx={{ mr: 1 }}>
+                <TuneOutlined />
+              </IconButton>
+            </Tooltip>}
+
             {/* Notification Bell */}
             <Tooltip title="Thông báo">
               <IconButton
@@ -728,6 +743,8 @@ export function AppShell() {
             </Tooltip>
           </Toolbar>
         </AppBar>
+
+        <TenantCustomizationDrawer open={customizationOpen} onClose={() => setCustomizationOpen(false)} />
 
         {/* Tenant Switcher Dropdown Menu */}
         <Menu

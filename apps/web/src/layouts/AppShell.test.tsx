@@ -10,6 +10,8 @@ import { AppShell } from './AppShell';
 
 const mockSelectTenant = vi.fn();
 const mockLogout = vi.fn();
+const settingsApi = vi.hoisted(() => ({ get: vi.fn(), updateBranding: vi.fn() }));
+const kanbanApi = vi.hoisted(() => ({ get: vi.fn(), save: vi.fn() }));
 
 const tenantA: TenantSummary = {
   id: '11111111-1111-1111-1111-111111111111',
@@ -57,12 +59,23 @@ vi.mock('../auth/AuthContext', () => ({
 
 vi.mock('../api/endpoints', () => ({
   notificationsApi: { list: vi.fn().mockResolvedValue([]) },
-  tenantSettingsApi: { get: vi.fn().mockResolvedValue(null) },
+  tenantSettingsApi: settingsApi,
 }));
+vi.mock('../api/kanbanSettings', () => ({ kanbanSettingsApi: kanbanApi }));
 
 describe('AppShell Tenant Switcher', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    tenantA.role = 'ADMIN';
+    settingsApi.get.mockResolvedValue({
+      capabilities: [{ capability: 'BRANDING', supported: true, granted: true, enabled: true, version: 0 }],
+      branding: { primaryColor: '#246BFD', accentColor: '#0F9F8F', version: 2 },
+    });
+    kanbanApi.get.mockResolvedValue({ version: 3, settings: {
+      wipMode: 'STRICT', wipLimit: 3, cardStyle: 'FULL',
+      defaultColumns: ['Todo', 'Doing', 'Done'],
+      fields: [{ key: 'story_points', label: 'Story points', type: 'NUMBER', required: false }],
+    } });
     window.matchMedia = vi.fn().mockImplementation((query: string) => ({
       matches: true,
       media: query,
@@ -140,5 +153,42 @@ describe('AppShell Tenant Switcher', () => {
     await user.click(createOption);
 
     expect(await screen.findByText('Onboarding Page')).toBeInTheDocument();
+  });
+
+  it('opens tenant configuration without leaving the current workspace page', async () => {
+    const { user } = renderShell();
+    await user.click(screen.getByRole('button', { name: 'Cấu hình tenant' }));
+    expect(await screen.findByRole('dialog', { name: 'Cấu hình tenant' })).toBeVisible();
+    expect(await screen.findByLabelText(/Mã trường/)).toHaveValue('story_points');
+    expect(screen.getByLabelText('Màu chính')).toHaveValue('#246bfd');
+    await user.click(screen.getByRole('button', { name: 'Đóng cấu hình tenant' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByText('Dashboard content')).toBeVisible();
+  });
+
+  it('does not offer tenant configuration to a member', () => {
+    tenantA.role = 'MEMBER';
+    renderShell();
+    expect(screen.queryByRole('button', { name: 'Cấu hình tenant' })).not.toBeInTheDocument();
+  });
+
+  it('saves the edited WIP mode and dynamic fields with the current configuration version', async () => {
+    kanbanApi.save.mockResolvedValue({});
+    const { user } = renderShell();
+    await user.click(screen.getByRole('button', { name: 'Cấu hình tenant' }));
+    await user.click(await screen.findByRole('combobox', { name: 'Khi vượt giới hạn công việc' }));
+    await user.click(screen.getByRole('option', { name: 'Cho phép và cảnh báo (WARN)' }));
+    await user.click(screen.getByRole('button', { name: 'Thêm trường' }));
+    await user.type(screen.getAllByLabelText('Tên trường', { exact: false })[1], 'Budget');
+    await user.type(screen.getAllByLabelText('Mã trường', { exact: false })[1], 'budget_usd');
+    await user.click(screen.getByRole('button', { name: 'Lưu quy trình và trường mở rộng' }));
+    await waitFor(() => expect(kanbanApi.save).toHaveBeenCalledWith({ version: 3, settings: {
+      wipMode: 'WARN', wipLimit: 3, cardStyle: 'FULL', defaultColumns: ['Todo', 'Doing', 'Done'],
+      fields: [
+        { key: 'story_points', label: 'Story points', type: 'NUMBER', required: false },
+        { key: 'budget_usd', label: 'Budget', type: 'STRING', required: false },
+      ],
+    } }));
+    expect(await screen.findByText('Đã lưu cấu hình workspace.')).toBeVisible();
   });
 });
