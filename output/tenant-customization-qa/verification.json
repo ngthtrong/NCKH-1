@@ -1,0 +1,12 @@
+{
+  "fixtureData": true,
+  "backendVerified": false,
+  "desktop": "1440x1000",
+  "mobile": "390x844",
+  "transfer": "workspace -> tenant session -> configuration drawer",
+  "brandingSave": true,
+  "wipSave": true,
+  "closeAndEscape": true,
+  "memberPermission": true,
+  "errors": []
+}

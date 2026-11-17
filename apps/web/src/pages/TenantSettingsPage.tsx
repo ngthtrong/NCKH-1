@@ -1,7 +1,6 @@
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   Chip,
@@ -9,17 +8,17 @@ import {
   Grid,
   Stack,
   Switch,
-  TextField,
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState } from 'react';
 import { tenantSettingsApi } from '../api/endpoints';
 import type { TenantCapability } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { FullPageLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
 import { KanbanConfigurationPanel } from '../components/KanbanConfigurationPanel';
+import { TenantBrandingPanel } from '../components/TenantBrandingPanel';
 
 const labels: Record<TenantCapability, string> = {
   BRANDING: 'Nhận diện giao diện',
@@ -36,16 +35,8 @@ export function TenantSettingsPage() {
   const queryClient = useQueryClient();
   const { session } = useAuth();
   const canManage = ['OWNER', 'ADMIN'].includes(session?.activeTenant?.role ?? '');
-  const [primary, setPrimary] = useState('#4F46E5');
-  const [accent, setAccent] = useState('#0EA5E9');
   const [error, setError] = useState('');
   const settings = useQuery({ queryKey: ['tenant-settings'], queryFn: tenantSettingsApi.get });
-
-  useEffect(() => {
-    if (!settings.data) return;
-    setPrimary(settings.data.branding.primaryColor);
-    setAccent(settings.data.branding.accentColor);
-  }, [settings.data]);
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['tenant-settings'] });
@@ -57,39 +48,8 @@ export function TenantSettingsPage() {
     onSuccess: refresh,
     onError: (cause) => setError(message(cause)),
   });
-  const saveBranding = useMutation({
-    mutationFn: () => tenantSettingsApi.updateBranding(
-      primary, accent, settings.data?.branding.version ?? 0,
-    ),
-    onSuccess: refresh,
-    onError: (cause) => setError(message(cause)),
-  });
-  const uploadLogo = useMutation({
-    mutationFn: (file: File) => tenantSettingsApi.uploadLogo(
-      file, settings.data?.branding.version ?? 0,
-    ),
-    onSuccess: refresh,
-    onError: (cause) => setError(message(cause)),
-  });
-  const deleteLogo = useMutation({
-    mutationFn: () => tenantSettingsApi.deleteLogo(settings.data?.branding.version ?? 0),
-    onSuccess: refresh,
-    onError: (cause) => setError(message(cause)),
-  });
-
   if (settings.isLoading) return <FullPageLoader />;
   if (settings.error || !settings.data) return <Alert severity="error">{message(settings.error)}</Alert>;
-
-  const brandingCapability = settings.data.capabilities.find((item) => item.capability === 'BRANDING');
-  const submitBranding = (event: FormEvent) => {
-    event.preventDefault();
-    setError('');
-    saveBranding.mutate();
-  };
-  const selectLogo = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) uploadLogo.mutate(file);
-  };
 
   return (
     <Stack spacing={3} className="page-container">
@@ -131,36 +91,8 @@ export function TenantSettingsPage() {
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
           <Card variant="outlined">
-            <CardContent component="form" onSubmit={submitBranding}>
-              <Typography variant="h6" gutterBottom>Nhận diện tổ chức</Typography>
-              <Stack spacing={2}>
-                <TextField
-                  label="Màu chính"
-                  type="color"
-                  value={primary}
-                  onChange={(event) => setPrimary(event.target.value.toUpperCase())}
-                  disabled={!canManage || !brandingCapability?.enabled}
-                />
-                <TextField
-                  label="Màu nhấn"
-                  type="color"
-                  value={accent}
-                  onChange={(event) => setAccent(event.target.value.toUpperCase())}
-                  disabled={!canManage || !brandingCapability?.enabled}
-                />
-                {settings.data.branding.logoUrl && (
-                  <Box component="img" src={settings.data.branding.logoUrl} alt="Logo tenant" sx={{ maxWidth: 180, maxHeight: 80, objectFit: 'contain' }} />
-                )}
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  <Button type="submit" variant="contained" disabled={!canManage || !brandingCapability?.enabled || saveBranding.isPending}>Lưu màu sắc</Button>
-                  <Button component="label" variant="outlined" disabled={!canManage || !brandingCapability?.enabled || uploadLogo.isPending}>
-                    Tải logo
-                    <input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={selectLogo} />
-                  </Button>
-                  {settings.data.branding.logoUrl && <Button color="error" onClick={() => deleteLogo.mutate()} disabled={!canManage || deleteLogo.isPending}>Xóa logo</Button>}
-                </Stack>
-                <Typography variant="caption" color="text.secondary">PNG, JPEG hoặc WebP, tối đa 2 MiB. HTML, CSS và JavaScript không được chấp nhận.</Typography>
-              </Stack>
+            <CardContent>
+              <TenantBrandingPanel canManage={canManage} />
             </CardContent>
           </Card>
         </Grid>

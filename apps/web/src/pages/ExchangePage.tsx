@@ -13,14 +13,15 @@ export function ExchangePage() {
   const [slow, setSlow] = useState(false);
   const started = useRef(false);
   const code = params.get('code');
+  const customize = params.get('customize') === '1';
 
   useEffect(() => {
     if (!code || started.current) return;
     started.current = true;
     exchangeTenantCode(code)
-      .then(() => navigate('/dashboard', { replace: true }))
+      .then(() => navigate(customize ? '/settings?customize=tenant' : '/dashboard', { replace: true }))
       .catch((cause: unknown) => setError(errorMessage(cause)));
-  }, [code, exchangeTenantCode, navigate]);
+  }, [code, customize, exchangeTenantCode, navigate]);
 
   useEffect(() => {
     if (!code || error) return undefined;
