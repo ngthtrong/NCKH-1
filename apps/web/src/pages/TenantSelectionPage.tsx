@@ -21,7 +21,11 @@ import { useAuth } from '../auth/AuthContext';
 import { EmptyState } from '../components/AsyncState';
 import { StatusChip } from '../components/StatusChip';
 
-const tierLabels: Record<string, string> = { STARTER: 'Khởi đầu', PROFESSIONAL: 'Chuyên nghiệp', ENTERPRISE: 'Doanh nghiệp' };
+const tierLabels: Record<string, string> = {
+  STARTER: 'Starter (Khởi đầu)',
+  PROFESSIONAL: 'Pro (Chuyên nghiệp)',
+  ENTERPRISE: 'Enterprise (Doanh nghiệp)',
+};
 
 const roleLabels: Record<TenantSummary['role'], string> = {
   OWNER: 'Chủ sở hữu',

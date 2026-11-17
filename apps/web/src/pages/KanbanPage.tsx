@@ -1,5 +1,5 @@
 import { PooledTaskFields } from '../components/PooledTaskFields';
-import { kanbanSettingsApi } from '../api/kanbanSettings';
+import { kanbanSettingsApi, type KanbanField } from '../api/kanbanSettings';
 import {
   closestCorners,
   DndContext,
@@ -121,14 +121,88 @@ const priorityPastelConfig: Record<TaskPriority, { bg: string; color: string; bo
   LOW: { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' },
 };
 
+function renderCustomBadges(
+  customData: Record<string, unknown> | undefined,
+  fieldDefinitions?: KanbanField[],
+) {
+  if (!customData) return null;
+
+  const validEntries = Object.entries(customData).filter(
+    ([, val]) => val !== null && val !== undefined && val !== '',
+  );
+
+  if (validEntries.length === 0) return null;
+
+  const fieldMap = new Map((fieldDefinitions ?? []).map((f) => [f.key, f.label]));
+
+  return validEntries.map(([key, val]) => {
+    const fieldLabel = fieldMap.get(key) || key;
+    let labelText = `${fieldLabel}: ${String(val)}`;
+    let chipStyle = {
+      bgcolor: '#f8fafc',
+      color: '#475569',
+      border: '1px solid #e2e8f0',
+    };
+
+    if (key === 'story_points') {
+      labelText = `${val} điểm`;
+      chipStyle = {
+        bgcolor: '#eff6ff',
+        color: '#1d4ed8',
+        border: '1px solid #bfdbfe',
+      };
+    } else if (key === 'budget_usd') {
+      const num = Number(val);
+      labelText = isNaN(num) ? `$${String(val)}` : `$${num.toLocaleString('en-US')}`;
+      chipStyle = {
+        bgcolor: '#ecfdf5',
+        color: '#047857',
+        border: '1px solid #a7f3d0',
+      };
+    } else if (key === 'sprint') {
+      labelText = `${val}`;
+      chipStyle = {
+        bgcolor: '#f5f3ff',
+        color: '#6d28d9',
+        border: '1px solid #ddd6fe',
+      };
+    } else if (key === 'channel') {
+      labelText = `${val}`;
+      chipStyle = {
+        bgcolor: '#fff7ed',
+        color: '#c2410c',
+        border: '1px solid #fed7aa',
+      };
+    }
+
+    return (
+      <Chip
+        key={key}
+        size="small"
+        label={labelText}
+        sx={{
+          height: 20,
+          fontSize: '0.7rem',
+          fontWeight: 600,
+          borderRadius: 1,
+          px: 0.25,
+          ...chipStyle,
+        }}
+      />
+    );
+  });
+}
+
 function TaskCardView({
   task,
   overlay = false,
   onOpen,
+  fieldDefinitions,
 }: {
   task: TaskCard;
   overlay?: boolean;
   onOpen?: () => void;
+  fieldDefinitions?: KanbanField[];
 }) {
   const isOverdue = task.dueDate ? new Date(task.dueDate).getTime() < Date.now() : false;
   const isDueSoon = task.dueDate
@@ -136,6 +210,9 @@ function TaskCardView({
     : false;
   const dueDateColor = isOverdue ? '#dc2626' : isDueSoon ? '#ea580c' : 'text.secondary';
   const isSubtasksComplete = task.subtaskCount > 0 && task.completedSubtaskCount === task.subtaskCount;
+  const hasCustomData =
+    Boolean(task.customData) &&
+    Object.values(task.customData!).some((v) => v !== null && v !== undefined && v !== '');
 
   return (
     <Paper
@@ -205,6 +282,11 @@ function TaskCardView({
         >
           {task.description}
         </Typography>
+      )}
+      {hasCustomData && (
+        <Stack direction="row" flexWrap="wrap" gap={0.75} mt={1}>
+          {renderCustomBadges(task.customData, fieldDefinitions)}
+        </Stack>
       )}
       <Stack direction="row" alignItems="center" gap={1.5} mt={1.5} color="text.secondary">
         {task.dueDate && (
@@ -291,10 +373,12 @@ function SortableTaskCard({
   task,
   disabled,
   onOpen,
+  fieldDefinitions,
 }: {
   task: TaskCard;
   disabled: boolean;
   onOpen: () => void;
+  fieldDefinitions?: KanbanField[];
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
@@ -307,7 +391,7 @@ function SortableTaskCard({
       {...attributes}
       {...listeners}
     >
-      <TaskCardView task={task} onOpen={onOpen} />
+      <TaskCardView task={task} onOpen={onOpen} fieldDefinitions={fieldDefinitions} />
     </Box>
   );
 }
@@ -315,6 +399,7 @@ function SortableTaskCard({
 function KanbanColumn({
   column,
   wipMode,
+  fieldDefinitions,
   disabled,
   canManageColumns,
   canEditTasks,
@@ -330,6 +415,7 @@ function KanbanColumn({
 }: {
   column: BoardColumn;
   wipMode?: string;
+  fieldDefinitions?: KanbanField[];
   disabled: boolean;
   canManageColumns: boolean;
   canEditTasks: boolean;
@@ -477,6 +563,7 @@ function KanbanColumn({
               task={task}
               disabled={disabled}
               onOpen={() => onOpenTask(task.id)}
+              fieldDefinitions={fieldDefinitions}
             />
           ))}
           {visibleTasks.length === 0 && (
@@ -1199,6 +1286,9 @@ export function KanbanPage() {
           filters={filters}
           onFilterChange={setFilters}
           assignees={assignableMembers}
+          wipMode={kanbanConfiguration.data?.settings.wipMode}
+          wipLimit={kanbanConfiguration.data?.settings.wipLimit}
+          customFields={kanbanConfiguration.data?.settings.fields}
         />
       )}
       {!boardId ? (
@@ -1228,6 +1318,7 @@ export function KanbanPage() {
                 key={column.id}
                 column={column}
                 wipMode={kanbanConfiguration.data?.settings.wipMode}
+                fieldDefinitions={kanbanConfiguration.data?.settings.fields}
                 disabled={boardInteractionDisabled}
                 canManageColumns={canManageColumns}
                 canEditTasks={Boolean(canEditTasks)}
@@ -1245,7 +1336,15 @@ export function KanbanPage() {
               />
             ))}
           </Box>
-          <DragOverlay>{activeTask ? <TaskCardView task={activeTask} overlay /> : null}</DragOverlay>
+          <DragOverlay>
+            {activeTask ? (
+              <TaskCardView
+                task={activeTask}
+                overlay
+                fieldDefinitions={kanbanConfiguration.data?.settings.fields}
+              />
+            ) : null}
+          </DragOverlay>
         </DndContext>
       ) : null}
       {kanbanConfiguration.data?.settings.wipMode === 'WARN' && board?.columns.some(column => column.taskLimit && column.tasks.length > column.taskLimit) &&

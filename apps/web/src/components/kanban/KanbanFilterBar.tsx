@@ -4,6 +4,8 @@ import Search from '@mui/icons-material/Search';
 import {
   Box,
   Button,
+  Chip,
+  Divider,
   FormControl,
   IconButton,
   InputAdornment,
@@ -27,6 +29,9 @@ export interface KanbanFilterBarProps {
   filters: KanbanFilterState;
   onFilterChange: (filters: KanbanFilterState) => void;
   assignees: Array<{ userId: string; name: string }>;
+  wipMode?: 'STRICT' | 'WARN' | 'OFF' | string;
+  wipLimit?: number;
+  customFields?: Array<{ key: string; label: string; type?: string }>;
 }
 
 const priorityOptions: Array<{ value: TaskPriority | 'ALL'; label: string }> = [
@@ -37,8 +42,17 @@ const priorityOptions: Array<{ value: TaskPriority | 'ALL'; label: string }> = [
   { value: 'URGENT', label: 'Khẩn cấp' },
 ];
 
-export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFilterBarProps) {
+export function KanbanFilterBar({
+  filters,
+  onFilterChange,
+  assignees,
+  wipMode,
+  wipLimit,
+  customFields,
+}: KanbanFilterBarProps) {
   const isFiltered = filters.search.trim() !== '' || filters.priority !== 'ALL' || filters.assigneeId !== 'ALL';
+  const hasPolicy = Boolean(wipMode);
+  const hasCustomFields = Boolean(customFields && customFields.length > 0);
 
   const handleReset = () => {
     onFilterChange({
@@ -59,12 +73,109 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
         border: '1px solid',
         borderColor: 'divider',
         boxShadow: 'none',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: 1.5,
       }}
     >
+      {(hasPolicy || hasCustomFields) && (
+        <>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            justifyContent="space-between"
+            gap={1}
+            sx={{ width: '100%', mb: 1.25 }}
+          >
+            {/* WIP Policy badge */}
+            <Stack direction="row" alignItems="center" gap={1} flexWrap="wrap">
+              {wipMode === 'STRICT' && (
+                <Chip
+                  size="small"
+                  label="Chính sách WIP: STRICT (Chặn cứng khi vượt trần)"
+                  sx={{
+                    bgcolor: '#fef2f2',
+                    color: '#b91c1c',
+                    border: '1px solid #fecaca',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    height: 26,
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+              {wipMode === 'WARN' && (
+                <Chip
+                  size="small"
+                  label="Chính sách WIP: WARN (Cảnh báo mềm khi vượt trần)"
+                  sx={{
+                    bgcolor: '#fffbeb',
+                    color: '#b45309',
+                    border: '1px solid #fde68a',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    height: 26,
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+              {wipMode === 'OFF' && (
+                <Chip
+                  size="small"
+                  label="Chính sách WIP: OFF (Không giới hạn)"
+                  sx={{
+                    bgcolor: '#f1f5f9',
+                    color: '#64748b',
+                    border: '1px solid #e2e8f0',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    height: 26,
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+            </Stack>
+
+            {/* Custom fields chips */}
+            {hasCustomFields && (
+              <Stack direction="row" alignItems="center" gap={0.75} flexWrap="wrap">
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}
+                >
+                  Trường mở rộng:
+                </Typography>
+                {customFields!.map((field) => (
+                  <Chip
+                    key={field.key}
+                    size="small"
+                    label={field.key}
+                    variant="outlined"
+                    sx={{
+                      height: 22,
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      borderRadius: 1,
+                      bgcolor: '#f8fafc',
+                      borderColor: '#e2e8f0',
+                      color: '#475569',
+                      fontFamily: 'monospace',
+                    }}
+                  />
+                ))}
+              </Stack>
+            )}
+          </Stack>
+          <Divider sx={{ width: '100%', mb: 1.5, borderColor: '#f1f5f9' }} />
+        </>
+      )}
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 1.5,
+          width: '100%',
+        }}
+      >
       <TextField
         placeholder="Tìm kiếm thẻ công việc..."
         value={filters.search}
@@ -207,6 +318,7 @@ export function KanbanFilterBar({ filters, onFilterChange, assignees }: KanbanFi
           </Button>
         )}
       </Stack>
+      </Box>
     </Paper>
   );
 }

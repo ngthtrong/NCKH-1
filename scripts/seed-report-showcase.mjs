@@ -13,7 +13,7 @@ for(const [slug,name,color,strict]of [['t-acme','Acme — Quy trình phát tri�
   p=(await api('/projects',{session:s,method:'POST',body:{name,description:strict?'Theo dõi phát triển tính năng theo sprint.':'Lên ý tưởng, sản xuất và phát hành nội dung.'},expect:201})).value;
   const b=(await api(`/boards/${p.boardId}`,{session:s})).value;
   const titles=strict?['Lên kế hoạch sprint','Thiết kế trang quản lý dự án','Xây dựng luồng đăng nhập','Rà soát yêu cầu mới']:['Lên ý tưởng chiến dịch','Viết nội dung giới thiệu','Thiết kế bộ ảnh truyền thông','Chuẩn bị video phát hành'];
-  for(let i=0;i<4;i++)await api(`/boards/${b.id}/tasks`,{session:s,method:'POST',body:{columnId:b.columns[i>0&&(!strict||i<3)?1:0].id,title:titles[i],priority:i===1?'HIGH':'MEDIUM',description:strict?'Làm việc trong Sprint 1.':'Nội dung cho kênh Web.',customData:strict?{story_points:i+3,sprint:'Sprint 1'}:{channel:'Web',budget_usd:(i+1)*200}},expect:201});
+  for(let i=0;i<4;i++)await api(`/boards/${b.id}/tasks`,{session:s,method:'POST',body:{columnId:b.columns[i>0&&(!strict||i<3)?1:0].id,title:titles[i],priority:i===1?'HIGH':'MEDIUM',description:strict?'Làm việc trong Sprint 12.':'Nội dung cho kênh TikTok.',customData:strict?{story_points:i===1?5:i===2?8:3,sprint:'Sprint-12'}:{channel:'TikTok',budget_usd:i===1?1500:i===2?1200:800}},expect:201});
  }
  evidence.push({slug,projectId:p.id,name,boardId:p.boardId,url:`http://${s.host}/kanban/${p.boardId}`});
 }

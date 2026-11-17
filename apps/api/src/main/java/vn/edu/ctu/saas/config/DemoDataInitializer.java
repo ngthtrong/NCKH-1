@@ -30,7 +30,7 @@ import vn.edu.ctu.saas.tenant.TenantRole;
 import vn.edu.ctu.saas.tenant.TenantStatus;
 
 @Component
-@Profile("worker")
+@Profile({"worker", "api", "default"})
 @ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true")
 public class DemoDataInitializer {
     @org.springframework.beans.factory.annotation.Value("${app.report-mode:false}")
@@ -90,6 +90,18 @@ public class DemoDataInitializer {
             owner.setSystemAdmin(true);
             owner = userRepository.save(owner);
         }
+        UserAccountEntity admin = userRepository.findByEmailIgnoreCase("admin@demo.local").orElseGet(() -> {
+            UserAccountEntity created = new UserAccountEntity();
+            created.setEmail("admin@demo.local");
+            created.setDisplayName("Demo Admin");
+            created.setPasswordHash(passwordEncoder.encode(properties.seed().ownerPassword()));
+            created.setSystemAdmin(true);
+            return userRepository.save(created);
+        });
+        if (!admin.isSystemAdmin()) {
+            admin.setSystemAdmin(true);
+            admin = userRepository.save(admin);
+        }
         UserAccountEntity member = userRepository.findByEmailIgnoreCase("member@example.test").orElseGet(() -> {
             UserAccountEntity created = new UserAccountEntity();
             created.setEmail("member@example.test");
@@ -97,15 +109,15 @@ public class DemoDataInitializer {
             created.setPasswordHash(passwordEncoder.encode(properties.seed().ownerPassword()));
             return userRepository.save(created);
         });
-        ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, member);
+        ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, admin, member);
         if (reportMode) {
-            ensureTenant("t-acme", "Acme Software", "PROFESSIONAL", TenantPlacement.POOL, owner, member);
-            ensureTenant("t-lotus", "Lotus Media", "PROFESSIONAL", TenantPlacement.POOL, owner, member);
+            ensureTenant("t-acme", "Acme Software", "ENTERPRISE", TenantPlacement.POOL, owner, admin, member);
+            ensureTenant("t-lotus", "Lotus Media", "PROFESSIONAL", TenantPlacement.POOL, owner, admin, member);
         } else {
-            ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
-            ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
+            ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, admin, member);
+            ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, admin, member);
         }
-        return new SeedUsers(owner, member);
+        return new SeedUsers(owner, admin, member);
     }
 
     private void ensureTenant(
@@ -114,6 +126,7 @@ public class DemoDataInitializer {
             String tier,
             TenantPlacement placementType,
             UserAccountEntity owner,
+            UserAccountEntity admin,
             UserAccountEntity member) {
         TenantEntity tenant = tenantRepository.findBySlug(slug).orElseGet(() -> {
             TenantEntity created = new TenantEntity();
@@ -123,6 +136,10 @@ public class DemoDataInitializer {
             created.setStatus(TenantStatus.PROVISIONING);
             return tenantRepository.save(created);
         });
+        if (!tier.equals(tenant.getTier())) {
+            tenant.setTier(tier);
+            tenant = tenantRepository.save(tenant);
+        }
         TenantPlacementEntity placement = placementRepository.findByTenantId(tenant.getId()).orElse(null);
         if (placement == null) {
             TenantPlacementEntity createdPlacement = new TenantPlacementEntity();
@@ -136,6 +153,9 @@ public class DemoDataInitializer {
             tenant = tenantRepository.save(tenant);
         }
         ensureMembership(tenant.getId(), owner.getId(), TenantRole.OWNER);
+        if (admin != null) {
+            ensureMembership(tenant.getId(), admin.getId(), TenantRole.OWNER);
+        }
         ensureMembership(tenant.getId(), member.getId(), TenantRole.MEMBER);
         String key = "seed:bridge-v2:" + tenant.getId();
         if (tenant.getStatus() != TenantStatus.ACTIVE) {
@@ -163,13 +183,17 @@ public class DemoDataInitializer {
                 if (reportMode && (tenant.getSlug().equals("t-acme") || tenant.getSlug().equals("t-lotus"))) {
                     boolean acme = tenant.getSlug().equals("t-acme");
                     String settings = acme
-                            ? "{\"wipMode\":\"STRICT\",\"wipLimit\":2,\"cardStyle\":\"FULL\",\"defaultColumns\":[\"Backlog\",\"In Dev\",\"Code Review\",\"Done\"],\"fields\":[{\"key\":\"story_points\",\"label\":\"Story points\",\"type\":\"NUMBER\",\"required\":false},{\"key\":\"sprint\",\"label\":\"Sprint\",\"type\":\"STRING\",\"required\":false}]}"
+                            ? "{\"wipMode\":\"STRICT\",\"wipLimit\":2,\"cardStyle\":\"FULL\",\"defaultColumns\":[\"Backlog\",\"Đang làm\",\"Code Review\",\"Done\"],\"fields\":[{\"key\":\"story_points\",\"label\":\"Story points\",\"type\":\"NUMBER\",\"required\":false},{\"key\":\"sprint\",\"label\":\"Sprint\",\"type\":\"STRING\",\"required\":false}]}"
                             : "{\"wipMode\":\"WARN\",\"wipLimit\":2,\"cardStyle\":\"COMPACT\",\"defaultColumns\":[\"Ý tưởng\",\"Sản xuất\",\"Phát hành\"],\"fields\":[{\"key\":\"channel\",\"label\":\"Kênh truyền thông\",\"type\":\"STRING\",\"required\":false},{\"key\":\"budget_usd\",\"label\":\"Ngân sách (USD)\",\"type\":\"NUMBER\",\"required\":false}]}";
-                    jdbc.update("INSERT INTO tenant_kanban_settings(tenant_id,settings) VALUES (?,CAST(? AS jsonb)) ON CONFLICT DO NOTHING",
+                    jdbc.update("INSERT INTO tenant_kanban_settings(tenant_id,settings) VALUES (?,CAST(? AS jsonb)) ON CONFLICT (tenant_id) DO UPDATE SET settings = EXCLUDED.settings",
                             tenant.getId(), settings);
                     controlJdbc.update("""
                             INSERT INTO tenant_branding(id,tenant_id,primary_color,accent_color,version,created_at,updated_at)
-                            VALUES (?,?,?,?,0,now(),now()) ON CONFLICT (tenant_id) DO NOTHING
+                            VALUES (?,?,?,?,0,now(),now())
+                            ON CONFLICT (tenant_id) DO UPDATE SET
+                                primary_color = EXCLUDED.primary_color,
+                                accent_color = EXCLUDED.accent_color,
+                                updated_at = now()
                             """, UUID.randomUUID(), tenant.getId(), acme ? "#2563EB" : "#C2410C", acme ? "#0284C7" : "#EA580C");
                 }
                 UUID projectId = stableId(tenant.getId(), "project");
@@ -187,6 +211,13 @@ public class DemoDataInitializer {
                         VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING
                         """, stableId(tenant.getId(), "pm-owner"), tenant.getId(), projectId,
                         users.owner().getId(), ProjectRole.MANAGER.name());
+                if (users.admin() != null) {
+                    jdbc.update("""
+                            INSERT INTO project_memberships(id,tenant_id,project_id,user_id,role)
+                            VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING
+                            """, stableId(tenant.getId(), "pm-admin"), tenant.getId(), projectId,
+                            users.admin().getId(), ProjectRole.MANAGER.name());
+                }
                 jdbc.update("""
                         INSERT INTO project_memberships(id,tenant_id,project_id,user_id,role)
                         VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING
@@ -197,7 +228,7 @@ public class DemoDataInitializer {
                         ON CONFLICT (tenant_id,id) DO NOTHING
                         """, boardId, tenant.getId(), projectId, "Bảng nghiên cứu");
                 String[] names = reportMode && tenant.getSlug().equals("t-acme")
-                        ? new String[]{"Backlog", "In Dev", "Done"}
+                        ? new String[]{"Backlog", "Đang làm", "Done"}
                         : reportMode && tenant.getSlug().equals("t-lotus")
                         ? new String[]{"Ý tưởng", "Sản xuất", "Phát hành"}
                         : new String[]{"Cần làm", "Đang làm", "Hoàn tất"};
@@ -207,9 +238,39 @@ public class DemoDataInitializer {
                     insertColumn(jdbc, tenant.getId(), boardId, stableId(tenant.getId(), "review"), "Code Review", 2500);
                 }
                 insertColumn(jdbc, tenant.getId(), boardId, doneId, names[2], 3000);
-                insertTask(jdbc, tenant.getId(), projectId, boardId, todoId, users.owner().getId(), "Hoàn thiện threat model", 1000);
-                insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.member().getId(), "Chạy spike cô lập dữ liệu", 1000);
-                insertTask(jdbc, tenant.getId(), projectId, boardId, doneId, users.owner().getId(), "Chuẩn hóa giao thức nghiên cứu", 1000);
+
+                if (reportMode && tenant.getSlug().equals("t-acme")) {
+                    // Cột "Đang làm" (doingId) có sẵn 2 thẻ (đạt giới hạn WIP 2/2)
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.owner().getId(),
+                            "Thiết kế API xác thực JWT", 1000, "{\"story_points\":5,\"sprint\":\"Sprint-12\"}");
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.member().getId(),
+                            "Tích hợp RLS đa thuê bao", 2000, "{\"story_points\":8,\"sprint\":\"Sprint-12\"}");
+                    // Cột "Backlog" (todoId) có 1 thẻ để sẵn sàng thao tác kéo sang thử nghiệm chặn STRICT HTTP 422
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, todoId, users.owner().getId(),
+                            "Hoàn thiện threat model", 1000, "{\"story_points\":3,\"sprint\":\"Sprint-12\"}");
+                    // Cột "Done" (doneId)
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doneId, users.owner().getId(),
+                            "Chuẩn hóa giao thức nghiên cứu", 1000, "{\"story_points\":2,\"sprint\":\"Sprint-12\"}");
+                } else if (reportMode && tenant.getSlug().equals("t-lotus")) {
+                    // Cột "Sản xuất" (doingId) có sẵn 2 thẻ (đạt giới hạn WIP 2/2)
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.owner().getId(),
+                            "Sản xuất video ngắn TikTok", 1000, "{\"channel\":\"TikTok\",\"budget_usd\":1500}");
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.member().getId(),
+                            "Thiết kế bộ ảnh truyền thông", 2000, "{\"channel\":\"Facebook\",\"budget_usd\":1200}");
+                    // Cột "Ý tưởng" (todoId) có 1 thẻ để sẵn sàng thao tác kéo sang thử nghiệm cảnh báo WARN
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, todoId, users.owner().getId(),
+                            "Lên ý tưởng chiến dịch truyền thông", 1000, "{\"channel\":\"TikTok\",\"budget_usd\":1500}");
+                    // Cột "Phát hành" (doneId)
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doneId, users.owner().getId(),
+                            "Phát hành bài viết báo chí", 1000, "{\"channel\":\"Web\",\"budget_usd\":800}");
+                } else {
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, todoId, users.owner().getId(),
+                            "Hoàn thiện threat model", 1000, "{}");
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doingId, users.member().getId(),
+                            "Chạy spike cô lập dữ liệu", 1000, "{}");
+                    insertTask(jdbc, tenant.getId(), projectId, boardId, doneId, users.owner().getId(),
+                            "Chuẩn hóa giao thức nghiên cứu", 1000, "{}");
+                }
             });
         } catch (RuntimeException exception) {
             log.warn("Cannot seed application data for tenant {}", tenant.getId(), exception);
@@ -227,7 +288,7 @@ public class DemoDataInitializer {
             long position) {
         jdbc.update("""
                 INSERT INTO board_columns(id,tenant_id,board_id,name,position,completed) VALUES (?,?,?,?,?,?)
-                ON CONFLICT (tenant_id,id) DO NOTHING
+                ON CONFLICT (tenant_id,id) DO UPDATE SET name = EXCLUDED.name
                 """, id, tenantId, boardId, name, BigDecimal.valueOf(position), position == 3000);
     }
 
@@ -239,19 +300,25 @@ public class DemoDataInitializer {
             UUID columnId,
             UUID assignee,
             String title,
-            long position) {
+            long position,
+            String customDataJson) {
         UUID id = stableId(tenantId, "task:" + title);
         jdbc.update("""
                 INSERT INTO tasks(
-                    id,tenant_id,project_id,board_id,board_column_id,title,assignee_user_id,position,created_by)
-                VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT (tenant_id,id) DO NOTHING
+                    id,tenant_id,project_id,board_id,board_column_id,title,assignee_user_id,position,created_by,custom_data)
+                VALUES (?,?,?,?,?,?,?,?,?,CAST(? AS jsonb))
+                ON CONFLICT (tenant_id,id) DO UPDATE SET
+                    board_column_id = EXCLUDED.board_column_id,
+                    custom_data = EXCLUDED.custom_data,
+                    position = EXCLUDED.position
                 """, id, tenantId, projectId, boardId, columnId, title, assignee,
-                BigDecimal.valueOf(position), assignee);
+                BigDecimal.valueOf(position), assignee,
+                customDataJson != null && !customDataJson.isBlank() ? customDataJson : "{}");
     }
 
     private UUID stableId(UUID tenantId, String name) {
         return UUID.nameUUIDFromBytes((tenantId + ":" + name).getBytes(StandardCharsets.UTF_8));
     }
 
-    private record SeedUsers(UserAccountEntity owner, UserAccountEntity member) {}
+    private record SeedUsers(UserAccountEntity owner, UserAccountEntity admin, UserAccountEntity member) {}
 }

@@ -109,4 +109,60 @@ describe('KanbanFilterBar', () => {
       assigneeId: 'ALL',
     });
   });
+
+  it('renders WIP STRICT policy badge and custom fields chips when provided', () => {
+    const filters: KanbanFilterState = {
+      search: '',
+      priority: 'ALL',
+      assigneeId: 'ALL',
+    };
+    const onFilterChange = vi.fn();
+    const customFields = [
+      { key: 'story_points', label: 'Story Points', type: 'NUMBER' },
+      { key: 'sprint', label: 'Sprint', type: 'STRING' },
+    ];
+
+    render(
+      <ThemeProvider theme={theme}>
+        <KanbanFilterBar
+          filters={filters}
+          onFilterChange={onFilterChange}
+          assignees={assignees}
+          wipMode="STRICT"
+          customFields={customFields}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(
+      screen.getByText('Chính sách WIP: STRICT (Chặn cứng khi vượt trần)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Trường mở rộng:')).toBeInTheDocument();
+    expect(screen.getByText('story_points')).toBeInTheDocument();
+    expect(screen.getByText('sprint')).toBeInTheDocument();
+  });
+
+  it('renders WIP WARN policy badge when wipMode is WARN', () => {
+    const filters: KanbanFilterState = {
+      search: '',
+      priority: 'ALL',
+      assigneeId: 'ALL',
+    };
+    const onFilterChange = vi.fn();
+
+    render(
+      <ThemeProvider theme={theme}>
+        <KanbanFilterBar
+          filters={filters}
+          onFilterChange={onFilterChange}
+          assignees={assignees}
+          wipMode="WARN"
+        />
+      </ThemeProvider>,
+    );
+
+    expect(
+      screen.getByText('Chính sách WIP: WARN (Cảnh báo mềm khi vượt trần)'),
+    ).toBeInTheDocument();
+  });
 });
