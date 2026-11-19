@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import vn.edu.ctu.saas.control.ProvisioningJobEntity;
+import vn.edu.ctu.saas.control.ProvisioningJobRepository;
+import vn.edu.ctu.saas.control.ProvisioningStatus;
 import vn.edu.ctu.saas.control.TenantEntity;
 import vn.edu.ctu.saas.control.TenantMembershipEntity;
 import vn.edu.ctu.saas.control.TenantMembershipRepository;
@@ -43,6 +46,7 @@ public class DemoDataInitializer {
     private final TenantRepository tenantRepository;
     private final TenantPlacementRepository placementRepository;
     private final TenantMembershipRepository membershipRepository;
+    private final ProvisioningJobRepository jobRepository;
     private final ProvisioningService provisioningService;
     private final PasswordEncoder passwordEncoder;
     private final TenantJdbcExecutor executor;
@@ -53,6 +57,7 @@ public class DemoDataInitializer {
             TenantRepository tenantRepository,
             TenantPlacementRepository placementRepository,
             TenantMembershipRepository membershipRepository,
+            ProvisioningJobRepository jobRepository,
             ProvisioningService provisioningService,
             PasswordEncoder passwordEncoder,
             TenantJdbcExecutor executor) {
@@ -61,6 +66,7 @@ public class DemoDataInitializer {
         this.tenantRepository = tenantRepository;
         this.placementRepository = placementRepository;
         this.membershipRepository = membershipRepository;
+        this.jobRepository = jobRepository;
         this.provisioningService = provisioningService;
         this.passwordEncoder = passwordEncoder;
         this.executor = executor;
@@ -128,7 +134,32 @@ public class DemoDataInitializer {
             ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
             ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
         }
+        syncPoolTenants();
         return new SeedUsers(owner, admin, member);
+    }
+
+    private void syncPoolTenants() {
+        for (TenantEntity t : tenantRepository.findAll()) {
+            placementRepository.findByTenantId(t.getId()).ifPresent(p -> {
+                if (p.getPlacementType() == TenantPlacement.POOL) {
+                    if (t.getStatus() != TenantStatus.ACTIVE) {
+                        t.setStatus(TenantStatus.ACTIVE);
+                        tenantRepository.save(t);
+                    }
+                    jobRepository.findTopByTenantIdOrderByCreatedAtDesc(t.getId()).ifPresent(job -> {
+                        if (job.getStatus() != ProvisioningStatus.SUCCEEDED) {
+                            job.setStatus(ProvisioningStatus.SUCCEEDED);
+                            job.setLastErrorCode(null);
+                            job.setLastErrorMessage(null);
+                            job.setLeaseOwner(null);
+                            job.setLeaseToken(null);
+                            job.setLeaseExpiresAt(null);
+                            jobRepository.save(job);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private void ensureTenant(
@@ -164,9 +195,27 @@ public class DemoDataInitializer {
         }
         ensureMembership(tenant.getId(), owner.getId(), TenantRole.OWNER);
         ensureMembership(tenant.getId(), member.getId(), TenantRole.MEMBER);
-        String key = "seed:bridge-v2:" + tenant.getId();
-        if (tenant.getStatus() != TenantStatus.ACTIVE) {
-            provisioningService.enqueue(tenant.getId(), key);
+        if (placementType == TenantPlacement.POOL) {
+            if (tenant.getStatus() != TenantStatus.ACTIVE) {
+                tenant.setStatus(TenantStatus.ACTIVE);
+                tenant = tenantRepository.save(tenant);
+            }
+            jobRepository.findTopByTenantIdOrderByCreatedAtDesc(tenant.getId()).ifPresent(job -> {
+                if (job.getStatus() != ProvisioningStatus.SUCCEEDED) {
+                    job.setStatus(ProvisioningStatus.SUCCEEDED);
+                    job.setLastErrorCode(null);
+                    job.setLastErrorMessage(null);
+                    job.setLeaseOwner(null);
+                    job.setLeaseToken(null);
+                    job.setLeaseExpiresAt(null);
+                    jobRepository.save(job);
+                }
+            });
+        } else {
+            String key = "seed:bridge-v2:" + tenant.getId();
+            if (tenant.getStatus() != TenantStatus.ACTIVE) {
+                provisioningService.enqueue(tenant.getId(), key);
+            }
         }
     }
 

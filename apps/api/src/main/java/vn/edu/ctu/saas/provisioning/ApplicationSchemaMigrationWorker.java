@@ -41,7 +41,7 @@ public class ApplicationSchemaMigrationWorker {
         tenants.findAll().stream()
                 .filter(tenant -> tenant.getStatus() == TenantStatus.ACTIVE)
                 .forEach(tenant -> placements.findByTenantId(tenant.getId()).ifPresent(placement -> {
-                    if (TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(
+                    if (TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(
                             placement.getSchemaVersion())) {
                         return;
                     }

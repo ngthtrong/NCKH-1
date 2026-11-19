@@ -149,7 +149,7 @@ public class TenantCapabilityService {
     private void requireApplicationSchemaReady(
             TenantPlacementEntity placement, TenantCapability capability) {
         if (capability != TenantCapability.BRANDING
-                && !TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(placement.getSchemaVersion())) {
+                && !TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(placement.getSchemaVersion())) {
             throw new ConflictException("Tenant application schema must be upgraded before enabling " + capability);
         }
     }
@@ -171,7 +171,7 @@ public class TenantCapabilityService {
 
     private void assertApprovalsCanBeDisabled(
             UUID actorUserId, UUID tenantId, TenantPlacementEntity placement) {
-        if (!TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(placement.getSchemaVersion())) {
+        if (!TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(placement.getSchemaVersion())) {
             throw new ConflictException("Tenant application schema is not ready for approval validation");
         }
         TenantEntity tenant = tenants.findById(tenantId).orElseThrow();

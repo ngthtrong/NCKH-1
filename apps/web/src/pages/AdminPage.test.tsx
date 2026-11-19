@@ -15,6 +15,7 @@ const api = vi.hoisted(() => ({
   requeueResourceDeadLetter: vi.fn(),
   capabilities: vi.fn(),
   setCapability: vi.fn(),
+  updateTier: vi.fn(),
 }));
 const auth = vi.hoisted(() => ({ logout: vi.fn() }));
 

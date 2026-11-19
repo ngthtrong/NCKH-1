@@ -61,7 +61,7 @@ public class DeadlineReminderWorker {
 
     private void processTenantSafely(TenantEntity tenant) {
         TenantPlacementEntity placement = placements.findByTenantId(tenant.getId()).orElse(null);
-        if (placement == null || !TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(
+        if (placement == null || !TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(
                 placement.getSchemaVersion())) {
             return;
         }

@@ -56,7 +56,7 @@ public class CustomizationSchemaWorker {
 
     private void processSafely(TenantEntity tenant) {
         TenantPlacementEntity placement = placements.findByTenantId(tenant.getId()).orElse(null);
-        if (placement == null || !TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(placement.getSchemaVersion())) return;
+        if (placement == null || !TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(placement.getSchemaVersion())) return;
         TenantMembershipEntity membership = memberships.findAllByTenantIdAndActiveTrue(tenant.getId()).stream().findFirst().orElse(null);
         if (membership == null) return;
         String correlation = "custom-schema-" + UUID.randomUUID();

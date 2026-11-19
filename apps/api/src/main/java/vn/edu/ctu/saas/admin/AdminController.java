@@ -66,6 +66,15 @@ public class AdminController {
         return service.tenant(tenantId);
     }
 
+    @PatchMapping("/tenants/{tenantId}/tier")
+    public AdminService.AdminTenantDetailView updateTier(
+            @PathVariable UUID tenantId,
+            @RequestBody UpdateTierRequest request) {
+        return service.updateTier(tenantId, request.tier());
+    }
+
+    public record UpdateTierRequest(String tier) {}
+
     @PostMapping("/tenants/{tenantId}/provisioning/retry")
     public void retryProvisioning(@PathVariable UUID tenantId) {
         service.retryProvisioning(tenantId);

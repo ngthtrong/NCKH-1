@@ -94,6 +94,19 @@ public class AdminService {
     }
 
     @Transactional
+    public AdminTenantDetailView updateTier(UUID tenantId, String tier) {
+        TenantEntity tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new NotFoundException("Tenant not found"));
+        String normalizedTier = tier == null ? "" : tier.trim().toUpperCase(java.util.Locale.ROOT);
+        if (!List.of("STARTER", "PROFESSIONAL", "ENTERPRISE").contains(normalizedTier)) {
+            throw new IllegalArgumentException("Unsupported tenant tier: " + tier);
+        }
+        tenant.setTier(normalizedTier);
+        tenantRepository.save(tenant);
+        return tenant(tenantId);
+    }
+
+    @Transactional
     public void retryProvisioning(UUID tenantId) {
         TenantEntity tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new NotFoundException("Tenant not found"));
@@ -101,8 +114,24 @@ public class AdminService {
                 .orElseThrow(() -> new NotFoundException("Provisioning job not found"));
         if (job.getStatus() != ProvisioningStatus.RETRYABLE_FAILED
                 && job.getStatus() != ProvisioningStatus.FAILED_ROLLED_BACK
-                && job.getStatus() != ProvisioningStatus.ROLLBACK_FAILED) {
+                && job.getStatus() != ProvisioningStatus.ROLLBACK_FAILED
+                && tenant.getStatus() != TenantStatus.FAILED) {
             throw new ConflictException("Provisioning job is not retryable in its current state");
+        }
+        TenantPlacementEntity placement = placementRepository.findByTenantId(tenantId).orElse(null);
+        if (placement != null && placement.getPlacementType() == TenantPlacement.POOL) {
+            ProvisioningStatus previousStatus = job.getStatus();
+            job.setStatus(ProvisioningStatus.SUCCEEDED);
+            job.setLastErrorCode(null);
+            job.setLastErrorMessage(null);
+            job.setLeaseOwner(null);
+            job.setLeaseToken(null);
+            job.setLeaseExpiresAt(null);
+            tenant.setStatus(TenantStatus.ACTIVE);
+            tenantRepository.save(tenant);
+            jobRepository.save(job);
+            eventRecorder.record(job, previousStatus, ProvisioningStatus.SUCCEEDED, null, "Pool tenant activated on retry");
+            return;
         }
         ProvisioningStatus previousStatus = job.getStatus();
         job.setStatus(ProvisioningStatus.QUEUED);

@@ -440,6 +440,11 @@ export const adminApi = {
   },
   tenant: (tenantId: UUID) =>
     request<AdminTenantDetail>(`/admin/tenants/${tenantId}`),
+  updateTier: (tenantId: UUID, tier: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE') =>
+    request<AdminTenantDetail>(`/admin/tenants/${tenantId}/tier`, {
+      method: 'PATCH',
+      body: { tier },
+    }),
   retryProvisioning: (tenantId: UUID) =>
     request<void>(`/admin/tenants/${tenantId}/provisioning/retry`, { method: 'POST' }),
   resourceDeadLetters: (tenantId: UUID, page = 0) =>

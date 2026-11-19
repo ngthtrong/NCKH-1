@@ -21,6 +21,18 @@ import vn.edu.ctu.saas.tenant.TenantPlacement;
 public class TenantDatabaseProvisioner {
     public static final String LATEST_APPLICATION_SCHEMA_VERSION = "14";
 
+    public static boolean isSupportedApplicationSchemaVersion(String schemaVersion) {
+        if (schemaVersion == null || schemaVersion.isBlank()) {
+            return false;
+        }
+        try {
+            int version = Integer.parseInt(schemaVersion.trim());
+            return version >= 14;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     private final AppProperties properties;
     private final PlacementSecretCipher cipher;
     private final ProvisioningCheckpoint checkpoint;
@@ -170,7 +182,10 @@ public class TenantDatabaseProvisioner {
         String schemaVersion = current == null || current.getVersion() == null
                 ? null
                 : current.getVersion().getVersion();
-        if (!LATEST_APPLICATION_SCHEMA_VERSION.equals(schemaVersion)) {
+        if (current != null && current.getState() != null && current.getState().isFailed()) {
+            throw new IllegalStateException("Latest application schema migration failed: " + schemaVersion);
+        }
+        if (schemaVersion == null || !isSupportedApplicationSchemaVersion(schemaVersion)) {
             throw new IllegalStateException("Unexpected application schema version " + schemaVersion);
         }
         return schemaVersion;

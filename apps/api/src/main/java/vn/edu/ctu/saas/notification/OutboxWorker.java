@@ -91,11 +91,11 @@ public class OutboxWorker {
     private void processTenantSafely(TenantEntity tenant) {
         TenantPlacementEntity placement = placementRepository.findByTenantId(tenant.getId()).orElse(null);
         if (placement == null) return;
-        if (!TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION.equals(
+        if (!TenantDatabaseProvisioner.isSupportedApplicationSchemaVersion(
                 placement.getSchemaVersion())) {
             log.debug(
-                    "Skipping outbox polling for tenant {} until application schema reaches version {}",
-                    tenant.getId(), TenantDatabaseProvisioner.LATEST_APPLICATION_SCHEMA_VERSION);
+                    "Skipping outbox polling for tenant {} until application schema reaches a supported version (got {})",
+                    tenant.getId(), placement.getSchemaVersion());
             return;
         }
         List<TenantMembershipEntity> loadedMemberships =
