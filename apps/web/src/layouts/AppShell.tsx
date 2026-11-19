@@ -88,6 +88,7 @@ export function AppShell() {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tenantAnchor, setTenantAnchor] = useState<HTMLElement | null>(null);
+  const [userAnchor, setUserAnchor] = useState<HTMLElement | null>(null);
   const [switchingTenantId, setSwitchingTenantId] = useState<string | null>(null);
   const [rateLimited, setRateLimited] = useState(false);
   const { session, logout, tenants, currentTenant, selectTenant } = useAuth();
@@ -103,7 +104,6 @@ export function AppShell() {
   };
   const tenant = currentTenant ?? session?.activeTenant;
   const canAdministerTenant = tenant && ['OWNER', 'ADMIN'].includes(tenant.role);
-  const canAdministerSystem = session?.user.platformRoles.includes('SYSTEM_ADMIN');
 
   useEffect(() => {
     return addRateLimitListener(() => {
@@ -133,17 +133,24 @@ export function AppShell() {
     (item) => item.capability === 'BRANDING' && item.supported && item.granted && item.enabled,
   );
   const activeBranding = brandingEnabled ? tenantSettings?.branding : undefined;
+
+  const defaultTenantPrimary = tenant?.slug === 't-lotus' ? '#C2410C' : tenant?.slug === 't-acme' ? '#2563EB' : '#246bfd';
+  const defaultTenantAccent = tenant?.slug === 't-lotus' ? '#EA580C' : tenant?.slug === 't-acme' ? '#0284C7' : '#0f9f8f';
+  const primaryColor = activeBranding?.primaryColor || defaultTenantPrimary;
+  const accentColor = activeBranding?.accentColor || defaultTenantAccent;
+  const primaryLight = `${primaryColor}14`;
+
   const tenantTheme = useMemo(() => {
-    if (!activeBranding) return theme;
     return createTheme({
       ...theme,
       palette: {
         ...theme.palette,
-        primary: { ...theme.palette.primary, main: activeBranding.primaryColor },
-        secondary: { ...theme.palette.secondary, main: activeBranding.accentColor },
+        primary: { ...theme.palette.primary, main: primaryColor },
+        secondary: { ...theme.palette.secondary, main: accentColor },
       },
     });
-  }, [activeBranding, theme]);
+  }, [primaryColor, accentColor, theme]);
+
   const hasBusinessExtensions = tenantSettings?.capabilities.some(
     (item) => item.capability !== 'BRANDING' && item.supported,
   ) ?? false;
@@ -154,10 +161,8 @@ export function AppShell() {
 
   const closeDrawer = () => setDrawerOpen(false);
 
-  const userRoleLabel = session?.user.platformRoles.includes('SYSTEM_ADMIN')
-    ? 'System Admin'
-    : tenant?.role === 'OWNER'
-    ? 'Chủ sở hữu'
+  const userRoleLabel = tenant?.role === 'OWNER'
+    ? 'Chủ sở hữu tổ chức'
     : tenant?.role === 'ADMIN'
     ? 'Quản trị viên'
     : 'Thành viên';
@@ -193,9 +198,9 @@ export function AppShell() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: 1.2,
+            gap: 1.25,
             px: 1,
-            py: 0.75,
+            py: 0.85,
             borderRadius: '9px',
             border: '1px solid #e2e8f0',
             backgroundColor: '#f8fafc',
@@ -215,11 +220,11 @@ export function AppShell() {
             src={activeBranding?.logoUrl ?? undefined}
             alt={activeBranding?.logoUrl ? `${tenant?.name ?? 'Tenant'} logo` : undefined}
             sx={{
-              width: 32,
-              height: 32,
-              minWidth: 32,
+              width: 34,
+              height: 34,
+              minWidth: 34,
               borderRadius: '8px',
-              backgroundColor: activeBranding?.primaryColor ?? '#246bfd',
+              backgroundColor: primaryColor,
               display: 'grid',
               placeItems: 'center',
               color: '#ffffff',
@@ -232,6 +237,7 @@ export function AppShell() {
             {activeBranding?.logoUrl ? null : tenant?.name ? initials(tenant.name) : 'T'}
           </Box>
           <Box sx={{ minWidth: 0, flex: 1 }}>
+            {/* Dòng 1: Tên tổ chức trọn vẹn, không bị cắt chữ */}
             <Typography
               variant="body2"
               fontWeight={750}
@@ -239,44 +245,47 @@ export function AppShell() {
               sx={{
                 fontSize: 13,
                 color: '#0f172a',
-                lineHeight: 1.25,
+                lineHeight: 1.3,
               }}
             >
               {tenant?.name ?? 'Chọn không gian'}
             </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              noWrap
-              display="block"
-              sx={{ fontSize: 10.5, color: '#64748b' }}
-            >
-              {tenant?.slug ? formatTenantHost(tenant.slug) : 'workspace'}
-            </Typography>
+
+            {/* Dòng 2: Subdomain kèm huy hiệu gói cước nhỏ gọn */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mt: 0.25, minWidth: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                noWrap
+                sx={{ fontSize: 10, color: '#64748b', maxWidth: 85 }}
+              >
+                {tenant?.slug ? formatTenantHost(tenant.slug) : 'workspace'}
+              </Typography>
+              <Chip
+                label={
+                  tenant?.tier
+                    ? (tierLabels[tenant.tier] ?? tenant.tier)
+                    : tenant?.role === 'OWNER'
+                    ? 'Chủ sở hữu'
+                    : tenant?.role === 'ADMIN'
+                    ? 'Quản trị viên'
+                    : 'Thành viên'
+                }
+                size="small"
+                sx={{
+                  height: 18,
+                  fontSize: 9.5,
+                  fontWeight: 650,
+                  borderRadius: '4px',
+                  backgroundColor: `${primaryColor}15`,
+                  color: primaryColor,
+                  border: `1px solid ${primaryColor}30`,
+                  px: 0.2,
+                  '& .MuiChip-label': { px: 0.5 },
+                }}
+              />
+            </Box>
           </Box>
-          <Chip
-            label={
-              tenant?.tier
-                ? (tierLabels[tenant.tier] ?? tenant.tier)
-                : tenant?.role === 'OWNER'
-                ? 'Chủ sở hữu'
-                : tenant?.role === 'ADMIN'
-                ? 'Quản trị viên'
-                : 'Thành viên'
-            }
-            size="small"
-            sx={{
-              height: 20,
-              fontSize: 10,
-              fontWeight: 650,
-              borderRadius: '5px',
-              backgroundColor: activeBranding?.primaryColor ? `${activeBranding.primaryColor}15` : '#eef2ff',
-              color: activeBranding?.primaryColor ?? '#246bfd',
-              border: `1px solid ${activeBranding?.primaryColor ? `${activeBranding.primaryColor}30` : '#c7d7fe'}`,
-              cursor: 'inherit',
-              px: 0.25,
-            }}
-          />
           <KeyboardArrowDown
             fontSize="small"
             sx={{
@@ -284,7 +293,8 @@ export function AppShell() {
               transform: Boolean(tenantAnchor) ? 'rotate(180deg)' : 'none',
               transition: 'transform 200ms ease',
               fontSize: 16,
-              ml: -0.5,
+              ml: 'auto',
+              flexShrink: 0,
             }}
           />
         </Button>
@@ -423,7 +433,7 @@ export function AppShell() {
           </ListItemButton>
         </List>
 
-        {(canAdministerTenant || canAdministerSystem) && (
+        {canAdministerTenant && tenant && (
           <>
             <Typography
               className="nav-label"
@@ -441,148 +451,65 @@ export function AppShell() {
               Quản trị
             </Typography>
             <List className="app-nav" sx={{ px: 1, py: 0 }}>
-              {canAdministerTenant && tenant && (
-                <>
-                  <ListItemButton
-                    component={NavLink}
-                    to="/settings"
-                    onClick={closeDrawer}
-                    className={location.pathname.startsWith('/settings') ? 'active' : ''}
-                    sx={{
-                      minHeight: 40,
-                      mx: 0.5,
-                      my: 0.25,
-                      px: 1.5,
-                      borderRadius: '8px',
-                      color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
-                      backgroundColor: location.pathname.startsWith('/settings')
-                        ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
-                        : 'transparent',
-                      borderLeft: location.pathname.startsWith('/settings')
-                        ? `3px solid ${activeBranding?.primaryColor ?? '#246bfd'}`
-                        : '3px solid transparent',
-                      fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
-                      transition: 'all 120ms ease',
-                      '&:hover': {
-                        backgroundColor: location.pathname.startsWith('/settings')
-                          ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
-                          : '#f1f5f9',
-                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
-                        '& .MuiListItemIcon-root': {
-                          color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 32,
-                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
-                      }}
-                    >
-                      <TuneOutlined fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Cài đặt workspace"
-                      primaryTypographyProps={{
-                        fontSize: 13.5,
-                        fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
-                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : 'inherit',
-                      }}
-                    />
-                  </ListItemButton>
-                  <ListItemButton
-                    component={NavLink}
-                    to={`/onboarding?tenant=${tenant.id}`}
-                    onClick={closeDrawer}
-                    sx={{
-                      minHeight: 40,
-                      mx: 0.5,
-                      my: 0.25,
-                      px: 1.5,
-                      borderRadius: '8px',
-                      color: '#64748b',
-                      borderLeft: '3px solid transparent',
-                      fontWeight: 500,
-                      transition: 'all 120ms ease',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                        color: '#0f172a',
-                        '& .MuiListItemIcon-root': { color: '#0f172a' },
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 32, color: '#64748b' }}>
-                      <AdminPanelSettingsOutlined fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Trạng thái workspace"
-                      primaryTypographyProps={{ fontSize: 13.5, fontWeight: 500 }}
-                    />
-                  </ListItemButton>
-                </>
-              )}
-              {canAdministerSystem && (
-                <ListItemButton
-                  component={NavLink}
-                  to="/admin"
-                  onClick={closeDrawer}
-                  className={location.pathname.startsWith('/admin') ? 'active' : ''}
-                  sx={{
-                    minHeight: 40,
-                    mx: 0.5,
-                    my: 0.25,
-                    px: 1.5,
-                    borderRadius: '8px',
-                    color: location.pathname.startsWith('/admin') ? '#246bfd' : '#64748b',
-                    backgroundColor: location.pathname.startsWith('/admin')
-                      ? '#eef2ff'
-                      : 'transparent',
-                    borderLeft: location.pathname.startsWith('/admin')
-                      ? '3px solid #246bfd'
-                      : '3px solid transparent',
-                    fontWeight: location.pathname.startsWith('/admin') ? 600 : 500,
-                    transition: 'all 120ms ease',
-                    '&:hover': {
-                      backgroundColor: location.pathname.startsWith('/admin')
-                        ? '#eef2ff'
-                        : '#f1f5f9',
-                      color: location.pathname.startsWith('/admin') ? '#246bfd' : '#0f172a',
-                      '& .MuiListItemIcon-root': {
-                        color: location.pathname.startsWith('/admin') ? '#246bfd' : '#0f172a',
-                      },
+              <ListItemButton
+                component={NavLink}
+                to="/settings"
+                onClick={closeDrawer}
+                className={location.pathname.startsWith('/settings') ? 'active' : ''}
+                sx={{
+                  minHeight: 40,
+                  mx: 0.5,
+                  my: 0.25,
+                  px: 1.5,
+                  borderRadius: '8px',
+                  color: location.pathname.startsWith('/settings') ? primaryColor : '#64748b',
+                  backgroundColor: location.pathname.startsWith('/settings')
+                    ? primaryLight
+                    : 'transparent',
+                  borderLeft: location.pathname.startsWith('/settings')
+                    ? `3px solid ${primaryColor}`
+                    : '3px solid transparent',
+                  fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
+                  transition: 'all 120ms ease',
+                  '&:hover': {
+                    backgroundColor: location.pathname.startsWith('/settings')
+                      ? primaryLight
+                      : '#f1f5f9',
+                    color: location.pathname.startsWith('/settings') ? primaryColor : '#0f172a',
+                    '& .MuiListItemIcon-root': {
+                      color: location.pathname.startsWith('/settings') ? primaryColor : '#0f172a',
                     },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 32,
+                    color: location.pathname.startsWith('/settings') ? primaryColor : '#64748b',
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 32,
-                      color: location.pathname.startsWith('/admin') ? '#246bfd' : '#64748b',
-                    }}
-                  >
-                    <AdminPanelSettingsOutlined fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="System Admin"
-                    primaryTypographyProps={{
-                      fontSize: 13.5,
-                      fontWeight: location.pathname.startsWith('/admin') ? 600 : 500,
-                      color: location.pathname.startsWith('/admin') ? '#1e3a8a' : 'inherit',
-                    }}
-                  />
-                </ListItemButton>
-              )}
+                  <TuneOutlined fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Cài đặt workspace"
+                  primaryTypographyProps={{
+                    fontSize: 13.5,
+                    fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
+                    color: location.pathname.startsWith('/settings') ? primaryColor : 'inherit',
+                  }}
+                />
+              </ListItemButton>
             </List>
           </>
         )}
       </Box>
 
-      {/* Bottom Profile Card */}
+      {/* Sidebar Footer: Data Boundary Indicator */}
       <Box
         sx={{
           mt: 'auto',
           p: 1.5,
-          borderTop: '1px solid #e2e8f0',
+          borderTop: '1px solid #f1f5f9',
           backgroundColor: '#ffffff',
         }}
       >
@@ -590,80 +517,36 @@ export function AppShell() {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.25,
-            p: 1,
-            borderRadius: '10px',
+            justifyContent: 'center',
+            gap: 0.75,
+            py: 0.85,
+            px: 1.25,
+            borderRadius: '8px',
             backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            transition: 'all 150ms ease',
+            border: '1px solid #f1f5f9',
           }}
         >
-          <Avatar
-            src={session?.user.avatarUrl}
+          <Box
             sx={{
-              width: 36,
-              height: 36,
-              fontSize: 13,
-              fontWeight: 700,
-              bgcolor: '#e0e7ff',
-              color: '#3730a3',
-              borderRadius: '8px',
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              backgroundColor: primaryColor,
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            variant="caption"
+            noWrap
+            sx={{
+              fontSize: 11,
+              color: '#64748b',
+              fontWeight: 500,
             }}
           >
-            {session?.user.displayName ? initials(session.user.displayName) : 'U'}
-          </Avatar>
-          <Box minWidth={0} flex={1}>
-            <Typography
-              variant="body2"
-              fontWeight={650}
-              noWrap
-              sx={{ fontSize: 13, color: '#0f172a', lineHeight: 1.25 }}
-            >
-              {session?.user.displayName ?? 'Người dùng'}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              noWrap
-              display="block"
-              sx={{ fontSize: 11, mt: 0.2, color: '#64748b' }}
-            >
-              {userRoleLabel}
-            </Typography>
-          </Box>
-          <Tooltip title="Đăng xuất">
-            <IconButton
-              size="small"
-              aria-label="Đăng xuất"
-              onClick={() => void logout()}
-              sx={{
-                color: '#64748b',
-                borderRadius: '8px',
-                p: 0.75,
-                transition: 'all 150ms ease',
-                '&:hover': {
-                  backgroundColor: '#fee2e2',
-                  color: '#ef4444',
-                },
-              }}
-            >
-              <Logout fontSize="small" sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Tooltip>
+            Phạm vi dữ liệu: {tenant?.name ?? 'Tổ chức'}
+          </Typography>
         </Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            display: 'block',
-            textAlign: 'center',
-            mt: 1,
-            fontSize: 10.5,
-            color: '#94a3b8',
-          }}
-        >
-          Dữ liệu chỉ hiển thị trong tổ chức này.
-        </Typography>
       </Box>
     </Box>
   );
@@ -785,14 +668,23 @@ export function AppShell() {
               </IconButton>
             </Tooltip>
 
-            {/* User Profile Pill */}
-            <Box
+            {/* User Profile Pill with Account Menu */}
+            <Button
+              onClick={(event) => setUserAnchor(event.currentTarget)}
+              aria-label="Tài khoản cá nhân"
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
                 pl: 1,
+                pr: 0.75,
+                py: 0.5,
                 borderLeft: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                textTransform: 'none',
+                textAlign: 'left',
+                color: 'inherit',
+                '&:hover': { backgroundColor: '#f8fafc' },
               }}
             >
               <Avatar
@@ -802,8 +694,8 @@ export function AppShell() {
                   height: 32,
                   fontSize: 12,
                   fontWeight: 700,
-                  bgcolor: '#e0e7ff',
-                  color: '#3730a3',
+                  bgcolor: `${primaryColor}20`,
+                  color: primaryColor,
                   borderRadius: '8px',
                 }}
               >
@@ -828,11 +720,90 @@ export function AppShell() {
                   {userRoleLabel}
                 </Typography>
               </Box>
-            </Box>
+              <KeyboardArrowDown
+                fontSize="small"
+                sx={{
+                  color: '#94a3b8',
+                  fontSize: 16,
+                  transform: Boolean(userAnchor) ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 200ms ease',
+                }}
+              />
+            </Button>
           </Toolbar>
         </AppBar>
 
         <TenantCustomizationDrawer open={customizationOpen} onClose={() => setCustomizationOpen(false)} />
+
+        {/* User Account Dropdown Menu */}
+        <Menu
+          anchorEl={userAnchor}
+          open={Boolean(userAnchor)}
+          onClose={() => setUserAnchor(null)}
+          PaperProps={{
+            sx: {
+              minWidth: 230,
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(15, 23, 42, 0.1)',
+              border: '1px solid #e2e8f0',
+              py: 0.5,
+              mt: 1,
+            },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <Box sx={{ px: 2, py: 1.25 }}>
+            <Typography variant="body2" fontWeight={750} color="#0f172a" noWrap>
+              {session?.user.displayName ?? 'Người dùng'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" display="block" noWrap sx={{ mt: 0.25 }}>
+              {session?.user.email}
+            </Typography>
+            <Chip
+              label={userRoleLabel}
+              size="small"
+              sx={{
+                mt: 1,
+                height: 20,
+                fontSize: 10,
+                fontWeight: 650,
+                borderRadius: '4px',
+                bgcolor: `${primaryColor}15`,
+                color: primaryColor,
+                border: `1px solid ${primaryColor}30`,
+              }}
+            />
+          </Box>
+          <Divider sx={{ my: 0.5 }} />
+          <MenuItem
+            onClick={() => {
+              setUserAnchor(null);
+              setTenantAnchor(document.querySelector('.tenant-switcher') as HTMLElement);
+            }}
+            sx={{ py: 1, px: 2, fontSize: 13, gap: 1.5 }}
+          >
+            <WorkspacesOutlined fontSize="small" sx={{ color: '#64748b' }} />
+            <ListItemText primary="Đổi không gian làm việc" primaryTypographyProps={{ fontSize: 13 }} />
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setUserAnchor(null);
+              void logout();
+            }}
+            sx={{
+              py: 1,
+              px: 2,
+              fontSize: 13,
+              gap: 1.5,
+              color: '#dc2626',
+              '&:hover': { bgcolor: '#fef2f2' },
+            }}
+          >
+            <Logout fontSize="small" sx={{ color: '#dc2626' }} />
+            <ListItemText primary="Đăng xuất" primaryTypographyProps={{ fontSize: 13, fontWeight: 500 }} />
+          </MenuItem>
+        </Menu>
 
         {/* Tenant Switcher Dropdown Menu */}
         <Menu

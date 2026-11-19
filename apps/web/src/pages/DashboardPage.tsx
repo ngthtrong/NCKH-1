@@ -125,7 +125,7 @@ export function DashboardPage() {
               borderRadius: '8px',
               textTransform: 'none',
               fontWeight: 650,
-              boxShadow: '0 2px 8px rgba(36, 107, 253, 0.25)',
+              boxShadow: (t) => `0 2px 8px ${t.palette.primary.main}40`,
             }}
           >
             Dự án mới
