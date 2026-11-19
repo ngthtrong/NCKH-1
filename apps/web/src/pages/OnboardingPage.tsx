@@ -28,6 +28,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { paymentsApi, tenantsApi } from '../api/endpoints';
+import { formatTenantHost } from '../utils/tenantHost';
 import type {
   OnboardingView,
   TenantPlacement,
@@ -298,7 +299,7 @@ export function OnboardingPage() {
                   required
                   value={slug}
                   inputProps={{ 'aria-label': 'Slug subdomain' }}
-                  helperText={slug ? `${slug}.localhost` : 'Chỉ gồm chữ thường, số và dấu gạch ngang.'}
+                  helperText={slug ? formatTenantHost(slug) : 'Chỉ gồm chữ thường, số và dấu gạch ngang.'}
                   onChange={(event) => {
                     setSlugTouched(true);
                     setSlug(event.target.value.toLowerCase());
@@ -405,7 +406,7 @@ export function OnboardingPage() {
               <Box>
                 <Typography variant="h5">{onboarding.tenant.name}</Typography>
                 <Typography color="text.secondary">
-                  {onboarding.tenant.slug}.localhost · {placementLabels[onboarding.tenant.placement]} ·{' '}
+                  {formatTenantHost(onboarding.tenant.slug)} · {placementLabels[onboarding.tenant.placement]} ·{' '}
                   {tierLabels[onboarding.tenant.tier]}
                 </Typography>
               </Box>

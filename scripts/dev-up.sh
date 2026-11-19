@@ -31,12 +31,14 @@ docker compose --env-file "$environment_file" -f "$compose_file" up --build --de
 
 http_port="$(sed -n 's/^HTTP_PORT=//p' "$environment_file" | tail -n 1)"
 http_port="${http_port:-8080}"
+base_domain="$(sed -n 's/^BASE_DOMAIN=//p' "$environment_file" | tail -n 1)"
+base_domain="${base_domain:-localhost}"
 health_url="http://127.0.0.1:${http_port}/actuator/health"
 
 echo "Waiting for the API readiness endpoint..."
 for _ in $(seq 1 60); do
-  if curl --fail --silent --show-error -H "Host: accounts.localhost" "$health_url" >/dev/null 2>&1; then
-    echo "Local stack is ready: http://accounts.localhost:${http_port}"
+  if curl --fail --silent --show-error -H "Host: accounts.${base_domain}" "$health_url" >/dev/null 2>&1; then
+    echo "Local stack is ready: http://accounts.${base_domain}:${http_port}"
     echo "Mailpit: http://127.0.0.1:$(sed -n 's/^MAILPIT_UI_PORT=//p' "$environment_file" | tail -n 1)"
     echo "Grafana: http://127.0.0.1:$(sed -n 's/^GRAFANA_PORT=//p' "$environment_file" | tail -n 1)"
     exit 0

@@ -146,5 +146,40 @@ export const theme = createTheme({
     MuiTextField: {
       defaultProps: { size: 'small' },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          transition: 'border-color 150ms ease, box-shadow 150ms ease',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#e2e8f0',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#cbd5e1',
+          },
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 14,
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.12)',
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          minHeight: 44,
+          borderRadius: 8,
+          transition: 'all 150ms ease',
+        },
+      },
+    },
   },
 });

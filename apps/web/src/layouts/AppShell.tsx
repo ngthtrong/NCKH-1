@@ -12,6 +12,7 @@ import SpaceDashboardOutlined from '@mui/icons-material/SpaceDashboardOutlined';
 import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import WorkspacesOutlined from '@mui/icons-material/WorkspacesOutlined';
 import {
+  Alert,
   AppBar,
   Avatar,
   Badge,
@@ -28,6 +29,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Snackbar,
   Toolbar,
   Tooltip,
   Typography,
@@ -36,11 +38,13 @@ import {
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { addRateLimitListener } from '../api/client';
 import { notificationsApi, tenantSettingsApi } from '../api/endpoints';
 import { useAuth } from '../auth/AuthContext';
 import { TenantCustomizationDrawer } from '../components/TenantCustomizationDrawer';
+import { formatTenantHost } from '../utils/tenantHost';
 
 const drawerWidth = 240;
 
@@ -50,8 +54,19 @@ const primaryNavigation = [
   { label: 'Kanban', to: '/kanban', icon: <SpaceDashboardOutlined /> },
   { label: 'Thành viên', to: '/members', icon: <GroupsOutlined /> },
   { label: 'Tài nguyên', to: '/resources', icon: <FolderOutlined /> },
-  { label: 'Tùy biến dự án', to: '/customization', icon: <TuneOutlined /> },
 ];
+
+const PAGE_TITLES: Record<string, string> = {
+  '/dashboard': 'Tổng quan',
+  '/projects': 'Dự án',
+  '/kanban': 'Bảng Kanban',
+  '/members': 'Thành viên',
+  '/resources': 'Tài nguyên',
+  '/notifications': 'Thông báo',
+  '/settings': 'Cài đặt workspace',
+  '/admin': 'Quản trị hệ thống',
+  '/customization': 'Tùy biến dự án',
+};
 
 const tierLabels: Record<string, string> = {
   STARTER: 'Khởi đầu',
@@ -74,6 +89,7 @@ export function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tenantAnchor, setTenantAnchor] = useState<HTMLElement | null>(null);
   const [switchingTenantId, setSwitchingTenantId] = useState<string | null>(null);
+  const [rateLimited, setRateLimited] = useState(false);
   const { session, logout, tenants, currentTenant, selectTenant } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,6 +104,21 @@ export function AppShell() {
   const tenant = currentTenant ?? session?.activeTenant;
   const canAdministerTenant = tenant && ['OWNER', 'ADMIN'].includes(tenant.role);
   const canAdministerSystem = session?.user.platformRoles.includes('SYSTEM_ADMIN');
+
+  useEffect(() => {
+    return addRateLimitListener(() => {
+      setRateLimited(true);
+    });
+  }, []);
+
+  const matchedPath = Object.keys(PAGE_TITLES).find(
+    (path) => location.pathname === path || (path !== '/' && location.pathname.startsWith(`${path}/`)),
+  );
+  const currentPageTitle = matchedPath ? PAGE_TITLES[matchedPath] : 'Không gian làm việc';
+
+  useEffect(() => {
+    document.title = `${currentPageTitle} · ${tenant?.name ?? 'TenantFlow'}`;
+  }, [currentPageTitle, tenant?.name]);
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: notificationsApi.list,
@@ -141,60 +172,122 @@ export function AppShell() {
         backgroundColor: '#ffffff',
       }}
     >
-      {/* Brand Header */}
+      {/* Workspace Switcher Header */}
       <Box
-        className="brand brand--drawer"
         sx={{
           height: 64,
           minHeight: 64,
-          px: 2.5,
+          px: 1.5,
           display: 'flex',
           alignItems: 'center',
-          gap: 1.5,
           borderBottom: '1px solid #e2e8f0',
         }}
       >
-        <Box
-          className="brand__symbol"
-          component={activeBranding?.logoUrl ? 'img' : 'div'}
-          src={activeBranding?.logoUrl ?? undefined}
-          alt={activeBranding?.logoUrl ? `${tenant?.name ?? 'Tenant'} logo` : undefined}
+        <Button
+          fullWidth
+          className="tenant-switcher tenant-pill"
+          data-testid="tenant-switcher"
+          aria-label="Đổi không gian làm việc"
+          onClick={(event) => setTenantAnchor(event.currentTarget)}
           sx={{
-            width: 34,
-            height: 34,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: 1.2,
+            px: 1,
+            py: 0.75,
             borderRadius: '9px',
-            backgroundColor: activeBranding?.primaryColor ?? '#246bfd',
-            display: 'grid',
-            placeItems: 'center',
-            color: '#ffffff',
-            fontWeight: 800,
-            fontSize: '1rem',
-            boxShadow: '0 2px 6px rgba(36, 107, 253, 0.25)',
+            border: '1px solid #e2e8f0',
+            backgroundColor: '#f8fafc',
+            color: '#0f172a',
+            textTransform: 'none',
+            textAlign: 'left',
+            transition: 'all 150ms ease',
+            '&:hover': {
+              backgroundColor: '#f1f5f9',
+              borderColor: '#cbd5e1',
+            },
           }}
         >
-          {activeBranding?.logoUrl ? null : 'T'}
-        </Box>
-        <Box>
-          <Typography
-            className="brand__name"
+          <Box
+            className="brand__symbol"
+            component={activeBranding?.logoUrl ? 'img' : 'div'}
+            src={activeBranding?.logoUrl ?? undefined}
+            alt={activeBranding?.logoUrl ? `${tenant?.name ?? 'Tenant'} logo` : undefined}
             sx={{
+              width: 32,
+              height: 32,
+              minWidth: 32,
+              borderRadius: '8px',
+              backgroundColor: activeBranding?.primaryColor ?? '#246bfd',
+              display: 'grid',
+              placeItems: 'center',
+              color: '#ffffff',
               fontWeight: 800,
-              fontSize: '1.05rem',
-              lineHeight: 1.2,
-              color: '#0f172a',
-              letterSpacing: '-0.02em',
+              fontSize: '0.875rem',
+              boxShadow: '0 2px 5px rgba(15, 23, 42, 0.08)',
+              objectFit: 'contain',
             }}
           >
-            TenantFlow
-          </Typography>
-          <Typography
-            className="brand__caption"
-            variant="caption"
-            sx={{ color: '#64748b', fontSize: '0.72rem', display: 'block' }}
-          >
-            Không gian làm việc
-          </Typography>
-        </Box>
+            {activeBranding?.logoUrl ? null : tenant?.name ? initials(tenant.name) : 'T'}
+          </Box>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography
+              variant="body2"
+              fontWeight={750}
+              noWrap
+              sx={{
+                fontSize: 13,
+                color: '#0f172a',
+                lineHeight: 1.25,
+              }}
+            >
+              {tenant?.name ?? 'Chọn không gian'}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              display="block"
+              sx={{ fontSize: 10.5, color: '#64748b' }}
+            >
+              {tenant?.slug ? formatTenantHost(tenant.slug) : 'workspace'}
+            </Typography>
+          </Box>
+          <Chip
+            label={
+              tenant?.tier
+                ? (tierLabels[tenant.tier] ?? tenant.tier)
+                : tenant?.role === 'OWNER'
+                ? 'Chủ sở hữu'
+                : tenant?.role === 'ADMIN'
+                ? 'Quản trị viên'
+                : 'Thành viên'
+            }
+            size="small"
+            sx={{
+              height: 20,
+              fontSize: 10,
+              fontWeight: 650,
+              borderRadius: '5px',
+              backgroundColor: activeBranding?.primaryColor ? `${activeBranding.primaryColor}15` : '#eef2ff',
+              color: activeBranding?.primaryColor ?? '#246bfd',
+              border: `1px solid ${activeBranding?.primaryColor ? `${activeBranding.primaryColor}30` : '#c7d7fe'}`,
+              cursor: 'inherit',
+              px: 0.25,
+            }}
+          />
+          <KeyboardArrowDown
+            fontSize="small"
+            sx={{
+              color: '#64748b',
+              transform: Boolean(tenantAnchor) ? 'rotate(180deg)' : 'none',
+              transition: 'transform 200ms ease',
+              fontSize: 16,
+              ml: -0.5,
+            }}
+          />
+        </Button>
       </Box>
 
       {/* Main Navigation */}
@@ -214,58 +307,58 @@ export function AppShell() {
           Không gian làm việc
         </Typography>
         <List className="app-nav" sx={{ px: 1, py: 0 }}>
-          {primaryNavigation
-            .filter((item) => item.to !== '/customization' || hasBusinessExtensions)
-            .map((item) => {
-              const isActive =
-                location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
-              return (
-                <ListItemButton
-                  key={item.to}
-                  component={NavLink}
-                  to={item.to}
-                  onClick={closeDrawer}
-                  className={isActive ? 'active' : ''}
-                  sx={{
-                    minHeight: 40,
-                    mx: 0.5,
-                    my: 0.25,
-                    px: 1.5,
-                    borderRadius: '8px',
-                    color: isActive ? '#246bfd' : '#64748b',
-                    backgroundColor: isActive ? '#eef2ff' : 'transparent',
-                    borderLeft: isActive ? '3px solid #246bfd' : '3px solid transparent',
-                    fontWeight: isActive ? 600 : 500,
-                    transition: 'all 120ms ease',
-                    '&:hover': {
-                      backgroundColor: isActive ? '#eef2ff' : '#f1f5f9',
-                      color: isActive ? '#246bfd' : '#0f172a',
-                      '& .MuiListItemIcon-root': {
-                        color: isActive ? '#246bfd' : '#0f172a',
-                      },
+          {primaryNavigation.map((item) => {
+            const isActive =
+              location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+            const primaryColor = activeBranding?.primaryColor ?? '#246bfd';
+            const primaryLight = activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff';
+            return (
+              <ListItemButton
+                key={item.to}
+                component={NavLink}
+                to={item.to}
+                onClick={closeDrawer}
+                className={isActive ? 'active' : ''}
+                sx={{
+                  minHeight: 40,
+                  mx: 0.5,
+                  my: 0.25,
+                  px: 1.5,
+                  borderRadius: '8px',
+                  color: isActive ? primaryColor : '#64748b',
+                  backgroundColor: isActive ? primaryLight : 'transparent',
+                  borderLeft: isActive ? `3px solid ${primaryColor}` : '3px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  transition: 'all 120ms ease',
+                  '&:hover': {
+                    backgroundColor: isActive ? primaryLight : '#f1f5f9',
+                    color: isActive ? primaryColor : '#0f172a',
+                    '& .MuiListItemIcon-root': {
+                      color: isActive ? primaryColor : '#0f172a',
                     },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 32,
+                    color: isActive ? primaryColor : '#64748b',
+                    fontSize: '1.2rem',
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 32,
-                      color: isActive ? '#246bfd' : '#64748b',
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    primaryTypographyProps={{
-                      fontSize: 13.5,
-                      fontWeight: isActive ? 600 : 500,
-                      color: isActive ? '#1e3a8a' : 'inherit',
-                    }}
-                  />
-                </ListItemButton>
-              );
-            })}
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: 13.5,
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? primaryColor : 'inherit',
+                  }}
+                />
+              </ListItemButton>
+            );
+          })}
           <ListItemButton
             component={NavLink}
             to="/notifications"
@@ -277,22 +370,22 @@ export function AppShell() {
               my: 0.25,
               px: 1.5,
               borderRadius: '8px',
-              color: location.pathname.startsWith('/notifications') ? '#246bfd' : '#64748b',
+              color: location.pathname.startsWith('/notifications') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
               backgroundColor: location.pathname.startsWith('/notifications')
-                ? '#eef2ff'
+                ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
                 : 'transparent',
               borderLeft: location.pathname.startsWith('/notifications')
-                ? '3px solid #246bfd'
+                ? `3px solid ${activeBranding?.primaryColor ?? '#246bfd'}`
                 : '3px solid transparent',
               fontWeight: location.pathname.startsWith('/notifications') ? 600 : 500,
               transition: 'all 120ms ease',
               '&:hover': {
                 backgroundColor: location.pathname.startsWith('/notifications')
-                  ? '#eef2ff'
+                  ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
                   : '#f1f5f9',
-                color: location.pathname.startsWith('/notifications') ? '#246bfd' : '#0f172a',
+                color: location.pathname.startsWith('/notifications') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
                 '& .MuiListItemIcon-root': {
-                  color: location.pathname.startsWith('/notifications') ? '#246bfd' : '#0f172a',
+                  color: location.pathname.startsWith('/notifications') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
                 },
               },
             }}
@@ -300,7 +393,7 @@ export function AppShell() {
             <ListItemIcon
               sx={{
                 minWidth: 32,
-                color: location.pathname.startsWith('/notifications') ? '#246bfd' : '#64748b',
+                color: location.pathname.startsWith('/notifications') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
               }}
             >
               <Badge
@@ -324,7 +417,7 @@ export function AppShell() {
               primaryTypographyProps={{
                 fontSize: 13.5,
                 fontWeight: location.pathname.startsWith('/notifications') ? 600 : 500,
-                color: location.pathname.startsWith('/notifications') ? '#1e3a8a' : 'inherit',
+                color: location.pathname.startsWith('/notifications') ? (activeBranding?.primaryColor ?? '#246bfd') : 'inherit',
               }}
             />
           </ListItemButton>
@@ -361,22 +454,22 @@ export function AppShell() {
                       my: 0.25,
                       px: 1.5,
                       borderRadius: '8px',
-                      color: location.pathname.startsWith('/settings') ? '#246bfd' : '#64748b',
+                      color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
                       backgroundColor: location.pathname.startsWith('/settings')
-                        ? '#eef2ff'
+                        ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
                         : 'transparent',
                       borderLeft: location.pathname.startsWith('/settings')
-                        ? '3px solid #246bfd'
+                        ? `3px solid ${activeBranding?.primaryColor ?? '#246bfd'}`
                         : '3px solid transparent',
                       fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
                       transition: 'all 120ms ease',
                       '&:hover': {
                         backgroundColor: location.pathname.startsWith('/settings')
-                          ? '#eef2ff'
+                          ? (activeBranding?.primaryColor ? `${activeBranding.primaryColor}14` : '#eef2ff')
                           : '#f1f5f9',
-                        color: location.pathname.startsWith('/settings') ? '#246bfd' : '#0f172a',
+                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
                         '& .MuiListItemIcon-root': {
-                          color: location.pathname.startsWith('/settings') ? '#246bfd' : '#0f172a',
+                          color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#0f172a',
                         },
                       },
                     }}
@@ -384,7 +477,7 @@ export function AppShell() {
                     <ListItemIcon
                       sx={{
                         minWidth: 32,
-                        color: location.pathname.startsWith('/settings') ? '#246bfd' : '#64748b',
+                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : '#64748b',
                       }}
                     >
                       <TuneOutlined fontSize="small" />
@@ -394,7 +487,7 @@ export function AppShell() {
                       primaryTypographyProps={{
                         fontSize: 13.5,
                         fontWeight: location.pathname.startsWith('/settings') ? 600 : 500,
-                        color: location.pathname.startsWith('/settings') ? '#1e3a8a' : 'inherit',
+                        color: location.pathname.startsWith('/settings') ? (activeBranding?.primaryColor ?? '#246bfd') : 'inherit',
                       }}
                     />
                   </ListItemButton>
@@ -609,99 +702,49 @@ export function AppShell() {
               </IconButton>
             )}
 
-            {/* Tenant Switcher Button: Sleek Tenant Pill */}
-            <Button
-              className="tenant-switcher tenant-pill"
-              data-testid="tenant-switcher"
-              aria-label="Đổi không gian làm việc"
-              onClick={(event) => setTenantAnchor(event.currentTarget)}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.25,
-                px: 1.5,
-                py: 0.6,
-                borderRadius: '10px',
-                border: '1px solid #e2e8f0',
-                backgroundColor: '#f8fafc',
-                color: '#0f172a',
-                textTransform: 'none',
-                transition: 'all 150ms ease',
-                '&:hover': {
-                  backgroundColor: '#f1f5f9',
-                  borderColor: '#cbd5e1',
-                },
-              }}
-            >
-              <Avatar
-                variant="rounded"
-                className="tenant-switcher__avatar"
-                sx={{
-                  width: 24,
-                  height: 24,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  bgcolor: '#e0e7ff',
-                  color: '#3730a3',
-                  borderRadius: '6px',
-                }}
-              >
-                {tenant ? initials(tenant.name) : '—'}
-              </Avatar>
+            {/* Breadcrumb / Page Title */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="body2"
-                fontWeight={650}
-                sx={{
-                  fontSize: 13.5,
-                  color: '#0f172a',
-                  maxWidth: { xs: 120, sm: 220 },
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
+                sx={{ color: '#64748b', fontWeight: 500, fontSize: 13 }}
               >
-                {tenant?.name ?? 'Chọn không gian'}
+                Không gian
               </Typography>
-              <Chip
-                label={
-                  tenant?.tier
-                    ? (tierLabels[tenant.tier] ?? tenant.tier)
-                    : tenant?.role === 'OWNER'
-                    ? 'Chủ sở hữu'
-                    : tenant?.role === 'ADMIN'
-                    ? 'Quản trị viên'
-                    : 'Thành viên'
-                }
-                size="small"
-                sx={{
-                  height: 20,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  borderRadius: '6px',
-                  backgroundColor: '#eef2ff',
-                  color: '#246bfd',
-                  border: '1px solid #c7d7fe',
-                  cursor: 'inherit',
-                }}
-              />
-              <KeyboardArrowDown
-                fontSize="small"
-                sx={{
-                  color: '#64748b',
-                  transform: Boolean(tenantAnchor) ? 'rotate(180deg)' : 'none',
-                  transition: 'transform 200ms ease',
-                  fontSize: 18,
-                }}
-              />
-            </Button>
+              <Typography sx={{ color: '#cbd5e1', fontSize: 13 }}>/</Typography>
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}
+              >
+                {currentPageTitle}
+              </Typography>
+            </Box>
 
             <Box flex={1} />
 
-            {canAdministerTenant && <Tooltip title="Cấu hình tenant">
-              <IconButton aria-label="Cấu hình tenant" onClick={() => setCustomizationOpen(true)} sx={{ mr: 1 }}>
-                <TuneOutlined />
-              </IconButton>
-            </Tooltip>}
+            {canAdministerTenant && (
+              <Tooltip title="Cấu hình tenant">
+                <IconButton
+                  aria-label="Cấu hình tenant"
+                  onClick={() => setCustomizationOpen(true)}
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                    color: '#64748b',
+                    transition: 'all 150ms ease',
+                    '&:hover': {
+                      backgroundColor: '#f8fafc',
+                      borderColor: '#cbd5e1',
+                      color: '#0f172a',
+                    },
+                  }}
+                >
+                  <TuneOutlined sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Tooltip>
+            )}
 
             {/* Notification Bell */}
             <Tooltip title="Thông báo">
@@ -741,6 +784,51 @@ export function AppShell() {
                 </Badge>
               </IconButton>
             </Tooltip>
+
+            {/* User Profile Pill */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                pl: 1,
+                borderLeft: '1px solid #e2e8f0',
+              }}
+            >
+              <Avatar
+                src={session?.user.avatarUrl}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  bgcolor: '#e0e7ff',
+                  color: '#3730a3',
+                  borderRadius: '8px',
+                }}
+              >
+                {session?.user.displayName ? initials(session.user.displayName) : 'U'}
+              </Avatar>
+              <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
+                <Typography
+                  variant="body2"
+                  fontWeight={650}
+                  noWrap
+                  sx={{ fontSize: 13, color: '#0f172a', lineHeight: 1.2 }}
+                >
+                  {session?.user.displayName ?? 'Người dùng'}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  noWrap
+                  display="block"
+                  sx={{ fontSize: 11, color: '#64748b' }}
+                >
+                  {userRoleLabel}
+                </Typography>
+              </Box>
+            </Box>
           </Toolbar>
         </AppBar>
 
@@ -890,6 +978,30 @@ export function AppShell() {
         >
           <Outlet />
         </Box>
+
+        {/* Natural Rate Limit Snackbar (K3) */}
+        <Snackbar
+          open={rateLimited}
+          autoHideDuration={6000}
+          onClose={() => setRateLimited(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity="warning"
+            variant="filled"
+            onClose={() => setRateLimited(false)}
+            sx={{
+              borderRadius: '10px',
+              fontWeight: 500,
+              fontSize: '0.85rem',
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+              backgroundColor: '#d97706',
+              color: '#ffffff',
+            }}
+          >
+            Không gian làm việc <strong>{tenant?.name ?? ''}</strong> đang có lưu lượng thao tác cao vượt mức gói dịch vụ. Hệ thống tự động tạm giãn nhịp xử lý, vui lòng thử lại sau giây lát.
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );

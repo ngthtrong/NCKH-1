@@ -71,12 +71,13 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link as RouterLink, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { errorMessage } from '../api/client';
+import { errorMessage, ApiError } from '../api/client';
 import { approvalsApi, boardsApi, customDataApi, membersApi, projectsApi, resourcesApi, tenantSettingsApi } from '../api/endpoints';
 import type { Board, BoardColumn, Comment, ProjectRole, TaskCard, TaskPriority, UUID } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
+import { WorkspaceBoundaryNotice } from '../components/WorkspaceBoundaryNotice';
 import { KanbanFilterBar, type KanbanFilterState } from '../components/kanban/KanbanFilterBar';
 import { QuickAddTaskInline } from '../components/kanban/QuickAddTaskInline';
 import { moveBoardTask } from './boardState';
@@ -133,10 +134,13 @@ function renderCustomBadges(
 
   if (validEntries.length === 0) return null;
 
-  const fieldMap = new Map((fieldDefinitions ?? []).map((f) => [f.key, f.label]));
+  const fieldMap = new Map((fieldDefinitions ?? []).map((f) => [f.key, f]));
 
   return validEntries.map(([key, val]) => {
-    const fieldLabel = fieldMap.get(key) || key;
+    const fieldDef = fieldMap.get(key);
+    const fieldLabel = fieldDef?.label || key;
+    const lowerKey = key.toLowerCase();
+
     let labelText = `${fieldLabel}: ${String(val)}`;
     let chipStyle = {
       bgcolor: '#f8fafc',
@@ -144,34 +148,66 @@ function renderCustomBadges(
       border: '1px solid #e2e8f0',
     };
 
-    if (key === 'story_points') {
+    if (
+      lowerKey.includes('budget') ||
+      lowerKey.includes('usd') ||
+      lowerKey.includes('price') ||
+      lowerKey.includes('cost') ||
+      lowerKey.includes('chi_phi')
+    ) {
+      const num = Number(val);
+      labelText = isNaN(num) ? `${fieldLabel}: $${String(val)}` : `$${num.toLocaleString('en-US')}`;
+      chipStyle = {
+        bgcolor: '#ecfdf5',
+        color: '#047857',
+        border: '1px solid #a7f3d0',
+      };
+    } else if (lowerKey.includes('point') || lowerKey.includes('score') || lowerKey.includes('diem')) {
       labelText = `${val} điểm`;
       chipStyle = {
         bgcolor: '#eff6ff',
         color: '#1d4ed8',
         border: '1px solid #bfdbfe',
       };
-    } else if (key === 'budget_usd') {
-      const num = Number(val);
-      labelText = isNaN(num) ? `$${String(val)}` : `$${num.toLocaleString('en-US')}`;
-      chipStyle = {
-        bgcolor: '#ecfdf5',
-        color: '#047857',
-        border: '1px solid #a7f3d0',
-      };
-    } else if (key === 'sprint') {
-      labelText = `${val}`;
+    } else if (
+      lowerKey.includes('sprint') ||
+      lowerKey.includes('milestone') ||
+      lowerKey.includes('cycle') ||
+      lowerKey.includes('ky')
+    ) {
+      labelText = `${String(val)}`;
       chipStyle = {
         bgcolor: '#f5f3ff',
         color: '#6d28d9',
         border: '1px solid #ddd6fe',
       };
-    } else if (key === 'channel') {
-      labelText = `${val}`;
+    } else if (
+      lowerKey.includes('channel') ||
+      lowerKey.includes('platform') ||
+      lowerKey.includes('kenh') ||
+      lowerKey.includes('tag')
+    ) {
+      labelText = `${String(val)}`;
       chipStyle = {
         bgcolor: '#fff7ed',
         color: '#c2410c',
         border: '1px solid #fed7aa',
+      };
+    } else if (fieldDef?.type === 'NUMBER') {
+      const num = Number(val);
+      labelText = `${fieldLabel}: ${isNaN(num) ? String(val) : num.toLocaleString('en-US')}`;
+      chipStyle = {
+        bgcolor: '#f1f5f9',
+        color: '#334155',
+        border: '1px solid #cbd5e1',
+      };
+    } else if (fieldDef?.type === 'BOOLEAN') {
+      if (!val) return null;
+      labelText = fieldLabel;
+      chipStyle = {
+        bgcolor: '#f0fdf4',
+        color: '#15803d',
+        border: '1px solid #bbf7d0',
       };
     }
 
@@ -198,11 +234,13 @@ function TaskCardView({
   overlay = false,
   onOpen,
   fieldDefinitions,
+  cardStyle = 'FULL',
 }: {
   task: TaskCard;
   overlay?: boolean;
   onOpen?: () => void;
   fieldDefinitions?: KanbanField[];
+  cardStyle?: 'FULL' | 'COMPACT';
 }) {
   const isOverdue = task.dueDate ? new Date(task.dueDate).getTime() < Date.now() : false;
   const isDueSoon = task.dueDate
@@ -272,7 +310,7 @@ function TaskCardView({
       >
         {task.title}
       </Typography>
-      {task.description && (
+      {task.description && cardStyle !== 'COMPACT' && (
         <Typography
           variant="body2"
           color="text.secondary"
@@ -374,11 +412,13 @@ function SortableTaskCard({
   disabled,
   onOpen,
   fieldDefinitions,
+  cardStyle,
 }: {
   task: TaskCard;
   disabled: boolean;
   onOpen: () => void;
   fieldDefinitions?: KanbanField[];
+  cardStyle?: 'FULL' | 'COMPACT';
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
@@ -391,7 +431,7 @@ function SortableTaskCard({
       {...attributes}
       {...listeners}
     >
-      <TaskCardView task={task} onOpen={onOpen} fieldDefinitions={fieldDefinitions} />
+      <TaskCardView task={task} onOpen={onOpen} fieldDefinitions={fieldDefinitions} cardStyle={cardStyle} />
     </Box>
   );
 }
@@ -400,6 +440,7 @@ function KanbanColumn({
   column,
   wipMode,
   fieldDefinitions,
+  cardStyle,
   disabled,
   canManageColumns,
   canEditTasks,
@@ -416,6 +457,7 @@ function KanbanColumn({
   column: BoardColumn;
   wipMode?: string;
   fieldDefinitions?: KanbanField[];
+  cardStyle?: 'FULL' | 'COMPACT';
   disabled: boolean;
   canManageColumns: boolean;
   canEditTasks: boolean;
@@ -432,6 +474,7 @@ function KanbanColumn({
   const { setNodeRef, isOver } = useDroppable({ id: column.id, disabled });
   const atLimit = Boolean(column.taskLimit && column.tasks.length >= column.taskLimit);
   const isWipWarn = wipMode === 'WARN' && atLimit;
+  const isWipStrict = wipMode === 'STRICT' && atLimit;
 
   const isFiltered = filters.search.trim() !== '' || filters.priority !== 'ALL' || filters.assigneeId !== 'ALL';
   const visibleTasks = column.tasks.filter((task) => {
@@ -461,26 +504,45 @@ function KanbanColumn({
       : `${column.tasks.length}`;
 
   const countBadge = (
-    <Chip
-      label={cardCountText}
-      size="small"
-      sx={{
-        borderRadius: 4,
-        height: 22,
-        fontSize: '0.75rem',
-        fontWeight: isWipWarn ? 800 : 700,
-        ...(isWipWarn
-          ? {
-              bgcolor: '#fef3c7',
-              color: '#b45309',
-              border: '1px solid #fde68a',
-            }
-          : {
-              bgcolor: 'action.selected',
-              color: 'text.secondary',
-            }),
-      }}
-    />
+    <Tooltip
+      title={
+        isWipStrict
+          ? `Cột đã đạt giới hạn nghiêm ngặt (${column.tasks.length}/${column.taskLimit}) - Không thể thêm thẻ`
+          : isWipWarn
+            ? `Cảnh báo: Cột đã đạt hoặc vượt giới hạn WIP (${column.tasks.length}/${column.taskLimit})`
+            : column.taskLimit
+              ? `Giới hạn WIP: ${column.taskLimit} thẻ`
+              : 'Số lượng thẻ'
+      }
+      arrow
+    >
+      <Chip
+        label={cardCountText}
+        size="small"
+        sx={{
+          borderRadius: 4,
+          height: 22,
+          fontSize: '0.75rem',
+          fontWeight: isWipStrict || isWipWarn ? 800 : 700,
+          ...(isWipStrict
+            ? {
+                bgcolor: '#fee2e2',
+                color: '#dc2626',
+                border: '1px solid #fecaca',
+              }
+            : isWipWarn
+              ? {
+                  bgcolor: '#fef3c7',
+                  color: '#b45309',
+                  border: '1px solid #fde68a',
+                }
+              : {
+                  bgcolor: 'action.selected',
+                  color: 'text.secondary',
+                }),
+        }}
+      />
+    </Tooltip>
   );
 
   return (
@@ -499,20 +561,12 @@ function KanbanColumn({
             sx={{ borderRadius: 1.5, height: 20, fontSize: '0.7rem' }}
           />
         )}
-        {isWipWarn ? (
-          <Tooltip
-            title={`Cảnh báo: Cột đã đạt hoặc vượt giới hạn WIP (${column.tasks.length}/${column.taskLimit})`}
-          >
-            {countBadge}
-          </Tooltip>
-        ) : (
-          countBadge
-        )}
+        {countBadge}
         <Box flex={1} />
-        {column.taskLimit && !isWipWarn && (
+        {column.taskLimit && !isWipWarn && !isWipStrict && (
           <Typography
             variant="caption"
-            color={atLimit ? 'error' : 'text.secondary'}
+            color="text.secondary"
             sx={{ fontWeight: 500 }}
           >
             WIP {column.tasks.length}/{column.taskLimit}
@@ -564,6 +618,7 @@ function KanbanColumn({
               disabled={disabled}
               onOpen={() => onOpenTask(task.id)}
               fieldDefinitions={fieldDefinitions}
+              cardStyle={cardStyle}
             />
           ))}
           {visibleTasks.length === 0 && (
@@ -592,7 +647,8 @@ export function KanbanPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const { session } = useAuth();
+  const { session, currentTenant } = useAuth();
+  const tenant = currentTenant ?? session?.activeTenant;
   const [board, setBoard] = useState<Board | null>(null);
   const [filters, setFilters] = useState<KanbanFilterState>({
     search: '',
@@ -736,9 +792,16 @@ export function KanbanPage() {
     }) => boardsApi.moveTask(boardId!, taskId, { targetColumnId, targetPosition, version }),
     onSuccess: acceptBoard,
     onError: (cause) => {
-      const status = (cause as { status?: number }).status;
-      if (status === 422) {
-        setSnackbar('Không thể chuyển công việc: vi phạm giới hạn WIP (chế độ nghiêm ngặt).');
+      const apiErr = cause as ApiError;
+      const status = apiErr?.status;
+      const isWip =
+        status === 422 ||
+        apiErr?.code === 'WIP_LIMIT_EXCEEDED' ||
+        (typeof apiErr?.message === 'string' &&
+          (apiErr.message.includes('WIP') || apiErr.message.includes('giới hạn') || apiErr.message.includes('đạt giới hạn')));
+      if (isWip) {
+        const targetLimit = kanbanConfiguration.data?.settings.wipLimit ?? 2;
+        setSnackbar(`Quy trình của ${tenant?.name ?? 'tổ chức'} giới hạn tối đa ${targetLimit} công việc cùng lúc ở cột này.`);
       } else if (status === 409) {
         setSnackbar('Công việc đã được người khác cập nhật. Bảng đang được tải lại.');
       } else {
@@ -980,7 +1043,8 @@ export function KanbanPage() {
     const currentWipMode = kanbanConfiguration.data?.settings.wipMode ?? 'STRICT';
     const result = moveBoardTask(board, String(active.id), String(over.id), currentWipMode);
     if (!result) {
-      setSnackbar('Không thể chuyển công việc: cột đích đã đạt giới hạn WIP.');
+      const targetLimit = kanbanConfiguration.data?.settings.wipLimit ?? 2;
+      setSnackbar(`Quy trình của ${tenant?.name ?? 'tổ chức'} giới hạn tối đa ${targetLimit} công việc cùng lúc ở cột này.`);
       return;
     }
     setBoard(result.board);
@@ -1303,7 +1367,11 @@ export function KanbanPage() {
       ) : boardQuery.isLoading && !board ? (
         <SectionLoader label="Đang tải bảng công việc…" />
       ) : boardQuery.isError ? (
-        <ErrorState message={errorMessage(boardQuery.error)} onRetry={() => void boardQuery.refetch()} />
+        (boardQuery.error as ApiError)?.status === 403 || (boardQuery.error as ApiError)?.status === 404 ? (
+          <WorkspaceBoundaryNotice resourceType="bảng công việc" />
+        ) : (
+          <ErrorState message={errorMessage(boardQuery.error)} onRetry={() => void boardQuery.refetch()} />
+        )
       ) : board ? (
         <DndContext
           sensors={sensors}
@@ -1319,6 +1387,7 @@ export function KanbanPage() {
                 column={column}
                 wipMode={kanbanConfiguration.data?.settings.wipMode}
                 fieldDefinitions={kanbanConfiguration.data?.settings.fields}
+                cardStyle={kanbanConfiguration.data?.settings.cardStyle}
                 disabled={boardInteractionDisabled}
                 canManageColumns={canManageColumns}
                 canEditTasks={Boolean(canEditTasks)}
@@ -1342,6 +1411,7 @@ export function KanbanPage() {
                 task={activeTask}
                 overlay
                 fieldDefinitions={kanbanConfiguration.data?.settings.fields}
+                cardStyle={kanbanConfiguration.data?.settings.cardStyle}
               />
             ) : null}
           </DragOverlay>

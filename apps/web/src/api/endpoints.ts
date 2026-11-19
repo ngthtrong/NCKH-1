@@ -39,6 +39,7 @@ import type {
   RefreshResponse,
   RegisterRequest,
   ResourceItem,
+  ResourceQuota,
   ResourceDeadLetter,
   ResourcesResponse,
   TenantRole,
@@ -373,6 +374,7 @@ export const invitationsApi = {
 };
 
 export const resourcesApi = {
+  quota: () => request<ResourceQuota>('/resources/quota'),
   list: async (): Promise<ResourcesResponse> => {
     const [items, quota] = await Promise.all([
       request<RawResource[]>('/resources'),

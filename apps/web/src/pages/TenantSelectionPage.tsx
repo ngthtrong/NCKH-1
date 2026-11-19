@@ -22,6 +22,7 @@ import type { TenantSummary } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState } from '../components/AsyncState';
 import { StatusChip } from '../components/StatusChip';
+import { formatTenantHost } from '../utils/tenantHost';
 
 const tierLabels: Record<string, string> = {
   STARTER: 'Starter (Khởi đầu)',
@@ -110,7 +111,7 @@ export function TenantSelectionPage() {
                   </Avatar>
                   <Box className="tenant-card__identity">
                     <Typography component="h2" variant="h6" noWrap>{tenant.name}</Typography>
-                    <Typography color="text.secondary" variant="body2">{tenant.host ?? `${tenant.slug}.localhost`}</Typography>
+                    <Typography color="text.secondary" variant="body2">{tenant.host ?? formatTenantHost(tenant.slug)}</Typography>
                   </Box>
                   <Box className="tenant-card__membership">
                     <Typography variant="body2" fontWeight={600}>{roleLabels[tenant.role]}</Typography>

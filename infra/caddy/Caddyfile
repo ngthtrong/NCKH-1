@@ -1,9 +1,16 @@
 {
-    auto_https off
     admin off
+    email {$TLS_EMAIL:huynhhonganhgr@gmail.com}
+    on_demand_tls {
+        ask http://api:8080/actuator/health
+    }
 }
 
-:80 {
+*.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech} {
+    tls {
+        on_demand
+    }
+
     encode zstd gzip
 
     @api path /api/* /actuator/health /actuator/health/*

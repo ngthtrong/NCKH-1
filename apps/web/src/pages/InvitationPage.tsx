@@ -10,6 +10,7 @@ import { invitationsApi } from '../api/endpoints';
 import type { InvitationView } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { StatusChip } from '../components/StatusChip';
+import { formatTenantHost } from '../utils/tenantHost';
 
 export function InvitationPage() {
   const { token = '' } = useParams();
@@ -93,7 +94,7 @@ export function InvitationPage() {
                   Tham gia {invitation.tenantName}
                 </Typography>
                 <Typography color="text.secondary" mt={1}>
-                  {invitation.tenantSlug}.localhost · vai trò {invitation.role} · gửi tới {invitation.email}
+                  {formatTenantHost(invitation.tenantSlug)} · vai trò {invitation.role} · gửi tới {invitation.email}
                 </Typography>
               </Box>
               <Box><StatusChip status={invitation.status} /></Box>

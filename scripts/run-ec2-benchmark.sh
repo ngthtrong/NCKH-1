@@ -63,9 +63,11 @@ echo "[1/5] Starting Docker Stack with EC2 m7i-flex.large resource profile..."
 
 # 4. Wait for readiness
 echo "[2/5] Waiting for Spring Boot 3 API readiness..."
+BASE_DOMAIN="$(sed -n 's/^BASE_DOMAIN=//p' "$ENV_FILE" | tail -n 1)"
+BASE_DOMAIN="${BASE_DOMAIN:-localhost}"
 READY=false
 for i in $(seq 1 45); do
-  if curl --fail --silent -H 'Host: accounts.localhost' "http://127.0.0.1:8080/actuator/health/readiness" >/dev/null 2>&1; then
+  if curl --fail --silent -H "Host: accounts.${BASE_DOMAIN}" "http://127.0.0.1:8080/actuator/health/readiness" >/dev/null 2>&1; then
     READY=true
     echo "    [✓] API is healthy and ready!"
     break

@@ -17,14 +17,47 @@ export function setApiSessionRefreshHandler(handler: (() => Promise<string | nul
 
 export class ApiError extends Error {
   readonly status: number;
+  readonly code?: string;
   readonly problem?: ApiProblem;
 
   constructor(status: number, problem?: ApiProblem) {
     super(problem?.detail ?? problem?.message ?? problem?.title ?? `Yêu cầu thất bại (${status})`);
     this.name = 'ApiError';
     this.status = status;
+    this.code = problem?.code;
     this.problem = problem;
   }
+}
+
+export type RateLimitNotification = {
+  status: number;
+  retryAfterSeconds?: number;
+};
+
+type RateLimitListener = (info: RateLimitNotification) => void;
+const rateLimitListeners = new Set<RateLimitListener>();
+let lastRateLimitTimestamp = 0;
+const RATE_LIMIT_DEBOUNCE_MS = 5000;
+
+export function addRateLimitListener(listener: RateLimitListener): () => void {
+  rateLimitListeners.add(listener);
+  return () => {
+    rateLimitListeners.delete(listener);
+  };
+}
+
+function notifyRateLimit(status: number, retryAfterHeader: string | null) {
+  const now = Date.now();
+  if (now - lastRateLimitTimestamp < RATE_LIMIT_DEBOUNCE_MS) return;
+  lastRateLimitTimestamp = now;
+  const retryAfterSeconds = retryAfterHeader ? parseInt(retryAfterHeader, 10) : undefined;
+  rateLimitListeners.forEach((listener) => {
+    try {
+      listener({ status, retryAfterSeconds: Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined });
+    } catch {
+      // Ignore listener error
+    }
+  });
 }
 
 function cookie(name: string): string | undefined {
@@ -85,6 +118,10 @@ export async function request<T>(path: string, options: RequestOptions = {}, ret
   if (response.status === 401 && accessToken && !skipAuth && !retried && sessionRefreshHandler) {
     const refreshedToken = await refreshSession();
     if (refreshedToken) return request<T>(path, options, true);
+  }
+
+  if (response.status === 429) {
+    notifyRateLimit(response.status, response.headers.get('Retry-After'));
   }
 
   if (!response.ok) {

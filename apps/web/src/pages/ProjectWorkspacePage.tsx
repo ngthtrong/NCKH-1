@@ -17,13 +17,14 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useParams } from 'react-router-dom';
-import { errorMessage } from '../api/client';
+import { ApiError, errorMessage } from '../api/client';
 import { boardsApi, projectsApi } from '../api/endpoints';
 import type { ProjectRole, UUID } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { EmptyState, ErrorState, SectionLoader } from '../components/AsyncState';
 import { PageHeader } from '../components/PageHeader';
 import { StatusChip } from '../components/StatusChip';
+import { WorkspaceBoundaryNotice } from '../components/WorkspaceBoundaryNotice';
 
 const roleLabels: Record<ProjectRole, string> = {
   MANAGER: 'Quản lý',
@@ -49,6 +50,14 @@ export function ProjectWorkspacePage() {
 
   if (projects.isLoading) return <Box className="page-container"><SectionLoader /></Box>;
   if (projects.isError) {
+    const err = projects.error as ApiError;
+    if (err?.status === 403 || err?.status === 404) {
+      return (
+        <Box className="page-container">
+          <WorkspaceBoundaryNotice resourceType="dự án" />
+        </Box>
+      );
+    }
     return (
       <Box className="page-container">
         <ErrorState message={errorMessage(projects.error)} onRetry={() => void projects.refetch()} />
@@ -58,11 +67,7 @@ export function ProjectWorkspacePage() {
   if (!project) {
     return (
       <Box className="page-container">
-        <EmptyState
-          title="Không tìm thấy dự án"
-          description="Dự án không tồn tại hoặc bạn không còn quyền truy cập."
-          action={<Button component={RouterLink} to="/projects">Quay lại danh sách</Button>}
-        />
+        <WorkspaceBoundaryNotice resourceType="dự án" />
       </Box>
     );
   }

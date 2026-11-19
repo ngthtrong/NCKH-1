@@ -10,10 +10,12 @@ compose=(docker compose --project-name nckh-report --env-file "$environment_file
 "${compose[@]}" config --quiet
 "${compose[@]}" up --build --detach api worker web caddy prometheus
 http_port="$(sed -n 's/^HTTP_PORT=//p' "$environment_file" | tail -n 1)"
+base_domain="$(sed -n 's/^BASE_DOMAIN=//p' "$environment_file" | tail -n 1)"
+base_domain="${base_domain:-localhost}"
 for _ in $(seq 1 60); do
-  if curl --fail --silent -H 'Host: accounts.localhost' "http://127.0.0.1:${http_port:-8080}/actuator/health/readiness" >/dev/null; then
-    echo "Report demo ready: http://accounts.localhost:${http_port:-8080}"
-    echo "Shared-table tenants: t-acme.localhost and t-lotus.localhost"
+  if curl --fail --silent -H "Host: accounts.${base_domain}" "http://127.0.0.1:${http_port:-8080}/actuator/health/readiness" >/dev/null; then
+    echo "Report demo ready: http://accounts.${base_domain}:${http_port:-8080}"
+    echo "Shared-table tenants: t-acme.${base_domain} and t-lotus.${base_domain}"
     exit 0
   fi
   sleep 2
