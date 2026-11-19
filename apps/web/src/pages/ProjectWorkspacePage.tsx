@@ -8,14 +8,19 @@ import {
   Box,
   Breadcrumbs,
   Button,
+  Card,
   Chip,
+  Grid,
   LinearProgress,
   Link,
   Paper,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { ApiError, errorMessage } from '../api/client';
 import { boardsApi, projectsApi } from '../api/endpoints';
@@ -35,6 +40,7 @@ const roleLabels: Record<ProjectRole, string> = {
 export function ProjectWorkspacePage() {
   const { projectId } = useParams<{ projectId: UUID }>();
   const { session } = useAuth();
+  const [activeTab, setActiveTab] = useState(0);
   const projects = useQuery({ queryKey: ['projects'], queryFn: projectsApi.list });
   const boards = useQuery({
     queryKey: ['project-boards', projectId],
@@ -116,7 +122,7 @@ export function ProjectWorkspacePage() {
         )}
       />
 
-      <Paper variant="outlined" className="project-hero">
+      <Paper variant="outlined" className="project-hero" sx={{ mb: 3 }}>
         <Box flex={1} minWidth={0}>
           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
             <Typography variant="h6">Tổng quan tiến độ</Typography>
@@ -133,15 +139,60 @@ export function ProjectWorkspacePage() {
         </Box>
       </Paper>
 
-      <Box className="project-workspace-grid">
-        <Paper variant="outlined" className="panel">
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      {/* Internal Project Tabs */}
+      <Box sx={{ borderBottom: '1px solid #e2e8f0', mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, val) => setActiveTab(val)}
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 650,
+              fontSize: '0.9rem',
+              minHeight: 46,
+            },
+          }}
+        >
+          <Tab
+            icon={<ViewKanbanOutlined />}
+            iconPosition="start"
+            label={`Bảng Kanban (${boards.data?.length ?? 0})`}
+          />
+          <Tab
+            icon={<GroupsOutlined />}
+            iconPosition="start"
+            label={`Thành viên dự án (${members.data?.length ?? 0})`}
+          />
+          <Tab
+            icon={<FolderOutlined />}
+            iconPosition="start"
+            label="Tài nguyên & Công cụ"
+          />
+        </Tabs>
+      </Box>
+
+      {/* Tab 0: Bảng Kanban */}
+      {activeTab === 0 && (
+        <Paper variant="outlined" className="panel" sx={{ p: 3, borderRadius: 3 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2.5}>
             <Box>
-              <Typography variant="h6">Bảng trong dự án</Typography>
+              <Typography variant="h6" fontWeight={750}>Bảng công việc trong dự án</Typography>
               <Typography variant="body2" color="text.secondary">
                 {boards.data?.length ?? 0} bảng · {project.taskCount} công việc · {project.memberCount} thành viên
               </Typography>
             </Box>
+            {firstBoardId && (
+              <Button
+                component={RouterLink}
+                to={`/kanban/${firstBoardId}`}
+                variant="contained"
+                size="small"
+                startIcon={<ViewKanbanOutlined />}
+                sx={{ fontWeight: 600, borderRadius: '8px' }}
+              >
+                Mở bảng chính
+              </Button>
+            )}
           </Stack>
           {boards.isLoading ? (
             <SectionLoader />
@@ -150,7 +201,7 @@ export function ProjectWorkspacePage() {
           ) : !boards.data?.length ? (
             <EmptyState title="Chưa có bảng" description="Tạo bảng từ màn Kanban để bắt đầu tổ chức công việc." />
           ) : (
-            <Stack spacing={1}>
+            <Stack spacing={1.5}>
               {boards.data.map((board, index) => (
                 <Button
                   key={board.id}
@@ -158,12 +209,19 @@ export function ProjectWorkspacePage() {
                   to={`/kanban/${board.id}`}
                   className="project-board-link"
                   endIcon={<ArrowForward />}
+                  sx={{
+                    p: 2,
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    justifyContent: 'space-between',
+                    '&:hover': { bgcolor: '#f8fafc', borderColor: '#cbd5e1' },
+                  }}
                 >
                   <Box className="project-board-link__index">{index + 1}</Box>
-                  <Box flex={1} textAlign="left">
-                    <Typography fontWeight={750}>{board.name}</Typography>
+                  <Box flex={1} textAlign="left" ml={1}>
+                    <Typography fontWeight={750} color="#0f172a">{board.name}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Mở các cột và công việc của bảng
+                      Nhấp để mở bảng Kanban và quản lý các cột công việc
                     </Typography>
                   </Box>
                 </Button>
@@ -171,39 +229,93 @@ export function ProjectWorkspacePage() {
             </Stack>
           )}
         </Paper>
+      )}
 
-        <Stack spacing={2}>
-          <Paper variant="outlined" className="panel">
-            <Typography variant="h6" mb={1.5}>Thành viên dự án</Typography>
-            {members.isLoading ? <SectionLoader /> : members.isError ? (
-              <ErrorState message={errorMessage(members.error)} onRetry={() => void members.refetch()} />
-            ) : (
-              <Stack spacing={1}>
-                {(Object.keys(roleLabels) as ProjectRole[]).map((role) => (
-                  <Stack key={role} direction="row" justifyContent="space-between">
-                    <Typography color="text.secondary">{roleLabels[role]}</Typography>
-                    <Typography fontWeight={750}>{roleCounts[role]}</Typography>
-                  </Stack>
-                ))}
-                <Button component={RouterLink} to={`/projects?manage=${project.id}`} startIcon={<GroupsOutlined />} sx={{ mt: 1 }}>
-                  Quản lý thành viên
+      {/* Tab 1: Thành viên dự án */}
+      {activeTab === 1 && (
+        <Paper variant="outlined" className="panel" sx={{ p: 3, borderRadius: 3 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2.5}>
+            <Box>
+              <Typography variant="h6" fontWeight={750}>Thành viên dự án</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Tổng cộng {members.data?.length ?? 0} thành viên tham gia dự án {project.name}.
+              </Typography>
+            </Box>
+            <Button
+              component={RouterLink}
+              to={`/projects?manage=${project.id}`}
+              variant="outlined"
+              size="small"
+              startIcon={<GroupsOutlined />}
+              sx={{ fontWeight: 600, borderRadius: '8px' }}
+            >
+              Quản lý phân quyền thành viên
+            </Button>
+          </Stack>
+          {members.isLoading ? (
+            <SectionLoader />
+          ) : members.isError ? (
+            <ErrorState message={errorMessage(members.error)} onRetry={() => void members.refetch()} />
+          ) : (
+            <Grid container spacing={2}>
+              {(Object.keys(roleLabels) as ProjectRole[]).map((role) => (
+                <Grid size={{ xs: 12, sm: 4 }} key={role}>
+                  <Card variant="outlined" sx={{ borderRadius: 2.5, p: 2 }}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                      {roleLabels[role]}
+                    </Typography>
+                    <Typography variant="h4" fontWeight={800} color="#0f172a" sx={{ mt: 0.5 }}>
+                      {roleCounts[role]}
+                    </Typography>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Paper>
+      )}
+
+      {/* Tab 2: Tài nguyên & Công cụ */}
+      {activeTab === 2 && (
+        <Paper variant="outlined" className="panel" sx={{ p: 3, borderRadius: 3 }}>
+          <Box mb={2.5}>
+            <Typography variant="h6" fontWeight={750}>Tài nguyên & Công cụ dự án</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Quản lý tệp đính kèm và cấu hình luồng nghiệp vụ riêng cho dự án.
+            </Typography>
+          </Box>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Card variant="outlined" sx={{ borderRadius: 2.5, p: 2.5 }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" mb={1}>
+                  <FolderOutlined color="primary" sx={{ fontSize: 28 }} />
+                  <Typography variant="subtitle1" fontWeight={700}>Kho tài nguyên tổ chức</Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary" mb={2}>
+                  Lưu trữ, tải lên và quản lý tệp đính kèm, tài liệu phục vụ cho công việc dự án.
+                </Typography>
+                <Button component={RouterLink} to="/resources" variant="outlined" size="small" endIcon={<ArrowForward />}>
+                  Mở kho tài nguyên
                 </Button>
-              </Stack>
-            )}
-          </Paper>
-          <Paper variant="outlined" className="panel">
-            <Typography variant="h6" mb={1}>Công cụ dự án</Typography>
-            <Stack>
-              <Button component={RouterLink} to="/resources" startIcon={<FolderOutlined />} sx={{ justifyContent: 'flex-start' }}>
-                Kho tài nguyên workspace
-              </Button>
-              <Button component={RouterLink} to={`/customization?project=${project.id}`} startIcon={<TuneOutlined />} sx={{ justifyContent: 'flex-start' }}>
-                Dữ liệu, phê duyệt và tự động hóa
-              </Button>
-            </Stack>
-          </Paper>
-        </Stack>
-      </Box>
+              </Card>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Card variant="outlined" sx={{ borderRadius: 2.5, p: 2.5 }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" mb={1}>
+                  <TuneOutlined color="secondary" sx={{ fontSize: 28 }} />
+                  <Typography variant="subtitle1" fontWeight={700}>Quy trình & Tự động hóa</Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary" mb={2}>
+                  Thiết lập các trường tùy biến động, luồng phê duyệt và tự động hóa chuyển trạng thái.
+                </Typography>
+                <Button component={RouterLink} to={`/customization?project=${project.id}`} variant="outlined" size="small" endIcon={<ArrowForward />}>
+                  Cấu hình nâng cao
+                </Button>
+              </Card>
+            </Grid>
+          </Grid>
+        </Paper>
+      )}
     </Box>
   );
 }

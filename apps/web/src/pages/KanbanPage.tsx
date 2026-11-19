@@ -33,6 +33,7 @@ import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
 import DownloadOutlined from '@mui/icons-material/DownloadOutlined';
 import DragIndicator from '@mui/icons-material/DragIndicator';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import FolderOutlined from '@mui/icons-material/FolderOutlined';
 import ForumOutlined from '@mui/icons-material/ForumOutlined';
 import InsertLink from '@mui/icons-material/InsertLink';
 import OpenInNew from '@mui/icons-material/OpenInNew';
@@ -507,12 +508,12 @@ function KanbanColumn({
     <Tooltip
       title={
         isWipStrict
-          ? `Cột đã đạt giới hạn nghiêm ngặt (${column.tasks.length}/${column.taskLimit}) - Không thể thêm thẻ`
+          ? `Giới hạn WIP Nghiêm ngặt: Đã đạt tối đa (${column.tasks.length}/${column.taskLimit} thẻ) - Không thể thêm thẻ`
           : isWipWarn
-            ? `Cảnh báo: Cột đã đạt hoặc vượt giới hạn WIP (${column.tasks.length}/${column.taskLimit})`
+            ? `Cảnh báo WIP: Cột đã đạt/vượt mức (${column.tasks.length}/${column.taskLimit} thẻ)`
             : column.taskLimit
-              ? `Giới hạn WIP: ${column.taskLimit} thẻ`
-              : 'Số lượng thẻ'
+              ? `Giới hạn WIP (${wipMode === 'STRICT' ? 'Nghiêm ngặt' : 'Cảnh báo'}): Tối đa ${column.taskLimit} thẻ (${column.tasks.length}/${column.taskLimit})`
+              : `Số lượng: ${column.tasks.length} thẻ`
       }
       arrow
     >
@@ -563,15 +564,6 @@ function KanbanColumn({
         )}
         {countBadge}
         <Box flex={1} />
-        {column.taskLimit && !isWipWarn && !isWipStrict && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontWeight: 500 }}
-          >
-            WIP {column.tasks.length}/{column.taskLimit}
-          </Typography>
-        )}
         {canManageColumns && (
           <Stack direction="row" className="kanban-column__actions">
             <IconButton
@@ -1253,72 +1245,135 @@ export function KanbanPage() {
             <Typography color="text.primary">{board?.name ?? 'Bảng công việc'}</Typography>
           </Breadcrumbs>
         ) : undefined}
-        eyebrow="Kanban"
-        title={board?.name ?? 'Bảng công việc'}
-        description="Kéo thả thẻ để cập nhật trạng thái. Giới hạn WIP được kiểm tra trước khi lưu."
-        actions={
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ md: 'center' }}>
-            {canManageColumns && (
-              <Button
-                variant="outlined"
-                startIcon={<Add />}
-                disabled={!board || columnMutationPending}
-                onClick={openCreateColumn}
-              >
-                Thêm cột
-              </Button>
-            )}
-            <FormControl size="small" sx={{ minWidth: 220 }}>
-              <InputLabel id="project-select-label">Dự án</InputLabel>
-              <Select
-                labelId="project-select-label"
-                label="Dự án"
-                value={selectedProjectId}
-                onChange={(event) => void selectProject(event.target.value as UUID)}
-              >
-                {projectOptions.map((project) => (
-                  <MenuItem key={project.id} value={project.id}>
-                    {project.name}{project.status === 'ARCHIVED' ? ' · đã lưu trữ' : ''}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl size="small" sx={{ minWidth: 200 }} disabled={!selectedProjectId}>
-              <InputLabel id="board-select-label">Bảng</InputLabel>
-              <Select
-                labelId="board-select-label"
-                label="Bảng"
-                value={boardId ?? ''}
-                onChange={(event) => navigate(`/kanban/${event.target.value}`)}
-              >
-                {(projectBoards.data ?? []).map((candidate) => (
-                  <MenuItem key={candidate.id} value={candidate.id}>{candidate.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            {selectedProject?.role === 'MANAGER' && projectActive && (
-              <Button
-                size="small"
-                onClick={() => {
-                  setBoardName('');
-                  setBoardDialog('create');
-                }}
-              >
-                Bảng mới
-              </Button>
-            )}
-            {canManageColumns && board && (
-              <>
+        eyebrow="Bảng công việc"
+        title={board?.name ?? 'Bảng Kanban'}
+        description={selectedProject ? `Thuộc dự án: ${selectedProject.name}. Kéo thả thẻ để cập nhật tiến độ công việc.` : 'Kéo thả thẻ để cập nhật trạng thái. Giới hạn WIP được kiểm tra trước khi lưu.'}
+      />
+
+      {/* Parent-Child Project & Board Context Bar */}
+      <Paper
+        variant="outlined"
+        sx={{
+          mb: 2.5,
+          p: 1.5,
+          borderRadius: 2.5,
+          bgcolor: '#ffffff',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'flex-start', md: 'center' },
+          justifyContent: 'space-between',
+          gap: 1.5,
+          border: '1px solid #e2e8f0',
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1.5} flexWrap="wrap">
+          {/* Project Selector */}
+          <FormControl size="small" sx={{ minWidth: 220 }}>
+            <InputLabel id="project-select-label">Dự án</InputLabel>
+            <Select
+              labelId="project-select-label"
+              label="Dự án"
+              value={selectedProjectId}
+              onChange={(event) => void selectProject(event.target.value as UUID)}
+              sx={{ borderRadius: '8px', bgcolor: '#f8fafc' }}
+            >
+              {projectOptions.map((project) => (
+                <MenuItem key={project.id} value={project.id}>
+                  {project.name}{project.status === 'ARCHIVED' ? ' · đã lưu trữ' : ''}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Typography color="#94a3b8" fontWeight={700} sx={{ display: { xs: 'none', sm: 'inline' } }}>/</Typography>
+
+          {/* Board Selector */}
+          <FormControl size="small" sx={{ minWidth: 200 }} disabled={!selectedProjectId}>
+            <InputLabel id="board-select-label">Bảng</InputLabel>
+            <Select
+              labelId="board-select-label"
+              label="Bảng"
+              value={boardId ?? ''}
+              onChange={(event) => navigate(`/kanban/${event.target.value}`)}
+              sx={{ borderRadius: '8px', bgcolor: '#f8fafc' }}
+            >
+              {(projectBoards.data ?? []).map((candidate) => (
+                <MenuItem key={candidate.id} value={candidate.id}>{candidate.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Return to Project Detail Page Button */}
+          {selectedProject && (
+            <Button
+              component={RouterLink}
+              to={`/projects/${selectedProject.id}`}
+              size="small"
+              variant="outlined"
+              startIcon={<FolderOutlined />}
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+                color: '#334155',
+                borderColor: '#cbd5e1',
+                height: 38,
+                px: 1.5,
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Chi tiết dự án
+            </Button>
+          )}
+
+          {selectedProject?.role === 'MANAGER' && projectActive && (
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<Add />}
+              onClick={() => {
+                setBoardName('');
+                setBoardDialog('create');
+              }}
+              sx={{ height: 38, fontWeight: 600 }}
+            >
+              Bảng mới
+            </Button>
+          )}
+        </Stack>
+
+        {/* Right side board actions: Column & Board Controls */}
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {canManageColumns && (
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              size="small"
+              disabled={!board || columnMutationPending}
+              onClick={openCreateColumn}
+              sx={{ borderRadius: '8px', height: 38, fontWeight: 600 }}
+            >
+              Thêm cột
+            </Button>
+          )}
+          {canManageColumns && board && (
+            <>
+              <Tooltip title="Đổi tên bảng">
                 <IconButton
+                  size="small"
                   aria-label="Đổi tên bảng"
                   onClick={() => {
                     setBoardName(board.name);
                     setBoardDialog('rename');
                   }}
+                  sx={{ border: '1px solid #e2e8f0', borderRadius: '8px', p: 0.85 }}
                 >
-                  <EditOutlined />
+                  <EditOutlined fontSize="small" />
                 </IconButton>
+              </Tooltip>
+              <Tooltip title="Xóa bảng này">
                 <IconButton
+                  size="small"
                   aria-label="Xóa bảng"
                   color="error"
                   disabled={deleteBoard.isPending}
@@ -1331,14 +1386,15 @@ export function KanbanPage() {
                       deleteBoard.mutate();
                     }
                   }}
+                  sx={{ border: '1px solid #fecaca', borderRadius: '8px', p: 0.85 }}
                 >
-                  <DeleteOutline />
+                  <DeleteOutline fontSize="small" />
                 </IconButton>
-              </>
-            )}
-          </Stack>
-        }
-      />
+              </Tooltip>
+            </>
+          )}
+        </Stack>
+      </Paper>
       {projects.isError && <ErrorState message={errorMessage(projects.error)} />}
       {selectedProject?.status === 'ARCHIVED' && (
         <Alert severity="info" sx={{ mb: 2 }}>

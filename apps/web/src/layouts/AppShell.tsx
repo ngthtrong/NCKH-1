@@ -51,7 +51,7 @@ const drawerWidth = 240;
 const primaryNavigation = [
   { label: 'Tổng quan', to: '/dashboard', icon: <DashboardOutlined /> },
   { label: 'Dự án', to: '/projects', icon: <WorkspacesOutlined /> },
-  { label: 'Kanban', to: '/kanban', icon: <SpaceDashboardOutlined /> },
+  { label: 'Bảng công việc', to: '/kanban', icon: <SpaceDashboardOutlined /> },
   { label: 'Thành viên', to: '/members', icon: <GroupsOutlined /> },
   { label: 'Tài nguyên', to: '/resources', icon: <FolderOutlined /> },
 ];
@@ -59,7 +59,7 @@ const primaryNavigation = [
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Tổng quan',
   '/projects': 'Dự án',
-  '/kanban': 'Bảng Kanban',
+  '/kanban': 'Bảng công việc',
   '/members': 'Thành viên',
   '/resources': 'Tài nguyên',
   '/notifications': 'Thông báo',

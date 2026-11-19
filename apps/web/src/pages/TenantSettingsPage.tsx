@@ -11,16 +11,14 @@ import {
   CardContent,
   Chip,
   Divider,
-  FormControlLabel,
   Grid,
   LinearProgress,
   Stack,
-  Switch,
   Tab,
   Tabs,
   Typography,
 } from '@mui/material';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { membersApi, resourcesApi, tenantSettingsApi } from '../api/endpoints';
 import type { TenantCapability } from '../api/types';
@@ -77,20 +75,6 @@ export function TenantSettingsPage() {
     await queryClient.invalidateQueries({ queryKey: ['tenant-settings'] });
     await queryClient.invalidateQueries({ queryKey: ['current-tenant'] });
   };
-
-  const toggle = useMutation({
-    mutationFn: ({
-      capability,
-      enabled,
-      version,
-    }: {
-      capability: TenantCapability;
-      enabled: boolean;
-      version: number;
-    }) => tenantSettingsApi.setEnabled(capability, enabled, version),
-    onSuccess: refresh,
-    onError: (cause) => setError(message(cause)),
-  });
 
   if (settings.isLoading) return <FullPageLoader />;
   if (settings.error || !settings.data) {
@@ -277,58 +261,80 @@ export function TenantSettingsPage() {
             </Grid>
           </Grid>
 
-          {/* Capabilities Switcher Card */}
+          {/* Capabilities Status Card (Read-only Entitlements per Tier) */}
           <Card variant="outlined" sx={{ borderRadius: 3 }}>
             <CardContent sx={{ p: 3 }}>
-              <Box mb={2}>
-                <Typography variant="h6" fontWeight={700}>
-                  Tính năng không gian làm việc
-                </Typography>
+              <Box mb={2.5}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <WorkspacePremiumOutlined sx={{ color: 'primary.main', fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight={750}>
+                    Tính năng theo gói dịch vụ ({tenantTier})
+                  </Typography>
+                </Stack>
                 <Typography variant="body2" color="text.secondary" mt={0.5}>
-                  Kích hoạt hoặc tạm dừng các phân hệ tính năng theo nhu cầu của tổ chức.
+                  Quyền lợi tính năng được quản lý tập trung theo gói dịch vụ của tổ chức. Để mở rộng hoặc thay đổi các phân hệ nâng cao, vui lòng liên hệ quản trị viên nền tảng.
                 </Typography>
               </Box>
 
               <Stack spacing={2} divider={<Divider />}>
-                {settings.data.capabilities
-                  .filter((item) => item.supported)
-                  .map((item) => {
-                    const info = capabilityLabels[item.capability] ?? {
-                      label: item.capability,
-                      desc: 'Tính năng bổ sung cho không gian làm việc.',
-                    };
-                    return (
-                      <Box
-                        key={item.capability}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        gap={2}
-                        py={0.5}
-                      >
-                        <Box>
-                          <Typography fontWeight={700} fontSize="0.9375rem">
-                            {info.label}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {info.desc}
-                          </Typography>
-                        </Box>
-                        <FormControlLabel
-                          control={<Switch checked={item.enabled} />}
-                          label={item.enabled ? 'Đang bật' : 'Đã tắt'}
-                          disabled={!canManage || !item.supported || !item.granted || toggle.isPending}
-                          onChange={(_, enabled) =>
-                            toggle.mutate({
-                              capability: item.capability,
-                              enabled,
-                              version: item.version,
-                            })
-                          }
-                        />
+                {(['BRANDING', 'CUSTOM_DATA', 'APPROVALS', 'AUTOMATION'] as TenantCapability[]).map((capKey) => {
+                  const item = settings.data.capabilities.find((c) => c.capability === capKey);
+                  const isAvailable = Boolean(item && item.supported && item.granted && item.enabled);
+                  const isGranted = Boolean(item && item.supported && item.granted);
+                  const info = capabilityLabels[capKey];
+
+                  return (
+                    <Box
+                      key={capKey}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      gap={2}
+                      py={0.75}
+                    >
+                      <Box flex={1} minWidth={0}>
+                        <Typography fontWeight={700} fontSize="0.9375rem" color="#0f172a">
+                          {info.label}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.825rem' }}>
+                          {info.desc}
+                        </Typography>
                       </Box>
-                    );
-                  })}
+                      <Box>
+                        {isAvailable ? (
+                          <Chip
+                            label="Đã kích hoạt"
+                            size="small"
+                            color="success"
+                            variant="filled"
+                            sx={{ fontWeight: 700, borderRadius: '6px', fontSize: '0.75rem' }}
+                          />
+                        ) : isGranted ? (
+                          <Chip
+                            label="Sẵn sàng"
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                            sx={{ fontWeight: 600, borderRadius: '6px', fontSize: '0.75rem' }}
+                          />
+                        ) : (
+                          <Chip
+                            label="Yêu cầu nâng cấp gói"
+                            size="small"
+                            sx={{
+                              fontWeight: 600,
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              bgcolor: '#f1f5f9',
+                              color: '#64748b',
+                              border: '1px solid #e2e8f0',
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                  );
+                })}
               </Stack>
             </CardContent>
           </Card>
