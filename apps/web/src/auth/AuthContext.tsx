@@ -11,7 +11,7 @@ import {
 import { authApi, tenantsApi } from '../api/endpoints';
 import { ApiError, setApiAccessToken, setApiSessionRefreshHandler } from '../api/client';
 import { useQueryClient } from '@tanstack/react-query';
-import type { LoginRequest, RegisterRequest, Session, TenantSummary } from '../api/types';
+import type { LoginRequest, RegisterRequest, Session, TenantSummary, UserSummary } from '../api/types';
 
 type AuthStatus = 'loading' | 'anonymous' | 'authenticated';
 
@@ -38,6 +38,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const sessionEpoch = useRef(0);
 
   const commitSession = useCallback((next: Session | null) => {
+    if (next?.user) {
+      next.user.systemAdmin = Boolean(next.user.platformRoles?.includes('SYSTEM_ADMIN'));
+    }
     setSession(next);
     setApiAccessToken(next?.accessToken ?? null);
     setStatus(next ? 'authenticated' : 'anonymous');
@@ -99,9 +102,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
       sessionEpoch.current += 1;
       const response = await authApi.login(credentials);
       const { tenants: availableTenants, ...nextSession } = response;
-      commitSession(nextSession);
+      const isSystemAdmin = Boolean(nextSession.user?.platformRoles?.includes('SYSTEM_ADMIN'));
+      const userSummary: UserSummary = {
+        ...nextSession.user,
+        systemAdmin: isSystemAdmin,
+      };
+      const sessionData: Session = {
+        ...nextSession,
+        user: userSummary,
+      };
+      commitSession(sessionData);
       setTenants(availableTenants);
-      return availableTenants;
+      const result = Object.assign(availableTenants, {
+        session: sessionData,
+        systemAdmin: isSystemAdmin,
+        tenants: availableTenants,
+      });
+      return result;
     },
     [commitSession],
   );

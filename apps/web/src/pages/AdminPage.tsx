@@ -36,7 +36,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import { adminApi } from '../api/endpoints';
@@ -49,7 +49,16 @@ import { StatusChip } from '../components/StatusChip';
 export function AdminPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { session, logout } = useAuth();
+
+  useEffect(() => {
+    const isSystemAdmin = Boolean(
+      session?.user?.systemAdmin || session?.user?.platformRoles?.includes('SYSTEM_ADMIN'),
+    );
+    if (session && !isSystemAdmin) {
+      navigate('/select-tenant', { replace: true });
+    }
+  }, [navigate, session]);
   const [page, setPage] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');

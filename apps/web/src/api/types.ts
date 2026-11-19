@@ -17,6 +17,7 @@ export type InvitationStatus = ApiSchemas['InvitationStatus'];
 
 export interface UserSummary extends ApiUserView {
   avatarUrl?: string;
+  systemAdmin?: boolean;
 }
 
 export interface TenantSummary extends ApiTenantView {

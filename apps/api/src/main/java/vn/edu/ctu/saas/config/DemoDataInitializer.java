@@ -83,17 +83,17 @@ public class DemoDataInitializer {
             created.setEmail(properties.seed().ownerEmail().trim().toLowerCase());
             created.setDisplayName("Demo Owner");
             created.setPasswordHash(passwordEncoder.encode(properties.seed().ownerPassword()));
-            created.setSystemAdmin(true);
+            created.setSystemAdmin(false);
             return userRepository.save(created);
         });
-        if (!owner.isSystemAdmin()) {
-            owner.setSystemAdmin(true);
+        if (owner.isSystemAdmin()) {
+            owner.setSystemAdmin(false);
             owner = userRepository.save(owner);
         }
-        UserAccountEntity admin = userRepository.findByEmailIgnoreCase("admin@demo.local").orElseGet(() -> {
+        UserAccountEntity admin = userRepository.findByEmailIgnoreCase("admin@tenantflow.tech").orElseGet(() -> {
             UserAccountEntity created = new UserAccountEntity();
-            created.setEmail("admin@demo.local");
-            created.setDisplayName("Demo Admin");
+            created.setEmail("admin@tenantflow.tech");
+            created.setDisplayName("System Administrator");
             created.setPasswordHash(passwordEncoder.encode(properties.seed().ownerPassword()));
             created.setSystemAdmin(true);
             return userRepository.save(created);
@@ -102,6 +102,17 @@ public class DemoDataInitializer {
             admin.setSystemAdmin(true);
             admin = userRepository.save(admin);
         }
+        // Đảm bảo System Admin không có membership trong bất kỳ tenant nào (0 tenant memberships)
+        List<TenantMembershipEntity> adminMemberships = membershipRepository.findAllByUserIdAndActiveTrue(admin.getId());
+        if (!adminMemberships.isEmpty()) {
+            membershipRepository.deleteAll(adminMemberships);
+        }
+        userRepository.findByEmailIgnoreCase("admin@demo.local").ifPresent(oldAdmin -> {
+            List<TenantMembershipEntity> oldMemberships = membershipRepository.findAllByUserIdAndActiveTrue(oldAdmin.getId());
+            if (!oldMemberships.isEmpty()) {
+                membershipRepository.deleteAll(oldMemberships);
+            }
+        });
         UserAccountEntity member = userRepository.findByEmailIgnoreCase("member@example.test").orElseGet(() -> {
             UserAccountEntity created = new UserAccountEntity();
             created.setEmail("member@example.test");
@@ -109,13 +120,13 @@ public class DemoDataInitializer {
             created.setPasswordHash(passwordEncoder.encode(properties.seed().ownerPassword()));
             return userRepository.save(created);
         });
-        ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, admin, member);
+        ensureTenant("pool-demo", "Pool Demo", "STARTER", TenantPlacement.POOL, owner, member);
         if (reportMode) {
-            ensureTenant("t-acme", "Acme Software", "ENTERPRISE", TenantPlacement.POOL, owner, admin, member);
-            ensureTenant("t-lotus", "Lotus Media", "PROFESSIONAL", TenantPlacement.POOL, owner, admin, member);
+            ensureTenant("t-acme", "Acme Software", "ENTERPRISE", TenantPlacement.POOL, owner, member);
+            ensureTenant("t-lotus", "Lotus Media", "PROFESSIONAL", TenantPlacement.POOL, owner, member);
         } else {
-            ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, admin, member);
-            ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, admin, member);
+            ensureTenant("schema-demo", "Schema Demo", "PROFESSIONAL", TenantPlacement.SCHEMA_PER_TENANT, owner, member);
+            ensureTenant("silo-demo", "Silo Demo", "ENTERPRISE", TenantPlacement.SILO_DATABASE, owner, member);
         }
         return new SeedUsers(owner, admin, member);
     }
@@ -126,7 +137,6 @@ public class DemoDataInitializer {
             String tier,
             TenantPlacement placementType,
             UserAccountEntity owner,
-            UserAccountEntity admin,
             UserAccountEntity member) {
         TenantEntity tenant = tenantRepository.findBySlug(slug).orElseGet(() -> {
             TenantEntity created = new TenantEntity();
@@ -153,9 +163,6 @@ public class DemoDataInitializer {
             tenant = tenantRepository.save(tenant);
         }
         ensureMembership(tenant.getId(), owner.getId(), TenantRole.OWNER);
-        if (admin != null) {
-            ensureMembership(tenant.getId(), admin.getId(), TenantRole.OWNER);
-        }
         ensureMembership(tenant.getId(), member.getId(), TenantRole.MEMBER);
         String key = "seed:bridge-v2:" + tenant.getId();
         if (tenant.getStatus() != TenantStatus.ACTIVE) {
@@ -211,13 +218,6 @@ public class DemoDataInitializer {
                         VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING
                         """, stableId(tenant.getId(), "pm-owner"), tenant.getId(), projectId,
                         users.owner().getId(), ProjectRole.MANAGER.name());
-                if (users.admin() != null) {
-                    jdbc.update("""
-                            INSERT INTO project_memberships(id,tenant_id,project_id,user_id,role)
-                            VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING
-                            """, stableId(tenant.getId(), "pm-admin"), tenant.getId(), projectId,
-                            users.admin().getId(), ProjectRole.MANAGER.name());
-                }
                 jdbc.update("""
                         INSERT INTO project_memberships(id,tenant_id,project_id,user_id,role)
                         VALUES (?,?,?,?,?) ON CONFLICT (tenant_id,project_id,user_id) DO NOTHING

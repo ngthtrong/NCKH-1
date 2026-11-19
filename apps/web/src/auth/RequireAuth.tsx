@@ -26,15 +26,18 @@ export function RequireAuth({
       />
     );
   }
+  const isSystemAdmin = Boolean(
+    session.user.systemAdmin || session.user.platformRoles?.includes('SYSTEM_ADMIN'),
+  );
   if (tenant && !session.activeTenant) return <Navigate to="/select-tenant" replace />;
   if (
     administrator &&
-    !session.user.platformRoles.includes('SYSTEM_ADMIN') &&
+    !isSystemAdmin &&
     (!session.activeTenant || !['OWNER', 'ADMIN'].includes(session.activeTenant.role))
   ) {
     return <Navigate to="/dashboard" replace />;
   }
-  if (systemAdministrator && !session.user.platformRoles.includes('SYSTEM_ADMIN')) {
+  if (systemAdministrator && !isSystemAdmin) {
     return <Navigate to={session.activeTenant ? '/dashboard' : '/select-tenant'} replace />;
   }
   return <Outlet />;

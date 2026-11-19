@@ -1,5 +1,4 @@
 import Add from '@mui/icons-material/Add';
-import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import Logout from '@mui/icons-material/Logout';
 import Refresh from '@mui/icons-material/Refresh';
@@ -16,7 +15,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { errorMessage } from '../api/client';
 import type { TenantSummary } from '../api/types';
@@ -42,6 +41,16 @@ export function TenantSelectionPage() {
   const navigate = useNavigate();
   const [openingSlug, setOpeningSlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const isPureSystemAdmin =
+    Boolean(session?.user?.systemAdmin || session?.user?.platformRoles?.includes('SYSTEM_ADMIN')) &&
+    tenants.length === 0;
+
+  useEffect(() => {
+    if (isPureSystemAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isPureSystemAdmin, navigate]);
 
   const openTenant = async (tenant: TenantSummary, customize = false) => {
     setOpeningSlug(tenant.slug);
@@ -95,75 +104,6 @@ export function TenantSelectionPage() {
             </Tooltip>
           </Stack>
         </Stack>
-        {session?.user.platformRoles?.includes('SYSTEM_ADMIN') && (
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 3.5,
-              p: 2.5,
-              borderRadius: '12px',
-              border: '1px solid #c7d7fe',
-              backgroundColor: '#f5f8ff',
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: { xs: 'flex-start', sm: 'center' },
-              justifyContent: 'space-between',
-              gap: 2,
-            }}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar
-                variant="rounded"
-                sx={{
-                  bgcolor: '#246bfd',
-                  color: '#ffffff',
-                  width: 44,
-                  height: 44,
-                  borderRadius: '10px',
-                }}
-              >
-                <AdminPanelSettingsOutlined />
-              </Avatar>
-              <Box>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="subtitle1" fontWeight={750} color="#0f172a">
-                    Cổng Quản trị Nền tảng (Control Plane)
-                  </Typography>
-                  <Chip
-                    label="System Admin"
-                    size="small"
-                    sx={{
-                      height: 20,
-                      fontSize: 10,
-                      fontWeight: 700,
-                      bgcolor: '#dbeafe',
-                      color: '#1d4ed8',
-                      borderRadius: '4px',
-                    }}
-                  />
-                </Stack>
-                <Typography variant="body2" color="#475569" sx={{ mt: 0.25, fontSize: '0.85rem' }}>
-                  Quản lý tổ chức thuê bao, cấu hình phân bổ cơ sở dữ liệu (Pool / Schema / Silo) và gói dịch vụ.
-                </Typography>
-              </Box>
-            </Stack>
-            <Button
-              variant="contained"
-              onClick={() => navigate('/admin')}
-              endIcon={<ArrowForward />}
-              sx={{
-                whiteSpace: 'nowrap',
-                bgcolor: '#246bfd',
-                '&:hover': { bgcolor: '#1d4ed8' },
-                fontWeight: 650,
-                borderRadius: '8px',
-                px: 2.5,
-              }}
-            >
-              Vào Control Plane
-            </Button>
-          </Paper>
-        )}
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {tenants.length === 0 ? (
           <EmptyState

@@ -21,7 +21,7 @@ import { errorMessage } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 
 export function LoginPage() {
-  const { login, status, session } = useAuth();
+  const { login, status, session, tenants } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -33,9 +33,16 @@ export function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated' && session) {
-      navigate(session.activeTenant ? '/dashboard' : '/select-tenant', { replace: true });
+      const isPureSysAdmin =
+        Boolean(session.user?.systemAdmin || session.user?.platformRoles?.includes('SYSTEM_ADMIN')) &&
+        (!tenants || tenants.length === 0);
+      if (isPureSysAdmin) {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(session.activeTenant ? '/dashboard' : '/select-tenant', { replace: true });
+      }
     }
-  }, [navigate, session, status]);
+  }, [navigate, session, status, tenants]);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -43,13 +50,21 @@ export function LoginPage() {
     setSubmitting(true);
     setError(null);
     try {
-      await login({ email: email.trim(), password });
+      const loginResult = await login({ email: email.trim(), password });
       const requestedPath = (location.state as { from?: string } | null)?.from;
-      const safeRequestedPath =
+      const isPureSysAdmin =
+        Boolean((loginResult as any)?.systemAdmin) &&
+        ((loginResult as any)?.tenants?.length ?? (Array.isArray(loginResult) ? loginResult.length : 0)) === 0;
+
+      let targetPath = '/select-tenant';
+      if (isPureSysAdmin) {
+        targetPath = '/admin';
+      } else if (
         requestedPath?.startsWith('/') && !requestedPath.startsWith('//') && requestedPath !== '/login'
-          ? requestedPath
-          : '/select-tenant';
-      navigate(safeRequestedPath, { replace: true });
+      ) {
+        targetPath = requestedPath;
+      }
+      navigate(targetPath, { replace: true });
     } catch (cause) {
       setError(errorMessage(cause));
     } finally {
