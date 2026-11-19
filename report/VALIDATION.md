@@ -1,9 +1,39 @@
-# Kiểm tra báo cáo V4 — 19/11/2026
+# Kiểm tra báo cáo V4 — cập nhật bố cục 20/11/2026
 
 Nội dung nghiên cứu chỉ lấy từ `../Report_V4.md` và `../Report_V4.pdf`;
 hai nguồn không bị sửa. Hash nguồn và bảng ánh xạ tài nguyên nằm trong
 [`assets/v4-import-manifest.json`](assets/v4-import-manifest.json).
 Hình thức theo `RULES.md`, `HinhThucBC.pdf` và template hiện tại.
+
+Bố cục ngày 20/11 theo yêu cầu mới: ưu tiên hình nhỏ trên trang dọc,
+đặt trực tiếp sau đoạn hoàn chỉnh, giảm trang gần trống và sửa Phần II.
+Hai bản một/hai mặt hiện đều 129 trang, so với 164 trang trước điều chỉnh.
+Phần II cùng trang đầu Chương 1, cỡ chữ theo tiêu đề hiện tại, không còn
+trang riêng chỉ có tiêu đề. Nhóm Phụ lục cũng không tạo trang tiêu đề trống.
+Có 35 hình dọc; chỉ năm sơ đồ dày thông tin dùng ngang: 2.7, 3.10, 4.4,
+4.8, 4.9. Hình/chú thích là một khối không nổi, tại ranh giới đoạn,
+không thể trôi vào giữa một đoạn văn. Đoạn giới thiệu bảng/hình ngang đi
+cùng đối tượng; cột bảng được cân lại và vẫn dùng chữ 13 bp.
+
+| PDF hiện hành | Số trang |
+| --- | ---: |
+| [Bản một mặt](build/content/content.pdf) | 129 |
+| [Bản hai mặt](build/content-twoside/content.pdf) | 129 |
+| [Bản tin Việt](build/bulletin-vi/bulletin-vi.pdf) | 1 |
+| [Bản tin Anh](build/bulletin-en/bulletin-en.pdf) | 1 |
+| [Tóm tắt Việt](build/summary-vi/summary-vi.pdf) | 1 |
+| [Tóm tắt Anh](build/summary-en/summary-en.pdf) | 1 |
+| [Minh họa template](build/smoke/smoke.pdf) | 6 |
+
+Cả bảy PDF qua kiểm tra A4/phông nhúng, không có lỗi tràn khung, thiếu
+ký tự hoặc tham chiếu chưa giải quyết. Hai quyển cùng đạt 27.470/27.470
+cụm năm từ của 297 đoạn; đủ 40 ảnh gốc nhúng đúng thứ tự và số hình/bảng.
+
+Rà soát trực quan: số trang thân bài không phải trang cuối chương có
+khoảng trắng đáy trên 150 mm giảm từ 14 xuống 1; trên 100 mm từ 23 xuống 2.
+Hai chỗ còn lại là hình dọc trước bảng ngang, giữ đúng thứ tự nguồn và
+chữ bảng 13 bp. Không còn trang chỉ một dòng hoặc tiêu đề. Hình 4.7 được
+giữ dọc sau đoạn giới thiệu, loại bỏ trang gần trống ở mục 4.3.1.
 
 ## Phạm vi chuyển đổi V4
 
@@ -21,8 +51,8 @@ Hình thức theo `RULES.md`, `HinhThucBC.pdf` và template hiện tại.
 - Mười khối mã: lấy lại dòng vật lý từ PDF, đối chiếu với Markdown sau
   khi bỏ khoảng trắng, có hash riêng. Mã không được thực thi. Consolas
   9 bp vừa toàn bộ dòng gốc trong khổ 160 mm; bản 10 bp gây thêm 38 ngắt dòng.
-  Mã dùng giãn dòng 1 và giữ từng khối cùng phần giới thiệu để tránh dòng
-  chú thích/dấu đóng ngoặc lẻ sang trang; giãn dòng thân bài vẫn 1,3.
+  Mã dùng giãn dòng 1, cho phép qua trang, bảo vệ các dòng đầu/cuối và
+  chừa đủ chỗ cho tiêu đề/phần mở đầu; giãn dòng thân bài vẫn 1,3.
 - Đủ 25 tài liệu tham khảo, chỉ dùng metadata V4. Khóa `v4-01`–`v4-25`
   giữ quan hệ với số cũ; số hiển thị được sắp xếp lại theo nhóm/tác giả.
   Nguyên văn nguồn tại [`bibliography/v4-reference-map.json`](bibliography/v4-reference-map.json).

@@ -77,14 +77,14 @@ Mô hình Hybrid kết hợp linh hoạt nhiều hình thái triển khai theo p
 
 Khi số lượng thuê bao hoặc sự phân hóa phân khúc vượt quá ngưỡng tối ưu của một cụm duy nhất trong mô hình Pool hoặc Hybrid, kiến trúc có thể mở rộng theo chiều ngang bằng chiến lược Phân vùng theo Ô (Cell-Based Architecture), như minh họa trên Hình 2.6. Thay vì gom toàn bộ khách hàng vào một cụm duy nhất, hệ thống chia tải thành nhiều ô triển khai độc lập đặt sau bộ định tuyến toàn cầu; mỗi ô tự đóng gói theo mô hình phù hợp nhất với nhóm khách hàng phụ trách (chẳng hạn các Ô 01 và Ô 02 vận hành theo mô hình Pool cho thuê bao phổ thông, còn Ô 03 tổ chức theo mô hình Hybrid cho phân khúc đa bậc), giúp khoanh vùng bán kính ảnh hưởng sự cố trong từng ô và mở rộng linh hoạt theo nhu cầu.
 
-\VfourFigureLandscape{2.6}{assets/figures/v4/image14.png}{Hướng mở rộng Phân vùng theo Ô (Cell-Based: Pool -- Pool -- Hybrid) nhằm giới hạn Bán kính Ảnh hưởng Sự cố.}{fig:v4-2-6}
-
-Bảng~\ref{tab:v4-2-1} tổng hợp đối sánh bốn mô hình kinh điển trên các tiêu chí kiến trúc và kinh tế cốt lõi:
+\VfourFigure{2.6}{assets/figures/v4/image14.png}{Hướng mở rộng Phân vùng theo Ô (Cell-Based: Pool -- Pool -- Hybrid) nhằm giới hạn Bán kính Ảnh hưởng Sự cố.}{fig:v4-2-6}
 
 \FloatBarrier
 \begin{landscape}
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
-\begin{longtable}{@{}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}@{}}
+Bảng~\ref{tab:v4-2-1} tổng hợp đối sánh bốn mô hình kinh điển trên các tiêu chí kiến trúc và kinh tế cốt lõi:
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{2.1}
+\begin{longtable}{@{}P{\dimexpr 0.18750\linewidth-7.500bp\relax}P{\dimexpr 0.18750\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-10.000bp\relax}P{\dimexpr 0.18750\linewidth-7.500bp\relax}P{\dimexpr 0.18750\linewidth-7.500bp\relax}@{}}
 \caption{Đối sánh tổng hợp bốn mô hình triển khai kiến trúc đa thuê bao kinh điển.}\label{tab:v4-2-1}\\
 \toprule
 Tiêu chí Đối sánh & Mô hình Silo & Mô hình Pool & Mô hình Bridge & Mô hình Hybrid \\
@@ -116,9 +116,11 @@ Bốn mô hình Silo, Bridge, Hybrid và Pool tạo thành một không gian đ�
 
 \textbf{(4) Sự chuyển dịch độ phức tạp giữa Vận hành và Kỹ thuật Phần mềm:} Cần nhấn mạnh rằng dùng chung một bộ mã nguồn (Tầng 9) không đồng nghĩa với dùng chung tiến trình thực thi lúc chạy. Mô hình Silo giảm bớt phức tạp kiểm soát rò rỉ dữ liệu trong mã nguồn ứng dụng nhưng đẩy gánh nặng sang tự động hóa hạ tầng và vận hành N thể hiện; còn Bridge phải giải quyết bài toán di trú lược đồ tuần tự trên N lược đồ/CSDL; Hybrid bổ sung chi phí xây dựng bộ định tuyến và quản trị đa phân vùng; trong khi Pool tối giản công tác triển khai còn duy nhất một thể hiện hệ thống nhưng chuyển toàn bộ trách nhiệm an toàn sang kỷ luật thiết kế phần mềm ở cả bốn khía cạnh kiểm soát K1--K4.
 
+\begin{landscape}
+\renewcommand{\VfourImageMaxHeight}{.72\textheight}
 Vì vậy, trước khi chốt phương án tổ chức tài nguyên, người thiết kế cần làm rõ đối tượng khách hàng mục tiêu, nhu cầu sử dụng, kỳ vọng chi phí, ràng buộc pháp lý cũng như biên độ tùy biến nghiệp vụ thực tế của sản phẩm để định lượng tường minh từng yếu tố trong bốn nhóm tiêu chí nêu trên. Từ sự phân định rõ ràng đó, nhóm phát triển mới đưa ra được quyết định thiết kế Tách -- Gộp chính xác xuyên suốt các cụm tầng cũng như dự phòng lộ trình tiến hóa kiến trúc phù hợp về sau.
-
-\VfourFigureLandscape{2.7}{assets/figures/v4/image15.png}{Khung Đánh đổi Đa yếu tố Tổng quát hỗ trợ Lựa chọn Mô hình Kiến trúc Đa thuê bao.}{fig:v4-2-7}
+\VfourFigure{2.7}{assets/figures/v4/image15.png}{Khung Đánh đổi Đa yếu tố Tổng quát hỗ trợ Lựa chọn Mô hình Kiến trúc Đa thuê bao.}{fig:v4-2-7}
+\end{landscape}
 
 Từ đó, đặt yêu cầu thực tiễn của ứng dụng quản lý công việc Kanban lên cả bốn yếu tố đó, từng phương án kiến trúc được đối chiếu như sau:
 
@@ -134,6 +136,6 @@ Từ đó, đặt yêu cầu thực tiễn của ứng dụng quản lý công v
   Về cán cân vận hành -- kỹ thuật, khởi đầu bằng một thể hiện hệ thống tập trung (tránh sớm phát sinh chi phí định tuyến đa phân vùng của Hybrid ở giai đoạn nền tảng) giúp giữ chi phí nâng cấp ở mức O(1) và tập trung giải quyết bài toán kiểm soát phần mềm K1--K4.
 \end{enumerate}
 
-\VfourFigureLandscape{2.8}{assets/figures/v4/image16.png}{Áp dụng Khung Đánh giá Đa yếu tố vào Bài toán SaaS Kanban --- Định vị Mô hình Pool Cấp độ 3 và Lộ trình Tiến hóa Mở.}{fig:v4-2-8}
+\VfourFigure{2.8}{assets/figures/v4/image16.png}{Áp dụng Khung Đánh giá Đa yếu tố vào Bài toán SaaS Kanban --- Định vị Mô hình Pool Cấp độ 3 và Lộ trình Tiến hóa Mở.}{fig:v4-2-8}
 
 Từ các luận cứ trên, đề tài quyết định chốt lựa chọn Mô hình Pool ở Cấp độ Trưởng thành 3 làm kiến trúc mục tiêu cho toàn bộ Thể hiện Hệ thống của nền tảng SaaS Kanban. Quyết định này đồng nghĩa với việc toàn bộ các Thể hiện Thành phần xuyên suốt từ Tầng 1 đến Tầng 9 đều được tổ chức theo chiến lược Pool (Gộp dùng chung). Tuy nhiên, việc chốt mô hình Pool ở Chương~\ref{v4-chapter-2} mới giải quyết được bài toán tối ưu chi phí một cách tổng quát. Vì khi các vách ngăn vật lý được dỡ bỏ để gộp chung trên từng cụm tầng, hệ thống sẽ đối mặt trực tiếp với các rủi ro về lẫn lộn ngữ cảnh, rò rỉ dữ liệu chéo và tranh chấp hiệu năng. Chương~\ref{v4-chapter-3} tiếp theo sẽ đi sâu vào từng cụm tầng của mô hình Pool để phân tích nguyên nhân phát sinh thách thức và thiết lập bộ nguyên lý kỹ thuật kiểm soát K1--K4 tương ứng.

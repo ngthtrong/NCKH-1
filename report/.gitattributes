@@ -4,3 +4,5 @@
 *.png -text
 *.jpg -text
 *.jpeg -text
+# Preserve the source-code hashes through Windows checkouts.
+assets/code/v4/*.txt text eol=lf

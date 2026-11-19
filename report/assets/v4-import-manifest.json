@@ -532,7 +532,7 @@
       "pdf_xref": 301,
       "number": "1.1",
       "caption": "Tiến trình tiến hóa của các mô hình chia sẻ tài nguyên điện toán từ thập niên 1960 đến nay.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image3",
@@ -550,7 +550,7 @@
       "pdf_xref": 304,
       "number": "1.2",
       "caption": "Biểu đồ tương quan hàm Tổng chi phí sở hữu (TCO) giữa mô hình Đơn thuê bao và Đa thuê bao theo quy mô khách hàng.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image4",
@@ -622,7 +622,7 @@
       "pdf_xref": 328,
       "number": "1.6a",
       "caption": "Cấu trúc Mô hình Phân tầng Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image8",
@@ -748,7 +748,7 @@
       "pdf_xref": 361,
       "number": "2.6",
       "caption": "Hướng mở rộng Phân vùng theo Ô (Cell-Based: Pool – Pool – Hybrid) nhằm giới hạn Bán kính Ảnh hưởng Sự cố.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image15",
@@ -784,7 +784,7 @@
       "pdf_xref": 371,
       "number": "2.8",
       "caption": "Áp dụng Khung Đánh giá Đa yếu tố vào Bài toán SaaS Kanban — Định vị Mô hình Pool Cấp độ 3 và Lộ trình Tiến hóa Mở.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image17",
@@ -802,7 +802,7 @@
       "pdf_xref": 376,
       "number": "3.1",
       "caption": "Zoom-in Tầng 7 – Tổ chức Pool tại tầng điều phối biên, xác thực định danh, điều tiết lưu lượng và phân vùng khóa bộ nhớ đệm / kênh truyền tin theo Thuê bao.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image18",
@@ -820,7 +820,7 @@
       "pdf_xref": 381,
       "number": "3.2",
       "caption": "Kiến trúc Bộ nhớ đệm Hai tầng nhận thức thuê bao (L1 + L2) và nguyên lý lọc tần suất W-TinyLFU chống ô nhiễm bộ đệm.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image19",
@@ -838,7 +838,7 @@
       "pdf_xref": 384,
       "number": "3.3",
       "caption": "Zoom-in Tầng 8 & Tầng 9 – Tổ chức Pool với Bộ mã nguồn duy nhất, điều phối ngữ cảnh luồng và tùy biến động trên Thể hiện Thành phần dùng chung.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image20",
@@ -856,7 +856,7 @@
       "pdf_xref": 389,
       "number": "3.4",
       "caption": "Biểu đồ tuần tự nguyên lý thiết lập ngữ cảnh luồng thực thi và kỷ luật thu hồi bắt buộc trong khối try/finally tại Tầng 8 (Khía cạnh K1).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image21",
@@ -874,7 +874,7 @@
       "pdf_xref": 392,
       "number": "3.5",
       "caption": "Nguyên lý hoạt động của Động cơ Đánh giá Quy tắc (Rule Evaluation Engine) và tùy biến động 3 lớp (K4).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image22",
@@ -892,7 +892,7 @@
       "pdf_xref": 397,
       "number": "3.6",
       "caption": "Zoom-in Tầng 4–6 – Tổ chức Pool toàn phần với Bảng dùng chung và cơ chế kiểm soát truy cập cấp dòng nội tại (FORCE RLS).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image23",
@@ -910,7 +910,7 @@
       "pdf_xref": 400,
       "number": "3.7",
       "caption": "Liên hệ mô hình Silo tại Tầng 4–5 – Tách biệt Máy chủ Hệ quản trị CSDL hoặc Cơ sở dữ liệu logic độc lập cho từng Thuê bao.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image24",
@@ -928,7 +928,7 @@
       "pdf_xref": 403,
       "number": "3.8",
       "caption": "Liên hệ mô hình Bridge nội cụm tại Tầng 6 – Gộp máy chủ CSDL nhưng Tách Lược đồ (Schema-per-Tenant) kết hợp chuyển mạch không gian tên.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image25",
@@ -982,7 +982,7 @@
       "pdf_xref": 420,
       "number": "4.1",
       "caption": "Tiến trình phân tích yêu cầu theo tiếp cận Ngoài–Vào định hướng thị trường và mô hình ba lớp dịch vụ tùy biến của ứng dụng SaaS Kanban.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image28",
@@ -1000,7 +1000,7 @@
       "pdf_xref": 423,
       "number": "4.2",
       "caption": "Sơ đồ phân rã các dịch vụ và chức năng quản trị thuộc Mặt phẳng Điều khiển (Control Plane).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image29",
@@ -1018,7 +1018,7 @@
       "pdf_xref": 426,
       "number": "4.3",
       "caption": "Sơ đồ phân rã các dịch vụ và chức năng nghiệp vụ quản lý công việc Kanban thuộc Mặt phẳng Dữ liệu (Data Plane).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image30",
@@ -1036,7 +1036,7 @@
       "pdf_xref": 433,
       "number": "4.4",
       "caption": "Biểu đồ Ca sử dụng Tổng thể (UML Use Case Diagram) phân tách Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu.",
-      "landscape": false
+      "landscape": true
     },
     {
       "image_id": "image31",
@@ -1054,7 +1054,7 @@
       "pdf_xref": 438,
       "number": "4.5",
       "caption": "Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow – (a) Chọn Không gian làm việc & cấp JWT gắn tenant_id; (b) Khung Cấu hình Tùy biến 3 Lớp.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image32",
@@ -1144,7 +1144,7 @@
       "pdf_xref": 459,
       "number": "4.10",
       "caption": "Sơ đồ Triển khai Internet SaaS (UML Deployment Diagram) trên AWS EC2 với Wildcard DNS, AWS Security Group và Caddy Reverse Proxy.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image37",
@@ -1162,7 +1162,7 @@
       "pdf_xref": 464,
       "number": "5.1",
       "caption": "Sơ đồ kiến trúc môi trường thực nghiệm cô lập tài nguyên trên AWS EC2 và đường ống thu thập số liệu hai phía.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image38",
@@ -1180,7 +1180,7 @@
       "pdf_xref": 469,
       "number": "5.2",
       "caption": "Kết quả kiểm định toàn vẹn ranh giới định danh (KB-1), rào chắn CSDL Fail-Closed (KB-2) và chi phí thực thi vi mô RLS.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image39",
@@ -1198,7 +1198,7 @@
       "pdf_xref": 474,
       "number": "5.3a",
       "caption": "Đối sánh độ trễ phản hồi theo phân nhóm thuê bao (p50 và p95).",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image40",
@@ -1216,7 +1216,7 @@
       "pdf_xref": 477,
       "number": "5.3b",
       "caption": "Thông lượng phục vụ, khả năng cắt tải tại biên và độ trễ truy xuất cấu hình.",
-      "landscape": true
+      "landscape": false
     },
     {
       "image_id": "image41",
@@ -1234,7 +1234,7 @@
       "pdf_xref": 478,
       "number": "5.4",
       "caption": "Diễn biến mức sử dụng CPU các vùng chứa theo chuỗi thời gian (Telemetry, N=17 mẫu) và kết quả kiểm chứng tùy biến động (KB-4).",
-      "landscape": true
+      "landscape": false
     }
   ],
   "tables": [

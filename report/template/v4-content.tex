@@ -6,18 +6,55 @@
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \providecommand{\addsubsec}[1]{\subsection*{#1}\addcontentsline{toc}{subsection}{#1}}
 \pdfstringdefDisableCommands{\def\allowbreak{}}
-\newcommand{\VfourImageMaxHeight}{.82\textheight}
+\newcommand{\VfourImageMaxHeight}{.64\textheight}
+\newsavebox{\VfourImageBox}
+\newsavebox{\VfourCaptionBox}
+\newlength{\VfourFigureWidth}
+\newlength{\VfourFigureAvailable}
+\newlength{\VfourFigureNaturalHeight}
+\newlength{\VfourFigureMinimumHeight}
+% Run after the next chapter's page break, before its TOC entry and title.
+% The division title shares the chapter page instead of creating a title-only page.
+\newcommand{\VfourDivisionDisplay}[2]{%
+  \par\phantomsection\addcontentsline{toc}{part}{#1}%
+  {\parindent=0pt\raggedright\normalfont\bfseries
+    \fontsize{16bp}{20bp}\selectfont #1\par}%
+  \nobreak\vspace{12bp}\nobreak}
+\newcommand{\VfourDivisionBeforeChapter}[1]{%
+  \AddtoOneTimeDoHook{heading/postinit/chapter}{\VfourDivisionDisplay{#1}}}
 % Preserve V4's lettered figure identifiers (1.6a/b and 5.3a/b) in captions,
 % lists and hyperlinks. Each image stays after its source paragraph.
 \newcommand{\VfourFigure}[4]{%
+  \par\addvspace{8bp}\penalty0%
   \begingroup
+  \let\autodot\relax
   \renewcommand{\thefigure}{#1}%
-  \begin{figure}[htbp]
+  \setlength{\VfourFigureWidth}{\linewidth}%
+  \def\VfourNumber{#1}\def\VfourSmallNumber{1.6a}%
+  \ifx\VfourNumber\VfourSmallNumber\setlength{\VfourFigureWidth}{.72\linewidth}\fi
+  \def\VfourSmallNumber{1.6b}%
+  \ifx\VfourNumber\VfourSmallNumber\setlength{\VfourFigureWidth}{.80\linewidth}\fi
+  \def\VfourTallNumber{1.5}%
+  \ifx\VfourNumber\VfourTallNumber\renewcommand{\VfourImageMaxHeight}{.59\textheight}\fi
+  \def\VfourTallNumber{4.6}%
+  \ifx\VfourNumber\VfourTallNumber\renewcommand{\VfourImageMaxHeight}{.58\textheight}\fi
+  \sbox{\VfourImageBox}{\includegraphics[width=\VfourFigureWidth,height=\VfourImageMaxHeight,keepaspectratio]{#2}}%
+  \sbox{\VfourCaptionBox}{\begin{minipage}{\linewidth}%
+    \usekomafont{caption}\textbf{\figurename~#1: }#3\par\end{minipage}}%
+  \setlength{\VfourFigureNaturalHeight}{\dimexpr\ht\VfourImageBox+\dp\VfourImageBox\relax}%
+  \setlength{\VfourFigureAvailable}{\dimexpr\pagegoal-\pagetotal-\ht\VfourCaptionBox-\dp\VfourCaptionBox-\abovecaptionskip-\belowcaptionskip-12bp\relax}%
+  \setlength{\VfourFigureMinimumHeight}{.86\VfourFigureNaturalHeight}%
+  \typeout{V4 figure #1 page \thepage: image=\the\VfourFigureNaturalHeight, available=\the\VfourFigureAvailable}%
+  \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth,height=\VfourImageMaxHeight,keepaspectratio]{#2}%
-    \caption{#3}\label{#4}%
-  \end{figure}
-  \endgroup}
+    \ifdim\VfourFigureAvailable<\VfourFigureNaturalHeight
+      \ifdim\VfourFigureAvailable>\VfourFigureMinimumHeight
+        \includegraphics[width=\VfourFigureWidth,height=\VfourFigureAvailable,keepaspectratio]{#2}%
+      \else\usebox{\VfourImageBox}\fi
+    \else\usebox{\VfourImageBox}\fi
+    \captionof{figure}{#3}\label{#4}%
+  \end{minipage}\par
+  \endgroup\addvspace{8bp}}
 \newcommand{\VfourFigureLandscape}[4]{%
   \FloatBarrier
   \begin{landscape}

@@ -25,6 +25,7 @@ PDF = ROOT.parent / 'Report_V4.pdf'
 WORK = ROOT / 'build/v4'
 API = []
 MANIFEST = {'sources': {}, 'headings': [], 'figures': [], 'tables': [], 'code': []}
+LANDSCAPE_FIGURES = {'2.7', '3.10', '4.4', '4.8', '4.9'}
 
 
 def plain(value):
@@ -202,15 +203,23 @@ def row_cells(row):
     return [cell[-1] for cell in row[1]]
 
 
-def render_table(table, caption=None):
+def render_table(table, caption=None, lead=''):
     heads, rows = table_rows(table)
     number = re.match(r'Bảng\s+(\d+\.\d+):\s*', plain(caption['c']))[1] if caption else None
     title = strip_prefix(unstyled(caption['c']), r'Bảng\s+\d+\.\d+:\s*') if caption else None
     n = len(table['c'][2])
     landscape = n >= 4
     weights = ([.10, .30, .60] if n == 3 else [1/n]*n)
+    if n == 3 and caption is None:
+        weights = [.20, .30, .50]
     if n == 3 and plain(row_cells(heads[0])[0][0]).startswith('Phương diện'):
         weights = [.24, .38, .38]
+    if number == '1.2':
+        weights = [.12, .28, .45, .15]
+    elif number == '2.1':
+        weights = [.1875, .1875, .25, .1875, .1875]
+    elif number == '4.2':
+        weights = [.07, .12, .29, .52]
     # widths sum to the available line width after column padding.
     spec = '@{}' + ''.join('P{\\dimexpr %.5f\\linewidth-%.3fbp\\relax}' % (w, 10*(n-1)*w) for w in weights) + '@{}'
     def render_row(row):
@@ -219,8 +228,10 @@ def render_table(table, caption=None):
     parts = [r'\FloatBarrier']
     if landscape:
         parts.append(r'\begin{landscape}')
+        if lead:
+            parts.append(lead)
     environment = 'longtable' if caption else 'longtable*'
-    parts += [r'\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}']
+    parts += [r'\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}']
     if number:
         # longtable* still advances the internal counter. Preserve V4's visible
         # number while leaving hyperref's internal destination counter unique.
@@ -257,19 +268,35 @@ def render_code(table):
                              'sha256': hashlib.sha256(recovered.encode('utf-8')).hexdigest(),
                              'non_whitespace_content_matches_markdown': True})
     return raw('\\par\\noindent\\textbf{' + literal(title) + '}\\par\n'
-               '\\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,'
+               '\\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\\clubpenalty10000\\widowpenalty10000},'
                'fontsize=\\fontsize{9bp}{11bp}\\selectfont]{' + path + '}')
 
 
-def render_figure(image, caption):
+def render_figure(image, caption, lead=''):
     number = re.match(r'Hình\s+(\d+\.\d+[ab]?):\s*', plain(caption['c']))[1]
     title = strip_prefix(unstyled(caption['c']), r'Hình\s+\d+\.\d+[ab]?:\s*')
     ident = Path(image['c'][2][0]).stem
     data = dict(IMAGE_DATA[ident])
-    landscape = data['width_px'] / data['height_px'] > 1.65
+    landscape = number in LANDSCAPE_FIGURES
     data.update(number=number, caption=title, landscape=landscape)
     MANIFEST['figures'].append(data)
-    return raw('\\VfourFigure' + ('Landscape' if landscape else '') + '{' + number + '}{' + data['path'] + '}{' + literal(title) + '}{fig:v4-' + number.replace('.', '-') + '}')
+    figure = '\\VfourFigure{' + number + '}{' + data['path'] + '}{' + literal(title) + '}{fig:v4-' + number.replace('.', '-') + '}'
+    if landscape:
+        limit = '.62' if number == '4.9' else '.72'
+        figure = '\\begin{landscape}\n\\renewcommand{\\VfourImageMaxHeight}{' + limit + '\\textheight}\n' + lead + '\n' + figure + '\n\\end{landscape}'
+    return raw(figure)
+
+
+def landscape_lead(result, extra_paragraph=False):
+    """Keep the complete introducing paragraph (and adjacent heading) with its object."""
+    lead = []
+    if result and result[-1]['t'] in ('Para', 'Plain'):
+        lead.insert(0, result.pop())
+        if result and result[-1]['t'] == 'RawBlock' and re.match(r'\\(?:section|subsection|subsubsection)\{', result[-1]['c'][1]):
+            lead.insert(0, result.pop())
+        if extra_paragraph and result and result[-1]['t'] in ('Para', 'Plain'):
+            lead.insert(0, result.pop())
+    return latex(lead) if lead else ''
 
 
 def heading(block, mode):
@@ -315,19 +342,22 @@ def process(blocks, mode):
                 result.append(converted)
         elif image_node(block):
             assert next_block and re.match('Hình ', plain(next_block)), plain(block)
-            result.append(render_figure(image_node(block), next_block))
+            number = re.match(r'Hình\s+(\d+\.\d+[ab]?):', plain(next_block))[1]
+            lead = landscape_lead(result) if number in LANDSCAPE_FIGURES else ''
+            result.append(render_figure(image_node(block), next_block, lead))
             i += 1
         elif block['t'] == 'Para' and re.match(r'^Bảng \d+\.\d+:', plain(block)):
             assert next_block and next_block['t'] == 'Table'
-            result.append(render_table(next_block, block))
+            number = re.match(r'Bảng\s+(\d+\.\d+):', plain(block))[1]
+            lead = landscape_lead(result, extra_paragraph=number == '4.2') if len(next_block['c'][2]) >= 4 else ''
+            result.append(render_table(next_block, block, lead))
             i += 1
         elif block['t'] == 'Table':
             result.append(render_code(block) if mode == 'appendix' else render_table(block))
         elif mode == 'appendix' and block['t'] == 'Para' and re.match(r'^[A-D]\.\d+\. ', plain(block)):
             title = re.sub(r'^[A-D]\.\d+\. ', '', plain(block))
             key = re.match(r'^([A-D]\.\d+)', plain(block))[1].replace('.', '-')
-            count = len('\n'.join(CODE[key.replace('-', '.')]['lines']).strip().splitlines())
-            result.append(raw('\\Needspace{' + str(count * 11 + 100) + 'bp}\n\\section{' + literal(title) + '}\\label{v4-sec-' + key + '}'))
+            result.append(raw('\\Needspace{90bp}\n\\section{' + literal(title) + '}\\label{v4-sec-' + key + '}'))
         else:
             result.append(walk_inlines(block))
         i += 1

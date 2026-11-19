@@ -47,7 +47,7 @@ bắt buộc trích dẫn theo IEEE; đó là các lựa chọn của template.
 | Hai mặt | Giữ lề vật lý trái/phải; không ép chương mở ở trang lẻ | `template/ctu-report.cls` |
 | Mục lục | Chừa rộng hơn cho số trang La Mã dài; phần đầu La Mã, Mở đầu bắt đầu từ 1 | Class và `main.tex` |
 | Bảng thân bài | Cỡ 13 bp trong `tabular`, `tabularx`, `longtable`; bảng trong biểu mẫu có cỡ riêng | `template/packages.tex`, `template/forms.tex` |
-| Vị trí hình/bảng | Không nổi lên trước đoạn nguồn; đặt gần đoạn giới thiệu, chặn trước phần tiếp theo | `flafter`, `placeins`, hook `FloatBarrier` |
+| Vị trí hình/bảng | V4 ưu tiên hình dọc đặt thành khối sau đoạn hoàn chỉnh; năm sơ đồ dày thông tin dùng ngang, giữ đoạn giới thiệu cùng đối tượng | `template/v4-content.tex`; `flafter`/`placeins` cho float thông thường |
 | Bảng/hình rộng | Tách nội dung hoặc dùng trang ngang A4; giữ cỡ chữ đọc được | `pdflscape`, ví dụ trong `examples/formatting.tex` |
 | Chú thích | Hình ở dưới, bảng ở trên; `label` sau `caption`; tham chiếu bằng nhãn | Hướng dẫn trong README và ví dụ |
 | Tài liệu tham khảo | Văn bản pháp quy → sách/báo/tạp chí → bài viết/tài liệu khác; xếp tác giả trong từng nhóm; số liên tục toàn danh mục | `template/bibliography.tex` |

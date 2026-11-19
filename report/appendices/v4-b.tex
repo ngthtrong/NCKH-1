@@ -1,26 +1,26 @@
 % Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
 \chapter{MÃ NGUỒN CÀI ĐẶT CÁC CƠ CHẾ KIỂM SOÁT ĐA THUÊ BAO CỐT LÕI (K1--K4) (Đối ứng Mục~\ref{v4-sec-3-2}, 3.3, 3.4 \& Mục~\ref{v4-sec-4-3-3})}\label{v4-appendix-B}
 
-\Needspace{540bp}
+\Needspace{90bp}
 \section{Bộ lọc xác thực JWT và Quản lý ngữ cảnh luồng (JwtTenantFilter \& TenantContext)}\label{v4-sec-B-1}
 
 \par\noindent\textbf{B.1. Java / Spring Boot -- TenantContext \& JwtTenantFilter (K1)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-1.txt}
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-1.txt}
 
-\Needspace{342bp}
+\Needspace{90bp}
 \section{Bộ đánh chặn giao dịch tiêm biến phiên CSDL (RlsConnectionInterceptor -- SET LOCAL)}\label{v4-sec-B-2}
 
 \par\noindent\textbf{B.2. Java / Hibernate -- RlsConnectionInterceptor với SET LOCAL (K2)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-2.txt}
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-2.txt}
 
-\Needspace{342bp}
+\Needspace{90bp}
 \section{Bộ giới hạn tốc độ theo thuê bao và Bộ nhớ đệm hai tầng (RateLimitFilter \& TwoTierCacheConfig)}\label{v4-sec-B-3}
 
 \par\noindent\textbf{B.3. Redis Lua Token Bucket \& Bộ nhớ đệm Hai tầng Caffeine/Redis Pub/Sub (K3 \& K4)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3.txt}
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3.txt}
 
-\Needspace{364bp}
+\Needspace{90bp}
 \section{Cấu trúc dữ liệu JSONB mẫu của Động cơ tùy biến 3 lớp (tenants.settings \& cards.custom\_\allowbreak{}fields)}\label{v4-sec-B-4}
 
 \par\noindent\textbf{B.4. JSONB Mẫu Cấu hình 3 Lớp \& Quy tắc Xử lý Luật WIP (K4)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4.txt}
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4.txt}

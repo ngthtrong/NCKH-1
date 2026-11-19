@@ -23,6 +23,12 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
+Bố cục cập nhật 20/11/2026: 35 hình được đặt trên trang dọc trong nội
+dung, sau đoạn văn hoàn chỉnh; chỉ năm sơ đồ nhiều chi tiết dùng trang
+ngang (2.7, 3.10, 4.4, 4.8, 4.9). Tiêu đề Phần II nằm cùng trang
+đầu Chương 1. Hình/chú thích không nổi giữa đoạn; cột bảng và vị trí các
+đoạn giới thiệu được điều chỉnh để giảm trang gần trống, giữ đủ nội dung.
+
 Nội dung hiện hành được chuyển từ `../Report_V4.md`, đối chiếu
 `../Report_V4.pdf` ngày 19/11/2026: Mở đầu, năm chương, kết luận, 25 tài
 liệu tham khảo và phụ lục A–D. Ô nghiên cứu để trống trong V4 tiếp tục

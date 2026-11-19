@@ -6,7 +6,8 @@ Nếu Chương~\ref{v4-chapter-2} và Chương~\ref{v4-chapter-3} đã xây dự
 Về mặt nghiệp vụ thuần túy, cấu trúc bảng Kanban (Bảng -- Cột -- Thẻ công việc) được lựa chọn với mức độ phức tạp vừa phải nhằm tập trung chứng minh trực diện các thuộc tính cốt lõi của kiến trúc Đa thuê bao Pool Cấp độ 3. Nếu chỉ triển khai phân quyền theo trường team\_\allowbreak{}id và lọc dữ liệu bằng mệnh đề WHERE thông thường, hệ thống mới chỉ dừng ở mức Đa người dùng (Multi-User -- MU). Sự khác biệt căn bản giúp nguyên mẫu chứng minh rõ bản chất Đa thuê bao (Multi-Tenant -- MT) được thể hiện trên bốn phương diện đối sánh tại Bảng~\ref{tab:v4-4-1}:
 
 \FloatBarrier
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{4.1}
 \begin{longtable}{@{}P{\dimexpr 0.24000\linewidth-4.800bp\relax}P{\dimexpr 0.38000\linewidth-7.600bp\relax}P{\dimexpr 0.38000\linewidth-7.600bp\relax}@{}}
 \caption{Đối chiếu Bản chất Kiến trúc giữa Đa người dùng (MU) và Đa thuê bao Cấp độ 3 (MT) trên Bài toán Kanban.}\label{tab:v4-4-1}\\
 \toprule
@@ -38,7 +39,7 @@ Qua khảo sát nhu cầu thực tế của các phòng ban chuyên môn trong d
 
 Từ việc đối chiếu hai chân dung tổ chức đối lập trên, nghiên cứu quy nạp nhu cầu thị trường của nền tảng SaaS Kanban thành mô hình Dịch vụ Tùy biến Ba Lớp theo tiếp cận Ngoài--Vào, được minh họa trên Hình~\ref{fig:v4-4-1}: (1) Lớp 1 -- Dịch vụ tùy biến nhận diện thương hiệu và giao diện (cho phép mỗi thuê bao thiết lập bảng màu chủ đạo, biểu trưng và chế độ hiển thị thẻ đầy đủ hay thu gọn); (2) Lớp 2 -- Dịch vụ tùy biến quy trình và quy tắc nghiệp vụ (cho phép tự định nghĩa danh sách cột trạng thái, ngưỡng giới hạn wip\_\allowbreak{}limit trên từng cột và lựa chọn chế độ cưỡng chế STRICT hoặc WARN); và (3) Lớp 3 -- Dịch vụ tùy biến lược đồ dữ liệu mở rộng (cho phép quản trị viên thuê bao tự khai báo thêm các trường thuộc tính động gắn với thẻ công việc ngay trong thời gian chạy):
 
-\VfourFigureLandscape{4.1}{assets/figures/v4/image27.png}{Tiến trình phân tích yêu cầu theo tiếp cận Ngoài--Vào định hướng thị trường và mô hình ba lớp dịch vụ tùy biến của ứng dụng SaaS Kanban.}{fig:v4-4-1}
+\VfourFigure{4.1}{assets/figures/v4/image27.png}{Tiến trình phân tích yêu cầu theo tiếp cận Ngoài--Vào định hướng thị trường và mô hình ba lớp dịch vụ tùy biến của ứng dụng SaaS Kanban.}{fig:v4-4-1}
 
 \subsection{Quy hoạch Dịch vụ Phần mềm thành Chức năng trên Hai Mặt phẳng Kiến trúc và Yêu cầu Phi chức năng}\label{v4-sec-4-1-2}
 
@@ -46,11 +47,11 @@ Theo đúng lý thuyết nền tảng đã xác lập ở Chương~\ref{v4-chapt
 
 Thứ nhất, Mặt phẳng Điều khiển (Control Plane -- Hình~\ref{fig:v4-4-2}): Đóng vai trò cơ quan thiết lập chính sách, quản trị vòng đời và kiểm soát ranh giới vận hành toàn cục của nền tảng SaaS. Đặc trưng kiến trúc của mặt phẳng này là tần suất phát sinh giao dịch ở mức vừa phải nhưng đòi hỏi tính toàn vẹn cao và thẩm quyền quản trị tối cao để quản lý các tổ chức thuê bao. Cấu trúc quy hoạch tổng thể các cụm dịch vụ quản trị thuộc Mặt phẳng Điều khiển được trực quan hóa trên sơ đồ Hình~\ref{fig:v4-4-2}; các ca sử dụng chi tiết tương ứng (UC01 đến UC05) sẽ được đặc tả cụ thể tại Mục 4.2.2.
 
-\VfourFigureLandscape{4.2}{assets/figures/v4/image28.png}{Sơ đồ phân rã các dịch vụ và chức năng quản trị thuộc Mặt phẳng Điều khiển (Control Plane).}{fig:v4-4-2}
+\VfourFigure{4.2}{assets/figures/v4/image28.png}{Sơ đồ phân rã các dịch vụ và chức năng quản trị thuộc Mặt phẳng Điều khiển (Control Plane).}{fig:v4-4-2}
 
 Thứ hai, Mặt phẳng Dữ liệu (Data Plane -- Hình~\ref{fig:v4-4-3}): Đóng vai trò môi trường thực thi nghiệp vụ có tần suất truy cập cao, nơi người dùng cuối trực tiếp thao tác hàng ngày để quản lý công việc và cộng tác dự án. Trái ngược với Mặt phẳng Điều khiển, Mặt phẳng Dữ liệu đòi hỏi thông lượng xử lý lớn, độ trễ phản hồi thấp và tính cô lập dữ liệu nghiêm ngặt giữa các không gian làm việc dùng chung. Sơ đồ phân rã chi tiết các cụm dịch vụ nghiệp vụ Kanban thuộc Mặt phẳng Dữ liệu được thể hiện trên Hình~\ref{fig:v4-4-3}; toàn bộ quy trình vận hành và tương tác chi tiết (UC06 đến UC10) sẽ được làm rõ tại Mục 4.2.2.
 
-\VfourFigureLandscape{4.3}{assets/figures/v4/image29.png}{Sơ đồ phân rã các dịch vụ và chức năng nghiệp vụ quản lý công việc Kanban thuộc Mặt phẳng Dữ liệu (Data Plane).}{fig:v4-4-3}
+\VfourFigure{4.3}{assets/figures/v4/image29.png}{Sơ đồ phân rã các dịch vụ và chức năng nghiệp vụ quản lý công việc Kanban thuộc Mặt phẳng Dữ liệu (Data Plane).}{fig:v4-4-3}
 
 Bên cạnh các yêu cầu chức năng trên, để bảo đảm hệ thống vận hành đạt chuẩn kiến trúc Pool Cấp độ 3, cần đáp ứng sáu yêu cầu phi chức năng (Non-Functional Requirements - NFR) ánh xạ trực tiếp từ bốn khía cạnh kiểm soát K1--K4:
 
@@ -82,16 +83,16 @@ Hệ thống kiểm soát truy cập của ứng dụng SaaS Kanban được thi
 
 - Quản trị viên Không gian làm việc Thuê bao (Tenant Administrator / Workspace Owner): Là người đại diện quản lý của từng tổ chức khách hàng (chẳng hạn Giám đốc dự án của Acme Software hoặc Trưởng phòng truyền thông của Lotus Media). Tác nhân này chỉ có quyền hạn bên trong ranh giới tenant\_\allowbreak{}id của tổ chức mình, chịu trách nhiệm: (1) Thiết lập nhận diện thương hiệu của không gian làm việc (chọn màu chủ đạo, bố cục thẻ); (2) Quản trị quy trình làm việc (tạo dự án, khởi tạo bảng Kanban, cấu hình các cột trạng thái, đặt ngưỡng wip\_\allowbreak{}limit và chọn chế độ kiểm soát STRICT hay WARN); (3) Định nghĩa danh mục các trường dữ liệu tùy biến mở rộng cho tổ chức; và (4) Mời thành viên mới vào không gian làm việc và gán vai trò trong dự án.
 
+\FloatBarrier
+\begin{landscape}
 - Thành viên Dự án (Project Member): Là các kỹ sư, nhân viên nội dung hoặc cộng tác viên làm việc hàng ngày trên bảng Kanban. Một người dùng (định danh qua địa chỉ email duy nhất) có thể đồng thời là thành viên của nhiều tổ chức thuê bao khác nhau (Multi-Workspace Membership). Khi làm việc trong không gian của một thuê bao cụ thể, Thành viên có quyền xem bảng Kanban, tạo thẻ công việc mới, nhập dữ liệu cho các trường chuẩn và trường mở rộng, thực hiện kéo -- thả (Drag-and-Drop) thẻ giữa các cột trạng thái theo quy tắc WIP của tổ chức đó, viết bình luận trao đổi và lọc/tìm kiếm công việc.
 
 \subsection{Đặc tả Ca sử dụng (Use Cases) và Luồng Hành trình Người dùng Điển hình (User Journeys)}\label{v4-sec-4-2-2}
 
 Từ ba nhóm tác nhân trên, toàn bộ quy hoạch năng lực dịch vụ tại Mục~\ref{v4-sec-4-1} được đặc tả thành 10 ca sử dụng cốt lõi phân theo hai mặt phẳng kiến trúc (Bảng~\ref{tab:v4-4-2}) và trực quan hóa trên Biểu đồ Ca sử dụng UML tại Hình~\ref{fig:v4-4-4}:
-
-\FloatBarrier
-\begin{landscape}
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
-\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{4.2}
+\begin{longtable}{@{}P{\dimexpr 0.07000\linewidth-2.100bp\relax}P{\dimexpr 0.12000\linewidth-3.600bp\relax}P{\dimexpr 0.29000\linewidth-8.700bp\relax}P{\dimexpr 0.52000\linewidth-15.600bp\relax}@{}}
 \caption{Đặc tả Danh mục 10 Ca sử dụng Cốt lõi (UC01--UC10) Phân tách theo Hai Mặt phẳng Kiến trúc.}\label{tab:v4-4-2}\\
 \toprule
 Mã UC & Mặt phẳng & Tên Ca sử dụng \& Tác nhân & Mô tả Nghiệp vụ \& Cơ chế Đa thuê bao Trọng tâm \\
@@ -115,15 +116,19 @@ UC10 & Dữ liệu & Lọc \& Theo dõi Thẻ Công việc (Admin / Member) & T�
 \endgroup
 \end{landscape}
 
+\begin{landscape}
+\renewcommand{\VfourImageMaxHeight}{.72\textheight}
+
 \VfourFigure{4.4}{assets/figures/v4/image30.png}{Biểu đồ Ca sử dụng Tổng thể (UML Use Case Diagram) phân tách Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu.}{fig:v4-4-4}
+\end{landscape}
 
 Để làm rõ cách thức người dùng tương tác với ứng dụng và cách các quy tắc đa thuê bao vận hành thực tế trên luồng nghiệp vụ, nghiên cứu phân tích chi tiết hai luồng sử dụng cốt lõi sau:
 
 \textbf{Luồng Sử dụng 1: Chuyển đổi Không gian làm việc và Thiết lập Tùy biến Động (Quản trị viên Thuê bao):}
 
 \FloatBarrier
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
-\begin{longtable*}{@{}P{\dimexpr 0.10000\linewidth-2.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.60000\linewidth-12.000bp\relax}@{}}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable*}{@{}P{\dimexpr 0.20000\linewidth-4.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.50000\linewidth-10.000bp\relax}@{}}
 \toprule
 Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
 \midrule\endfirsthead
@@ -140,8 +145,8 @@ Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ c
 \textbf{Luồng Sử dụng 2: Thao tác Kéo -- Thả Thẻ công việc dưới sự Giám sát của Luật WIP (Thành viên Dự án):}
 
 \FloatBarrier
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
-\begin{longtable*}{@{}P{\dimexpr 0.10000\linewidth-2.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.60000\linewidth-12.000bp\relax}@{}}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable*}{@{}P{\dimexpr 0.20000\linewidth-4.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.50000\linewidth-10.000bp\relax}@{}}
 \toprule
 Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
 \midrule\endfirsthead
@@ -159,7 +164,7 @@ Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ c
 
 Giao diện người dùng của nguyên mẫu ứng dụng SaaS Kanban (tên giao diện TenantFlow) được xây dựng theo kiến trúc Single-Page Application (SPA) bằng React 18 và TypeScript. Sau khi đăng nhập qua màn hình chọn không gian làm việc và thiết lập tùy biến ở Mặt phẳng Điều khiển (Hình~\ref{fig:v4-4-5}), bố cục màn hình Kanban chính (Hình~\ref{fig:v4-4-6}) tổ chức thành ba khu vực: (1) Thanh điều hướng \& nhận diện tổ chức ở phía trên và bên trái (hiển thị viết tắt AS/LM, tên tổ chức, gói dịch vụ, bộ chuyển nhanh Workspace và mục Cài đặt workspace dành cho Tenant Admin); (2) Thanh trạng thái chính sách \& bộ lọc công việc (hiển thị chế độ WIP STRICT hay WARN, danh sách mã trường mở rộng đang áp dụng và bộ lọc mức ưu tiên / người thực hiện); và (3) Không gian bảng Kanban trung tâm hiển thị bộ đếm tỷ lệ trên tiêu đề cột (như 2/2 hoặc 3/2) và các huy hiệu trường động trên từng thẻ. Ghi chú phạm vi nguyên mẫu (MVP Scope): Các mục điều hướng bổ trợ như Tổng quan, Dự án, Tài nguyên và Thông báo được bố trí trên thanh menu nhằm định hình khung sản phẩm SaaS hoàn chỉnh, trong khi phạm vi xử lý dữ liệu và đo kiểm cốt lõi tập trung vào chu trình Kanban (Workspace -- Board -- Column -- Card).
 
-\VfourFigureLandscape{4.5}{assets/figures/v4/image31.png}{Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow -- (a) Chọn Không gian làm việc \& cấp JWT gắn tenant\_\allowbreak{}id; (b) Khung Cấu hình Tùy biến 3 Lớp.}{fig:v4-4-5}
+\VfourFigure{4.5}{assets/figures/v4/image31.png}{Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow -- (a) Chọn Không gian làm việc \& cấp JWT gắn tenant\_\allowbreak{}id; (b) Khung Cấu hình Tùy biến 3 Lớp.}{fig:v4-4-5}
 
 \VfourFigure{4.6}{assets/figures/v4/image32.png}{Đối chứng giao diện bảng Kanban thực tế của hai thuê bao Acme Software (t-acme) và Lotus Media (t-lotus) vận hành đồng thời trên cùng một phiên bản mã nguồn tại cụm AWS EC2.}{fig:v4-4-6}
 
@@ -179,7 +184,7 @@ Tổ hợp công nghệ của nguyên mẫu được lựa chọn đồng bộ v
 
 \FloatBarrier
 \begin{landscape}
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
 \renewcommand{\thetable}{4.3}
 \begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
 \caption{Hợp đồng Giao tiếp API Trọng yếu và Cấu trúc Tải trọng Dữ liệu Đa thuê bao (API \& Metadata Contracts).}\label{tab:v4-4-3}\\
@@ -199,11 +204,13 @@ PATCH /api/cards/\{id\}/move(Mặt phẳng Dữ liệu) & Member+; Trong giao d�
 \endgroup
 \end{landscape}
 
+\begin{landscape}
+\renewcommand{\VfourImageMaxHeight}{.72\textheight}
 \subsection{Thiết kế Lược đồ Cơ sở Dữ liệu Năm Bảng và Kiểm soát Đồng thời}\label{v4-sec-4-3-2}
 
 Tại Tầng 6, dữ liệu toàn hệ thống lưu trên một lược đồ public duy nhất gồm năm bảng cốt lõi, phân định rành mạch theo hai mặt phẳng như trên Hình~\ref{fig:v4-4-8}:
-
-\VfourFigureLandscape{4.8}{assets/figures/v4/image34.png}{Lược đồ cơ sở dữ liệu đa thuê bao 5 bảng cốt lõi của ứng dụng SaaS Kanban phân định phạm vi Mặt phẳng Điều khiển và FORCE RLS trên Mặt phẳng Dữ liệu.}{fig:v4-4-8}
+\VfourFigure{4.8}{assets/figures/v4/image34.png}{Lược đồ cơ sở dữ liệu đa thuê bao 5 bảng cốt lõi của ứng dụng SaaS Kanban phân định phạm vi Mặt phẳng Điều khiển và FORCE RLS trên Mặt phẳng Dữ liệu.}{fig:v4-4-8}
+\end{landscape}
 
 Quan sát Sơ đồ Thực thể -- Liên kết (ERD) tại Hình~\ref{fig:v4-4-8}, toàn bộ các khóa chính (UUID), khóa ngoại phân cấp và ràng buộc dữ liệu của năm bảng (tenants, tenant\_\allowbreak{}users, boards, board\_\allowbreak{}columns, cards) được thiết kế xoay quanh ba quyết định kỹ thuật trọng tâm sau:
 
@@ -213,11 +220,13 @@ Quan sát Sơ đồ Thực thể -- Liên kết (ERD) tại Hình~\ref{fig:v4-4-
 
 Thứ ba, Phạm vi Áp dụng FORCE RLS, Kiểm soát Tranh chấp Ghi (Concurrency) và Chỉ mục Tổ hợp: Khác với cách hiểu giản lược áp dụng mù FORCE RLS lên mọi bảng, thiết kế phân định chính xác: ba bảng nghiệp vụ Mặt phẳng Dữ liệu (boards, board\_\allowbreak{}columns, cards) bật toàn phần ENABLE và FORCE ROW LEVEL SECURITY cho vai trò thực thi kanban\_\allowbreak{}app\_\allowbreak{}user (quyền tối thiểu NOBYPASSRLS) với mệnh đề USING/WITH CHECK Fail-Closed đọc app.current\_\allowbreak{}tenant\_\allowbreak{}id. Trong khi đó, bảng tenants và tenant\_\allowbreak{}users thuộc Mặt phẳng Điều khiển cho phép truy vấn tra cứu danh sách Workspace hợp lệ theo email ở bước tiền đăng nhập (tránh bế tắc khi chưa chọn thuê bao) và chỉ cho phép ghi/sửa cấu hình dưới kiểm soát của ngữ cảnh tenant\_\allowbreak{}id đã xác thực. Ngoài ra, để chống điều kiện tranh chấp (Race Condition) khi hai thành viên kéo thẻ vào cùng một cột chạm giới hạn WIP đồng thời, giao dịch di chuyển thẻ thực hiện khóa bi quan dòng cột đích (SELECT ... FOR UPDATE) trước khi đếm thẻ dưới chế độ STRICT và sử dụng cột cards.version (Optimistic Locking) nhằm tránh ghi đè vị trí. Cuối cùng, hệ thống chỉ mục B-Tree dẫn đầu bởi tenant\_\allowbreak{}id (idx\_\allowbreak{}boards\_\allowbreak{}tenant\_\allowbreak{}created, idx\_\allowbreak{}columns\_\allowbreak{}tenant\_\allowbreak{}board\_\allowbreak{}pos, idx\_\allowbreak{}cards\_\allowbreak{}tenant\_\allowbreak{}col\_\allowbreak{}pos) kết hợp chỉ mục GIN trên cards.custom\_\allowbreak{}fields giúp mọi truy vấn và kiểm định RLS thu gọn về quét phạm vi hẹp theo từng tổ chức.
 
+\begin{landscape}
+\renewcommand{\VfourImageMaxHeight}{.62\textheight}
 \subsection{Ánh xạ Luồng Thao tác Nghiệp vụ Kanban Xuyên tầng sang Bốn Kỹ thuật K1--K4}\label{v4-sec-4-3-3}
 
 Để thấy rõ sự phối hợp nhịp nhàng giữa logic nghiệp vụ của ứng dụng Kanban và bốn cơ chế kiểm soát đa thuê bao K1--K4 trong thời gian chạy, Hình~\ref{fig:v4-4-9} trình bày Biểu đồ tuần tự (Sequence Diagram) gồm chín bước xử lý xuyên tầng khi một thành viên dự án thực hiện thao tác truy xuất bảng hoặc kéo -- thả thẻ công việc trên giao diện React:
-
-\VfourFigureLandscape{4.9}{assets/figures/v4/image35.png}{Biểu đồ tuần tự 9 bước ánh xạ thao tác kéo -- thả thẻ Kanban xuyên tầng qua K1--K4, bao đóng giao dịch SET LOCAL và khối finally.}{fig:v4-4-9}
+\VfourFigure{4.9}{assets/figures/v4/image35.png}{Biểu đồ tuần tự 9 bước ánh xạ thao tác kéo -- thả thẻ Kanban xuyên tầng qua K1--K4, bao đóng giao dịch SET LOCAL và khối finally.}{fig:v4-4-9}
+\end{landscape}
 
 Theo dõi trên Hình~\ref{fig:v4-4-9}, một thao tác nghiệp vụ của người dùng trên ứng dụng Kanban được bảo vệ và điều phối qua bốn chặng ánh xạ trực tiếp tới K1--K4:
 
@@ -241,7 +250,7 @@ Bước cuối cùng trong quá trình xây dựng nguyên mẫu là đóng gói
 
 Nhằm hoàn thiện mục tiêu triển khai ứng dụng dưới dạng dịch vụ phần mềm truy cập trực tiếp qua Internet (Hình~\ref{fig:v4-4-10}), nền tảng giải quyết bốn vấn đề hạ tầng biên khi vận hành SaaS công cộng: (1) Phân giải Tên miền phụ Động (Wildcard DNS): Thay vì cấu hình bản ghi A thủ công cho từng khách hàng mới, tên miền chính dùng bản ghi *.domain (hoặc *.47.128.76.180.sslip.io trên môi trường thực nghiệm AWS EC2) để mọi thuê bao mới (như t-acme hay t-lotus) tự động trỏ về cùng địa chỉ IP máy chủ ngay sau khi đăng ký tại UC01; (2) Đối soát Tiêu đề Host ở Cổng biên: caddy-proxy giữ nguyên tiêu đề Host gốc (t-acme.\textless domain\textgreater) chuyển vào kanban-api để JwtTenantFilter đối chiếu trực tiếp với trường slug/tenant\_\allowbreak{}id đã ký trong JWT, chặn các yêu cầu tráo tên miền giữa các thuê bao; (3) Bảo mật Kênh truyền TLS và Tường lửa AWS Security Group: Ở cấu hình vận hành chính thức, Caddy tự động cấp phát và gia hạn chứng chỉ HTTPS (Let\textquotesingle s Encrypt) trên cổng 443; riêng môi trường trình diễn thực nghiệm dùng dịch vụ DNS miễn phí sslip.io tạm mở cổng HTTP :8080 (hiển thị nhãn "Không bảo mật" trên thanh địa chỉ trình duyệt tại Hình~\ref{fig:v4-4-6}) để kiểm thử nhanh mà không chạm ngưỡng giới hạn cấp chứng chỉ công cộng; đồng thời tường lửa Security Group chặn mọi truy cập trực tiếp từ bên ngoài vào cổng 5432 (PostgreSQL), 6379 (Redis) và cổng nội bộ ứng dụng; (4) Bền vững Dữ liệu: Dữ liệu PostgreSQL được ánh xạ ra Persistent Docker Volume (pgdata) gắn trên ổ đĩa EC2 độc lập với vòng đời vùng chứa.
 
-\VfourFigureLandscape{4.10}{assets/figures/v4/image36.png}{Sơ đồ Triển khai Internet SaaS (UML Deployment Diagram) trên AWS EC2 với Wildcard DNS, AWS Security Group và Caddy Reverse Proxy.}{fig:v4-4-10}
+\VfourFigure{4.10}{assets/figures/v4/image36.png}{Sơ đồ Triển khai Internet SaaS (UML Deployment Diagram) trên AWS EC2 với Wildcard DNS, AWS Security Group và Caddy Reverse Proxy.}{fig:v4-4-10}
 
 \section{Tiểu kết Chương~\ref{v4-chapter-4}}\label{v4-sec-4-5}
 

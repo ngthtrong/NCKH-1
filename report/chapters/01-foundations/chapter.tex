@@ -21,7 +21,7 @@ Tuy nhiên, để nhà cung cấp SaaS có thể phục vụ số lượng lớn
 
 \textbf{- Hiện nay (SaaS Đa thuê bao hiện đại):} Kết hợp việc chia sẻ môi trường vận hành và cơ sở dữ liệu để tối ưu chi phí với việc duy trì không gian làm việc cô lập, quản trị phân cấp và cấu hình riêng cho từng tổ chức khách hàng.
 
-\VfourFigureLandscape{1.1}{assets/figures/v4/image2.png}{Tiến trình tiến hóa của các mô hình chia sẻ tài nguyên điện toán từ thập niên 1960 đến nay.}{fig:v4-1-1}
+\VfourFigure{1.1}{assets/figures/v4/image2.png}{Tiến trình tiến hóa của các mô hình chia sẻ tài nguyên điện toán từ thập niên 1960 đến nay.}{fig:v4-1-1}
 
 Có thể thấy, yếu tố duy trì xuyên suốt lịch sử phát triển là sự dịch chuyển trọng tâm chia sẻ: từ chia sẻ phần cứng cấp thấp, sang tập trung hóa vị trí lưu trữ nhưng phân mảnh môi trường chạy (ASP), tiến tới chia sẻ môi trường chạy cho người dùng cá nhân phẳng, và đạt đến chia sẻ nền tảng phần mềm có nhận thức ngữ cảnh tổ chức và hỗ trợ tùy biến động.
 
@@ -35,7 +35,7 @@ Có thể thấy, yếu tố duy trì xuyên suốt lịch sử phát triển l�
 
 Ngược lại, khi nhiều khách hàng cùng chia sẻ một tập tài nguyên chung và có thời điểm tải đỉnh không đồng thời trùng khớp nhau, hệ thống có thể phân bổ năng lực xử lý linh hoạt giữa các khách hàng. Cơ chế này vận hành dựa trên Nguyên lý ghép kênh thống kê (Statistical Multiplexing): nhu cầu tải tổng hợp của một tập hợp khách hàng được làm phẳng, cho phép phục vụ cùng một số lượng tổ chức với lượng tài nguyên vật lý thấp hơn đáng kể so với tổng tài nguyên dự phòng rời rạc. Nhờ đó, kiến trúc đa thuê bao hiện thực hóa tính kinh tế theo quy mô, đưa hàm chi phí về dạng: C(N) = C\_\allowbreak{}fixed + δ × N, trong đó C\_\allowbreak{}fixed là chi phí đầu tư ban đầu để thiết kế nền tảng đa thuê bao, còn δ là chi phí biên rất nhỏ khi tiếp nhận thêm một khách hàng mới.
 
-\VfourFigureLandscape{1.2}{assets/figures/v4/image3.png}{Biểu đồ tương quan hàm Tổng chi phí sở hữu (TCO) giữa mô hình Đơn thuê bao và Đa thuê bao theo quy mô khách hàng.}{fig:v4-1-2}
+\VfourFigure{1.2}{assets/figures/v4/image3.png}{Biểu đồ tương quan hàm Tổng chi phí sở hữu (TCO) giữa mô hình Đơn thuê bao và Đa thuê bao theo quy mô khách hàng.}{fig:v4-1-2}
 
 Tại đây ta thấy để xây dựng nền tảng đa thuê bao, nhà cung cấp cần đầu tư chi phí cố định ban đầu cao hơn nhằm thiết kế đảm bảo các đặc trưng của một hệ thống đa thuê bao. Ở quy mô nhỏ, mô hình dành riêng có thể có chi phí khởi đầu thấp hơn, nhưng khi số lượng khách hàng vượt qua Điểm hòa vốn, lợi thế về quy mô trở nên rõ rệt và giúp việc vận hành hệ thống hiệu quả hơn về chi phí.
 
@@ -105,11 +105,11 @@ Tổng hợp đối chiếu theo Hình~\ref{fig:v4-1-4} qua ba tiêu chí trên 
 
 \VfourFigure{1.5}{assets/figures/v4/image6.png}{Bốn cấp độ trưởng thành kiến trúc SaaS (Chong \& Carraro, 2006).}{fig:v4-1-5}
 
-Từ Hình~\ref{fig:v4-1-5} và đối chiếu chi tiết tại Bảng~\ref{tab:v4-1-1}, quy luật chuyển dịch kiến trúc qua bốn cấp độ cho thấy một ranh giới phân kỳ rõ rệt giữa hai nhóm mô hình: ở Cấp độ 1 và Cấp độ 2, hệ thống vẫn cấp phát cho mỗi tổ chức một Thể hiện Hệ thống tách rời độc lập (chuyển dịch từ tùy biến phân nhánh mã nguồn cục bộ sang hợp nhất về một bộ mã nguồn chuẩn với cấu hình tĩnh theo bản cài đặt), nên chi phí hạ tầng máy chủ và nỗ lực vận hành môi trường vẫn tăng tuyến tính O(N) theo số khách hàng. Bước ngoặt quyết định diễn ra tại Cấp độ 3 khi toàn bộ vách ngăn vật lý giữa các khách hàng được dỡ bỏ để hợp nhất nhiều Thuê bao vào chia sẻ chung một Thể hiện Hệ thống duy nhất, kết hợp tùy biến động bằng siêu dữ liệu lúc chạy; và Cấp độ 4 kế thừa trọn vẹn kiến trúc Cấp độ 3 để nhân bản theo cụm đa thể hiện phía sau bộ cân bằng tải. Như vậy, kiến trúc Đa thuê bao thực sự bắt đầu từ Cấp độ 3 khi hợp nhất các thuê bao vào chung một Thể hiện Hệ thống.
-
 \FloatBarrier
 \begin{landscape}
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+Từ Hình~\ref{fig:v4-1-5} và đối chiếu chi tiết tại Bảng~\ref{tab:v4-1-1}, quy luật chuyển dịch kiến trúc qua bốn cấp độ cho thấy một ranh giới phân kỳ rõ rệt giữa hai nhóm mô hình: ở Cấp độ 1 và Cấp độ 2, hệ thống vẫn cấp phát cho mỗi tổ chức một Thể hiện Hệ thống tách rời độc lập (chuyển dịch từ tùy biến phân nhánh mã nguồn cục bộ sang hợp nhất về một bộ mã nguồn chuẩn với cấu hình tĩnh theo bản cài đặt), nên chi phí hạ tầng máy chủ và nỗ lực vận hành môi trường vẫn tăng tuyến tính O(N) theo số khách hàng. Bước ngoặt quyết định diễn ra tại Cấp độ 3 khi toàn bộ vách ngăn vật lý giữa các khách hàng được dỡ bỏ để hợp nhất nhiều Thuê bao vào chia sẻ chung một Thể hiện Hệ thống duy nhất, kết hợp tùy biến động bằng siêu dữ liệu lúc chạy; và Cấp độ 4 kế thừa trọn vẹn kiến trúc Cấp độ 3 để nhân bản theo cụm đa thể hiện phía sau bộ cân bằng tải. Như vậy, kiến trúc Đa thuê bao thực sự bắt đầu từ Cấp độ 3 khi hợp nhất các thuê bao vào chung một Thể hiện Hệ thống.
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{1.1}
 \begin{longtable}{@{}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}@{}}
 \caption{Đối chiếu sự khác biệt bản chất giữa bốn cấp độ trưởng thành kiến trúc SaaS (Chong \& Carraro, 2006).}\label{tab:v4-1-1}\\
 \toprule
@@ -179,7 +179,7 @@ Trong môi trường chia sẻ tài nguyên, việc chỉ giám sát các chỉ 
 
 Trong công trình nghiên cứu năm 2015, \textbf{Kabbedijk và cộng sự \cite{v4-05}} đã giới thiệu mô hình phân tầng phần mềm gồm 9 tầng thành phần (Hình~\ref{fig:v4-1-6a}) nhằm cung cấp một khung tham chiếu chỉ ra các vị trí bên trong một thể hiện hệ thống mà tại đó cơ chế đa thuê bao có thể được áp dụng:
 
-\VfourFigureLandscape{1.6a}{assets/figures/v4/image7.png}{Cấu trúc Mô hình Phân tầng Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).}{fig:v4-1-6a}
+\VfourFigure{1.6a}{assets/figures/v4/image7.png}{Cấu trúc Mô hình Phân tầng Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).}{fig:v4-1-6a}
 
 Trong mô hình nguyên bản (Hình~\ref{fig:v4-1-6a}), Kabbedijk và cộng sự chia hệ thống thành 9 tầng từ thấp lên cao. Đồng thời sử dụng nét liền cho 5 tầng phần mềm nhận thức trực tiếp đa thuê bao (Tầng 4, 5, 6, 8, 9) và nét đứt cho 4 tầng hạ tầng nền hoặc nằm ngoài phạm vi phân tích của bài báo lúc bấy giờ (Tầng 1, 2, 3 và Tầng 7 phần mềm trung gian).
 
@@ -195,8 +195,9 @@ Trên cơ sở hai cập nhật trên, mô hình kiến trúc 9 tầng điện t
 
 \FloatBarrier
 \begin{landscape}
-\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
-\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{1.2}
+\begin{longtable}{@{}P{\dimexpr 0.12000\linewidth-3.600bp\relax}P{\dimexpr 0.28000\linewidth-8.400bp\relax}P{\dimexpr 0.45000\linewidth-13.500bp\relax}P{\dimexpr 0.15000\linewidth-4.500bp\relax}@{}}
 \caption{Định nghĩa bản chất trừu tượng và vai trò trong thể hiện hệ thống của 9 tầng thành phần.}\label{tab:v4-1-2}\\
 \toprule
 Tầng thành phần & Bản chất kỹ thuật trừu tượng của Thể hiện Thành phần & Vai trò trong Kiến trúc Đa thuê bao Cấp độ 3 - 4 & Quy ước Phạm vi \\
