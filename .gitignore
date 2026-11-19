@@ -2,3 +2,8 @@
 diagrams/_build/
 diagrams/_archive/
 diagrams/scripts/__pycache__/
+
+infra/.env
+apps/api/target/
+apps/web/node_modules/
+apps/web/dist/

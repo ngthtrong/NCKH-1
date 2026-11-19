@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: tenantflow-kanban-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kanban_saas_db}
+    username: ${SPRING_DATASOURCE_USERNAME:kanban_app_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:tenantflow-app-user-pass}
+    hikari:
+      maximum-pool-size: 25
+      minimum-idle: 5
+      connection-timeout: 10000
+      pool-name: TenantFlowHikariPool
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/kanban_saas_db}
+    user: ${SPRING_FLYWAY_USER:kanban_migrator}
+    password: ${SPRING_FLYWAY_PASSWORD:tenantflow-migrator-pass}
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:tenantflow-super-secret-hmac-sha256-key-at-least-32-chars}
+    expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}
+  sysadmin:
+    email: ${APP_SYSADMIN_EMAIL:admin@tenantflow.vn}
+    password: ${APP_SYSADMIN_PASSWORD:Password123!}
+    full-name: "System Administrator"
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [tenant=%X{tenant_id:-none}] - %msg%n"

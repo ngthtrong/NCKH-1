@@ -1,0 +1,109 @@
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: tenantflow-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kanban_saas_db}
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-tenantflow-pg-admin-pass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/db/init-roles.sql:/docker-entrypoint-initdb.d/01-init-roles.sql:ro
+    networks:
+      - nckh-ec2-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ADMIN_USER:-postgres} -d ${POSTGRES_DB:-kanban_saas_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 1536M
+
+  redis-cache:
+    image: redis:7.2-alpine
+    container_name: tenantflow-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - nckh-ec2-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 512M
+
+  kanban-api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: tenantflow-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB:-kanban_saas_db}
+      SPRING_DATASOURCE_USERNAME: ${APP_DB_USER:-kanban_app_user}
+      SPRING_DATASOURCE_PASSWORD: ${APP_DB_PASSWORD:-tenantflow-app-user-pass}
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB:-kanban_saas_db}
+      SPRING_FLYWAY_USER: ${MIGRATOR_DB_USER:-kanban_migrator}
+      SPRING_FLYWAY_PASSWORD: ${MIGRATOR_DB_PASSWORD:-tenantflow-migrator-pass}
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      APP_JWT_SECRET: ${JWT_SECRET:-tenantflow-super-secret-hmac-sha256-key-at-least-32-chars}
+      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    networks:
+      - nckh-ec2-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    deploy:
+      resources:
+        limits:
+          cpus: "1.25"
+          memory: 2560M
+
+  kanban-web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: tenantflow-web
+    depends_on:
+      - kanban-api
+    networks:
+      - nckh-ec2-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+  caddy-proxy:
+    image: caddy:2.8-alpine
+    container_name: tenantflow-caddy
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - ./infra/proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - kanban-api
+      - kanban-web
+    networks:
+      - nckh-ec2-net
+
+networks:
+  nckh-ec2-net:
+    driver: bridge
+
+volumes:
+  pgdata:

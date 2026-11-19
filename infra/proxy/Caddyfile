@@ -1,0 +1,21 @@
+:80 {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle /actuator/health {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+		}
+	}
+
+	handle {
+		reverse_proxy kanban-web:80
+	}
+}
