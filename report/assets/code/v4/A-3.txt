@@ -1,0 +1,25 @@
+-- Kích hoạt và Cưỡng chế Row-Level Security trên các bảng Mặt phẳng Dữ liệu (Fail-
+Closed)
+ALTER TABLE boards        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE boards        FORCE ROW LEVEL SECURITY;
+ALTER TABLE board_columns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE board_columns FORCE ROW LEVEL SECURITY;
+ALTER TABLE cards         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cards         FORCE ROW LEVEL SECURITY;
+-- Hàm đọc ngữ cảnh an toàn: trả về NULL nếu chưa thiết lập SET LOCAL
+-- Khi so sánh tenant_id = NULL -> UNKNOWN (FALSE) -> 0 dòng rò rỉ chéo (Fail-Closed)
+CREATE POLICY p_boards_isolation ON boards FOR ALL TO kanban_app_user
+    USING      (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid)
+    WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid);
+CREATE POLICY p_columns_isolation ON board_columns FOR ALL TO kanban_app_user
+    USING      (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid)
+    WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid);
+CREATE POLICY p_cards_isolation ON cards FOR ALL TO kanban_app_user
+    USING      (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid)
+    WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true),
+'')::uuid);

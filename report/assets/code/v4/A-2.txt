@@ -1,0 +1,36 @@
+-- Bảng Mặt phẳng Dữ liệu: Phi chuẩn hóa tenant_id NOT NULL + version chống xung đột
+ghi
+CREATE TABLE boards (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id  UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    name       VARCHAR(150) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_boards_tenant_created ON boards (tenant_id, created_at DESC);
+CREATE TABLE board_columns (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id  UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    board_id   UUID NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+    name       VARCHAR(80) NOT NULL,
+    position   INT NOT NULL,
+    wip_limit  INT NULL                                -- NULL = không giới hạn
+);
+CREATE INDEX idx_columns_tenant_board_pos ON board_columns (tenant_id, board_id,
+position);
+CREATE TABLE cards (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    tenant_id     UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    column_id     UUID NOT NULL REFERENCES board_columns(id) ON DELETE CASCADE,
+    assignee_id   UUID NULL REFERENCES tenant_users(id) ON DELETE SET NULL,
+    title         VARCHAR(200) NOT NULL,
+    description   TEXT,
+    position      INT NOT NULL DEFAULT 0,
+    version       INT NOT NULL DEFAULT 1,              -- Khóa lạc quan chống ghi đè
+đồng thời
+    custom_fields JSONB NOT NULL DEFAULT '{}'::jsonb   -- Thuộc tính mở rộng
+(story_points, budget_usd...)
+);
+CREATE INDEX idx_cards_tenant_col_pos ON cards (tenant_id, column_id, position);
+CREATE INDEX idx_cards_custom_fields_gin ON cards USING GIN (custom_fields
+jsonb_path_ops);

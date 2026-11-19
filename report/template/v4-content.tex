@@ -1,0 +1,26 @@
+% Import support only: the existing class, typography and official forms own layout.
+\usepackage{fvextra}
+\usepackage{ltcaption}
+\usepackage{needspace}
+\IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{\setmonofont{Latin Modern Mono}}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\addsubsec}[1]{\subsection*{#1}\addcontentsline{toc}{subsection}{#1}}
+\pdfstringdefDisableCommands{\def\allowbreak{}}
+\newcommand{\VfourImageMaxHeight}{.82\textheight}
+% Preserve V4's lettered figure identifiers (1.6a/b and 5.3a/b) in captions,
+% lists and hyperlinks. Each image stays after its source paragraph.
+\newcommand{\VfourFigure}[4]{%
+  \begingroup
+  \renewcommand{\thefigure}{#1}%
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth,height=\VfourImageMaxHeight,keepaspectratio]{#2}%
+    \caption{#3}\label{#4}%
+  \end{figure}
+  \endgroup}
+\newcommand{\VfourFigureLandscape}[4]{%
+  \FloatBarrier
+  \begin{landscape}
+    \renewcommand{\VfourImageMaxHeight}{.76\textheight}%
+    \VfourFigure{#1}{#2}{#3}{#4}%
+  \end{landscape}}

@@ -1,4 +1,137 @@
-\chapter{}\label{chap:evaluation}
-\input{chapters/04-evaluation/sections/setup}
-\input{chapters/04-evaluation/sections/results}
-\input{chapters/04-evaluation/sections/limitations}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{THIẾT LẬP THỰC NGHIỆM VÀ KẾT QUẢ KIỂM ĐỊNH}\label{v4-chapter-5}
+
+Chương~\ref{v4-chapter-5} tiến hành kiểm chứng thực nghiệm các quyết định kiến trúc và giải pháp kỹ thuật đã đề xuất thông qua bốn nhóm kịch bản đo kiểm KB-1 đến KB-4 trên môi trường cô lập tài nguyên. Mục tiêu là kiểm chứng mức độ thỏa mãn của sáu yêu cầu phi chức năng NFR-01 đến NFR-06, phân tích nguyên nhân kỹ thuật đằng sau các kết quả đo lường, và đối chiếu kết quả với các thách thức thiết kế đã đặt ra ở Chương 1.
+
+\section{Thiết lập Môi trường Thực nghiệm, Dữ liệu Phân tầng và Khung Đo lường}\label{v4-sec-5-1}
+
+Để hạn chế nhiễu từ môi trường phát triển cục bộ (WSL2) và tái lập sát thực sự cạnh tranh tài nguyên tính toán trong mô hình chia sẻ dùng chung, cụm đóng gói Docker Compose của nguyên mẫu (Mục~\ref{v4-sec-4-4}) được triển khai lên máy chủ điện toán đám mây AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM, Ubuntu 24.04 LTS). Lớp điều phối biên caddy-proxy (Caddy v2) tiếp nhận lưu lượng công khai từ tên miền phụ *.47.128.76.180.sslip.io (cổng 8080 thử nghiệm / chuẩn bị 80--443 TLS) và định tuyến qua mạng nội bộ cô lập nckh-ec2-net tới bốn vùng chứa dịch vụ bị ghim trần tài nguyên cgroups:
+
+\begin{itemize}
+\tightlist
+\item
+  kanban-web (0,25 vCPU, 256 MB RAM): Phục vụ gói tĩnh ứng dụng giao diện một trang React 18 SPA (TypeScript) phía sau caddy-proxy, đảm nhiệm hiển thị tùy biến Lớp 1 qua CSS Variables, nhận diện không gian làm việc và tương tác kéo -- thả Kanban.\\
+\item
+  \textbf{kanban-api (1,25 vCPU, 2.560 MB RAM):} Vận hành dịch vụ hậu đài Spring Boot 3.3 trên máy ảo Java 21 LTS (máy chủ nhúng Apache Tomcat và bể kết nối HikariCP cố định max = 25 kết nối), tích hợp chuỗi bộ lọc JwtTenantFilter, RateLimitFilter, bộ đệm cục bộ L1 Caffeine, RlsConnectionInterceptor và KanbanService.\\
+\item
+  \textbf{redis-cache (0,25 vCPU, 512 MB RAM):} Vận hành Redis 7.2 lưu trữ bộ đếm giới hạn tốc độ nguyên tử theo khóa ratelimit:tenant:\{tenant\_\allowbreak{}id\}, vùng đệm phân tán L2 theo cấu trúc tenant:\{tenant\_\allowbreak{}id\}:config và tenant:\{tenant\_\allowbreak{}id\}:board:\{board\_\allowbreak{}id\}, cùng kênh phát tán sự kiện thu hồi đệm Pub/Sub.\\
+\item
+  postgres-db (0,50 vCPU, 1.536 MB RAM): Vận hành PostgreSQL 16 lưu trữ cơ sở dữ liệu dùng chung kanban\_\allowbreak{}saas\_\allowbreak{}db (lược đồ public gồm năm bảng quản lý phiên bản bằng Flyway), thực thi chính sách FORCE ROW LEVEL SECURITY hai chiều USING và WITH CHECK trên ba bảng Mặt phẳng Dữ liệu (boards, board\_\allowbreak{}columns, cards) dưới vai trò ứng dụng kanban\_\allowbreak{}app\_\allowbreak{}user (NOBYPASSRLS).
+\end{itemize}
+
+\VfourFigureLandscape{5.1}{assets/figures/v4/image37.png}{Sơ đồ kiến trúc môi trường thực nghiệm cô lập tài nguyên trên AWS EC2 và đường ống thu thập số liệu hai phía.}{fig:v4-5-1}
+
+Như thể hiện trên \textbf{Hình~\ref{fig:v4-5-1}}, tập dữ liệu hạt giống được khởi tạo trên lược đồ dùng chung gồm năm tổ chức thuê bao đại diện cho các quy mô dữ liệu và chính sách vận hành khác nhau (kế thừa hai chân dung điển hình t-acme và t-lotus từ Mục~\ref{v4-sec-4-1-1}), với tổng cộng \textbf{80 tài khoản người dùng ảo (80 VUs)} hoạt động đồng thời qua công cụ sinh tải \textbf{k6 (v0.50)}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nhóm thuê bao Nhỏ (t-acme --- 15 VUs):} Đại diện tổ chức phát triển phần mềm (Acme Software), quy mô 1 bảng Kanban, 200 thẻ công việc, áp dụng chế độ kiểm soát quy trình nghiêm ngặt (WIP Strict, giới hạn tối đa 2 thẻ/cột) cùng các trường mở rộng story\_\allowbreak{}points và sprint.\\
+\item
+  \textbf{Nhóm thuê bao Vừa (pool-demo --- 15 VUs):} Quy mô 4 bảng Kanban, 500 thẻ công việc, áp dụng chế độ cảnh báo mềm (WIP WARN).\\
+\item
+  \textbf{Nhóm thuê bao Lớn (t-lotus --- 20 VUs):} Đại diện tổ chức truyền thông (Lotus Media), quy mô 10 bảng Kanban, 1.000 thẻ công việc kèm thuộc tính mở rộng bán cấu trúc JSONB trong cột cards.custom\_\allowbreak{}fields, áp dụng chế độ WIP WARN.\\
+\item
+  \textbf{Nhóm thuê bao Chuẩn (t-finance --- 10 VUs):} Quy mô 2 bảng Kanban, 300 thẻ công việc, áp dụng chế độ WIP Strict.\\
+\item
+  \textbf{Nhóm thuê bao Gây nhiễu (t-aggressor --- 20 VUs):} Tác nhân mô phỏng hiện tượng \emph{Hàng xóm ồn ào}, phát lưu lượng truy cập dồn dập ở cường độ 1.800--3.000 yêu cầu/phút không có thời gian nghỉ giữa các phiên nhằm tạo áp lực bão hòa tài nguyên dùng chung.
+\end{itemize}
+
+Quá trình thu thập số liệu được triển khai đồng bộ từ hai phía: \textbf{(1) Phía máy khách/sinh tải (k6)} ghi nhận thông lượng giao dịch (RPS), phân phối độ trễ phản hồi (p50, p95, p99), tỷ lệ thành công và số lượng yêu cầu bị từ chối ở từng mã trạng thái (HTTP 401, 403, 422, 429); \textbf{(2) Phía máy chủ (Prometheus, cAdvisor và Docker Stats)} thu thập chuỗi thời gian mức chiếm dụng vi xử lý (\% CPU) và bộ nhớ (RAM) của từng vùng chứa theo chu kỳ 5 giây/mẫu (N=17 mẫu trong pha đo chính thức). Mỗi kịch bản đo tuân thủ quy trình ba pha chuẩn hóa gồm 30 giây làm nóng (\emph{Warm-up} để trình biên dịch JIT tối ưu mã byte và làm ấm bộ nhớ đệm), 60 giây đo lường chính thức và 25 giây giải phóng trạng thái (\emph{Cooldown}), lặp lại độc lập n = 5 lượt nhằm bảo đảm tính ổn định thống kê.
+
+Toàn bộ chương trình thực nghiệm được tổ chức thành bốn nhóm kịch bản kiểm định đối ứng trực tiếp với bốn khía cạnh kỹ thuật (K1--K4) và sáu yêu cầu phi chức năng (NFR-01--NFR-06) đã xác lập tại Chương~\ref{v4-chapter-4}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Kịch bản KB-1 (Định danh \& Ngữ cảnh luồng --- Đối ứng K1 / NFR-01):} Kiểm thử xâm nhập với 500 mẫu thẻ bài JWT thiếu hoặc sai chữ ký mật mã HMAC-SHA256, 200 mẫu lệch tiêu đề Host so với tuyên bố tenant\_\allowbreak{}id, và bắn tải 1.500 yêu cầu đan xen trên hồ luồng Apache Tomcat dùng chung để đối soát tiêu đề phản hồi X-Tenant-ID và nhãn chẩn đoán SLF4J MDC.\\
+\item
+  \textbf{Kịch bản KB-2 (Cô lập dữ liệu \& Chi phí rào chắn CSDL --- Đối ứng K2 / NFR-02, NFR-03):} Tiêm lỗi 200 truy vấn SELECT * FROM cards cố tình bỏ sót mệnh đề WHERE tenant\_\allowbreak{}id, 300 mẫu tấn công IDOR đoán mã UUID thẻ công việc thuộc t-lotus từ phiên của t-acme, 100 truy vấn trên kết nối HikariCP thiếu lệnh thiết lập biến phiên SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id, và đo vi mô độ trễ thực thi trên n = 500 truy vấn khi bật/tắt FORCE ROW LEVEL SECURITY.\\
+\item
+  \textbf{Kịch bản KB-3 (Hiệu năng \& Kháng hàng xóm ồn ào --- Đối ứng K3 / NFR-04):} Đối sánh \emph{Baseline} và \emph{Kiến trúc Đề xuất} dưới tải đồng thời 80 VUs có bão lưu lượng từ t-aggressor, đánh giá khả năng cắt tải tại biên của RateLimitFilter (HTTP 429), hiệu quả bộ đệm hai tầng Caffeine (W-TinyLFU) + Redis 7.2, và mức bảo toàn độ trễ p50, p95 của bốn nhóm thuê bao thông thường.\\
+\item
+  \textbf{Kịch bản KB-4 (Tùy biến động ba lớp \& Đồng bộ cấu hình --- Đối ứng K4 / NFR-05, NFR-06):} Kiểm chứng truy xuất siêu dữ liệu cấu hình tenants.settings, lưu trữ thuộc tính mở rộng bán cấu trúc JSONB trong cột cards.custom\_\allowbreak{}fields (story\_\allowbreak{}points, sprint), thực thi quy tắc giới hạn công việc WIP Strict của t-acme trong KanbanService (n = 19 mẫu/phép thử) và đo độ trễ lan truyền vô hiệu hóa đệm L1 qua kênh Redis Pub/Sub.
+\end{itemize}
+
+\section{Kết quả Kiểm định Định danh, Ngữ cảnh Luồng và Cô lập Dữ liệu (KB-1, KB-2)}\label{v4-sec-5-2}
+
+Kết quả thực nghiệm kiểm chứng năng lực cô lập ranh giới định danh ở tầng biên ứng dụng (KB-1) và phòng thủ chiều sâu tại nhân cơ sở dữ liệu (KB-2) được tổng hợp trên Hình 5.2.
+
+\VfourFigureLandscape{5.2}{assets/figures/v4/image38.png}{Kết quả kiểm định toàn vẹn ranh giới định danh (KB-1), rào chắn CSDL Fail-Closed (KB-2) và chi phí thực thi vi mô RLS.}{fig:v4-5-2}
+
+Phân tích định lượng từ \textbf{Hình~\ref{fig:v4-5-2}} ghi nhận ba kết quả kỹ thuật cốt lõi:
+
+\begin{itemize}
+\tightlist
+\item
+  Bảo toàn ranh giới ngữ cảnh trên hồ luồng dùng chung (Hình 5.2a): Trong kịch bản KB-1, toàn bộ 500/500 yêu cầu thiếu thẻ bài JWT hoặc mang chữ ký số bị sửa đổi đều bị bộ lọc JwtTenantFilter từ chối ngay tại biên với mã lỗi HTTP 401, trong khi 200/200 yêu cầu có tiêu đề Host không khớp với tuyên bố tenant\_\allowbreak{}id trong token bị chặn bằng mã HTTP 403 (chặn toàn bộ trên tập mẫu thử nghiệm). Dưới áp lực 1.500 yêu cầu luân chuyển đan xen liên tục giữa năm thuê bao trên hồ luồng dùng chung Apache Tomcat, kỷ luật giải phóng ngữ cảnh trong khối try ... finally qua TenantContext.clear() giúp duy trì tỷ lệ khớp toàn phần (1.500/1.500) giữa định danh đầu vào, tiêu đề phản hồi X-Tenant-ID và nhãn chẩn đoán nhật ký SLF4J MDC, ngăn ngừa hiệu quả nguy cơ nhiễm bẩn ngữ cảnh luồng (NFR-01).\\
+\item
+  Cơ chế đóng an toàn mặc định (Fail-Closed) tại nhân cơ sở dữ liệu (Hình 5.2b): Trong ba phép thử tiêm lỗi truy cập dữ liệu của KB-2 gồm: (i) thực thi 200 câu lệnh SELECT * FROM cards cố tình bỏ sót điều kiện lọc WHERE tenant\_\allowbreak{}id; (ii) thực hiện 300 lượt tấn công tham chiếu đối tượng trực tiếp không an toàn (IDOR) bằng cách dùng mã UUID thẻ công việc hợp lệ của t-lotus để truy vấn dưới danh nghĩa t-acme; và (iii) thực thi 100 truy vấn trên kết nối HikariCP cố tình bỏ qua bước thiết lập biến phiên SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id, hệ thống ghi nhận 0 bản ghi rò rỉ chéo (cô lập triệt để trên 600 mẫu tiêm lỗi thử nghiệm). Khi biến ngữ cảnh phiên bị khuyết, biểu thức kiểm soát hai chiều USING và WITH CHECK của chính sách FORCE ROW LEVEL SECURITY trên PostgreSQL 16 tự động kích hoạt trạng thái Fail-Closed và trả về tập kết quả rỗng (0 dòng), bảo vệ tính riêng tư dữ liệu ngay cả khi phát sinh sai sót lập trình ở tầng ứng dụng (NFR-02).\\
+\item
+  Chi phí độ trễ vi mô của rào chắn RLS (Hình~\ref{fig:v4-5-2}c): Phép đo vi mô đối chứng trên n = 500 truy vấn chọn lọc cho thấy thời gian thực thi trung bình tại nhân CSDL tăng từ 1,25 ± 0,32 ms (khi tắt FORCE RLS, chỉ lọc WHERE thủ công) lên 1,70 ± 0,41 ms khi kích hoạt đầy đủ hai lớp SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id + FORCE RLS. Mức phụ trội trực tiếp là +0,45 ms (tương đương +36,0\% trong phép đo vi mô cục bộ). Nhờ hệ thống chỉ mục tổ hợp B-Tree có cột tenant\_\allowbreak{}id đặt ở vị trí dẫn đầu (idx\_\allowbreak{}cards\_\allowbreak{}tenant\_\allowbreak{}col\_\allowbreak{}pos, idx\_\allowbreak{}boards\_\allowbreak{}tenant\_\allowbreak{}created), mức phụ trội +0,45 ms này chỉ chiếm khoảng 1,8\% khi đặt trong tổng thời gian phản hồi đầu-cuối của một yêu cầu API (\textasciitilde23--27 ms), đáp ứng tốt ngưỡng dưới 5\% của chỉ tiêu NFR-03.
+\end{itemize}
+
+\section{Kết quả Kiểm định Hiệu năng, Kháng Láng giềng Ồn ào và Chi phí Tùy biến}\label{v4-sec-5-3}
+
+\subsection{Kiểm định hiệu năng và kiểm soát láng giềng ồn ào (KB-3)}\label{v4-sec-5-3-1}
+
+Để kiểm chứng năng lực cô lập hiệu năng (\textbf{K3}) và mức độ đáp ứng yêu cầu phi chức năng \textbf{NFR-04}, kịch bản \textbf{KB-3} mô phỏng đồng thời \textbf{80 người dùng ảo (VUs)} trên máy chủ AWS EC2, trong đó nhóm thuê bao gây nhiễu (\emph{Aggressor}, 20 VUs) phát lưu lượng đột biến song song với bốn nhóm thuê bao hoạt động bình thường (tổng 60 VUs). Kết quả đối sánh độ trễ phản hồi giữa cấu hình cơ sở (\emph{Baseline} --- tắt bộ nhớ đệm và giới hạn tốc độ) với kiến trúc đề xuất được thể hiện tại \textbf{Hình~\ref{fig:v4-5-3a}}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Độ trễ trung vị (p50) giảm sâu và đồng đều:} Khi kích hoạt cơ chế bảo vệ, độ trễ p50 của cả bốn nhóm thuê bao bình thường giảm từ mức \textbf{187,99 -- 233,33 ms} xuống còn \textbf{22,87 -- 26,92 ms} (giảm \textbf{87,2\% -- 88,5\%}). Riêng nhóm \emph{Aggressor} có p50 ở mức \textbf{6,56 ms} (\textbf{-95,8\%}) do các yêu cầu vượt ngưỡng bị từ chối tức thì ngay tại lớp biên bằng mã lỗi HTTP 429 thay vì đi sâu vào tầng xử lý nghiệp vụ và cơ sở dữ liệu.\\
+\item
+  \textbf{Bảo toàn cam kết chất lượng dịch vụ ở phân vị đuôi (p95 \textless{} 500 ms):} Ở cấu hình \emph{Baseline}, sự tranh chấp tài nguyên khiến độ trễ p95 của toàn bộ các thuê bao bình thường vi phạm nghiêm trọng ngưỡng cam kết 500 ms, vọt lên mức \textbf{1.166,02 -- 1.526,48 ms} (cao nhất ở nhóm t-acme với \textbf{1.526,48 ms} và t-finance với \textbf{1.291,25 ms}). Ngược lại, kiến trúc đề xuất kéo p95 của tất cả các nhóm thuê bao thường giảm \textbf{78,2\% -- 83,4\%}, duy trì ổn định trong khoảng \textbf{242,17 -- 276,84 ms} và đạt chuẩn \textbf{SLA \textless{} 500 ms}.
+\end{itemize}
+
+\VfourFigureLandscape{5.3a}{assets/figures/v4/image39.png}{Đối sánh độ trễ phản hồi theo phân nhóm thuê bao (p50 và p95).}{fig:v4-5-3a}
+
+Bên cạnh việc ổn định độ trễ cho từng nhóm khách hàng, tác động tổng hợp của bộ lọc điều tiết lưu lượng tại biên, kiến trúc bộ nhớ đệm hai tầng và chỉ mục tổ hợp cơ sở dữ liệu được định lượng chi tiết qua \textbf{Hình~\ref{fig:v4-5-3b}}:
+
+\begin{itemize}
+\tightlist
+\item
+  Tăng trưởng thông lượng hệ thống (+222,9\%): Nhờ loại bỏ tình trạng nghẽn cổ chai tài nguyên, thông lượng phục vụ chung của toàn hệ thống tăng gấp hơn ba lần, từ 101,45 RPS (kèm 63 lỗi timeout ở cấu hình Baseline) lên 327,56 RPS, bảo đảm toàn bộ yêu cầu hợp lệ của các thuê bao bình thường (2.613/2.613 yêu cầu) được xử lý thành công.\\
+\item
+  \textbf{Cắt bão lưu lượng tại biên bằng Redis Token Bucket:} Bộ điều tiết lưu lượng tại Tầng 7 đã chặn đứng \textbf{16.423 yêu cầu} vượt hạn ngạch của thuê bao gây nhiễu ngay tại cửa ngõ API, tương đương \textbf{92,66\%} tổng lưu lượng gây nhiễu, qua đó giữ thông suốt bể luồng Tomcat và hồ kết nối cơ sở dữ liệu cho các tổ chức lân cận.\\
+\item
+  \textbf{Hiệu quả bộ nhớ đệm hai tầng (W-TinyLFU) và chỉ mục tổ hợp B-Tree:} Đối với tác vụ đọc lặp lại tần suất cao như truy xuất siêu dữ liệu cấu hình (GET /tenant-settings/kanban), việc kết hợp bộ đệm cục bộ Caffeine L1 (sử dụng chính sách thu nạp chống ô nhiễm quét W-TinyLFU) tại Tầng 8 và bộ đệm phân tán Redis L2 tại Tầng 7 giúp giảm độ trễ p50 từ \textbf{137,67 ms} (p95 = 737,24 ms) xuống còn \textbf{21,36 ms} (p95 = 213,21 ms), tương đương mức giảm \textbf{84,5\%}, trong đó thời gian truy xuất trúng đệm L1 chỉ mất \textbf{0,12 ms}. Đồng thời, thiết kế chỉ mục tổ hợp B-Tree đặt cột tenant\_\allowbreak{}id ở vị trí dẫn đầu tại Tầng 6 giúp thu hẹp mọi truy vấn xuống phạm vi phân vùng riêng của từng thuê bao, ngăn chặn hiện tượng quét toàn bảng làm cạn kiệt băng thông đĩa dùng chung.
+\end{itemize}
+
+\VfourFigureLandscape{5.3b}{assets/figures/v4/image40.png}{Thông lượng phục vụ, khả năng cắt tải tại biên và độ trễ truy xuất cấu hình.}{fig:v4-5-3b}
+
+Các số liệu đo kiểm trên \textbf{Hình~\ref{fig:v4-5-3a}} và \textbf{Hình~\ref{fig:v4-5-3b}} khẳng định sự phối hợp đa tầng giữa Redis Token Bucket, bộ nhớ đệm hai tầng Caffeine L1 / Redis L2 và chỉ mục tổ hợp dẫn đầu bởi tenant\_\allowbreak{}id đã triệt tiêu hiệu quả hiệu ứng hàng xóm ồn ào, đáp ứng đầy đủ tiêu chí \textbf{NFR-04} trong điều kiện vận hành dùng chung tài nguyên.
+
+\subsection{Phân tích Chuỗi thời gian Tài nguyên (Telemetry) và Kiểm định khả năng tùy biến trong thời gian chạy (KB-4)}\label{v4-sec-5-3-2}
+
+Hình~\ref{fig:v4-5-4} minh họa diễn biến mức tiêu thụ vi xử lý của các vùng chứa theo thời gian thực trong pha chịu tải cao điểm cùng kết quả kiểm chứng năng lực tùy biến động lúc chạy (KB-4).
+
+\VfourFigureLandscape{5.4}{assets/figures/v4/image41.png}{Diễn biến mức sử dụng CPU các vùng chứa theo chuỗi thời gian (Telemetry, N=17 mẫu) và kết quả kiểm chứng tùy biến động (KB-4).}{fig:v4-5-4}
+
+\textbf{Tính ổn định tài nguyên và lý giải phân vị cực đoan p99:} Dữ liệu giám sát chuỗi thời gian qua N=17 chu kỳ cho thấy vùng chứa kanban-api vận hành ở mức CPU trung bình \textbf{95,0\%} và đạt đỉnh \textbf{127,9\%} (tiệm cận trần giới hạn 125\% tương ứng 1,25 vCPU được cấp phát qua cgroups), tiêu thụ khoảng 1.010 MB / 2.560 MB RAM. Trong khi đó, các vùng chứa nền duy trì mức tải thấp và ổn định: kanban-web đạt trung bình 11,9\% (đỉnh 17,1\%), postgres-db đạt trung bình 8,1\% (đỉnh 17,2\%, 149,3 MB RAM), và redis-cache chỉ chiếm trung bình 2,8\% (đỉnh 6,1\%, 8,6 MB RAM). Bằng chứng chuỗi thời gian này lý giải khách quan hiện tượng độ trễ ở phân vị cực đoan p99 của các thuê bao thường còn dao động ở mức 1,99 -- 2,45 giây: do cụm thực nghiệm được triển khai trên máy chủ đơn nút 2 vCPU bị ghim cứng trần tài nguyên, các yêu cầu rơi đúng vào thời điểm kanban-api chạm ngưỡng bão hòa CPU của cgroups phải chờ lập lịch luồng của hệ điều hành.\\
+Hiệu lực thực thi tùy biến động và đồng bộ đệm tức thời (Hình~\ref{fig:v4-5-3b} \& Hình 5.4b): Trên phương diện tùy biến lúc chạy (KB-4), 19/19 lượt truy xuất siêu dữ liệu cấu hình từ bảng tenants.settings (qua điểm cuối GET /tenant-settings/kanban) đều thành công (HTTP 200), với độ trễ trung vị p50 giảm 84,5\% (từ 137,67 ms ở Baseline xuống 21,36 ms ở Đề xuất nhờ khóa đệm tenant:\{tenant\_\allowbreak{}id\}:config; thời gian đọc trực tiếp từ bộ đệm L1 Caffeine đạt 0,12 ms) và độ trễ đuôi p95 giảm 71,1\% (từ 737,24 ms xuống 213,21 ms). Đồng thời, 19/19 thao tác khởi tạo thẻ công việc mới (ánh xạ vào bảng cards) kèm thuộc tính mở rộng bán cấu trúc JSONB trong cột cards.custom\_\allowbreak{}fields (story\_\allowbreak{}points, sprint) đều được động cơ siêu dữ liệu xác thực hợp lệ và lưu trữ thành công (HTTP 201 Created) mà không cần sửa đổi lược đồ bảng vật lý. Đối với quy tắc giới hạn công việc WIP Strict của t-acme (wip\_\allowbreak{}limit = 2), KanbanService chấp thuận chính xác 2 lượt di chuyển thẻ đầu tiên (HTTP 200) và từ chối 17/17 lượt kéo thẻ vượt hạn mức tiếp theo bằng mã lỗi HTTP 422 Unprocessable Entity (NFR-05). Thời gian lan truyền sự kiện vô hiệu hóa đệm L1 qua kênh Redis Pub/Sub ghi nhận mức trung bình 2,45 ± 0,65 ms, đáp ứng yêu cầu đồng bộ tức thời dưới ngưỡng vài chục mili-giây (NFR-06).
+
+\section{Bàn luận Tổng hợp Kết quả Thực nghiệm}\label{v4-sec-5-4}
+
+Kết hợp chuỗi bằng chứng từ Hình~\ref{fig:v4-5-1} đến Hình~\ref{fig:v4-5-4}, nguyên mẫu ứng dụng quản lý công việc SaaS Kanban đã đáp ứng đầy đủ bốn tiêu chí chuẩn của mô hình Pool Cấp độ 3 và giải quyết hiệu quả bảy thách thức thiết kế cốt lõi đặt ra từ Chương~\ref{v4-chapter-1} trong phạm vi thực nghiệm:
+
+\begin{itemize}
+\tightlist
+\item
+  Định danh và quản lý ngữ cảnh luồng (Thách thức 1 \& NFR-01): Được kiểm soát chặt chẽ thông qua xác thực mật mã JWT tại biên của JwtTenantFilter kết hợp đối tượng bất biến TenantContext trên ThreadLocal và kỷ luật dọn dẹp trong khối try ... finally (chặn toàn bộ các mẫu sai lệch kiểm thử, 0\% rò rỉ ngữ cảnh trên 1.500 lượt luân chuyển).\\
+\item
+  Cô lập dữ liệu và kiểm soát bán kính sự cố (Thách thức 2 \& NFR-02, NFR-03): Phòng thủ chiều sâu hai lớp nhờ chính sách FORCE ROW LEVEL SECURITY (USING / WITH CHECK) theo nguyên tắc \emph{Fail-Closed} và biến phiên giao dịch nguyên tử SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id qua RlsConnectionInterceptor (0 bản ghi rò rỉ qua 600 phép tiêm lỗi, chi phí phụ trội vi mô +0,45 ms, tương đương \textasciitilde1,8\% độ trễ API đầu-cuối).\\
+\item
+  Quản trị hiệu năng và kháng hiện tượng hàng xóm ồn ào (Thách thức 3 \& NFR-04): Cắt giảm 92,66\% lưu lượng đột biến của t-aggressor bằng RateLimitFilter (Token Bucket trên Redis 7.2), kết hợp bộ đệm hai tầng L1 Caffeine (W-TinyLFU) + L2 Redis và chỉ mục tổ hợp (tenant\_\allowbreak{}id, ...) giúp giảm 87,2\%--88,5\% độ trễ p50 (về dải 22,87--26,92 ms), co gọn p95 về 242,17--276,84 ms và tăng thông lượng tổng thêm +222,9\%.\\
+\item
+  Tùy biến động lúc chạy trên một bộ mã nguồn duy nhất (Thách thức 4 \& NFR-05, NFR-06): Vận hành đồng thời các tổ chức có quy trình đối lập (t-acme và t-lotus) trên cùng một phiên bản React 18 và Spring Boot 3.3 thông qua cột siêu dữ liệu tenants.settings, trường mở rộng cards.custom\_\allowbreak{}fields kiểu JSONB kèm chỉ mục GIN (19/19 hợp lệ), thực thi luật WIP Strict (17/17 lượt vượt bị chặn HTTP 422) và đồng bộ thu hồi đệm L1 qua Redis Pub/Sub trong 2,45 ± 0,65 ms.\\
+\item
+  Tự động hóa vòng đời thuê bao (Thách thức 5): Phân tách Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu cho phép tự động cấp phát không gian làm việc, khởi tạo cấu hình mặc định 3 lớp và phân quyền RBAC trong một giao dịch khép kín.\\
+\item
+  Nâng cấp không gián đoạn và quản lý phiên bản lược đồ (Thách thức 6): Duy trì một lược đồ dùng chung duy nhất (public) quản lý bằng Flyway trên tài khoản tách biệt kanban\_\allowbreak{}migrator giúp chi phí di trú cấu trúc bảng đạt độ phức tạp hằng số O(1) không phụ thuộc số lượng thuê bao.\\
+\item
+  Đo lường và giám sát nhận thức thuê bao (Thách thức 7): Tích hợp nhãn tenant\_\allowbreak{}id xuyên suốt vào nhật ký SLF4J MDC, chỉ số Prometheus và chuỗi thời gian Telemetry giúp bóc tách minh bạch mức tiêu thụ tài nguyên của từng tổ chức.
+\end{itemize}
+
+Những bằng chứng định lượng từ bốn kịch bản thực nghiệm tại Chương~\ref{v4-chapter-5} là cơ sở thực tiễn để đúc kết các đóng góp chính, nhìn nhận các hạn chế khách quan cũng như định hướng mở rộng kiến trúc lên Cấp độ 4 trong phần Kết luận và Hướng phát triển tiếp theo.

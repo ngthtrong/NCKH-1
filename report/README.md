@@ -12,7 +12,7 @@ chưa được cung cấp vẫn giữ trống.
 Căn cứ ưu tiên là [HinhThucBC.pdf](HinhThucBC.pdf), không phải mọi thay
 đổi trong báo cáo gốc. Bảng đối chiếu mục 2 và 3.1–3.17 nằm trong
 [RULES.md](RULES.md). Báo cáo hoàn thiện phải đạt ít nhất 50 trang theo
-quy định và có hồ sơ thật; PDF khung trống chưa đáp ứng các điều kiện đó.
+quy định và có hồ sơ thật. Biên dịch thành công không xác nhận hồ sơ nghiệm thu.
 
 Bộ template độc lập, giữ bố cục của báo cáo gốc: A4, Times New Roman
 13 bp, giãn dòng 1,3; lề trái 30 mm, phải/trên/dưới 20 mm. Hai bìa dùng
@@ -23,8 +23,10 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
-Nội dung nghiên cứu được hoàn thiện theo từng phần đã được người dùng
-cho phép. Ô trống trên biểu mẫu dành cho thông tin chưa có căn cứ.
+Nội dung hiện hành được chuyển từ `../Report_V4.md`, đối chiếu
+`../Report_V4.pdf` ngày 19/11/2026: Mở đầu, năm chương, kết luận, 25 tài
+liệu tham khảo và phụ lục A–D. Ô nghiên cứu để trống trong V4 tiếp tục
+để trống; thông tin hành chính và biểu mẫu kế thừa bản hiện tại.
 Bốn bản tin/tóm tắt được ghép sau
 phụ lục và đồng thời có đầu ra PDF riêng. Kiểm tra kỹ thuật cho khung
 trống không áp số trang tối thiểu hoặc kiểm tra hồ sơ nghiệm thu; khi
@@ -55,6 +57,19 @@ không tự thay bằng phông khác. Phông toán dùng Latin Modern Math.
 Trên Windows/macOS có thể dùng TeX Live/MiKTeX/MacTeX cùng Python,
 Make và Poppler tương ứng. Chạy `make doctor` để kiểm tra thực tế.
 
+Trên Windows/PowerShell, chạy từ thư mục gốc:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File report/scripts/build.ps1 -Target doctor
+powershell -ExecutionPolicy Bypass -File report/scripts/build.ps1
+```
+
+Wrapper làm mới PATH của tài khoản, dùng `python`, bật UTF-8 và chạy
+`all`, `smoke`, `check`. Make có thể dùng `PYTHON=python`.
+Nội dung V4 dùng thêm `fvextra` và `caption` (`ltcaption`). Khối mã dùng
+Consolas 9 bp nếu có để giữ vừa dòng mã gốc PDF; thân bài và bảng vẫn
+dùng Times New Roman 13 bp.
+
 ## Biên dịch
 
 Từ repository:
@@ -66,7 +81,7 @@ make -C report smoke
 make -C report check
 ```
 
-Hoặc vào `report/` và bỏ `-C reportTemplate` trong các lệnh.
+Hoặc vào `report/` và bỏ `-C report` trong các lệnh.
 
 | Lệnh Make | PDF được tạo trong thư mục template |
 | --- | --- |
@@ -106,6 +121,19 @@ LaTeX, tràn khung, thiếu ký tự, nhãn lặp hoặc tham chiếu chưa gi�
 Log nằm cạnh từng PDF. Xem trực quan PDF sau khi thay nội dung, vì log
 không phát hiện được mọi vấn đề như chữ đè lên logo.
 
+`assets/v4-import-manifest.json` ghi hash hai nguồn, đề mục, thứ tự/chú
+thích hình, trang/xref ảnh gốc PDF, số hàng/cột bảng và mã phụ lục.
+`bibliography/v4-reference-map.json` ánh xạ số nguồn V4 sang khóa trích
+dẫn; số hiển thị do template sắp xếp theo nhóm/tác giả. Giữ các số hình
+1.6a/b và 5.3a/b. Hai bảng hành trình không có caption trong V4 vẫn không
+đánh số; một hàng bị ngắt trong Markdown được nối lại đúng ô theo PDF.
+
+Nhập lại từ hai nguồn bằng `python report/scripts/import_v4.py` (ghi lại
+các tệp nội dung đã sinh); bước này cần `pypandoc_binary`, `PyMuPDF`,
+`Pillow`. Kiểm tra nội dung PDF bằng `python report/scripts/verify_v4.py`.
+Các thư viện này không cần cho build LaTeX thông thường. Kết quả và những
+điểm thiếu thông tin trong nguồn được ghi tại [VALIDATION.md](VALIDATION.md).
+
 `make clean` xóa **đầu ra do template sinh trong `build/`**, gồm các PDF;
 chạy `make all smoke` để tạo lại. Chỉ PDF cuối được phép theo dõi bằng
 Git; file phụ, log và tệp tạm bị bỏ qua.
@@ -122,19 +150,16 @@ Git; file phụ, log và tệp tạm bị bỏ qua.
 - `frontmatter/`: danh sách thành viên, chữ viết tắt, thông tin kết quả
   Việt–Anh và thông tin chủ nhiệm. Thay `\PendingField{...}` bằng nội
   dung cần kê khai; thêm/bớt khối năm học và chèn ảnh vào đúng ô.
-- `chapters/introduction.tex`: sáu mục Mở đầu.
-- `chapters/01-foundations/` và `02-architecture/`: hai chương cơ sở lý
-  thuyết và phân tích phương án; bản nội dung đang duyệt local, xem
-  [LOCAL_REVIEW.md](LOCAL_REVIEW.md).
-- `chapters/03-system/`, `04-implementation/`, `04-evaluation/`: khung
-  tiếp nối cho yêu cầu/thiết kế → hiện thực → kiểm thử và thực nghiệm.
-  Thư mục `02-data-methods/` được giữ làm khung tham khảo, không nhập
-  riêng vào quyển; phương pháp đánh giá sẽ nằm cùng chương thực nghiệm.
-  `main.tex` xếp cơ sở lý thuyết → phương án kiến trúc → thiết kế →
-  hiện thực → thực nghiệm. Các nội dung khung chưa có kết quả vẫn để trống.
-  Số trong tên thư mục không quyết định số chương.
+- `chapters/introduction.tex`: bảy mục Mở đầu của V4.
+- `chapters/01-foundations/chapter.tex`: cơ sở lý thuyết và mô hình hóa.
+- `chapters/02-architecture/chapter.tex`: kiến trúc hệ thống đa thuê bao.
+- `chapters/03-system/chapter.tex`: kỹ thuật/nguyên lý Pool 9 tầng, K1–K4.
+- `chapters/04-implementation/chapter.tex`: nghiệp vụ, thiết kế và hiện thực Kanban.
+- `chapters/04-evaluation/chapter.tex`: thực nghiệm và kết quả kiểm định.
+  Nội dung hiện hành nằm trong các `chapter.tex`; section và khung cũ
+  không được nhập vào `main.tex`. Số trong tên thư mục không quyết định số chương.
 - `chapters/conclusion.tex`: kết luận và kiến nghị.
-- `appendices/`: hai phụ lục khái quát, có thể đổi tên/thêm/bớt.
+- `appendices/v4-a.tex` đến `v4-d.tex`: bốn phụ lục V4, dùng mã trong `assets/code/v4/`.
 - `deliverables/content/`: nội dung bản tin Việt–Anh; hai bản tóm tắt
   dùng lại `frontmatter/research-body-vi.tex` và `research-body-en.tex`
   để thông tin thống nhất với biểu mẫu trong báo cáo.

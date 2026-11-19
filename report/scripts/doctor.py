@@ -3,11 +3,15 @@
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 missing = []
-for tool in ['python3', 'make', 'xelatex', 'kpsewhich', 'pdftotext', 'pdfinfo', 'pdffonts']:
+print(f'Python: {sys.executable} ({sys.version.split()[0]})')
+if sys.version_info < (3, 9):
+    missing.append('Python 3.9+')
+for tool in ['make', 'xelatex', 'kpsewhich', 'pdftotext', 'pdfinfo', 'pdffonts']:
     found = shutil.which(tool)
     print(f'{tool}: {found or "MISSING"}')
     if not found:
@@ -22,12 +26,14 @@ if shutil.which('kpsewhich'):
                     'booktabs.sty', 'tabularx.sty', 'amsmath.sty', 'tikz.sty', 'pdfpages.sty',
                     'scrlayer-scrpage.sty', 'hyperref.sty', 'bookmark.sty', 'splitbib.sty', 'plainurl.bst',
                     'pdflscape.sty', 'flafter.sty', 'placeins.sty', 'eso-pic.sty']:
-        found = subprocess.run(['kpsewhich', package], capture_output=True, text=True).stdout.strip()
+        found = subprocess.run(['kpsewhich', package], capture_output=True, text=True,
+                               encoding='utf-8', errors='replace').stdout.strip()
         print(f'{package}: {"OK" if found else "MISSING"}')
         if not found:
             missing.append(package)
     for package in ['ieee.bbx', 'ieee.cbx', 'xurl.sty']:
-        found = subprocess.run(['kpsewhich', package], capture_output=True, text=True).stdout.strip()
+        found = subprocess.run(['kpsewhich', package], capture_output=True, text=True,
+                               encoding='utf-8', errors='replace').stdout.strip()
         print(f'{package}: {"OK" if found else "optional / not installed"}')
 if shutil.which('xelatex'):
     with tempfile.TemporaryDirectory(prefix='template-font-check-') as temp:
@@ -36,8 +42,9 @@ if shutil.which('xelatex'):
                   r'\textbf{Đậm}\textit{Nghiêng}\textbf{\textit{Đậm nghiêng}}\end{document}')
         result = subprocess.run(['xelatex', '-interaction=nonstopmode', '-halt-on-error',
                                  f'-output-directory={temp}', '-jobname=font-check', source],
-                                cwd=ROOT, capture_output=True, text=True)
-        log = Path(temp, 'font-check.log').read_text(errors='replace')
+                                cwd=ROOT, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace')
+        log = Path(temp, 'font-check.log').read_text(encoding='utf-8', errors='replace')
         good = result.returncode == 0 and 'Font shape' not in log and 'Missing character' not in log
         print('Times New Roman (four faces): ' + ('OK' if good else 'MISSING / check fonts'))
         if not good:

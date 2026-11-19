@@ -1,0 +1,1435 @@
+{
+  "sources": {
+    "Report_V4.md": "1793c771900f4c4f32566a6883ce6a30d5e0d9d32e42d35a9d3115a6e6db5c45",
+    "Report_V4.pdf": "2659be42cc3a351e5a3f14bdda87700c679b16ab39fdb12ce8dbffc046188242"
+  },
+  "headings": [
+    {
+      "source": "1. Tổng quan tình hình nghiên cứu",
+      "rendered_title": "1. Tổng quan tình hình nghiên cứu",
+      "command": "addsec",
+      "label": "v4-intro-1"
+    },
+    {
+      "source": "1.1. Tình hình trong nước",
+      "rendered_title": "1.1. Tình hình trong nước",
+      "command": "addsubsec",
+      "label": "v4-intro-1-1"
+    },
+    {
+      "source": "1.2. Tình hình ngoài nước",
+      "rendered_title": "1.2. Tình hình ngoài nước",
+      "command": "addsubsec",
+      "label": "v4-intro-1-2"
+    },
+    {
+      "source": "2. Lý do chọn đề tài",
+      "rendered_title": "2. Lý do chọn đề tài",
+      "command": "addsec",
+      "label": "v4-intro-2"
+    },
+    {
+      "source": "3. Mục tiêu đề tài",
+      "rendered_title": "3. Mục tiêu đề tài",
+      "command": "addsec",
+      "label": "v4-intro-3"
+    },
+    {
+      "source": "4. Phương pháp nghiên cứu",
+      "rendered_title": "4. Phương pháp nghiên cứu",
+      "command": "addsec",
+      "label": "v4-intro-4"
+    },
+    {
+      "source": "5. Đối tượng nghiên cứu",
+      "rendered_title": "5. Đối tượng nghiên cứu",
+      "command": "addsec",
+      "label": "v4-intro-5"
+    },
+    {
+      "source": "6. Phạm vi nghiên cứu",
+      "rendered_title": "6. Phạm vi nghiên cứu",
+      "command": "addsec",
+      "label": "v4-intro-6"
+    },
+    {
+      "source": "7. Bố cục của báo cáo",
+      "rendered_title": "7. Bố cục của báo cáo",
+      "command": "addsec",
+      "label": "v4-intro-7"
+    },
+    {
+      "source": "CHƯƠNG 1. CƠ SỞ LÝ THUYẾT VÀ MÔ HÌNH HÓA KIẾN TRÚC ĐA THUÊ BAO",
+      "rendered_title": "CƠ SỞ LÝ THUYẾT VÀ MÔ HÌNH HÓA KIẾN TRÚC ĐA THUÊ BAO",
+      "command": "chapter",
+      "label": "v4-chapter-1"
+    },
+    {
+      "source": "1.1. Tổng quan về SaaS và Động lực Kinh tế của Chia sẻ Tài nguyên",
+      "rendered_title": "Tổng quan về SaaS và Động lực Kinh tế của Chia sẻ Tài nguyên",
+      "command": "section",
+      "label": "v4-sec-1-1"
+    },
+    {
+      "source": "1.1.1. Mô hình Phần mềm dưới dạng Dịch vụ và Tiến trình Tiến hóa của các Mô hình Chia sẻ Tài nguyên Điện toán",
+      "rendered_title": "Mô hình Phần mềm dưới dạng Dịch vụ và Tiến trình Tiến hóa của các Mô hình Chia sẻ Tài nguyên Điện toán",
+      "command": "subsection",
+      "label": "v4-sec-1-1-1"
+    },
+    {
+      "source": "1.1.2. Động lực Kinh tế – Kỹ thuật",
+      "rendered_title": "Động lực Kinh tế – Kỹ thuật",
+      "command": "subsection",
+      "label": "v4-sec-1-1-2"
+    },
+    {
+      "source": "1.2. Chuẩn hóa Khái niệm Nền tảng và Định nghĩa Đa thuê bao",
+      "rendered_title": "Chuẩn hóa Khái niệm Nền tảng và Định nghĩa Đa thuê bao",
+      "command": "section",
+      "label": "v4-sec-1-2"
+    },
+    {
+      "source": "1.2.1. Thuê bao (Tenant)",
+      "rendered_title": "Thuê bao (Tenant)",
+      "command": "subsection",
+      "label": "v4-sec-1-2-1"
+    },
+    {
+      "source": "1.2.2. Dịch vụ (Service)",
+      "rendered_title": "Dịch vụ (Service)",
+      "command": "subsection",
+      "label": "v4-sec-1-2-2"
+    },
+    {
+      "source": "1.2.3. Thể hiện (Instance)",
+      "rendered_title": "Thể hiện (Instance)",
+      "command": "subsection",
+      "label": "v4-sec-1-2-3"
+    },
+    {
+      "source": "1.2.4. Định nghĩa Khoa học Chuẩn hóa về Đa thuê bao và Mô hình Khái niệm Tổng quát",
+      "rendered_title": "Định nghĩa Khoa học Chuẩn hóa về Đa thuê bao và Mô hình Khái niệm Tổng quát",
+      "command": "subsection",
+      "label": "v4-sec-1-2-4"
+    },
+    {
+      "source": "1.3. Phân biệt Bốn Mô hình Hệ thống (ST, MI, MU, MT) và Bốn Cấp độ Trưởng thành Kiến trúc SaaS",
+      "rendered_title": "Phân biệt Bốn Mô hình Hệ thống (ST, MI, MU, MT) và Bốn Cấp độ Trưởng thành Kiến trúc SaaS",
+      "command": "section",
+      "label": "v4-sec-1-3"
+    },
+    {
+      "source": "1.3.1. Phân biệt Bốn Mô hình Hệ thống (Đơn thuê bao, Đa thể hiện, Đa người dùng, Đa thuê bao)",
+      "rendered_title": "Phân biệt Bốn Mô hình Hệ thống (Đơn thuê bao, Đa thể hiện, Đa người dùng, Đa thuê bao)",
+      "command": "subsection",
+      "label": "v4-sec-1-3-1"
+    },
+    {
+      "source": "1.3.2. Bốn Cấp độ Trưởng thành Kiến trúc SaaS (Chong & Carraro, 2006)",
+      "rendered_title": "Bốn Cấp độ Trưởng thành Kiến trúc SaaS (Chong & Carraro, 2006)",
+      "command": "subsection",
+      "label": "v4-sec-1-3-2"
+    },
+    {
+      "source": "1.4. Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao (Từ Cấp độ 3)",
+      "rendered_title": "Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao (Từ Cấp độ 3)",
+      "command": "section",
+      "label": "v4-sec-1-4"
+    },
+    {
+      "source": "1.4.1. Chia sẻ Tài nguyên Trong suốt và Thực thi Phi trạng thái (Stateless)",
+      "rendered_title": "Chia sẻ Tài nguyên Trong suốt và Thực thi Phi trạng thái (Stateless)",
+      "command": "subsection",
+      "label": "v4-sec-1-4-1"
+    },
+    {
+      "source": "1.4.2. Quản lý Ngữ cảnh Định danh và Tùy biến Động dựa trên Siêu dữ liệu",
+      "rendered_title": "Quản lý Ngữ cảnh Định danh và Tùy biến Động dựa trên Siêu dữ liệu",
+      "command": "subsection",
+      "label": "v4-sec-1-4-2"
+    },
+    {
+      "source": "1.4.3. Tính Cô lập Đa chiều Nội tại (Dữ liệu, Hiệu năng, Sự cố)",
+      "rendered_title": "Tính Cô lập Đa chiều Nội tại (Dữ liệu, Hiệu năng, Sự cố)",
+      "command": "subsection",
+      "label": "v4-sec-1-4-3"
+    },
+    {
+      "source": "1.4.4. Tự phục vụ Vòng đời và Phân tách Hai Mặt phẳng (Control Plane & Data Plane)",
+      "rendered_title": "Tự phục vụ Vòng đời và Phân tách Hai Mặt phẳng (Control Plane & Data Plane)",
+      "command": "subsection",
+      "label": "v4-sec-1-4-4"
+    },
+    {
+      "source": "1.4.5. Đo lường và Giám sát Mức tiêu thụ Nhận thức Thuê bao",
+      "rendered_title": "Đo lường và Giám sát Mức tiêu thụ Nhận thức Thuê bao",
+      "command": "subsection",
+      "label": "v4-sec-1-4-5"
+    },
+    {
+      "source": "1.5. Mô hình Kiến trúc 9 Tầng và Bảy Thách thức Thiết kế Cốt lõi",
+      "rendered_title": "Mô hình Kiến trúc 9 Tầng và Bảy Thách thức Thiết kế Cốt lõi",
+      "command": "section",
+      "label": "v4-sec-1-5"
+    },
+    {
+      "source": "1.5.1. Mô hình Kiến trúc 9 Tầng Cloud-Native",
+      "rendered_title": "Mô hình Kiến trúc 9 Tầng Cloud-Native",
+      "command": "subsection",
+      "label": "v4-sec-1-5-1"
+    },
+    {
+      "source": "1.5.2. Bảy Thách thức Thiết kế Cốt lõi khi Hợp nhất Đa thuê bao trên 9 Tầng",
+      "rendered_title": "Bảy Thách thức Thiết kế Cốt lõi khi Hợp nhất Đa thuê bao trên 9 Tầng",
+      "command": "subsection",
+      "label": "v4-sec-1-5-2"
+    },
+    {
+      "source": "1.5.3. Tiểu kết Chương 1",
+      "rendered_title": "Tiểu kết Chương 1",
+      "command": "subsection",
+      "label": "v4-sec-1-5-3"
+    },
+    {
+      "source": "CHƯƠNG 2: KIẾN TRÚC HỆ THỐNG ĐA THUÊ BAO",
+      "rendered_title": "KIẾN TRÚC HỆ THỐNG ĐA THUÊ BAO",
+      "command": "chapter",
+      "label": "v4-chapter-2"
+    },
+    {
+      "source": "2.1. Tổng quan Kiến trúc Hệ thống Đa thuê bao",
+      "rendered_title": "Tổng quan Kiến trúc Hệ thống Đa thuê bao",
+      "command": "section",
+      "label": "v4-sec-2-1"
+    },
+    {
+      "source": "2.1.1. Bản chất Thiết kế Hệ thống Đa thuê bao, Khái niệm Tách – Gộp và Hai Trục Phân tích Kiến trúc",
+      "rendered_title": "Bản chất Thiết kế Hệ thống Đa thuê bao, Khái niệm Tách – Gộp và Hai Trục Phân tích Kiến trúc",
+      "command": "subsection",
+      "label": "v4-sec-2-1-1"
+    },
+    {
+      "source": "2.1.2. Sơ đồ Kiến trúc Tổng thể Tham chiếu và Hệ Quy ước Biểu diễn Nhất quán",
+      "rendered_title": "Sơ đồ Kiến trúc Tổng thể Tham chiếu và Hệ Quy ước Biểu diễn Nhất quán",
+      "command": "subsection",
+      "label": "v4-sec-2-1-2"
+    },
+    {
+      "source": "2.2. Các Mô hình Triển khai Kiến trúc Đa thuê bao Kinh điển",
+      "rendered_title": "Các Mô hình Triển khai Kiến trúc Đa thuê bao Kinh điển",
+      "command": "section",
+      "label": "v4-sec-2-2"
+    },
+    {
+      "source": "2.2.1. Mô hình Silo (Cô lập Toàn phần Thể hiện Hệ thống theo Thuê bao)",
+      "rendered_title": "Mô hình Silo (Cô lập Toàn phần Thể hiện Hệ thống theo Thuê bao)",
+      "command": "subsection",
+      "label": "v4-sec-2-2-1"
+    },
+    {
+      "source": "2.2.2. Mô hình Pool (Chia sẻ Toàn phần trên một Thể hiện Hệ thống Dùng chung)",
+      "rendered_title": "Mô hình Pool (Chia sẻ Toàn phần trên một Thể hiện Hệ thống Dùng chung)",
+      "command": "subsection",
+      "label": "v4-sec-2-2-2"
+    },
+    {
+      "source": "2.2.3. Mô hình Bridge (Lai ghép theo Chiều dọc Mô hình Phân tầng: Gộp Thể hiện Tính toán – Tách Không gian Dữ liệu)",
+      "rendered_title": "Mô hình Bridge (Lai ghép theo Chiều dọc Mô hình Phân tầng: Gộp Thể hiện Tính toán – Tách Không gian Dữ liệu)",
+      "command": "subsection",
+      "label": "v4-sec-2-2-3"
+    },
+    {
+      "source": "2.2.4. Mô hình Hybrid (Phân tầng Hỗn hợp theo Phân khúc Thuê bao) và So sánh Tổng hợp",
+      "rendered_title": "Mô hình Hybrid (Phân tầng Hỗn hợp theo Phân khúc Thuê bao) và So sánh Tổng hợp",
+      "command": "subsection",
+      "label": "v4-sec-2-2-4"
+    },
+    {
+      "source": "2.3. Khung Đánh giá Đa yếu tố và Quyết định Mô hình Pool Cấp độ 3 cho Đề tài",
+      "rendered_title": "Khung Đánh giá Đa yếu tố và Quyết định Mô hình Pool Cấp độ 3 cho Đề tài",
+      "command": "section",
+      "label": "v4-sec-2-3"
+    },
+    {
+      "source": "CHƯƠNG 3: PHÂN TÍCH KỸ THUẬT VÀ NGUYÊN LÝ KIỂM SOÁT ĐA THUÊ BAO TRÊN MÔ HÌNH POOL 9 TẦNG",
+      "rendered_title": "PHÂN TÍCH KỸ THUẬT VÀ NGUYÊN LÝ KIỂM SOÁT ĐA THUÊ BAO TRÊN MÔ HÌNH POOL 9 TẦNG",
+      "command": "chapter",
+      "label": "v4-chapter-3"
+    },
+    {
+      "source": "3.1. Cụm Hạ tầng Nền tảng: Phần cứng, Ảo hóa và Điều phối Vùng chứa (Tầng 1 – 3)",
+      "rendered_title": "Cụm Hạ tầng Nền tảng: Phần cứng, Ảo hóa và Điều phối Vùng chứa (Tầng 1 – 3)",
+      "command": "section",
+      "label": "v4-sec-3-1"
+    },
+    {
+      "source": "3.2. Cụm Phần mềm Trung gian – Middleware (Tầng 7)",
+      "rendered_title": "Cụm Phần mềm Trung gian – Middleware (Tầng 7)",
+      "command": "section",
+      "label": "v4-sec-3-2"
+    },
+    {
+      "source": "3.2.1. Nguyên lý Xác thực Định danh Mật mã tại Biên và Chống Giả mạo Tham chiếu (Khía cạnh K1)",
+      "rendered_title": "Nguyên lý Xác thực Định danh Mật mã tại Biên và Chống Giả mạo Tham chiếu (Khía cạnh K1)",
+      "command": "subsection",
+      "label": "v4-sec-3-2-1"
+    },
+    {
+      "source": "3.2.2. Nguyên lý Điều tiết Lưu lượng, Bộ nhớ Đệm Đa tầng và Đồng bộ Sự kiện (Khía cạnh K3, K2, K4)",
+      "rendered_title": "Nguyên lý Điều tiết Lưu lượng, Bộ nhớ Đệm Đa tầng và Đồng bộ Sự kiện (Khía cạnh K3, K2, K4)",
+      "command": "subsection",
+      "label": "v4-sec-3-2-2"
+    },
+    {
+      "source": "3.3. Cụm Thể hiện Ứng dụng và Môi trường Thực thi (Tầng 8 – 9)",
+      "rendered_title": "Cụm Thể hiện Ứng dụng và Môi trường Thực thi (Tầng 8 – 9)",
+      "command": "section",
+      "label": "v4-sec-3-3"
+    },
+    {
+      "source": "3.3.1. Nguyên lý Quản lý Ngữ cảnh gắn theo Phạm vi Thực thi và Kỷ luật Thu hồi Bắt buộc (Khía cạnh K1)",
+      "rendered_title": "Nguyên lý Quản lý Ngữ cảnh gắn theo Phạm vi Thực thi và Kỷ luật Thu hồi Bắt buộc (Khía cạnh K1)",
+      "command": "subsection",
+      "label": "v4-sec-3-3-1"
+    },
+    {
+      "source": "3.3.2. Nguyên lý Đánh giá Quy tắc và Tùy biến Hành vi Động dựa trên Siêu dữ liệu (Khía cạnh K4)",
+      "rendered_title": "Nguyên lý Đánh giá Quy tắc và Tùy biến Hành vi Động dựa trên Siêu dữ liệu (Khía cạnh K4)",
+      "command": "subsection",
+      "label": "v4-sec-3-3-2"
+    },
+    {
+      "source": "3.3.3. Nguyên lý Bảo vệ Vùng nhớ Dùng chung và Phân bổ Luồng Thực thi theo Thuê bao (Khía cạnh K3)",
+      "rendered_title": "Nguyên lý Bảo vệ Vùng nhớ Dùng chung và Phân bổ Luồng Thực thi theo Thuê bao (Khía cạnh K3)",
+      "command": "subsection",
+      "label": "v4-sec-3-3-3"
+    },
+    {
+      "source": "3.4. Cụm Cơ sở Dữ liệu Có cấu trúc (Tầng 4 – 6)",
+      "rendered_title": "Cụm Cơ sở Dữ liệu Có cấu trúc (Tầng 4 – 6)",
+      "command": "section",
+      "label": "v4-sec-3-4"
+    },
+    {
+      "source": "3.4.1. Nguyên lý Kiểm soát Truy cập Cấp dòng Nội tại (RLS) và Biến Phiên Giao dịch Nguyên tử (Khía cạnh K1, K2)",
+      "rendered_title": "Nguyên lý Kiểm soát Truy cập Cấp dòng Nội tại (RLS) và Biến Phiên Giao dịch Nguyên tử (Khía cạnh K1, K2)",
+      "command": "subsection",
+      "label": "v4-sec-3-4-1"
+    },
+    {
+      "source": "3.4.2. Nguyên lý Mở rộng Dữ liệu Bán cấu trúc và Tối ưu Đường dẫn Truy xuất trên Bảng Gộp (Khía cạnh K4, K3)",
+      "rendered_title": "Nguyên lý Mở rộng Dữ liệu Bán cấu trúc và Tối ưu Đường dẫn Truy xuất trên Bảng Gộp (Khía cạnh K4, K3)",
+      "command": "subsection",
+      "label": "v4-sec-3-4-2"
+    },
+    {
+      "source": "3.5. Tổng kết Chương 3: Sự Phối hợp Liên tầng của K1–K4 và Chuyển giao sang Chương 4",
+      "rendered_title": "Tổng kết Chương 3: Sự Phối hợp Liên tầng của K1–K4 và Chuyển giao sang Chương 4",
+      "command": "section",
+      "label": "v4-sec-3-5"
+    },
+    {
+      "source": "CHƯƠNG 4: PHÂN TÍCH NGHIỆP VỤ, THIẾT KẾ VÀ HIỆN THỰC HÓA ỨNG DỤNG QUẢN LÝ CÔNG VIỆC KANBAN ĐA THUÊ BAO",
+      "rendered_title": "PHÂN TÍCH NGHIỆP VỤ, THIẾT KẾ VÀ HIỆN THỰC HÓA ỨNG DỤNG QUẢN LÝ CÔNG VIỆC KANBAN ĐA THUÊ BAO",
+      "command": "chapter",
+      "label": "v4-chapter-4"
+    },
+    {
+      "source": "4.1. Phân tích Bài toán Nghiệp vụ và Quy hoạch Dịch vụ theo Tiếp cận Thị trường (Market-Driven Outside-In)",
+      "rendered_title": "Phân tích Bài toán Nghiệp vụ và Quy hoạch Dịch vụ theo Tiếp cận Thị trường (Market-Driven Outside-In)",
+      "command": "section",
+      "label": "v4-sec-4-1"
+    },
+    {
+      "source": "4.1.1. Khảo sát Nhu cầu Thị trường và Chân dung Tổ chức Thuê bao Điển hình (Customer Personas)",
+      "rendered_title": "Khảo sát Nhu cầu Thị trường và Chân dung Tổ chức Thuê bao Điển hình (Customer Personas)",
+      "command": "subsection",
+      "label": "v4-sec-4-1-1"
+    },
+    {
+      "source": "4.1.2. Quy hoạch Dịch vụ Phần mềm thành Chức năng trên Hai Mặt phẳng Kiến trúc và Yêu cầu Phi chức năng",
+      "rendered_title": "Quy hoạch Dịch vụ Phần mềm thành Chức năng trên Hai Mặt phẳng Kiến trúc và Yêu cầu Phi chức năng",
+      "command": "subsection",
+      "label": "v4-sec-4-1-2"
+    },
+    {
+      "source": "4.2. Đặc tả Chức năng, Luồng Tương tác Nghiệp vụ và Giao diện Ứng dụng Nguyên mẫu",
+      "rendered_title": "Đặc tả Chức năng, Luồng Tương tác Nghiệp vụ và Giao diện Ứng dụng Nguyên mẫu",
+      "command": "section",
+      "label": "v4-sec-4-2"
+    },
+    {
+      "source": "4.2.1. Phân rã Tác nhân và Vai trò Người dùng trong Ứng dụng (User Roles & Permissions)",
+      "rendered_title": "Phân rã Tác nhân và Vai trò Người dùng trong Ứng dụng (User Roles & Permissions)",
+      "command": "subsection",
+      "label": "v4-sec-4-2-1"
+    },
+    {
+      "source": "4.2.2. Đặc tả Ca sử dụng (Use Cases) và Luồng Hành trình Người dùng Điển hình (User Journeys)",
+      "rendered_title": "Đặc tả Ca sử dụng (Use Cases) và Luồng Hành trình Người dùng Điển hình (User Journeys)",
+      "command": "subsection",
+      "label": "v4-sec-4-2-2"
+    },
+    {
+      "source": "4.2.3. Thiết kế Giao diện Nguyên mẫu và Đối chứng Trực quan Đa thuê bao",
+      "rendered_title": "Thiết kế Giao diện Nguyên mẫu và Đối chứng Trực quan Đa thuê bao",
+      "command": "subsection",
+      "label": "v4-sec-4-2-3"
+    },
+    {
+      "source": "4.3. Thiết kế Thành phần, Hợp đồng Giao tiếp, Cơ sở Dữ liệu và Ánh xạ Kỹ thuật (K1–K4)",
+      "rendered_title": "Thiết kế Thành phần, Hợp đồng Giao tiếp, Cơ sở Dữ liệu và Ánh xạ Kỹ thuật (K1–K4)",
+      "command": "section",
+      "label": "v4-sec-4-3"
+    },
+    {
+      "source": "4.3.1. Tổ hợp Công nghệ, Kiến trúc Thành phần và Hợp đồng API Cốt lõi",
+      "rendered_title": "Tổ hợp Công nghệ, Kiến trúc Thành phần và Hợp đồng API Cốt lõi",
+      "command": "subsection",
+      "label": "v4-sec-4-3-1"
+    },
+    {
+      "source": "4.3.2. Thiết kế Lược đồ Cơ sở Dữ liệu Năm Bảng và Kiểm soát Đồng thời",
+      "rendered_title": "Thiết kế Lược đồ Cơ sở Dữ liệu Năm Bảng và Kiểm soát Đồng thời",
+      "command": "subsection",
+      "label": "v4-sec-4-3-2"
+    },
+    {
+      "source": "4.3.3. Ánh xạ Luồng Thao tác Nghiệp vụ Kanban Xuyên tầng sang Bốn Kỹ thuật K1–K4",
+      "rendered_title": "Ánh xạ Luồng Thao tác Nghiệp vụ Kanban Xuyên tầng sang Bốn Kỹ thuật K1–K4",
+      "command": "subsection",
+      "label": "v4-sec-4-3-3"
+    },
+    {
+      "source": "4.4. Đóng gói và Triển khai Nguyên mẫu Hệ thống Đa thuê bao",
+      "rendered_title": "Đóng gói và Triển khai Nguyên mẫu Hệ thống Đa thuê bao",
+      "command": "section",
+      "label": "v4-sec-4-4"
+    },
+    {
+      "source": "4.4.1. Kiến trúc Đóng gói Vùng chứa Đa dịch vụ (Docker Compose)",
+      "rendered_title": "Kiến trúc Đóng gói Vùng chứa Đa dịch vụ (Docker Compose)",
+      "command": "subsection",
+      "label": "v4-sec-4-4-1"
+    },
+    {
+      "source": "4.4.2. Kiến trúc Triển khai Dịch vụ qua Internet Công cộng (Subdomain Routing, TLS và Tường lửa)",
+      "rendered_title": "Kiến trúc Triển khai Dịch vụ qua Internet Công cộng (Subdomain Routing, TLS và Tường lửa)",
+      "command": "subsection",
+      "label": "v4-sec-4-4-2"
+    },
+    {
+      "source": "4.5. Tiểu kết Chương 4",
+      "rendered_title": "Tiểu kết Chương 4",
+      "command": "section",
+      "label": "v4-sec-4-5"
+    },
+    {
+      "source": "CHƯƠNG 5: THIẾT LẬP THỰC NGHIỆM VÀ KẾT QUẢ KIỂM ĐỊNH",
+      "rendered_title": "THIẾT LẬP THỰC NGHIỆM VÀ KẾT QUẢ KIỂM ĐỊNH",
+      "command": "chapter",
+      "label": "v4-chapter-5"
+    },
+    {
+      "source": "5.1. Thiết lập Môi trường Thực nghiệm, Dữ liệu Phân tầng và Khung Đo lường",
+      "rendered_title": "Thiết lập Môi trường Thực nghiệm, Dữ liệu Phân tầng và Khung Đo lường",
+      "command": "section",
+      "label": "v4-sec-5-1"
+    },
+    {
+      "source": "5.2. Kết quả Kiểm định Định danh, Ngữ cảnh Luồng và Cô lập Dữ liệu (KB-1, KB-2)",
+      "rendered_title": "Kết quả Kiểm định Định danh, Ngữ cảnh Luồng và Cô lập Dữ liệu (KB-1, KB-2)",
+      "command": "section",
+      "label": "v4-sec-5-2"
+    },
+    {
+      "source": "5.3. Kết quả Kiểm định Hiệu năng, Kháng Láng giềng Ồn ào và Chi phí Tùy biến",
+      "rendered_title": "Kết quả Kiểm định Hiệu năng, Kháng Láng giềng Ồn ào và Chi phí Tùy biến",
+      "command": "section",
+      "label": "v4-sec-5-3"
+    },
+    {
+      "source": "5.3.1. Kiểm định hiệu năng và kiểm soát láng giềng ồn ào (KB-3)",
+      "rendered_title": "Kiểm định hiệu năng và kiểm soát láng giềng ồn ào (KB-3)",
+      "command": "subsection",
+      "label": "v4-sec-5-3-1"
+    },
+    {
+      "source": "5.3.2. Phân tích Chuỗi thời gian Tài nguyên (Telemetry) và Kiểm định khả năng tùy biến trong thời gian chạy (KB-4)",
+      "rendered_title": "Phân tích Chuỗi thời gian Tài nguyên (Telemetry) và Kiểm định khả năng tùy biến trong thời gian chạy (KB-4)",
+      "command": "subsection",
+      "label": "v4-sec-5-3-2"
+    },
+    {
+      "source": "5.4. Bàn luận Tổng hợp Kết quả Thực nghiệm",
+      "rendered_title": "Bàn luận Tổng hợp Kết quả Thực nghiệm",
+      "command": "section",
+      "label": "v4-sec-5-4"
+    },
+    {
+      "source": "Kết luận",
+      "rendered_title": "Kết luận",
+      "command": "addsec",
+      "label": "v4-conclusion-kết-luận"
+    },
+    {
+      "source": "Hạn chế của đề tài",
+      "rendered_title": "Hạn chế của đề tài",
+      "command": "addsec",
+      "label": "v4-conclusion-hạn-chế-của-đề-tài"
+    },
+    {
+      "source": "Kiến nghị",
+      "rendered_title": "Kiến nghị",
+      "command": "addsec",
+      "label": "v4-conclusion-kiến-nghị"
+    },
+    {
+      "source": "Hướng nghiên cứu tiếp theo",
+      "rendered_title": "Hướng nghiên cứu tiếp theo",
+      "command": "addsec",
+      "label": "v4-conclusion-hướng-nghiên-cứu-tiếp-theo"
+    },
+    {
+      "source": "PHỤ LỤC A: LƯỢC ĐỒ CƠ SỞ DỮ LIỆU VÀ CHÍNH SÁCH BẢO MẬT DÒNG (POSTGRESQL DDL & RLS) (Đối ứng Mục 3.4 & Mục 4.3.2)",
+      "rendered_title": "LƯỢC ĐỒ CƠ SỞ DỮ LIỆU VÀ CHÍNH SÁCH BẢO MẬT DÒNG (POSTGRESQL DDL & RLS) (Đối ứng Mục 3.4 & Mục 4.3.2)",
+      "command": "chapter",
+      "label": "v4-appendix-A"
+    },
+    {
+      "source": "PHỤ LỤC B: MÃ NGUỒN CÀI ĐẶT CÁC CƠ CHẾ KIỂM SOÁT ĐA THUÊ BAO CỐT LÕI (K1–K4) (Đối ứng Mục 3.2, 3.3, 3.4 & Mục 4.3.3)",
+      "rendered_title": "MÃ NGUỒN CÀI ĐẶT CÁC CƠ CHẾ KIỂM SOÁT ĐA THUÊ BAO CỐT LÕI (K1–K4) (Đối ứng Mục 3.2, 3.3, 3.4 & Mục 4.3.3)",
+      "command": "chapter",
+      "label": "v4-appendix-B"
+    },
+    {
+      "source": "PHỤ LỤC C: CẤU HÌNH ĐÓNG GÓI VÀ GIỚI HẠN TÀI NGUYÊN THỰC NGHIỆM (DOCKER COMPOSE) (Đối ứng Mục 3.1, Mục 4.4.1–4.4.2 & Mục 5.1)",
+      "rendered_title": "CẤU HÌNH ĐÓNG GÓI VÀ GIỚI HẠN TÀI NGUYÊN THỰC NGHIỆM (DOCKER COMPOSE) (Đối ứng Mục 3.1, Mục 4.4.1–4.4.2 & Mục 5.1)",
+      "command": "chapter",
+      "label": "v4-appendix-C"
+    },
+    {
+      "source": "PHỤ LỤC D: KỊCH BẢN ĐO KIỂM HIỆU NĂNG VÀ KIỂM THỬ CÔ LẬP THỰC NGHIỆM (Đối ứng Mục 5.1, 5.2 & 5.3)",
+      "rendered_title": "KỊCH BẢN ĐO KIỂM HIỆU NĂNG VÀ KIỂM THỬ CÔ LẬP THỰC NGHIỆM (Đối ứng Mục 5.1, 5.2 & 5.3)",
+      "command": "chapter",
+      "label": "v4-appendix-D"
+    }
+  ],
+  "figures": [
+    {
+      "image_id": "image2",
+      "path": "assets/figures/v4/image2.png",
+      "sha256": "f9fd258cd6c23e5d8c1711ac219d52b9dd3784b33bcd70585657840005767812",
+      "width_px": 1400,
+      "height_px": 680,
+      "markdown_sha256": "175a245c0dd4fb94fe0496cd343a0d5593de02b5844fbe234dd6a6b01ed5e869",
+      "markdown_dimensions": [
+        565,
+        255
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 25,
+      "pdf_xref": 301,
+      "number": "1.1",
+      "caption": "Tiến trình tiến hóa của các mô hình chia sẻ tài nguyên điện toán từ thập niên 1960 đến nay.",
+      "landscape": true
+    },
+    {
+      "image_id": "image3",
+      "path": "assets/figures/v4/image3.png",
+      "sha256": "5d789d8fed34ed9dc0d136c04e3d78572c1ae399dfb0b9bc7074ac89772f896c",
+      "width_px": 1320,
+      "height_px": 640,
+      "markdown_sha256": "0e4503d0b9a6d895af4a0b10a51bb7166629d066f8fff1a8a6ec2713a7bf06e7",
+      "markdown_dimensions": [
+        565,
+        274
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 26,
+      "pdf_xref": 304,
+      "number": "1.2",
+      "caption": "Biểu đồ tương quan hàm Tổng chi phí sở hữu (TCO) giữa mô hình Đơn thuê bao và Đa thuê bao theo quy mô khách hàng.",
+      "landscape": true
+    },
+    {
+      "image_id": "image4",
+      "path": "assets/figures/v4/image4.png",
+      "sha256": "8665a1c7dd8ebf9fedbfa0a79ad41f8c4cd7edc38fe87236e35a05f8662a337c",
+      "width_px": 1976,
+      "height_px": 1359,
+      "markdown_sha256": "f25cad3ed355d375f94b3018bebb51d8c2d3dfd80f9d3548eb5eb3accfc03b91",
+      "markdown_dimensions": [
+        565,
+        389
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 29,
+      "pdf_xref": 311,
+      "number": "1.3",
+      "caption": "Mô hình Đa thuê bao và phạm vi bao phủ Thể hiện Hệ thống.",
+      "landscape": false
+    },
+    {
+      "image_id": "image5",
+      "path": "assets/figures/v4/image5.png",
+      "sha256": "f296fc5d997290c7fac5b412916852ba3e1b46bf9e9404c0ac83eca667584ab1",
+      "width_px": 1295,
+      "height_px": 1072,
+      "markdown_sha256": "a89579c57fb5e7676abf69c5b37fb8c271d38d9a33f81237f642353555716a2c",
+      "markdown_dimensions": [
+        565,
+        447
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 31,
+      "pdf_xref": 316,
+      "number": "1.4",
+      "caption": "So sánh bốn mô hình Đơn thuê bao, Đa thể hiện, Đa người dùng và Đa thuê bao qua ranh giới Thuê bao.",
+      "landscape": false
+    },
+    {
+      "image_id": "image6",
+      "path": "assets/figures/v4/image6.png",
+      "sha256": "c867e555b830573d8422c458fe10a0fb4ca39978b4f8cc7640bb7b3f5c0263bc",
+      "width_px": 1230,
+      "height_px": 1278,
+      "markdown_sha256": "3055389a3ae9bfd973df670b5225ea67636b7284779d840ba4c5ba1ff43e27d7",
+      "markdown_dimensions": [
+        565,
+        588
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 32,
+      "pdf_xref": 319,
+      "number": "1.5",
+      "caption": "Bốn cấp độ trưởng thành kiến trúc SaaS (Chong & Carraro, 2006).",
+      "landscape": false
+    },
+    {
+      "image_id": "image7",
+      "path": "assets/figures/v4/image7.png",
+      "sha256": "caf51bf7d3812d514dab3217965ffea572ffbca72dff08d02de9a2dee917eb7b",
+      "width_px": 565,
+      "height_px": 264,
+      "markdown_sha256": "c45d973daa922f143f70841bcfdf06f0fe94f5ab6756dc71a747d4da316e0994",
+      "markdown_dimensions": [
+        565,
+        264
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 36,
+      "pdf_xref": 328,
+      "number": "1.6a",
+      "caption": "Cấu trúc Mô hình Phân tầng Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).",
+      "landscape": true
+    },
+    {
+      "image_id": "image8",
+      "path": "assets/figures/v4/image8.png",
+      "sha256": "734a76cf9d8191b2ff5263041d706b4382b29cf11c0d93dbbc403357c0249a12",
+      "width_px": 685,
+      "height_px": 540,
+      "markdown_sha256": "51c38954f0f370e9951ad7f6a3e35e923df3dce2e00e166f284d5b198ce33854",
+      "markdown_dimensions": [
+        462,
+        364
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 37,
+      "pdf_xref": 331,
+      "number": "1.6b",
+      "caption": "Mô hình kiến trúc đa thuê bao 9 tầng cập nhật cho môi trường Cloud-Native.",
+      "landscape": false
+    },
+    {
+      "image_id": "image9",
+      "path": "assets/figures/v4/image9.png",
+      "sha256": "db9575a45a61f669c414129d16dce52b00cb84325bcb6188765b1336b12ae914",
+      "width_px": 1296,
+      "height_px": 1659,
+      "markdown_sha256": "cc3b26e4e7f2b6e854cec17c6a80bd65aad0b6a2340275a246efcd8dc9d0633d",
+      "markdown_dimensions": [
+        565,
+        724
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 43,
+      "pdf_xref": 344,
+      "number": "2.1",
+      "caption": "Khung Tham chiếu 9 tầng phân định phân vùng nhận thức thuê bao (Tầng 4–9) và phân vùng hạ tầng nền tảng (Tầng 1–3).",
+      "landscape": false
+    },
+    {
+      "image_id": "image10",
+      "path": "assets/figures/v4/image10.png",
+      "sha256": "b2de7d4c457950d4b810195e5e3aaebdf9fdef7766d1e53b185666f92a2b491b",
+      "width_px": 2046,
+      "height_px": 1294,
+      "markdown_sha256": "c003affe55eca54852b0dfb554a392ececfac18a10ccf9a0f8cd6db3d7d22bca",
+      "markdown_dimensions": [
+        565,
+        358
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 45,
+      "pdf_xref": 349,
+      "number": "2.2",
+      "caption": "Kiến trúc Mô hình Silo (Mỗi Thuê bao sở hữu một Thể hiện Hệ thống dành riêng (Dedicated) dưới sự điều phối của Control Plane chung).",
+      "landscape": false
+    },
+    {
+      "image_id": "image11",
+      "path": "assets/figures/v4/image11.png",
+      "sha256": "8fe739315be58fc8115fcd2ce7677223441c78ed8ab771da41deb79fc70ffd54",
+      "width_px": 1976,
+      "height_px": 1354,
+      "markdown_sha256": "4798d123be4fcea61982d6d85e336325df45f5bf3fd5e4ddc4f7ff46dc87fbcd",
+      "markdown_dimensions": [
+        565,
+        387
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 46,
+      "pdf_xref": 352,
+      "number": "2.3",
+      "caption": "Kiến trúc Mô hình Pool (Nhiều Thuê bao chia sẻ chung một Thể hiện Hệ thống dùng chung (Shared) với vách ngăn cô lập logic theo tenant_id).",
+      "landscape": false
+    },
+    {
+      "image_id": "image12",
+      "path": "assets/figures/v4/image12.png",
+      "sha256": "47e05897de2549ed067112735a1bb3e1e3b7c7f0cfa33f6dfcae7442ccf4d5fb",
+      "width_px": 1976,
+      "height_px": 1494,
+      "markdown_sha256": "5f1be6afb1861d62c6527d3a56b1ce4e29440879a314ed8ddb2e79e420c64cf1",
+      "markdown_dimensions": [
+        565,
+        427
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 47,
+      "pdf_xref": 355,
+      "number": "2.4",
+      "caption": "Kiến trúc Mô hình Bridge.",
+      "landscape": false
+    },
+    {
+      "image_id": "image13",
+      "path": "assets/figures/v4/image13.png",
+      "sha256": "ae947490af89364f60fc349acb84e4e6c0bff896f6ffa17d74fa07dfe7a04c8b",
+      "width_px": 2046,
+      "height_px": 1305,
+      "markdown_sha256": "b2e83ba951f1424d73c40dad3227ea8071a288b82eacaae5dc7c4fc06cccf07a",
+      "markdown_dimensions": [
+        565,
+        361
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 48,
+      "pdf_xref": 358,
+      "number": "2.5",
+      "caption": "Kiến trúc Mô hình Hybrid (Kết hợp phân vùng Thể hiện Hệ thống dùng chung (Shared) cho thuê bao phổ thông và Thể hiện Hệ thống dành riêng (Dedicated) cho thuê bao Enterprise).",
+      "landscape": false
+    },
+    {
+      "image_id": "image14",
+      "path": "assets/figures/v4/image14.png",
+      "sha256": "a22c782db0c061025eb4d6e8edb295fcfe9d19dbbf29b8ca95a1a89705ee42e1",
+      "width_px": 2046,
+      "height_px": 1120,
+      "markdown_sha256": "67e540492166fc4cf16ae91ce75041c45c634d7d4a9052432c71dbb9a957b6ff",
+      "markdown_dimensions": [
+        565,
+        309
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 49,
+      "pdf_xref": 361,
+      "number": "2.6",
+      "caption": "Hướng mở rộng Phân vùng theo Ô (Cell-Based: Pool – Pool – Hybrid) nhằm giới hạn Bán kính Ảnh hưởng Sự cố.",
+      "landscape": true
+    },
+    {
+      "image_id": "image15",
+      "path": "assets/figures/v4/image15.png",
+      "sha256": "c68602060a6a9fadb84ac8540f27400f9dacfa245c70a4fbce9633ecb65a861e",
+      "width_px": 2046,
+      "height_px": 1101,
+      "markdown_sha256": "6964f5a81dbbcddac480e0b4c4bd62401c5ec5989cf039211f504e8216be3190",
+      "markdown_dimensions": [
+        565,
+        304
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 52,
+      "pdf_xref": 368,
+      "number": "2.7",
+      "caption": "Khung Đánh đổi Đa yếu tố Tổng quát hỗ trợ Lựa chọn Mô hình Kiến trúc Đa thuê bao.",
+      "landscape": true
+    },
+    {
+      "image_id": "image16",
+      "path": "assets/figures/v4/image16.png",
+      "sha256": "b3aae107c1179887b717984bb8fa1ac647feabfbad52d0d0837e78663f69d53d",
+      "width_px": 1296,
+      "height_px": 702,
+      "markdown_sha256": "9c33a8c8076def9d4fda7ff330824d0803a93c41316d5531c177d2a0e3e03638",
+      "markdown_dimensions": [
+        565,
+        306
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 53,
+      "pdf_xref": 371,
+      "number": "2.8",
+      "caption": "Áp dụng Khung Đánh giá Đa yếu tố vào Bài toán SaaS Kanban — Định vị Mô hình Pool Cấp độ 3 và Lộ trình Tiến hóa Mở.",
+      "landscape": true
+    },
+    {
+      "image_id": "image17",
+      "path": "assets/figures/v4/image17.png",
+      "sha256": "f79a2040fd1883ccec8181684a568fdf6769565706004b71c94310322704d0f4",
+      "width_px": 1296,
+      "height_px": 475,
+      "markdown_sha256": "4252d3914f757cc3c62a9387e22126514096f289a84530eff74c81d143a60e20",
+      "markdown_dimensions": [
+        565,
+        207
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 55,
+      "pdf_xref": 376,
+      "number": "3.1",
+      "caption": "Zoom-in Tầng 7 – Tổ chức Pool tại tầng điều phối biên, xác thực định danh, điều tiết lưu lượng và phân vùng khóa bộ nhớ đệm / kênh truyền tin theo Thuê bao.",
+      "landscape": true
+    },
+    {
+      "image_id": "image18",
+      "path": "assets/figures/v4/image18.png",
+      "sha256": "7c1319eb5a6d238de5a64a575063b42a4ac586847f0b239c4abc3e5381d1921b",
+      "width_px": 1296,
+      "height_px": 576,
+      "markdown_sha256": "f9b6ea1d0b4227839341294b9b669ec8adea5b5b944664e4c1862d6ce032f2af",
+      "markdown_dimensions": [
+        565,
+        251
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 57,
+      "pdf_xref": 381,
+      "number": "3.2",
+      "caption": "Kiến trúc Bộ nhớ đệm Hai tầng nhận thức thuê bao (L1 + L2) và nguyên lý lọc tần suất W-TinyLFU chống ô nhiễm bộ đệm.",
+      "landscape": true
+    },
+    {
+      "image_id": "image19",
+      "path": "assets/figures/v4/image19.png",
+      "sha256": "e47906144c341a38af17cf643daab4d155a83a4f6b9595b13291861f08ba8187",
+      "width_px": 2048,
+      "height_px": 1045,
+      "markdown_sha256": "d6257a03c1ef1fc0912659c68b94ac0d02b0c53482911dbbcd38cf0cf5295797",
+      "markdown_dimensions": [
+        565,
+        288
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 58,
+      "pdf_xref": 384,
+      "number": "3.3",
+      "caption": "Zoom-in Tầng 8 & Tầng 9 – Tổ chức Pool với Bộ mã nguồn duy nhất, điều phối ngữ cảnh luồng và tùy biến động trên Thể hiện Thành phần dùng chung.",
+      "landscape": true
+    },
+    {
+      "image_id": "image20",
+      "path": "assets/figures/v4/image20.png",
+      "sha256": "ccddaf4a8e61378152cce2ec303f29b7b77a9b879f03f1e95d3c5365ef7070ef",
+      "width_px": 2046,
+      "height_px": 1066,
+      "markdown_sha256": "c99e5d6393664062520cc39d8bf07e512bad0d8e2c3fb26face3262fc49ff6a5",
+      "markdown_dimensions": [
+        565,
+        294
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 60,
+      "pdf_xref": 389,
+      "number": "3.4",
+      "caption": "Biểu đồ tuần tự nguyên lý thiết lập ngữ cảnh luồng thực thi và kỷ luật thu hồi bắt buộc trong khối try/finally tại Tầng 8 (Khía cạnh K1).",
+      "landscape": true
+    },
+    {
+      "image_id": "image21",
+      "path": "assets/figures/v4/image21.png",
+      "sha256": "24b1f53715e7e80168f32fbc62c3c7d5fe0682c418f65dc6e08f7d1b960d57c1",
+      "width_px": 1296,
+      "height_px": 601,
+      "markdown_sha256": "ee784f3a88d915b5b97a7657d58084c8f09dd6ceec47e523bbe4f6ba41f6fecf",
+      "markdown_dimensions": [
+        565,
+        262
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 61,
+      "pdf_xref": 392,
+      "number": "3.5",
+      "caption": "Nguyên lý hoạt động của Động cơ Đánh giá Quy tắc (Rule Evaluation Engine) và tùy biến động 3 lớp (K4).",
+      "landscape": true
+    },
+    {
+      "image_id": "image22",
+      "path": "assets/figures/v4/image22.png",
+      "sha256": "af6193c557f402d201f48739a0c29afb1e325fa596ba68b99508cbb9336177d2",
+      "width_px": 2046,
+      "height_px": 1031,
+      "markdown_sha256": "029ac1ae27c98e61efdab676abfc95be157217118ffc61803a7f9390623641d8",
+      "markdown_dimensions": [
+        565,
+        285
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 63,
+      "pdf_xref": 397,
+      "number": "3.6",
+      "caption": "Zoom-in Tầng 4–6 – Tổ chức Pool toàn phần với Bảng dùng chung và cơ chế kiểm soát truy cập cấp dòng nội tại (FORCE RLS).",
+      "landscape": true
+    },
+    {
+      "image_id": "image23",
+      "path": "assets/figures/v4/image23.png",
+      "sha256": "9a9d5205615367e77c71a52a208f1e0d0f5db9f4808e63a77e17016ea2f5a0e4",
+      "width_px": 2045,
+      "height_px": 764,
+      "markdown_sha256": "274ebb4a97995f1d3e74dc438c3a83c5fbe9ba57c05f55684c4b4de0833b4024",
+      "markdown_dimensions": [
+        565,
+        211
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 64,
+      "pdf_xref": 400,
+      "number": "3.7",
+      "caption": "Liên hệ mô hình Silo tại Tầng 4–5 – Tách biệt Máy chủ Hệ quản trị CSDL hoặc Cơ sở dữ liệu logic độc lập cho từng Thuê bao.",
+      "landscape": true
+    },
+    {
+      "image_id": "image24",
+      "path": "assets/figures/v4/image24.png",
+      "sha256": "80a20d0a5235b589fd82439f2cdfe2c4e85729941ffef72c0fcc278fb16790de",
+      "width_px": 1296,
+      "height_px": 586,
+      "markdown_sha256": "a3867fc8a57ea27093a4eb827ea897faa7b974b101eb418ccc8bc8e57fc9cf8b",
+      "markdown_dimensions": [
+        565,
+        256
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 65,
+      "pdf_xref": 403,
+      "number": "3.8",
+      "caption": "Liên hệ mô hình Bridge nội cụm tại Tầng 6 – Gộp máy chủ CSDL nhưng Tách Lược đồ (Schema-per-Tenant) kết hợp chuyển mạch không gian tên.",
+      "landscape": true
+    },
+    {
+      "image_id": "image25",
+      "path": "assets/figures/v4/image25.png",
+      "sha256": "abc9ee80db3b260b95442ec6191958ed23c31edd822c753ceb961869a475b105",
+      "width_px": 2046,
+      "height_px": 1299,
+      "markdown_sha256": "72c8a547ebcbf866b67759066a9a3a2163aa81a12da6e152a3bbb7afff14ec1f",
+      "markdown_dimensions": [
+        565,
+        359
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 67,
+      "pdf_xref": 408,
+      "number": "3.9",
+      "caption": "Nguyên lý tái sử dụng kết nối vật lý an toàn trên Bể kết nối dùng chung bằng biến phiên giao dịch nguyên tử (Khía cạnh K1 & K2).",
+      "landscape": false
+    },
+    {
+      "image_id": "image26",
+      "path": "assets/figures/v4/image26.png",
+      "sha256": "e37b84f18c1b242a5ced1eef18587177ae97e5f484a3fc9e27c3a93088216d50",
+      "width_px": 2047,
+      "height_px": 1032,
+      "markdown_sha256": "1ad998bf6a0c52b4aeb31126143d52befd2a6dc077fabd069560a017a364f5ed",
+      "markdown_dimensions": [
+        565,
+        285
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 69,
+      "pdf_xref": 413,
+      "number": "3.10",
+      "caption": "Tổng hợp luồng phối hợp liên tầng của bốn khía cạnh kiểm soát K1–K4 từ Tầng 7 xuống Tầng 4–6.",
+      "landscape": true
+    },
+    {
+      "image_id": "image27",
+      "path": "assets/figures/v4/image27.png",
+      "sha256": "35cfb15061bab7e82bb15d7d6e30241307cee9ee6329f0157bcecdce1cb79ce2",
+      "width_px": 1296,
+      "height_px": 559,
+      "markdown_sha256": "cefad3620bc46577bb025adf1593eb638e14472fd29e94c2d0067809ab59ae29",
+      "markdown_dimensions": [
+        565,
+        244
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 72,
+      "pdf_xref": 420,
+      "number": "4.1",
+      "caption": "Tiến trình phân tích yêu cầu theo tiếp cận Ngoài–Vào định hướng thị trường và mô hình ba lớp dịch vụ tùy biến của ứng dụng SaaS Kanban.",
+      "landscape": true
+    },
+    {
+      "image_id": "image28",
+      "path": "assets/figures/v4/image28.png",
+      "sha256": "45ca61b6d61ea4af81771d4a2fd45756816c11805a7acd5014f7dbed2eb7352e",
+      "width_px": 1296,
+      "height_px": 715,
+      "markdown_sha256": "4e79c31f949a8faa12334f00d183f2eccafa7b7ead605a86465125c60cf767d9",
+      "markdown_dimensions": [
+        565,
+        312
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 73,
+      "pdf_xref": 423,
+      "number": "4.2",
+      "caption": "Sơ đồ phân rã các dịch vụ và chức năng quản trị thuộc Mặt phẳng Điều khiển (Control Plane).",
+      "landscape": true
+    },
+    {
+      "image_id": "image29",
+      "path": "assets/figures/v4/image29.png",
+      "sha256": "e40c489433d81ee7aaff2c4a13315ce3f61cdf3808fd4df14c0c1db88b6b023b",
+      "width_px": 1296,
+      "height_px": 715,
+      "markdown_sha256": "a876243aa94787ccac293067f2612fd99477465b2653be5c2edeaffa188c3815",
+      "markdown_dimensions": [
+        565,
+        312
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 74,
+      "pdf_xref": 426,
+      "number": "4.3",
+      "caption": "Sơ đồ phân rã các dịch vụ và chức năng nghiệp vụ quản lý công việc Kanban thuộc Mặt phẳng Dữ liệu (Data Plane).",
+      "landscape": true
+    },
+    {
+      "image_id": "image30",
+      "path": "assets/figures/v4/image30.png",
+      "sha256": "77dceb68457478c7de210a45ca9fb0c007415d38dafeb42aa7698c094ca8bf1c",
+      "width_px": 1296,
+      "height_px": 810,
+      "markdown_sha256": "be41ac3e500624c4cfa3b9da3c5e6c38453b21cbcacc385d49deac0491956aa9",
+      "markdown_dimensions": [
+        565,
+        353
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 77,
+      "pdf_xref": 433,
+      "number": "4.4",
+      "caption": "Biểu đồ Ca sử dụng Tổng thể (UML Use Case Diagram) phân tách Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu.",
+      "landscape": false
+    },
+    {
+      "image_id": "image31",
+      "path": "assets/figures/v4/image31.png",
+      "sha256": "0861f0b18e5a8dac047404dc01f71314ee7b5dde4ac822cbe5c7b3911dae4d43",
+      "width_px": 1296,
+      "height_px": 583,
+      "markdown_sha256": "7eb3cb1705d2a4b71b757f42bc1abb5cd967d7d48c23a00d2387f6be23548016",
+      "markdown_dimensions": [
+        565,
+        254
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 79,
+      "pdf_xref": 438,
+      "number": "4.5",
+      "caption": "Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow – (a) Chọn Không gian làm việc & cấp JWT gắn tenant_id; (b) Khung Cấu hình Tùy biến 3 Lớp.",
+      "landscape": true
+    },
+    {
+      "image_id": "image32",
+      "path": "assets/figures/v4/image32.png",
+      "sha256": "b5fa07ea450674bb20134590cca9392bcc2888c2a3760dca616baf3debe71386",
+      "width_px": 1296,
+      "height_px": 1401,
+      "markdown_sha256": "ff7caa11da9dec75e4f1e1d345a43cfba4d59860fa4919e08f1091c79ddda6eb",
+      "markdown_dimensions": [
+        565,
+        611
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 80,
+      "pdf_xref": 441,
+      "number": "4.6",
+      "caption": "Đối chứng giao diện bảng Kanban thực tế của hai thuê bao Acme Software (t-acme) và Lotus Media (t-lotus) vận hành đồng thời trên cùng một phiên bản mã nguồn tại cụm AWS EC2.",
+      "landscape": false
+    },
+    {
+      "image_id": "image33",
+      "path": "assets/figures/v4/image33.png",
+      "sha256": "e19dabf9a3fe660fcb54a96b7405946ceb4df7c280e4631fb69f3770848f9af3",
+      "width_px": 1296,
+      "height_px": 818,
+      "markdown_sha256": "2c4fbd6f84bfc3bfc38e1d4bc6b760a373a828c0966a9b1a103102dcbad44b19",
+      "markdown_dimensions": [
+        565,
+        357
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 82,
+      "pdf_xref": 446,
+      "number": "4.7",
+      "caption": "Kiến trúc Thành phần (Component Architecture) của ứng dụng TenantFlow phân định chuỗi kiểm soát K1–K4 và Hai Mặt phẳng.",
+      "landscape": false
+    },
+    {
+      "image_id": "image34",
+      "path": "assets/figures/v4/image34.png",
+      "sha256": "2a872b9dd40d8f806267adc5ff4c6e1d1cae4f2780f9d7557c205be2e5b8807c",
+      "width_px": 1296,
+      "height_px": 734,
+      "markdown_sha256": "8754ce5e6bd8d1a4f5ae8de5f91a35c7a8d43c422f94449c393b6c284d3fcb32",
+      "markdown_dimensions": [
+        565,
+        320
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 83,
+      "pdf_xref": 449,
+      "number": "4.8",
+      "caption": "Lược đồ cơ sở dữ liệu đa thuê bao 5 bảng cốt lõi của ứng dụng SaaS Kanban phân định phạm vi Mặt phẳng Điều khiển và FORCE RLS trên Mặt phẳng Dữ liệu.",
+      "landscape": true
+    },
+    {
+      "image_id": "image35",
+      "path": "assets/figures/v4/image35.png",
+      "sha256": "31801f805e14deb4a37ba9080bfdf8df7d8535503d6ec214c6bcc500fd13c1e0",
+      "width_px": 1296,
+      "height_px": 703,
+      "markdown_sha256": "72e5a7e07f3a9d50554bc233e59756f18fc3e8df0ccf534df88a6b9e5521619f",
+      "markdown_dimensions": [
+        565,
+        307
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 84,
+      "pdf_xref": 452,
+      "number": "4.9",
+      "caption": "Biểu đồ tuần tự 9 bước ánh xạ thao tác kéo – thả thẻ Kanban xuyên tầng qua K1–K4, bao đóng giao dịch SET LOCAL và khối finally.",
+      "landscape": true
+    },
+    {
+      "image_id": "image36",
+      "path": "assets/figures/v4/image36.png",
+      "sha256": "07428de8a23cc782eef356d1fafbbfd73266aeeba50aea401f1f5a1f6817e9d0",
+      "width_px": 1296,
+      "height_px": 710,
+      "markdown_sha256": "2d4ef705f98f4e8c8dbe4889aa2c418523fbdeb2de2086be025e29cb82912dcf",
+      "markdown_dimensions": [
+        565,
+        310
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 87,
+      "pdf_xref": 459,
+      "number": "4.10",
+      "caption": "Sơ đồ Triển khai Internet SaaS (UML Deployment Diagram) trên AWS EC2 với Wildcard DNS, AWS Security Group và Caddy Reverse Proxy.",
+      "landscape": true
+    },
+    {
+      "image_id": "image37",
+      "path": "assets/figures/v4/image37.png",
+      "sha256": "c6ce98fdf146fd0a10863af28f324f51e8529cd04875821ced57c71f6fbf3f17",
+      "width_px": 1024,
+      "height_px": 572,
+      "markdown_sha256": "440e48ee28c53de99ad9482d078fd07463621d5ab3acd9360ad26bb67d1c44fc",
+      "markdown_dimensions": [
+        565,
+        316
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 89,
+      "pdf_xref": 464,
+      "number": "5.1",
+      "caption": "Sơ đồ kiến trúc môi trường thực nghiệm cô lập tài nguyên trên AWS EC2 và đường ống thu thập số liệu hai phía.",
+      "landscape": true
+    },
+    {
+      "image_id": "image38",
+      "path": "assets/figures/v4/image38.png",
+      "sha256": "26975b998697447a14538d32972304fdc229ef126613b1606ff6156c7bb1150e",
+      "width_px": 1296,
+      "height_px": 434,
+      "markdown_sha256": "f8e6b1bf80efda3f552bc6aad5c6fba68aa40ebf686c8d6b734afcd7cb559c40",
+      "markdown_dimensions": [
+        565,
+        190
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 91,
+      "pdf_xref": 469,
+      "number": "5.2",
+      "caption": "Kết quả kiểm định toàn vẹn ranh giới định danh (KB-1), rào chắn CSDL Fail-Closed (KB-2) và chi phí thực thi vi mô RLS.",
+      "landscape": true
+    },
+    {
+      "image_id": "image39",
+      "path": "assets/figures/v4/image39.png",
+      "sha256": "b04b412eaee7179a9ce02180baf30e6b5d526de18ffba62c4abf108ae852b777",
+      "width_px": 1024,
+      "height_px": 572,
+      "markdown_sha256": "30735de5adb455ff19da63557b6cea05d62994c4187c68d7032f11e074248512",
+      "markdown_dimensions": [
+        565,
+        316
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 93,
+      "pdf_xref": 474,
+      "number": "5.3a",
+      "caption": "Đối sánh độ trễ phản hồi theo phân nhóm thuê bao (p50 và p95).",
+      "landscape": true
+    },
+    {
+      "image_id": "image40",
+      "path": "assets/figures/v4/image40.png",
+      "sha256": "abfbc0e16f5377517dc249f33417cd57d80a1d80328eb6bf8929a9937c1fc6cb",
+      "width_px": 1296,
+      "height_px": 435,
+      "markdown_sha256": "14ab3ee2d28a64389e308e00521d42637e31abeb70639b58547ccf7df30cf30f",
+      "markdown_dimensions": [
+        565,
+        190
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 94,
+      "pdf_xref": 477,
+      "number": "5.3b",
+      "caption": "Thông lượng phục vụ, khả năng cắt tải tại biên và độ trễ truy xuất cấu hình.",
+      "landscape": true
+    },
+    {
+      "image_id": "image41",
+      "path": "assets/figures/v4/image41.png",
+      "sha256": "12ff0cead8826c9a4447c0ce3d0cc28a32753c839345f6a5df0e9695eec737ab",
+      "width_px": 1296,
+      "height_px": 571,
+      "markdown_sha256": "950fd96fdc378290e4fa5b25153fc991be3ee4621d7bdaf2191bddada86b6d7c",
+      "markdown_dimensions": [
+        565,
+        249
+      ],
+      "source": "Report_V4.pdf",
+      "pdf_page": 94,
+      "pdf_xref": 478,
+      "number": "5.4",
+      "caption": "Diễn biến mức sử dụng CPU các vùng chứa theo chuỗi thời gian (Telemetry, N=17 mẫu) và kết quả kiểm chứng tùy biến động (KB-4).",
+      "landscape": true
+    }
+  ],
+  "tables": [
+    {
+      "number": "1.1",
+      "caption": "Đối chiếu sự khác biệt bản chất giữa bốn cấp độ trưởng thành kiến trúc SaaS (Chong & Carraro, 2006).",
+      "columns": 5,
+      "header_rows": 1,
+      "body_rows": 5,
+      "landscape": true
+    },
+    {
+      "number": "1.2",
+      "caption": "Định nghĩa bản chất trừu tượng và vai trò trong thể hiện hệ thống của 9 tầng thành phần.",
+      "columns": 4,
+      "header_rows": 1,
+      "body_rows": 9,
+      "landscape": true
+    },
+    {
+      "number": "2.1",
+      "caption": "Đối sánh tổng hợp bốn mô hình triển khai kiến trúc đa thuê bao kinh điển.",
+      "columns": 5,
+      "header_rows": 1,
+      "body_rows": 6,
+      "landscape": true
+    },
+    {
+      "number": "3.1",
+      "caption": "Ánh xạ Chuẩn hóa các Nguyên lý Kiểm soát K1–K4 sang Một số Tổ hợp Công nghệ Phổ biến.",
+      "columns": 4,
+      "header_rows": 1,
+      "body_rows": 4,
+      "landscape": true
+    },
+    {
+      "number": "4.1",
+      "caption": "Đối chiếu Bản chất Kiến trúc giữa Đa người dùng (MU) và Đa thuê bao Cấp độ 3 (MT) trên Bài toán Kanban.",
+      "columns": 3,
+      "header_rows": 1,
+      "body_rows": 4,
+      "landscape": false
+    },
+    {
+      "number": "4.2",
+      "caption": "Đặc tả Danh mục 10 Ca sử dụng Cốt lõi (UC01–UC10) Phân tách theo Hai Mặt phẳng Kiến trúc.",
+      "columns": 4,
+      "header_rows": 1,
+      "body_rows": 10,
+      "landscape": true
+    },
+    {
+      "number": null,
+      "caption": null,
+      "columns": 3,
+      "header_rows": 1,
+      "body_rows": 2,
+      "landscape": false
+    },
+    {
+      "number": null,
+      "caption": null,
+      "columns": 3,
+      "header_rows": 1,
+      "body_rows": 2,
+      "landscape": false
+    },
+    {
+      "number": "4.3",
+      "caption": "Hợp đồng Giao tiếp API Trọng yếu và Cấu trúc Tải trọng Dữ liệu Đa thuê bao (API & Metadata Contracts).",
+      "columns": 4,
+      "header_rows": 1,
+      "body_rows": 4,
+      "landscape": true
+    }
+  ],
+  "code": [
+    {
+      "id": "A.1",
+      "title": "A.1. SQL – Vai trò NOBYPASSRLS & Bảng Mặt phẳng Điều khiển",
+      "path": "assets/code/v4/A-1.txt",
+      "pdf_pages": [
+        101
+      ],
+      "sha256": "c184e501ddb34cbd69c2ffc9d4c13c4f9ca12fcbe9ba9d0d1ee2331eb4b2510a",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "A.2",
+      "title": "A.2. SQL – Bảng Mặt phẳng Dữ liệu & Chỉ mục Dẫn đầu tenant_id + GIN",
+      "path": "assets/code/v4/A-2.txt",
+      "pdf_pages": [
+        101,
+        102
+      ],
+      "sha256": "22d56cc3a4cb9835edfd78587056ebdc723dd4c7b378febb2458d5c325b47aec",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "A.3",
+      "title": "A.3. SQL – Chính sách ENABLE / FORCE ROW LEVEL SECURITY (Fail-Closed)",
+      "path": "assets/code/v4/A-3.txt",
+      "pdf_pages": [
+        102
+      ],
+      "sha256": "07877d2d3782de58463d814591d25cb72f9c4a8b0ae34ba63015a49c5bc320b3",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "B.1",
+      "title": "B.1. Java / Spring Boot – TenantContext & JwtTenantFilter (K1)",
+      "path": "assets/code/v4/B-1.txt",
+      "pdf_pages": [
+        103
+      ],
+      "sha256": "7c3bcbfd7593acef5b5189f744f23873b88e198e6b24628cfc32138ddeafa2da",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "B.2",
+      "title": "B.2. Java / Hibernate – RlsConnectionInterceptor với SET LOCAL (K2)",
+      "path": "assets/code/v4/B-2.txt",
+      "pdf_pages": [
+        103,
+        104
+      ],
+      "sha256": "75d3d08055982fabd157369709fb6e88a89c49b4ac3a05216a70da9fd8dbaa64",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "B.3",
+      "title": "B.3. Redis Lua Token Bucket & Bộ nhớ đệm Hai tầng Caffeine/Redis Pub/Sub (K3 & K4)",
+      "path": "assets/code/v4/B-3.txt",
+      "pdf_pages": [
+        104
+      ],
+      "sha256": "f646da0cb28fb7fad673ccfbd588857880d178b1e1879e89ec650bf5baabaa7d",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "B.4",
+      "title": "B.4. JSONB Mẫu Cấu hình 3 Lớp & Quy tắc Xử lý Luật WIP (K4)",
+      "path": "assets/code/v4/B-4.txt",
+      "pdf_pages": [
+        104
+      ],
+      "sha256": "fc2722e0d81b6ab3a3b0d7180a25699e97cf1d001bc0343cc81b46779b618b91",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "C.1",
+      "title": "C.1. Docker Compose (5 Vùng chứa + cgroups) & Cấu hình Caddyfile",
+      "path": "assets/code/v4/C-1.txt",
+      "pdf_pages": [
+        105
+      ],
+      "sha256": "ea9b93780c7007cc171f5acc004dc4a180ff4b50f76a0017c9f94a3260ea8468",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "D.1",
+      "title": "D.1. Quy trình Kiểm thử Xâm nhập Biên (KB-1) & Tiêm lỗi CSDL (KB-2)",
+      "path": "assets/code/v4/D-1.txt",
+      "pdf_pages": [
+        106
+      ],
+      "sha256": "fd307280566d8f7bc9887d4c8a4fece32a66432512a72b21ee21deed49ca9bbb",
+      "non_whitespace_content_matches_markdown": true
+    },
+    {
+      "id": "D.2",
+      "title": "D.2. Kịch bản Đo tải Đa thuê bao Hàng xóm Ồn ào k6 (KB-3)",
+      "path": "assets/code/v4/D-2.txt",
+      "pdf_pages": [
+        106
+      ],
+      "sha256": "73db728b89e83b29bc24e14ce25dbe6154740f2710928dc0004dbaa0beadc7b6",
+      "non_whitespace_content_matches_markdown": true
+    }
+  ],
+  "markdown_table_rows_repaired_from_pdf": 1,
+  "template_logos_retained": [
+    {
+      "image_id": "image1",
+      "path": "assets/figures/v4/image1.png",
+      "sha256": "1bb12f24452f4f378fd6149b4ee55149d182c22949997f9b03301a5c15357632",
+      "width_px": 142,
+      "height_px": 142
+    },
+    {
+      "image_id": "image42",
+      "path": "assets/figures/v4/image42.png",
+      "sha256": "3be67c17cc800de53d58670069a4e62b43857f57a925ce8855ee146da9225c2d",
+      "width_px": 52,
+      "height_px": 52
+    }
+  ]
+}

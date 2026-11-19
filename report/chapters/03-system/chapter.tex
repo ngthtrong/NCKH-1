@@ -1,4 +1,221 @@
-\chapter{}\label{chap:system-design}
-\input{chapters/03-system/sections/architecture}
-\input{chapters/03-system/sections/synchronization}
-\input{chapters/03-system/sections/implementation}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{PHÂN TÍCH KỸ THUẬT VÀ NGUYÊN LÝ KIỂM SOÁT ĐA THUÊ BAO TRÊN MÔ HÌNH POOL 9 TẦNG}\label{v4-chapter-3}
+
+Thay vì tách rời việc phân tích tầng với các cơ chế bảo vệ, nội dung chương được tổ chức xuyên suốt theo bốn cụm tầng. Tại mỗi cụm tầng, nghiên cứu phân tích trạng thái vận hành khi áp dụng chiến lược Pool, chỉ rõ nguyên nhân kỹ thuật làm phát sinh các thách thức đa thuê bao. Từ đó trình bày các nguyên lý thiết kế tổng quát để giải quyết bốn khía cạnh kiểm soát cốt lõi.
+
+\section{Cụm Hạ tầng Nền tảng: Phần cứng, Ảo hóa và Điều phối Vùng chứa (Tầng 1 -- 3)}\label{v4-sec-3-1}
+
+Trong cấu trúc mô hình Pool Cấp độ 3 đã lựa chọn cho đề tài, Cụm Hạ tầng nền tảng (Tầng 1 đến Tầng 3) đều được tổ chức theo chiến lược Gộp (Pool). Cụ thể, toàn bộ các tổ chức thuê bao cùng chia sẻ chung cụm máy chủ, mạng nội bộ và nền tảng điều phối vùng chứa dùng chung. So với mô hình Silo hoặc Bridge (cấp phát máy chủ vật lý hay mạng VPC riêng biệt cho từng thuê bao) làm chi phí tăng tuyến tính theo O(N), chiến lược Pool tối ưu hóa chi phí đầu tư và loại bỏ tài nguyên nhàn rỗi, song đặt ra thách thức tranh chấp tài nguyên tính toán vật lý giữa các tiến trình dịch vụ trên máy chủ chủ thể.
+
+Về mặt phạm vi, cần phân định rõ sự khác biệt giữa Cô lập hạ tầng phi ngữ cảnh thuê bao (Tầng 1--3) và Cô lập phần mềm nhận thức thuê bao (Tầng 4--9). Các cơ chế hạ tầng như Linux cgroups hay Namespaces chỉ đóng khung tài nguyên ở cấp độ vùng chứa (Container/Pod) mà không thể phân biệt hay điều tiết ranh giới giữa các thuê bao hoạt động bên trong cùng một tiến trình ứng dụng hay cơ sở dữ liệu.
+
+Do đó, đề tài giới hạn phạm vi Tầng 1--3 ở mức vận dụng cơ chế điều phối vùng chứa để áp đặt trần tài nguyên tính toán và bộ nhớ vật lý (ví dụ: đóng gói bằng Docker Compose kết hợp cơ chế Linux cgroups) làm nền tảng môi trường thực nghiệm, dành trọng tâm nghiên cứu cho các cơ chế phần mềm nhận thức thuê bao từ Tầng 4 đến Tầng 9.
+
+\section{Cụm Phần mềm Trung gian -- Middleware (Tầng 7)}\label{v4-sec-3-2}
+
+Nằm ở vị trí cầu nối điều phối giữa môi trường thực thi ứng dụng (Tầng 8--9) và hệ thống lưu trữ dữ liệu (Tầng 4--6) là Tầng 7 -- Phần mềm Trung gian. Trong kiến trúc hiện đại, Tầng 7 quy tụ các thành phần điều phối biên và dịch vụ trung gian cốt lõi: cổng giao tiếp biên và chuỗi bộ lọc trung gian (ví dụ: API Gateway hoặc Reverse Proxy), bộ nhớ đệm phân tán trong bộ nhớ, hệ thống hàng đợi thông điệp và kênh phát tán sự kiện, cùng dịch vụ lưu trữ đối tượng. Khi áp dụng mô hình Pool tại Tầng 7, toàn bộ lưu lượng truy cập của mọi tổ chức thuê bao đều đi qua chung một đường ống điều phối biên dùng chung, như được mô hình hóa trên Hình~\ref{fig:v4-3-1}:
+
+\VfourFigureLandscape{3.1}{assets/figures/v4/image17.png}{Zoom-in Tầng 7 -- Tổ chức Pool tại tầng điều phối biên, xác thực định danh, điều tiết lưu lượng và phân vùng khóa bộ nhớ đệm / kênh truyền tin theo Thuê bao.}{fig:v4-3-1}
+
+Như thể hiện trên Hình~\ref{fig:v4-3-1}, do Tầng 7 là cửa ngõ tập trung lưu lượng và là nơi chia sẻ bộ nhớ đệm tốc độ cao của toàn bộ các thuê bao, việc tổ chức theo mô hình Pool tại tầng này làm nảy sinh các thách thức kỹ thuật giao thoa trên cả bốn khía cạnh kiểm soát:
+
+- Thứ nhất, nguy cơ giả mạo tham chiếu định danh tại biên giao tiếp (Khía cạnh K1): Khi tất cả thuê bao cùng truy cập qua một điểm tiếp nhận giao tiếp dùng chung, nếu hệ thống tin cậy trực tiếp mã định danh thuê bao do máy khách tự khai báo thông qua các kênh truyền thông không được bảo vệ toàn vẹn (ví dụ: tham số đường dẫn URL, phần thân thông điệp JSON hoặc tiêu đề HTTP trần) mà không có cơ chế xác thực mật mã đối ứng, người dùng của một thuê bao có thể dễ dàng thay đổi giá trị tham chiếu để truy cập trái phép hoặc làm sai lệch dữ liệu của tổ chức khác (Insecure Direct Object Reference -- IDOR).
+
+- Thứ hai, nguy cơ va chạm không gian khóa đệm và Hiện tượng hàng xóm ồn ào làm sụp đổ bộ nhớ đệm (Khía cạnh K2 \& K3): Khi nhiều thuê bao dùng chung một cụm bộ nhớ đệm, nếu khóa lưu trữ chỉ mang mã định danh bản ghi đơn lẻ mà thiếu tiền tố tổ chức (ví dụ: chỉ lưu khóa dạng \textless entity\textgreater:\textless id\textgreater), dữ liệu giữa các thuê bao sẽ bị ghi đè hoặc đọc chéo (K2). Nghiêm trọng hơn về mặt hiệu năng (K3), nếu một thuê bao phát sinh lưu lượng truy cập đột biến hoặc thực hiện tác vụ quét dữ liệu lịch sử quy mô lớn, lưu lượng của thuê bao đó sẽ làm nghẽn băng thông xử lý biên và đẩy toàn bộ dữ liệu đang sử dụng thường xuyên của các thuê bao láng giềng ra khỏi bộ nhớ đệm (Hiện tượng ô nhiễm quét bộ đệm -- Cache Scan Pollution).
+
+- Thứ ba, bài toán bất nhất dữ liệu cấu hình động giữa các tầng đệm (Khía cạnh K4): Khi quản trị viên của một thuê bao cập nhật cấu hình tùy biến lúc chạy, nếu các bản sao cấu hình đang lưu đệm tại các tiến trình Tầng 8 không được thông báo xóa bỏ kịp thời qua Tầng 7, hệ thống sẽ tiếp tục áp dụng quy tắc nghiệp vụ cũ gây sai lệch hành vi.
+
+Nếu tổ chức Tầng 7 theo mô hình Silo hoặc Bridge, không gian bộ đệm và băng thông được cô lập ở mức cấu trúc hạ tầng trung gian. Tuy nhiên, phần lớn các hệ thống đệm và hàng đợi trung chuyển đều giới hạn cứng số lượng phân vùng logic nội bộ hoặc không gian kết nối ảo (ví dụ: số cơ sở dữ liệu logic trong Redis hay số Virtual Host trên máy chủ hàng đợi thông điệp), đồng thời làm tăng chi phí quản trị vận hành khi quy mô lên tới hàng trăm hoặc hàng nghìn thuê bao. Vì vậy, mô hình Pool tại Tầng 7 giải quyết các thách thức trên bằng các nguyên lý kiểm soát phần mềm tại Mục~\ref{v4-sec-3-2-1} và 3.2.2.
+
+\subsection{Nguyên lý Xác thực Định danh Mật mã tại Biên và Chống Giả mạo Tham chiếu (Khía cạnh K1)}\label{v4-sec-3-2-1}
+
+Triết lý thiết kế tổng quát (Zero-Trust đối với tham số định danh từ máy khách): Để bảo vệ cửa ngõ của kiến trúc Pool, Tầng 7 áp dụng nguyên tắc không tin cậy trực tiếp bất kỳ mã định danh thuê bao nào do máy khách tự khai báo trong thông điệp yêu cầu của giao thức truyền thông (ví dụ: các tham số đường dẫn hoặc tiêu đề HTTP thông thường). Nguồn chân lý duy nhất để thiết lập ngữ cảnh thuê bao phải bắt nguồn từ các Tuyên bố định danh được bảo vệ bằng chữ ký số mật mã.
+
+Theo nguyên lý này, quá trình phân giải và khóa chặt định danh tại biên Tầng 7 phải đi qua chu trình kiểm định ba bước nghiêm ngặt trước khi bàn giao vào Tầng 8:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Xác thực chữ ký mật mã và tính toàn vẹn của thẻ bài định danh: Khi người dùng đăng nhập và chọn không gian làm việc của một tổ chức, máy chủ xác thực cấp phát một mã thông báo định danh được ký số mật mã (Signed Security Token, ví dụ: JWT), bên trong phần thân tải đóng gói cứng mã người dùng, mã thuê bao đang hoạt động (tenant\_\allowbreak{}id) và vai trò tương ứng. Tại mỗi yêu cầu tiếp theo, bộ lọc biên kiểm tra chữ ký số và thời hạn hiệu lực; bất kỳ hành vi tự ý chỉnh sửa tenant\_\allowbreak{}id nào ở phía máy khách sẽ làm sai lệch chữ ký mật mã và bị từ chối ngay tại biên (ví dụ: trả về mã lỗi xác thực HTTP 401);
+\item
+  Đối soát chéo và kiểm chứng tư cách thành viên: Trong trường hợp giao thức giao tiếp có sử dụng thêm tín hiệu định tuyến phụ trợ ở lớp truyền tải (ví dụ: tên miền phụ Host hoặc tiêu đề HTTP bổ trợ như X-Tenant-ID), giá trị đó chỉ được xem là gợi ý định hướng. Bộ lọc biên bắt buộc phải đối chiếu sự trùng khớp giữa tín hiệu đó với tuyên bố tenant\_\allowbreak{}id đã được ký bên trong thẻ bài, đồng thời xác minh người dùng thực sự đang giữ tư cách thành viên hợp lệ trong tổ chức đó;
+\item
+  Khởi tạo ngữ cảnh tin cậy: Chỉ sau khi vượt qua hai bước kiểm định trên, tenant\_\allowbreak{}id đã xác thực mới được chuyển giao sang cơ chế quản lý ngữ cảnh luồng của Tầng 8 (trình bày tại Mục~\ref{v4-sec-3-3-1}), tạo thành chuỗi định danh khép kín chống lại các cuộc tấn công giả mạo tham chiếu IDOR.
+\end{enumerate}
+
+\subsection{Nguyên lý Điều tiết Lưu lượng, Bộ nhớ Đệm Đa tầng và Đồng bộ Sự kiện (Khía cạnh K3, K2, K4)}\label{v4-sec-3-2-2}
+
+Triết lý phòng thủ đa lớp cho tài nguyên trung gian dùng chung: Để ngăn chặn Hiện tượng hàng xóm ồn ào (K3), bảo đảm cô lập không gian dữ liệu đệm (K2) và duy trì tính nhất quán tức thời cho cấu hình động (K4), Tầng 7 phối hợp liên hoàn với Tầng 8 thông qua ba nguyên lý kỹ thuật cốt lõi:
+
+Thứ nhất, nguyên lý Định hình và Giới hạn lưu lượng theo từng thuê bao tại biên (Per-Tenant Rate Limiting -- Khía cạnh K3): Thay vì chỉ đặt giới hạn tải tổng thể cho toàn máy chủ (vốn vẫn để mặc một thuê bao chiếm hết toàn bộ băng thông chung), Tầng 7 thiết lập cơ chế kiểm soát hạn ngạch độc lập cho từng mã tenant\_\allowbreak{}id bằng các thuật toán điều tiết lưu lượng chuẩn hóa lưu trữ trên bộ nhớ tốc độ cao (ví dụ: Thùng thẻ bài -- Token Bucket hoặc Cửa sổ trượt -- Sliding Window). Mỗi tổ chức thuê bao được cấp một hạn mức riêng tương ứng với gói dịch vụ; mọi yêu cầu đi vào hệ thống đều phải qua bước khấu trừ hạn ngạch nguyên tử theo đúng tenant\_\allowbreak{}id. Khi một thuê bao phát sinh cơn bão yêu cầu vượt ngưỡng, chỉ các yêu cầu dư thừa của riêng thuê bao đó bị từ chối ngay tại Tầng 7 (ví dụ: mã HTTP 429), giữ cho đường ống xử lý phía sau thông suốt đối với các thuê bao láng giềng.
+
+Thứ hai, nguyên lý Phân vùng không gian tên khóa (K2) kết hợp Kiến trúc Bộ nhớ đệm Hai tầng dùng thuật toán lọc tần suất W-TinyLFU (K3): Để vừa đạt độ trễ truy xuất cực thấp vừa chia sẻ được trạng thái giữa nhiều tiến trình, hệ thống phối hợp Bộ nhớ đệm cục bộ L1 (Tầng 8, xem Mục~\ref{v4-sec-3-3}) với Bộ nhớ đệm phân tán L2 (Tầng 7). Trên cả hai tầng đệm, mọi khóa dữ liệu bắt buộc phải được đóng gói tiền tố không gian tên chuẩn hóa theo cấu trúc: tenant:\{tenant\_\allowbreak{}id\}:\{domain\_\allowbreak{}entity\}:\{entity\_\allowbreak{}id\}. Tiền tố này tạo ra vách ngăn logic ngăn ngừa việc đọc chéo dữ liệu đệm giữa các tổ chức (K2). Tuy nhiên, để giải quyết triệt để bài toán một thuê bao thực hiện truy vấn quét dữ liệu lớn làm tràn bộ nhớ đệm và đẩy dữ liệu nóng của các thuê bao khác ra ngoài (K3), việc dùng thuật toán trục xuất LRU (Least Recently Used) truyền thống là không đủ vì LRU chỉ xét yếu tố "mới truy cập". Nguyên lý giải quyết hiện đại là áp dụng thuật toán thu nạp dựa trên cả tần suất lẫn độ mới Window TinyLFU (W-TinyLFU), như minh họa trên Hình~\ref{fig:v4-3-2}:
+
+\VfourFigureLandscape{3.2}{assets/figures/v4/image18.png}{Kiến trúc Bộ nhớ đệm Hai tầng nhận thức thuê bao (L1 + L2) và nguyên lý lọc tần suất W-TinyLFU chống ô nhiễm bộ đệm.}{fig:v4-3-2}
+
+Như mô tả trên Hình~\ref{fig:v4-3-2}, thuật toán W-TinyLFU kết hợp cửa sổ đón (Window Cache) và bộ lọc tần suất lịch sử thu nạp. Cơ chế này giúp ngăn chặn việc một thuê bao quét lượng dữ liệu lớn đẩy các bản ghi truy cập thường xuyên của các thuê bao khác ra khỏi bộ nhớ đệm, bảo vệ tỷ lệ trúng bộ đệm (Cache Hit Ratio) ổn định cho toàn hệ thống.
+
+Thứ ba, nguyên lý Đồng bộ hóa và Vô hiệu hóa bộ đệm phân tán qua kênh Phát tán sự kiện (K4): Do bộ đệm L1 nằm cục bộ trong vùng nhớ của từng tiến trình Tầng 8, khi một thuê bao thay đổi siêu dữ liệu cấu hình (K4), tiến trình vừa xử lý cập nhật sẽ xóa khóa trên L2 và phát một thông điệp sự kiện nhẹ chứa mã tenant\_\allowbreak{}id vào kênh truyền tin Publish/Subscribe tại Tầng 7. Tất cả các tiến trình Tầng 8 đang lắng nghe trên kênh này sẽ tức thời xóa bỏ bản sao cấu hình cũ của đúng tenant\_\allowbreak{}id đó trong bộ đệm L1 của mình, bảo đảm tính nhất quán cấu hình trên toàn hệ thống trong thời gian thực.
+
+\section{Cụm Thể hiện Ứng dụng và Môi trường Thực thi (Tầng 8 -- 9)}\label{v4-sec-3-3}
+
+Ở đỉnh của mô hình kiến trúc 9 tầng là Cụm Ứng dụng, bao gồm Tầng 8 (Môi trường thực thi và máy chủ ứng dụng) và Tầng 9 (Thể hiện ứng dụng và mã nguồn nghiệp vụ). Khi áp dụng mô hình Pool Cấp độ 3 tại cụm tầng này, toàn bộ các tổ chức thuê bao đều được phục vụ bởi một bộ mã nguồn nghiệp vụ duy nhất tại Tầng 9 và cùng thực thi đồng thời bên trong một (hoặc một cụm) tiến trình máy chủ ứng dụng phi trạng thái dùng chung tại Tầng 8, như minh họa trên Hình~\ref{fig:v4-3-3}:
+
+\VfourFigureLandscape{3.3}{assets/figures/v4/image19.png}{Zoom-in Tầng 8 \& Tầng 9 -- Tổ chức Pool với Bộ mã nguồn duy nhất, điều phối ngữ cảnh luồng và tùy biến động trên Thể hiện Thành phần dùng chung.}{fig:v4-3-3}
+
+Việc hợp nhất nhiều thuê bao vào cùng một tiến trình thực thi ở Tầng 8 và cùng một bộ mã nguồn ở Tầng 9 làm phát sinh trực tiếp ba thách thức kỹ thuật:
+
+- Thứ nhất, nguy cơ rò rỉ hoặc lẫn lộn ngữ cảnh giữa các luồng thực thi đồng thời (Khía cạnh K1 -- Thách thức 1): Để đạt thông lượng cao, máy chủ ứng dụng tại Tầng 8 không khởi tạo luồng hệ điều hành mới cho từng yêu cầu mà duy trì một Bể luồng (Thread Pool) tái sử dụng liên tục. Một luồng thực thi vừa hoàn tất yêu cầu của Thuê bao A sẽ lập tức được cấp phát để xử lý yêu cầu kế tiếp của Thuê bao B. Nếu thông tin định danh của Thuê bao A gắn trên luồng đó không được thu hồi sạch sẽ khi kết thúc chu kỳ trước, yêu cầu của Thuê bao B sẽ vô tình kế thừa ngữ cảnh cũ và đọc/ghi nhầm vào dữ liệu của Thuê bao A.
+
+- Thứ hai, mâu thuẫn giữa một bộ mã nguồn cố định và nhu cầu tùy biến nghiệp vụ đa dạng của từng tổ chức (Khía cạnh K4 -- Thách thức 4): Tại Tầng 9, chuẩn đa thuê bao Cấp độ 3 đòi hỏi duy trì duy nhất một bộ mã nguồn, không được phân nhánh mã nguồn riêng hay viết các câu lệnh rẽ nhánh cứng theo mã khách hàng. Thách thức đặt ra là làm thế nào để cùng một hàm xử lý nghiệp vụ có thể tự động biến đổi giao diện hiển thị, quy tắc kiểm tra luồng công việc và cấu trúc dữ liệu mở rộng theo đúng thiết lập riêng của từng thuê bao lúc chạy.
+
+- Thứ ba, nguy cơ tranh chấp vùng nhớ Heap và dừng hệ thống do thu gom rác (Khía cạnh K3 -- Thách thức 3): Khi mọi luồng xử lý của các thuê bao cùng cấp phát đối tượng trên một vùng nhớ Heap duy nhất tại Tầng 8, nếu một thuê bao gửi yêu cầu truy xuất danh sách dữ liệu quá lớn không kiểm soát phân trang, vùng nhớ Heap sẽ nhanh chóng bị lấp đầy và kích hoạt cơ chế thu gom rác toàn cục, làm đóng băng tạm thời mọi luồng xử lý của các thuê bao láng giềng.
+
+Nếu áp dụng mô hình Silo (tách riêng bộ mã nguồn và chạy máy chủ ứng dụng độc lập cho từng khách hàng như ở Cấp độ 1--2) hoặc mô hình Bridge (dùng chung một bộ mã nguồn ở Tầng 9 nhưng khởi chạy các tiến trình thực thi độc lập ở Tầng 8 cho từng thuê bao, ví dụ: tách riêng Worker hay vùng chứa Pod), vùng nhớ Heap và bể luồng được cách ly ở cấp tiến trình hệ điều hành. Tuy nhiên, mỗi tiến trình máy ảo ứng dụng đều tiêu tốn một lượng bộ nhớ RAM khởi tạo cố định, khiến chi phí bộ nhớ tăng tuyến tính O(N) và không thể mở rộng hiệu quả khi số lượng thuê bao tăng cao.
+
+\subsection{Nguyên lý Quản lý Ngữ cảnh gắn theo Phạm vi Thực thi và Kỷ luật Thu hồi Bắt buộc (Khía cạnh K1)}\label{v4-sec-3-3-1}
+
+Triết lý thiết kế tổng quát: Trong một kiến trúc ứng dụng đa tầng, nếu truyền tường minh tham số định danh thuê bao (tenant\_\allowbreak{}id) qua từng chữ ký hàm sẽ làm ô nhiễm thiết kế hướng đối tượng và dễ xảy ra sai sót khi lập trình viên truyền nhầm biến. Ngược lại, nếu lưu tenant\_\allowbreak{}id vào biến toàn cục của tiến trình dùng chung, các luồng chạy song song sẽ lập tức ghi đè lên nhau. Do đó, nguyên lý nền tảng của Khía cạnh K1 tại Tầng 8 là thiết lập Cơ chế Lưu trữ Ngữ cảnh Ngầm định gắn chặt theo Phạm vi Thực thi của từng Yêu cầu.
+
+Trong môi trường thực thi máy chủ ứng dụng hiện đại theo mô hình đồng bộ hoặc bất đồng bộ, hệ thống sử dụng cơ chế lưu trữ ngữ cảnh cục bộ gắn chặt theo luồng hoặc chuỗi thực thi (ví dụ: ThreadLocal trong Java/Spring Boot, AsyncLocalStorage trong Node.js hoặc context.Context trong Go). Khi yêu cầu đi qua bộ lọc bảo mật tại biên, ngữ cảnh định danh được gắn kết độc quyền vào phạm vi thực thi tương ứng, bảo đảm luồng xử lý chỉ truy xuất được dữ liệu của chính thuê bao đang gửi yêu cầu.
+
+Để ngăn chặn nguy cơ rò rỉ ngữ cảnh khi Tầng 8 tái sử dụng luồng từ Bể luồng dùng chung (Thread Pool / Worker Pool), thiết kế bắt buộc phải tuân thủ ba quy tắc bất biến: Thứ nhất, tính bất biến của đối tượng ngữ cảnh -- ngay khi định danh được xác thực ở đầu vào, bộ thông tin (tenant\_\allowbreak{}id, user\_\allowbreak{}id, roles) được khởi tạo thành đối tượng chỉ đọc, ngăn không cho bất kỳ logic nghiệp vụ nào ở Tầng 9 tự ý sửa đổi mã thuê bao giữa chừng. Thứ hai, kỷ luật thu hồi ngữ cảnh cưỡng bức tại chốt chặn cuối -- mọi bộ lọc thiết lập ngữ cảnh ở đầu vào bắt buộc phải bao bọc lời gọi xử lý nghiệp vụ bên trong khối bảo vệ kết thúc vòng đời (ví dụ: cấu trúc try ... finally trong ngôn ngữ hướng đối tượng hay phạm vi đóng tự động) để luôn thực thi lệnh giải phóng ngữ cảnh trước khi luồng quay trở về bể luồng dùng chung, ngay cả khi phát sinh ngoại lệ. Thứ ba, đối với các tác vụ tách luồng chạy nền, hệ thống phải áp dụng mẫu Bộ trang trí ngữ cảnh (Context Decorator) để sao chép ngữ cảnh từ luồng cha, nạp vào luồng con khi khởi tạo và tự động xóa sạch khi tác vụ kết thúc. Chu trình khép kín này được minh họa trực quan trên Hình~\ref{fig:v4-3-4}:
+
+\VfourFigureLandscape{3.4}{assets/figures/v4/image20.png}{Biểu đồ tuần tự nguyên lý thiết lập ngữ cảnh luồng thực thi và kỷ luật thu hồi bắt buộc trong khối try/finally tại Tầng 8 (Khía cạnh K1).}{fig:v4-3-4}
+
+\subsection{Nguyên lý Đánh giá Quy tắc và Tùy biến Hành vi Động dựa trên Siêu dữ liệu (Khía cạnh K4)}\label{v4-sec-3-3-2}
+
+Triết lý thiết kế tổng quát: Để giải quyết bài toán cung cấp tính năng tùy biến đa dạng trên một bộ mã nguồn duy nhất tại Tầng 9, kiến trúc đa thuê bao Cấp độ 3 áp dụng triết lý Tách biệt Cơ chế Thực thi khỏi Chính sách Nghiệp vụ. Theo triết lý này, mã nguồn biên dịch tại Tầng 9 chỉ cài đặt các cơ chế tổng quát, trong khi các chính sách quy định hệ thống phải hành xử như thế nào đối với từng tổ chức được tách hoàn chỉnh ra khỏi mã lệnh để lưu trữ dưới dạng Siêu dữ liệu cấu hình. Khi một yêu cầu được thực thi, Tầng 9 sẽ kết hợp ngữ cảnh thuê bao hiện hành với kho siêu dữ liệu để quyết định hành vi của ứng dụng ngay trong thời gian chạy.
+
+Mô hình hóa hàm phân giải hành vi động theo ngữ cảnh: Thay vì kiểm tra điều kiện tĩnh, mọi điểm biến thiên nghiệp vụ trong ứng dụng được trừu tượng hóa thành một hàm đánh giá phụ thuộc ngữ cảnh:
+
+\textbf{\emph{Behavior = f(PolicyKey, EvaluationContext, MetadataRuleset)}}
+
+Trong đó, PolicyKey là mã định danh của điểm biến thiên hoặc cờ tính năng (ví dụ: chế độ kiểm soát giới hạn công việc, cấu hình giao diện hay quy tắc kiểm tra trường dữ liệu); EvaluationContext là tập thuộc tính ngữ cảnh trích xuất trực tiếp từ TenantContext của luồng hiện tại (bao gồm tenant\_\allowbreak{}id, gói dịch vụ tier, vai trò người dùng role); và MetadataRuleset là tập quy tắc siêu dữ liệu của hệ thống. Rule Evaluation Engine thực hiện phân giải giá trị theo cơ chế thác nước ba cấp độ ưu tiên từ đặc thù đến khái quát:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Mức ưu tiên 1 -- Cấu hình ghi đè đặc thù của từng Thuê bao (Tenant-Specific Override): Kiểm tra xem tổ chức mang mã tenant\_\allowbreak{}id hiện tại có thiết lập cấu hình riêng cho PolicyKey đó hay không;
+\item
+  Mức ưu tiên 2 -- Quy tắc theo Phân khúc hoặc Gói dịch vụ: Nếu thuê bao không cấu hình riêng, hệ thống áp dụng quy tắc chung của gói cước mà thuê bao đang đăng ký;
+\item
+  Mức ưu tiên 3 -- Giá trị mặc định an toàn của hệ thống: Trả về cấu hình chuẩn mặc định nếu không khớp với các quy tắc trên.
+\end{enumerate}
+
+Thông qua mô hình hàm đánh giá siêu dữ liệu này, khả năng tùy biến của một ứng dụng SaaS tại Tầng 9 được triển khai đồng bộ trên ba lớp: (1) Lớp tùy biến Giao diện và Trải nghiệm hiển thị; (2) Lớp tùy biến Quy trình và Quy tắc nghiệp vụ; và (3) Lớp tùy biến Lược đồ và Kiểm định dữ liệu mở rộng, như minh họa trên Hình~\ref{fig:v4-3-5}:
+
+\VfourFigureLandscape{3.5}{assets/figures/v4/image21.png}{Nguyên lý hoạt động của Động cơ Đánh giá Quy tắc (Rule Evaluation Engine) và tùy biến động 3 lớp (K4).}{fig:v4-3-5}
+
+\subsection{Nguyên lý Bảo vệ Vùng nhớ Dùng chung và Phân bổ Luồng Thực thi theo Thuê bao (Khía cạnh K3)}\label{v4-sec-3-3-3}
+
+\textbf{Triết lý thiết kế tổng quát (Đóng khung Ngân sách Thực thi theo Yêu cầu -- Bounded Execution \& Bulkhead Isolation):} Vì mọi yêu cầu trong mô hình Pool đều cấp phát đối tượng trên cùng một vùng nhớ Heap và chia sẻ chung một Bể luồng tại Tầng 8--9, hệ thống không thể cô lập tài nguyên thực thi bằng vách ngăn tiến trình hệ điều hành. Do đó, nguyên lý phòng thủ của Khía cạnh K3 tại cụm tầng này là áp đặt rào chắn ngân sách tiêu thụ bộ nhớ và thời gian thực thi cho từng yêu cầu theo định danh thuê bao, ngăn không cho một thuê bao kích hoạt chuỗi thu gom rác toàn cục (Stop-the-World GC) hoặc chiếm cạn bể luồng dùng chung.
+
+Nguyên lý bảo vệ tài nguyên thực thi tại Tầng 8--9 được phối hợp đồng bộ thông qua ba cơ chế phòng thủ trực tiếp:
+
+\textbf{(1) Cưỡng chế Phân trang và Giới hạn Kích thước Tải (Bounded Pagination \& Payload Limits):} Mọi giao diện truy vấn danh sách đều phải áp đặt ngưỡng kích thước trang tối đa và cơ chế nạp dữ liệu từng phần, ngăn chặn việc một yêu cầu nạp không kiểm soát toàn bộ tập dữ liệu lớn của một thuê bao vào vùng nhớ Heap (tránh tăng áp lực cấp phát đối tượng đột biến dẫn đến đóng băng hệ thống khi thu gom rác).
+
+\textbf{(2) Áp trần Thời gian Thực thi và Vách ngăn Đồng thời theo Thuê bao (Execution Timeout \& Per-Tenant Concurrency Bulkhead):} Mỗi tác vụ xử lý được gắn hạn mức thời gian tối đa để tự động ngắt khi kẹt chờ tài nguyên, đồng thời hệ thống duy trì hạn ngạch số luồng được phép thực thi song song cho từng mã tenant\_\allowbreak{}id trên bể luồng chung. Nếu một thuê bao phát sinh đồng loạt nhiều tác vụ chậm, vách ngăn Bulkhead lập tức từ chối sớm phần vượt ngưỡng để bảo toàn luồng phục vụ cho các thuê bao láng giềng.
+
+\textbf{(3) Tách luồng Bất đồng bộ cho Tác vụ Nặng (Asynchronous Offloading):} Các tác vụ tiêu tốn nhiều bộ nhớ hoặc thời gian CPU kéo dài (ví dụ: kết xuất báo cáo tổng hợp quy mô lớn hay nhập dữ liệu hàng loạt) được tách khỏi Bể luồng tương tác chính để đẩy sang hàng đợi xử lý nền có giới hạn tài nguyên riêng, kết hợp với cơ chế chuyển giao ngữ cảnh an toàn tại Mục 3.3.1.
+
+\section{Cụm Cơ sở Dữ liệu Có cấu trúc (Tầng 4 -- 6)}\label{v4-sec-3-4}
+
+Trọng tâm lưu trữ có trạng thái của toàn bộ hệ thống nằm tại Cụm Cơ sở Dữ liệu Có cấu trúc, bao gồm Tầng 4 đến Tầng 6. Khi áp dụng mô hình Pool toàn phần theo định vị của đề tài tại đây, toàn bộ các tổ chức thuê bao cùng chia sẻ chung một cụm máy chủ hệ quản trị CSDL (Tầng 4), chung một cơ sở dữ liệu logic (Tầng 5) và chung một lược đồ chứa các bảng dữ liệu vật lý tại Tầng 6 (Shared-Table). Trong cấu trúc này, các dòng bản ghi (Rows) của mọi thuê bao nằm xen kẽ bên trong cùng các bảng vật lý và được phân định quyền sở hữu thông qua cột khóa định danh bắt buộc tenant\_\allowbreak{}id, như minh họa trên Hình~\ref{fig:v4-3-6}:
+
+\VfourFigureLandscape{3.6}{assets/figures/v4/image22.png}{Zoom-in Tầng 4--6 -- Tổ chức Pool toàn phần với Bảng dùng chung và cơ chế kiểm soát truy cập cấp dòng nội tại (FORCE RLS).}{fig:v4-3-6}
+
+Việc hợp nhất dữ liệu của tất cả các tổ chức vào chung một không gian bảng vật lý như trên Hình~\ref{fig:v4-3-6} mang lại hiệu quả tối ưu về mật độ lưu trữ, cho phép tái sử dụng trọn vẹn một Bể kết nối vật lý dùng chung và giúp công tác nâng cấp lược đồ đạt độ phức tạp hằng số O(1) (chỉ cần thực thi kịch bản cập nhật trên một bộ bảng duy nhất). Tuy nhiên, chính việc dỡ bỏ ranh giới cơ sở dữ liệu và lược đồ riêng biệt làm phát sinh đầy đủ bốn thách thức kỹ thuật nghiêm trọng nhất xuyên suốt cả K1--K4 tại Tầng 4--6:
+
+- Thứ nhất, nguy cơ ô nhiễm ngữ cảnh định danh trên bể kết nối vật lý dùng chung (Khía cạnh K1 -- Thách thức 1): Tầng 8 giao tiếp với Cụm Cơ sở Dữ liệu tại Tầng 4 thông qua một Bể kết nối vật lý dùng chung (Connection Pool) tồn tại dai dẳng để tái sử dụng cho hàng nghìn giao dịch liên tiếp của nhiều thuê bao khác nhau. Nếu thông tin ngữ cảnh thuê bao được thiết lập xuống phiên kết nối CSDL nhưng không được gắn chặt nguyên tử vào vòng đời giao dịch và tự động thu hồi sạch khi kết thúc, kết nối được cấp phát lại sau đó sẽ kế thừa nhầm định danh thuê bao trước, làm sai lệch trực tiếp nền tảng nhận thức thuê bao của các lớp bảo vệ dữ liệu bên dưới.
+
+- Thứ hai, nguy cơ rò rỉ dữ liệu chéo do sơ suất truy vấn ở tầng ứng dụng (Khía cạnh K2 -- Thách thức 2): Khi hàng triệu bản ghi của nhiều tổ chức nằm chung trong cùng một bảng vật lý (Shared-Table), nếu hệ thống chỉ dựa vào kỷ luật lập trình gắn thủ công điều kiện lọc theo mã thuê bao ở lớp truy xuất ứng dụng, chỉ một sơ suất nhỏ trong câu truy vấn nối bảng phức tạp, truy vấn con hoặc báo cáo tổng hợp sẽ trực tiếp trả về dữ liệu của thuê bao này cho thuê bao khác.
+
+- Thứ ba, xung đột giữa cấu trúc bảng quan hệ cố định và nhu cầu mở rộng trường dữ liệu động (Khía cạnh K4 -- Thách thức 4): Trong bảng dùng chung tại Tầng 6, hệ thống không thể cho phép một thuê bao tự ý thay đổi cấu trúc lược đồ vật lý (ví dụ: thêm cột vật lý mới bằng câu lệnh DDL) ngay lúc chạy, bởi thao tác sửa cấu trúc bảng thường chiếm khóa độc quyền toàn bảng làm đình trệ mọi truy vấn của các thuê bao lân cận và tạo ra hàng trăm cột thưa chứa giá trị rỗng.
+
+- Thứ tư, nguy cơ suy giảm hiệu năng quét dữ liệu và tranh chấp khóa/I/O khi bảng chung phình to (Khía cạnh K3 -- Thách thức 3): Khi dữ liệu của mọi thuê bao tích lũy vào cùng một bảng vật lý, nếu cấu trúc chỉ mục không được thiết kế nhận thức theo mã thuê bao dẫn đầu, truy vấn của một khách hàng có thể kích hoạt quét toàn bộ bảng, làm cạn kiệt băng thông đọc đĩa và chiếm dụng vùng nhớ đệm trang dùng chung của toàn máy chủ CSDL.
+
+Để làm rõ cơ sở đánh đổi ngay tại cụm tầng lưu trữ có trạng thái trước khi thiết kế rào chắn cho mô hình Pool, Hình~\ref{fig:v4-3-7} và Hình~\ref{fig:v4-3-8} đối chứng hai phương án còn lại tại Tầng 4--6. Ở mô hình Silo (Hình~\ref{fig:v4-3-7} -- tách máy chủ hệ quản trị CSDL tại Tầng 4 hoặc cơ sở dữ liệu logic riêng tại Tầng 5), dữ liệu được cô lập ở cấp tiến trình hoặc tệp vật lý, nhưng mỗi cơ sở dữ liệu đòi hỏi một bể kết nối độc lập khiến tổng số kết nối và chi phí bộ nhớ tăng tuyến tính O(N). Ở mô hình Bridge (Hình~\ref{fig:v4-3-8} -- gộp máy chủ CSDL nhưng tách lược đồ riêng theo từng thuê bao tại Tầng 6 kết hợp chuyển mạch không gian tên, ví dụ lệnh search\_\allowbreak{}path trong PostgreSQL), các thuê bao tái sử dụng chung một bể kết nối, song khi mở rộng lên hàng nghìn tổ chức, số bảng vật lý tăng cấp số nhân gây phình đại danh mục hệ thống (ví dụ bảng siêu dữ liệu pg\_\allowbreak{}class) và kéo dài thời gian di trú lược đồ theo bậc O(N). Sự đánh đổi này khẳng định ưu thế bảo trì O(1) của mô hình Pool tại Tầng 4--6 và đặt yêu cầu giải quyết bốn thách thức trên qua các nguyên lý kỹ thuật tại Mục~\ref{v4-sec-3-4-1} và 3.4.2.
+
+\VfourFigureLandscape{3.7}{assets/figures/v4/image23.png}{Liên hệ mô hình Silo tại Tầng 4--5 -- Tách biệt Máy chủ Hệ quản trị CSDL hoặc Cơ sở dữ liệu logic độc lập cho từng Thuê bao.}{fig:v4-3-7}
+
+\VfourFigureLandscape{3.8}{assets/figures/v4/image24.png}{Liên hệ mô hình Bridge nội cụm tại Tầng 6 -- Gộp máy chủ CSDL nhưng Tách Lược đồ (Schema-per-Tenant) kết hợp chuyển mạch không gian tên.}{fig:v4-3-8}
+
+\subsection{Nguyên lý Kiểm soát Truy cập Cấp dòng Nội tại (RLS) và Biến Phiên Giao dịch Nguyên tử (Khía cạnh K1, K2)}\label{v4-sec-3-4-1}
+
+Triết lý Phòng thủ chiều sâu bên trong nhân cơ sở dữ liệu (In-Database Defense-in-Depth): Để bảo vệ bảng dùng chung trước nguy cơ sơ suất mã nguồn ở tầng ứng dụng, kiến trúc Pool không được phép chỉ dựa vào bộ lọc ở lớp truy xuất ứng dụng (Application-Layer Filtering). Nguyên lý cốt lõi của Khía cạnh K2 tại Tầng 6 là thiết lập một rào chắn kiểm soát truy cập bắt buộc ngay bên trong nhân hệ quản trị CSDL thông qua cơ chế Bảo mật cấp dòng (Row-Level Security -- RLS). Khi RLS được kích hoạt trên bảng dùng chung, chính bộ tối ưu và thực thi truy vấn của nhân CSDL sẽ tự động bổ sung điều kiện kiểm tra định danh thuê bao vào mọi thao tác đọc/ghi trước khi lập kế hoạch thực thi.
+
+Để rào chắn RLS vận hành kín kẽ trên bảng dùng chung, thiết kế chính sách bảo mật cấp dòng phải tuân thủ bốn nguyên tắc kỹ thuật:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Cưỡng chế chính sách đối với mọi chủ thể truy vấn (Mandatory Policy Enforcement): Mặc định, nhiều hệ quản trị CSDL cho phép chủ sở hữu bảng bỏ qua chính sách bảo mật dòng; do đó, hệ thống bắt buộc phải bật chế độ cưỡng chế áp dụng cả với chủ sở hữu bảng (ví dụ: lệnh FORCE ROW LEVEL SECURITY trong PostgreSQL) đồng thời tách biệt tài khoản thực thi ứng dụng khỏi tài khoản quản trị di trú lược đồ;
+\item
+  Kiểm soát đối xứng cả hai chiều Đọc và Ghi: Chính sách RLS phải định nghĩa đồng thời hai biểu thức điều kiện - biểu thức lọc chiều đọc/sửa/xóa và biểu thức kiểm định chiều ghi/cập nhật (WITH CHECK predicate: bắt buộc mọi dòng dữ liệu mới chèn vào hoặc sau khi sửa đổi phải mang đúng tenant\_\allowbreak{}id của phiên hiện tại, chặn đứng hành vi một thuê bao chèn dữ liệu giả mạo sang không gian của thuê bao khác);
+\item
+  Thiết kế biểu thức theo nguyên tắc Đóng an toàn mặc định (Fail-Closed Predicate): Biểu thức đối sánh định danh trong chính sách RLS được thiết kế sao cho nếu biến ngữ cảnh phiên chưa được khởi tạo hoặc mang giá trị chuỗi rỗng, hàm đọc biến phiên sẽ chuyển đổi an toàn về giá trị rỗng thay vì ném lỗi cú pháp hay bỏ qua bộ lọc:
+\end{enumerate}
+
+\textbf{\emph{RLS\_\allowbreak{}Predicate: record.tenant\_\allowbreak{}id = NULLIF(current\_\allowbreak{}session\_\allowbreak{}context(\textquotesingle tenant\_\allowbreak{}id\textquotesingle), \textquotesingle\textquotesingle)}}
+
+Theo logic tam trị của SQL (Three-Valued Logic), khi biến ngữ cảnh bị khuyết (NULL), phép so sánh record.tenant\_\allowbreak{}id = NULL luôn trả về giá trị UNKNOWN (tương đương FALSE), khiến nhân CSDL tự động từ chối ghi hoặc chỉ trả về tập kết quả rỗng (0 dòng bản ghi), bảo đảm an toàn dữ liệu ngay cả khi tầng ứng dụng gặp lỗi quên truyền ngữ cảnh;
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Phi chuẩn hóa có chủ đích cột tenant\_\allowbreak{}id xuống toàn bộ các bảng nghiệp vụ con: Thay vì chỉ đặt tenant\_\allowbreak{}id ở bảng gốc rồi dùng phép nối bảng trong chính sách RLS của các bảng con (vốn làm suy giảm nghiêm trọng hiệu năng thực thi), mọi bảng nghiệp vụ trong lược đồ dùng chung đều lưu trữ trực tiếp cột tenant\_\allowbreak{}id NOT NULL để nhân CSDL kiểm tra chính sách RLS trên từng dòng với chi phí O(1).
+\end{enumerate}
+
+Nguyên lý Biến phiên gắn kết Giao dịch Nguyên tử (Khía cạnh K1 tại Tầng 4--6): Rào chắn RLS trong nhân CSDL cần đọc mã định danh thuê bao từ biến ngữ cảnh phiên do Tầng 8 truyền xuống (kết nối trực tiếp với đối tượng TenantContext đã chuẩn hóa tại Mục~\ref{v4-sec-3-3-1}). Tuy nhiên, do Tầng 8 sử dụng Bể kết nối vật lý dùng chung để giao tiếp với Tầng 4, nếu ứng dụng gán biến phiên có vòng đời gắn với kết nối TCP thông thường (Session-Level Variable), giá trị tenant\_\allowbreak{}id sẽ tồn tại dai dẳng ngay cả khi kết nối đã trả về bể, gây rò rỉ dữ liệu cho giao dịch kế tiếp.
+
+Để giải quyết triệt để mâu thuẫn giữa RLS và Bể kết nối dùng chung, nguyên lý K1 bắt buộc phải sử dụng Biến phiên có phạm vi Giao dịch Nguyên tử (Transaction-Scoped Session Context, ví dụ: câu lệnh SET LOCAL trong khối giao dịch SQL): biến định danh thuê bao chỉ được tiêm vào kết nối bên trong ranh giới giao dịch tường minh (BEGIN ... COMMIT/ROLLBACK). Ngay tại thời điểm giao dịch kết thúc, nhân CSDL tự động hủy bỏ biến phiên và khôi phục kết nối vật lý về trạng thái rỗng ban đầu trước khi hoàn trả về bể kết nối, như minh họa trên Hình~\ref{fig:v4-3-9}:
+
+\VfourFigure{3.9}{assets/figures/v4/image25.png}{Nguyên lý tái sử dụng kết nối vật lý an toàn trên Bể kết nối dùng chung bằng biến phiên giao dịch nguyên tử (Khía cạnh K1 \& K2).}{fig:v4-3-9}
+
+\subsection{Nguyên lý Mở rộng Dữ liệu Bán cấu trúc và Tối ưu Đường dẫn Truy xuất trên Bảng Gộp (Khía cạnh K4, K3)}\label{v4-sec-3-4-2}
+
+Triết lý Lược đồ Lai Quan hệ -- Tài liệu (Hybrid Relational--Document Schema) giải quyết Khía cạnh K4 tại Tầng 6: Làm thế nào để các thuê bao cùng nằm trên một bảng vật lý cố định nhưng mỗi thuê bao lại có thể tự định nghĩa và lưu trữ các trường dữ liệu nghiệp vụ riêng biệt? Các cách tiếp cận truyền thống như tạo sẵn cột dự phòng (col\_\allowbreak{}1..col\_\allowbreak{}20) hay mô hình EAV (Entity-Attribute-Value) đều gây lãng phí lưu trữ hoặc phát sinh chuỗi phép nối bảng đắt đỏ. Nguyên lý hiện đại giải quyết bài toán này tại Tầng 6 là mô hình Lược đồ Lai Quan hệ -- Tài liệu: giữ nguyên các thuộc tính nghiệp vụ cốt lõi dùng chung dưới dạng các cột quan hệ chuẩn hóa (để bảo toàn khóa ngoại và hiệu năng), đồng thời bổ sung một cột dữ liệu bán cấu trúc dạng tài liệu nhị phân (Binary Document Column, ví dụ: kiểu JSONB) ngay trên bảng dùng chung để chứa tập thuộc tính động theo từng thuê bao.
+
+Để cột dữ liệu bán cấu trúc vận hành ổn định trên bảng dùng chung, nguyên lý này kết hợp hai cơ chế bổ trợ: (1) Đánh chỉ mục đảo ngược (Inverted Index, ví dụ: GIN Index) trực tiếp trên cột tài liệu nhị phân để hỗ trợ tìm kiếm và lọc theo khóa -- giá trị bên trong cấu trúc động mà không phải quét tuần tự toàn bảng; và (2) Ủy quyền kiểm định lược đồ lên Tầng 9 thông qua Động cơ Đánh giá Quy tắc tại Mục~\ref{v4-sec-3-3-2} để đối chiếu tên trường, kiểu dữ liệu và miền giá trị với siêu dữ liệu khai báo của đúng thuê bao đó trước khi ghi xuống CSDL.
+
+Nguyên lý Chỉ mục tổ hợp dẫn đầu bởi mã thuê bao giải quyết Khía cạnh K3 tại Tầng 6: Trong mô hình bảng dùng chung được bảo vệ bởi RLS, mọi câu truy vấn đều mang điều kiện lọc bắt buộc theo tenant\_\allowbreak{}id. Nếu chỉ đánh chỉ mục đơn lẻ trên các cột thuộc tính nghiệp vụ (ví dụ: cột phân loại trạng thái hay mốc thời gian), bộ thực thi truy vấn vẫn phải đọc qua nhiều trang dữ liệu của các thuê bao khác trước khi loại bỏ bởi bộ lọc RLS, gây lãng phí I/O đĩa. Do đó, quy tắc thiết kế bắt buộc tại Tầng 6 là đặt cột tenant\_\allowbreak{}id ở vị trí dẫn đầu (Leftmost Prefix) trong mọi chỉ mục tổ hợp cây cân bằng B-Tree: INDEX (tenant\_\allowbreak{}id, \textless clustering\_\allowbreak{}columns\textgreater). Cách tổ chức này giúp gom cụm liền kề toàn bộ khóa chỉ mục của cùng một thuê bao trên các nút lá của cây chỉ mục.
+
+Khi đó, bất kỳ truy vấn nào của một thuê bao cũng được thu hẹp ngay lập tức về một phép quét phạm vi hẹp (Index Range Scan) chỉ nằm gọn trong phân vùng cây B-Tree của thuê bao đó, kết hợp với cơ chế áp trần thời gian thực thi câu lệnh tại Tầng 4 để tự động ngắt các truy vấn bất thường, ngăn chặn hiệu quả nguy cơ nghẽn I/O lan truyền trên cơ sở dữ liệu dùng chung.
+
+\section{Tổng kết Chương~\ref{v4-chapter-3}: Sự Phối hợp Liên tầng của K1--K4 và Chuyển giao sang Chương~\ref{v4-chapter-4}}\label{v4-sec-3-5}
+
+Chương~\ref{v4-chapter-3} đã hệ thống hóa bốn cụm tầng của mô hình Pool 9 tầng thành một chuỗi phòng thủ liên hoàn cho cả bốn khía cạnh kiểm soát K1--K4, phối hợp xuyên suốt qua ba điểm chốt chặn trong vòng đời một yêu cầu (minh họa trực quan trên Hình~\ref{fig:v4-3-10}):
+
+1. Tại Tầng 7 (Middleware): Chốt chặn biên xác thực mật mã thẻ bài để khóa chặt định danh thuê bao chống giả mạo IDOR (K1), đồng thời điều tiết lưu lượng độc lập theo từng thuê bao để cắt sớm các đột biến tải (K3).
+
+2. Tại Tầng 8--9 (Ứng dụng \& Thực thi): Gắn kết ngữ cảnh thuê bao bất biến theo phạm vi luồng kèm kỷ luật thu hồi bắt buộc và vách ngăn tài nguyên thực thi (K1, K3), truy xuất bộ nhớ đệm hai tầng chống ô nhiễm quét dữ liệu (K2, K3) và diễn giải siêu dữ liệu tùy biến ba lớp lúc chạy (K4).
+
+3. Tại Tầng 4--6 (Cơ sở dữ liệu): Tiêm biến phiên giao dịch nguyên tử qua bể kết nối dùng chung (K1) để kích hoạt rào chắn bảo mật cấp dòng cưỡng bức (K2), thu hẹp phạm vi quét nhờ chỉ mục tổ hợp dẫn đầu tenant\_\allowbreak{}id (K3) và lưu trữ trường mở rộng trên cột bán cấu trúc kèm chỉ mục đảo ngược (K4).
+
+\VfourFigureLandscape{3.10}{assets/figures/v4/image26.png}{Tổng hợp luồng phối hợp liên tầng của bốn khía cạnh kiểm soát K1--K4 từ Tầng 7 xuống Tầng 4--6.}{fig:v4-3-10}
+
+Để chuyển giao các nguyên lý trừu tượng K1--K4 sang giai đoạn cài đặt kỹ thuật ở Chương~\ref{v4-chapter-4} theo nhiều lựa chọn công nghệ khác nhau, Bảng~\ref{tab:v4-3-1} tổng hợp ánh xạ quy đổi sang ba tổ hợp công nghệ phổ biến:
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\caption{Ánh xạ Chuẩn hóa các Nguyên lý Kiểm soát K1--K4 sang Một số Tổ hợp Công nghệ Phổ biến.}\label{tab:v4-3-1}\\
+\toprule
+Chốt chặn \& Nguyên lý & Java / Spring Boot + PostgreSQL (Nguyên mẫu) & Node.js (NestJS) + MySQL / PostgreSQL & Go + NoSQL (DocumentDB / MongoDB) \\
+\midrule\endfirsthead
+\toprule
+Chốt chặn \& Nguyên lý & Java / Spring Boot + PostgreSQL (Nguyên mẫu) & Node.js (NestJS) + MySQL / PostgreSQL & Go + NoSQL (DocumentDB / MongoDB) \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+K1 -- Ngữ cảnh Luồng & JwtTenantFilter + ThreadLocal cố định trong khối try/finally & Middleware + AsyncLocalStorage (.run) tự động đóng phạm vi & Middleware + context.WithValue truyền qua context.Context \\
+K2 -- Cô lập Dữ liệu & FORCE RLS + SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id trong giao dịch & PostgreSQL SET LOCAL hoặc View bảo mật / Repository Wrapper cưỡng chế tenant\_\allowbreak{}id & Logical tenant\_\allowbreak{}id Partition Key bắt buộc ở lớp DAO + Shard Key (tenant\_\allowbreak{}id) \\
+K3 -- Hiệu năng \& Cache & Redis Token Bucket (Lua) + Caffeine L1 (W-TinyLFU) + Composite B-Tree (tenant\_\allowbreak{}id, ...) & Redis Rate Limiter + In-memory LRU/LFU L1 + Chỉ mục phức hợp (tenant\_\allowbreak{}id, ...) & Redis/Envoy Token Bucket + Local Cache + Compound Index dẫn đầu tenant\_\allowbreak{}id \\
+K4 -- Tùy biến Động & Động cơ Rule 3 mức + cột JSONB (GIN Index) + Redis Pub/Sub đồng bộ L1 & Metadata JSON Ruleset + cột JSON / JSONB + Redis Pub/Sub & Document Dynamic Schema Validator + Native Flexible Fields + NATS/Redis Pub/Sub \\
+\end{longtable}
+\endgroup
+\end{landscape}

@@ -1,8 +1,139 @@
-\chapter{KIẾN TRÚC ĐA THUÊ BAO: CƠ CHẾ CHIA SẺ, RANH GIỚI VÀ CÁC KỊCH BẢN ĐÁNH ĐỔI}
-\label{chap:architecture}
-\input{chapters/02-architecture/sections/boundaries}
-\input{chapters/02-architecture/sections/topologies}
-\input{chapters/02-architecture/sections/tradeoffs}
-\input{chapters/02-architecture/sections/scenarios}
-\input{chapters/02-architecture/sections/mechanisms}
-\input{chapters/02-architecture/sections/decision-framework}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{KIẾN TRÚC HỆ THỐNG ĐA THUÊ BAO}\label{v4-chapter-2}
+
+Kiến trúc một nền tảng SaaS đa thuê bao là bài toán tối ưu hóa đa mục tiêu: vừa tối ưu chi phí hạ tầng thông qua chia sẻ tài nguyên, vừa kiểm soát nguy cơ rò rỉ dữ liệu chéo và hạn chế ảnh hưởng từ hiện tượng hàng xóm ồn ào. Chương~\ref{v4-chapter-2} thiết lập khung kiến trúc hệ thống thông qua cặp phạm trù Tách -- Gộp trên mô hình 9 tầng và bốn khía cạnh kiểm soát K1--K4 (Mục~\ref{v4-sec-2-1}); phân tích bốn mô hình triển khai kinh điển Silo, Pool, Bridge, Hybrid cùng hướng mở rộng phân vùng theo ô (Mục~\ref{v4-sec-2-2}); và khái quát hóa khung đánh đổi đa yếu tố làm cơ sở luận giải lựa chọn mô hình Pool Cấp độ 3 cho nền tảng SaaS Kanban (Mục~\ref{v4-sec-2-3}).
+
+\section{Tổng quan Kiến trúc Hệ thống Đa thuê bao}\label{v4-sec-2-1}
+
+Mục này xác lập hệ quy chiếu thiết kế hệ thống đa thuê bao dựa trên cặp phạm trù Tách -- Gộp, bốn khía cạnh kiểm soát K1--K4 và Sơ đồ Kiến trúc Tổng thể Tham chiếu.
+
+\subsection{Bản chất Thiết kế Hệ thống Đa thuê bao, Khái niệm Tách -- Gộp và Hai Trục Phân tích Kiến trúc}\label{v4-sec-2-1-1}
+
+Bản chất thiết kế của kiến trúc đa thuê bao được xác lập dựa trên ba trụ cột kỹ thuật: (1) Tách biệt định danh tổ chức và tài nguyên vật lý bằng ngữ cảnh tenant\_\allowbreak{}id; (2) Điều tiết mức độ chia sẻ và cô lập tài nguyên qua từng tầng; và (3) Thích nghi hành vi động dựa trên siêu dữ liệu trên cùng một bộ mã nguồn thống nhất.
+
+Để cụ thể hóa việc phân bổ tài nguyên trên mô hình kiến trúc 9 tầng, nghiên cứu sử dụng cặp phạm trù \textbf{Tách (Dedicated)} và \textbf{Gộp (Shared)}:
+
+\textbf{- Tách:} Cấp phát cho mỗi thuê bao một Thể hiện Thành phần riêng biệt hoặc không gian lưu trữ độc lập tại tầng đang xét (máy chủ, cơ sở dữ liệu, lược đồ hoặc tiến trình ứng dụng riêng). Phương án này tối đa hóa mức độ cô lập và thu hẹp bán kính ảnh hưởng sự cố, nhưng làm tăng chi phí hạ tầng và gánh nặng vận hành.
+
+\textbf{- Gộp:} Nhiều thuê bao cùng chia sẻ chung một Thể hiện Thành phần tại tầng đang xét (chia sẻ tiến trình ứng dụng, cụm trung gian hoặc bảng dữ liệu). Phương án này tối ưu hóa chi phí biên nhờ nguyên lý ghép kênh thống kê, nhưng đòi hỏi các cơ chế kiểm soát phần mềm nghiêm ngặt.
+
+Ví dụ, để vừa tối ưu hóa chi phí máy chủ tính toán vừa bảo đảm khả năng tùy biến lược đồ sâu cho từng tổ chức khách hàng, hệ thống có thể Gộp tại Cụm Ứng dụng và Middleware (Tầng 7--9) nhằm chia sẻ năng lực xử lý chung, đồng thời Tách lược đồ hoặc cơ sở dữ liệu độc lập tại Cụm Cơ sở dữ liệu (Tầng 5--6). Tương tự, đối với một nền tảng phục vụ đồng thời nhiều nhóm khách hàng muốn vừa giữ mức giá cạnh tranh cho số đông vừa cô lập rủi ro tải nặng hoặc yêu cầu pháp lý đặc thù, kiến trúc sư có thể Gộp toàn bộ dịch vụ quản lý cốt lõi cho phân khúc phổ thông vào cùng một cụm dùng chung, nhưng Tách riêng tiến trình xử lý nặng tải hoặc tách cụm lưu trữ riêng cho nhóm khách hàng doanh nghiệp. Như vậy, việc phân rã theo cặp phạm trù Tách -- Gộp cho phép phối hợp linh hoạt ranh giới chia sẻ trên từng tầng thành phần thay vì bị bó buộc vào một lựa chọn đồng nhất trên toàn hệ thống.
+
+Khi áp dụng quyết định Gộp tại bất kỳ tầng nào, hệ thống bắt buộc phải thiết lập các cơ chế kiểm soát kỹ thuật tương ứng, được quy tụ thành \textbf{Bốn Khía cạnh Kiểm soát Cốt lõi (K1--K4)}:
+
+\textbf{- K1 -- Kiểm soát định danh và ngữ cảnh thuê bao:} Phân giải chính xác người dùng gắn với tổ chức và duy trì ngữ cảnh hợp lệ xuyên suốt mọi tầng xử lý.
+
+\textbf{- K2 -- Cô lập dữ liệu và trạng thái lưu trữ:} Kiểm soát các thao tác đọc, ghi và truy xuất trạng thái trong đúng phạm vi ranh giới của thuê bao.
+
+\textbf{- K3 -- Cô lập hiệu năng và quản trị tài nguyên:} Điều tiết mức sử dụng CPU, RAM, kết nối cơ sở dữ liệu và tần suất yêu cầu nhằm hạn chế hiện tượng hàng xóm ồn ào.
+
+\textbf{- K4 -- Tùy biến cấu hình và hành vi động:} Cho phép điều chỉnh tính năng, quy trình và trường dữ liệu mở rộng theo siêu dữ liệu của từng thuê bao trên cùng một bộ mã nguồn.
+
+Từ đó, việc phân tích kiến trúc được tổ chức theo hai trục liên hoàn: Trục vĩ mô xem xét mô hình triển khai tổng thể của Thể hiện Hệ thống; và Trục vi mô xem xét quyết định Tách -- Gộp và cơ chế bảo đảm K1--K4 xuyên suốt 9 tầng thành phần.
+
+\subsection{Sơ đồ Kiến trúc Tổng thể Tham chiếu và Hệ Quy ước Biểu diễn Nhất quán}\label{v4-sec-2-1-2}
+
+Hình~\ref{fig:v4-2-1} trình bày Khung Tham chiếu 9 tầng của hệ thống đa thuê bao, phân tách rõ Phân vùng Phần mềm Nhận thức Thuê bao (Tầng 4--9) ở phía trên và Phân vùng Hạ tầng Nền tảng (Tầng 1--3) ở phía dưới, làm cơ sở áp dụng hai chiến lược Tách -- Gộp ở từng tầng.
+
+\VfourFigure{2.1}{assets/figures/v4/image9.png}{Khung Tham chiếu 9 tầng phân định phân vùng nhận thức thuê bao (Tầng 4--9) và phân vùng hạ tầng nền tảng (Tầng 1--3).}{fig:v4-2-1}
+
+Các sơ đồ kiến trúc trong báo cáo tuân thủ hệ quy ước trực quan thống nhất: (1) Khung phân vùng 9 tầng gồm nét liền cho vùng phần mềm nhận thức thuê bao (Tầng 4--9) và nét đứt cho vùng hạ tầng nền (Tầng 1--3); (2) Khung ranh giới Thuê bao mang màu định danh riêng để bao bọc tài nguyên hoặc phạm vi dữ liệu logic của từng tổ chức; (3) Khung thành phần nét liền thể hiện tài nguyên Gộp dùng chung, nét đứt thể hiện tài nguyên Tách riêng.
+
+\section{Các Mô hình Triển khai Kiến trúc Đa thuê bao Kinh điển}\label{v4-sec-2-2}
+
+Trước khi phân tích chi tiết từng mô hình triển khai, cần làm rõ nguồn gốc từ vựng và hình ảnh ẩn dụ kỹ thuật của ba thuật ngữ cốt lõi là Silo, Pool và Bridge trong các tài liệu kiến trúc SaaS hiện đại \cite{v4-18}, \cite{v4-19} nhằm giúp người đọc hình dung trực quan bản chất tổ chức tài nguyên:
+
+- Silo (Tháp/Buồng chứa biệt lập): Thuật ngữ mượn từ hình ảnh các tháp chứa nông sản công nghiệp (grain silos) - nơi mỗi tháp là một kết cấu hình trụ khép kín, dựng đứng và tách biệt vật lý với các tháp xung quanh để bảo đảm nguyên liệu bên trong không bị pha trộn. Khi đưa vào kiến trúc đa thuê bao, Silo đại diện cho chiến lược Tách (Separation): mỗi thuê bao được đặt vào một "buồng chứa" tài nguyên dành riêng (Dedicated).
+
+- Pool (Bể/Hồ dùng chung): Nơi tài nguyên tính toán, bộ nhớ và lưu trữ được tập hợp vào một "bể chứa" chung duy nhất. Trong kiến trúc đa thuê bao, Pool đại diện cho chiến lược Gộp (Pooling): nhiều thuê bao cùng chia sẻ tài nguyên trong cùng ``bể chứa''.
+
+- Bridge (Cầu nối trung gian): Thuật ngữ mang hình ảnh "chiếc cầu" bắc ngang kết nối hai thái cực thiết kế giữa Pool (chia sẻ) và Silo (cô lập) - đại diện cho chiến lược Lai ghép theo chiều dọc mô hình phân tầng: gộp chung tài nguyên ở một số tầng phía trên để tối ưu hiệu suất tính toán, nhưng tách riêng ở một số tầng phía dưới để củng cố ranh giới cô lập dữ liệu hoặc trạng thái.
+
+Điểm mấu chốt về mặt lý luận kiến trúc cần khẳng định tường minh là: các thuật ngữ Silo, Pool và Bridge không chỉ giới hạn ở cụm tầng cơ sở dữ liệu, mà là quy tắc tổ chức áp dụng trực tiếp cho từng Thể hiện Thành phần tại mỗi tầng hoặc cụm tầng xuyên suốt mô hình 9 tầng. Chẳng hạn, ở Cụm Ứng dụng (Tầng 8--9) cũng tồn tại lựa chọn Silo (mỗi thuê bao một tiến trình ứng dụng riêng), Pool (nhiều thuê bao dùng chung một tiến trình thực thi và một bộ mã nguồn) hoặc Bridge (dùng chung mã nguồn ở Tầng 9 nhưng tách tiến trình thực thi ở Tầng 8). Trên cơ sở đó, bốn mô hình triển khai kinh điển ở cấp độ Thể hiện Hệ thống, bao gồm:
+
+\subsection{Mô hình Silo (Cô lập Toàn phần Thể hiện Hệ thống theo Thuê bao)}\label{v4-sec-2-2-1}
+
+Trong mô hình Silo, mỗi Thuê bao sở hữu một Thể hiện Hệ thống dành riêng độc lập từ hạ tầng, ứng dụng đến cơ sở dữ liệu. Toàn bộ các môi trường dành riêng vẫn duy trì một bộ mã nguồn chuẩn thống nhất và được điều phối thông qua Mặt phẳng Điều khiển (Control Plane) tập trung.
+
+\VfourFigure{2.2}{assets/figures/v4/image10.png}{Kiến trúc Mô hình Silo (Mỗi Thuê bao sở hữu một Thể hiện Hệ thống dành riêng (Dedicated) dưới sự điều phối của Control Plane chung).}{fig:v4-2-2}
+
+\subsection{Mô hình Pool (Chia sẻ Toàn phần trên một Thể hiện Hệ thống Dùng chung)}\label{v4-sec-2-2-2}
+
+Mô hình Pool tối đa hóa việc chia sẻ tài nguyên: toàn bộ các Thuê bao cùng vận hành trên một Thể hiện Hệ thống dùng chung duy nhất từ tầng ứng dụng đến cơ sở dữ liệu. Ranh giới giữa các tổ chức được duy trì bằng cơ chế cô lập logic thông qua định danh tenant\_\allowbreak{}id và bốn khía cạnh kiểm soát K1--K4.
+
+\VfourFigure{2.3}{assets/figures/v4/image11.png}{Kiến trúc Mô hình Pool (Nhiều Thuê bao chia sẻ chung một Thể hiện Hệ thống dùng chung (Shared) với vách ngăn cô lập logic theo tenant\_\allowbreak{}id).}{fig:v4-2-3}
+
+\subsection{Mô hình Bridge (Lai ghép theo Chiều dọc Mô hình Phân tầng: Gộp Thể hiện Tính toán -- Tách Không gian Dữ liệu)}\label{v4-sec-2-2-3}
+
+Bridge là mô hình lai ghép theo chiều dọc: Gộp chung các thành phần tính toán ở Tầng 7--9 (dùng chung ứng dụng và phần trung gian), nhưng Tách không gian dữ liệu tại Tầng 5 (Database riêng) hoặc Tầng 6 (Schema riêng) cho từng thuê bao.
+
+\VfourFigure{2.4}{assets/figures/v4/image12.png}{Kiến trúc Mô hình Bridge.}{fig:v4-2-4}
+
+\subsection{Mô hình Hybrid (Phân tầng Hỗn hợp theo Phân khúc Thuê bao) và So sánh Tổng hợp}\label{v4-sec-2-2-4}
+
+Mô hình Hybrid kết hợp linh hoạt nhiều hình thái triển khai theo phân khúc khách hàng: duy trì vùng dùng chung (Pool) cho khách hàng phổ thông nhằm tối ưu chi phí, và cấp phát vùng dành riêng (Silo) cho khách hàng doanh nghiệp có yêu cầu khắt khe về bảo mật và SLA.
+
+\VfourFigure{2.5}{assets/figures/v4/image13.png}{Kiến trúc Mô hình Hybrid (Kết hợp phân vùng Thể hiện Hệ thống dùng chung (Shared) cho thuê bao phổ thông và Thể hiện Hệ thống dành riêng (Dedicated) cho thuê bao Enterprise).}{fig:v4-2-5}
+
+Khi số lượng thuê bao hoặc sự phân hóa phân khúc vượt quá ngưỡng tối ưu của một cụm duy nhất trong mô hình Pool hoặc Hybrid, kiến trúc có thể mở rộng theo chiều ngang bằng chiến lược Phân vùng theo Ô (Cell-Based Architecture), như minh họa trên Hình 2.6. Thay vì gom toàn bộ khách hàng vào một cụm duy nhất, hệ thống chia tải thành nhiều ô triển khai độc lập đặt sau bộ định tuyến toàn cầu; mỗi ô tự đóng gói theo mô hình phù hợp nhất với nhóm khách hàng phụ trách (chẳng hạn các Ô 01 và Ô 02 vận hành theo mô hình Pool cho thuê bao phổ thông, còn Ô 03 tổ chức theo mô hình Hybrid cho phân khúc đa bậc), giúp khoanh vùng bán kính ảnh hưởng sự cố trong từng ô và mở rộng linh hoạt theo nhu cầu.
+
+\VfourFigureLandscape{2.6}{assets/figures/v4/image14.png}{Hướng mở rộng Phân vùng theo Ô (Cell-Based: Pool -- Pool -- Hybrid) nhằm giới hạn Bán kính Ảnh hưởng Sự cố.}{fig:v4-2-6}
+
+Bảng~\ref{tab:v4-2-1} tổng hợp đối sánh bốn mô hình kinh điển trên các tiêu chí kiến trúc và kinh tế cốt lõi:
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}@{}}
+\caption{Đối sánh tổng hợp bốn mô hình triển khai kiến trúc đa thuê bao kinh điển.}\label{tab:v4-2-1}\\
+\toprule
+Tiêu chí Đối sánh & Mô hình Silo & Mô hình Pool & Mô hình Bridge & Mô hình Hybrid \\
+\midrule\endfirsthead
+\toprule
+Tiêu chí Đối sánh & Mô hình Silo & Mô hình Pool & Mô hình Bridge & Mô hình Hybrid \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{1. Tổ chức \emph{thể hiện hệ thống} và \emph{thể hiện thành phần}} & Mỗi \emph{Thuê bao} sở hữu 1 \emph{thể hiện hệ thống dành} riêng (Tách Tầng 1-8, Gộp bộ mã nguồn Tầng 9). & Nhiều \emph{Thuê bao} chia sẻ 1 \emph{thể hiện hệ thống dùng chung} duy nhất (Gộp toàn phần Tầng 1-9). & Gộp \emph{các thể hiện thành phần} tầng tính toán (Tầng 7-9); Tách cấu trúc dữ liệu theo cơ sở dữ liệu hoặc lược đồ (Tầng 5-6). & Kết hợp \emph{thể hiện hệ thống dùng chung} cho gói \emph{miễn phí và nâng cao} và \emph{thể hiện hệ thống dành riêng} cho gói \emph{doanh nghiệp}. \\
+\textbf{2. Hiệu quả Chi phí và Kinh tế quy mô} & \textbf{Thấp nhất:} Chi phí tăng tuyến tính O(N), không tận dụng được ghép kênh thống kê. & \textbf{Cao nhất:} Chi phí biên δ → 0, tối đa hóa ghép kênh thống kê (chuẩn Cấp độ 3-4). & \textbf{Trung bình - Khá:} Tiết kiệm chi phí tính toán ứng dụng, phát sinh thêm chi phí quản lý dữ liệu riêng. & \textbf{Tối ưu theo doanh thu:} Cân bằng chi phí biên thấp cho số đông với biên lợi nhuận từ gói khách hàng đặc biệt. \\
+\textbf{3. Mức độ Cô lập và Rủi ro \emph{hàng xóm ồn ào}} & \textbf{Cô lập vật lý/ảo hóa cứng:} Bán kính sự cố đóng khung trong 1 thuê bao; miễn nhiễm \emph{hàng xóm ồn ào}. & \textbf{Cô lập lô-gic phần mềm:} Bán kính sự cố rộng; bắt buộc kiểm soát chặt chẽ trên cả K1-K4. & \textbf{Cô lập trung gian:} Dữ liệu tách cấu trúc, nhưng vẫn có thể tranh chấp bộ xử lý/bộ nhớ truy cập ngẫu nhiên ở tầng ứng dụng/hệ quản trị cơ sở dữ liệu. & \textbf{Thích ứng theo cam kết chất lượng dịch vụ:} Thuê bao \emph{doanh nghiệp} miễn nhiễm \emph{hàng xóm ồn ào}; thuê bao thường chịu kiểm soát \emph{hạn ngạch}. \\
+\textbf{4. Độ phức tạp Vận hành và Quản trị} & \textbf{Rất phức tạp khi N lớn:} Phải tự động hóa hạ tầng được mô tả bằng mã để quản lý và nâng cấp N thể hiện hệ thống. & \textbf{Đơn giản nhất về triển khai:} Chỉ vận hành 1 \emph{thể hiện hệ thống}, nhưng đòi hỏi kỷ luật cao trong mã nguồn. & \textbf{Trung bình - Cao:} Triển khai ứng dụng đơn giản, nhưng di trú lược đồ phải lặp qua N lược đồ hoặc cơ sở dữ liệu. & \textbf{Cao nhất về định tuyến:} Đòi hỏi \emph{mặt phẳng điều khiển} và \emph{bộ định tuyến theo gói dịch vụ} điều phối đa hình thái và di trú. \\
+\textbf{5. Khả năng Mở rộng theo Số lượng Thuê bao} & Kém (thường giới hạn ở N từ vài chục đến vài trăm thuê bao lớn). & Xuất sắc (hỗ trợ từ hàng nghìn đến hàng triệu thuê bao nhỏ và vừa). & Trung bình (phù hợp vài trăm đến vài nghìn thuê bao; bị giới hạn bởi \emph{danh mục hệ thống/bể kết nối}). & Rất linh hoạt (mở rộng số lượng lớn ở nhánh \emph{chia sẻ toàn phần} và phục vụ khách hàng lớn ở nhánh \emph{cô lập to}àn phần). \\
+\textbf{6. Phân khúc Khách hàng Phù hợp Điển hình} & Tài chính, ngân hàng, y tế, chính phủ, tập đoàn yêu cầu tuân thủ pháp lý nghiêm ngặt. & Nền tảng phần mềm dưới dạng dịch vụ doanh nghiệp với người tiêu dùng/doanh nghiệp phục vụ cả doanh nghiệp và người tiêu dùng, doanh nghiệp vừa và nhỏ, doanh nghiệp khởi nghiệp, công cụ cộng tác nhóm (bảng công việc, quản lý quan hệ khách hàng vừa và nhỏ). & Hệ thống hoạch định nguồn lực doanh nghiệp và quản trị nhân sự tầm trung cần tùy biến bảng dữ liệu hoặc trích xuất/sao lưu cơ sở dữ liệu riêng. & Các nền tảng phần mềm dưới dạng dịch vụ thương mại trưởng thành có bảng giá đa bậc. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\section{Khung Đánh giá Đa yếu tố và Quyết định Mô hình Pool Cấp độ 3 cho Đề tài}\label{v4-sec-2-3}
+
+Bốn mô hình Silo, Bridge, Hybrid và Pool tạo thành một không gian đánh đổi đa chiều mà ở đó không tồn tại phương án đúng cho mọi ngữ cảnh. Ở mức độ tổng quát, quyết định kiến trúc cần cân nhắc đồng thời bốn nhóm yếu tố sau:
+
+\textbf{(1) Thị trường mục tiêu, quy mô thuê bao và kinh tế đơn vị:} Nếu sản phẩm phục vụ nhóm ít tổ chức lớn với giá trị hợp đồng cao, cấu trúc chi phí tăng tuyến tính O(N) của Silo là chấp nhận được. Ngược lại, phân khúc số lượng lớn khách hàng vừa và nhỏ đòi hỏi chi phí biên tiếp nhận thuê bao tiến về 0 nhờ ghép kênh thống kê với Pool, còn tệp khách hàng trải rộng nhiều phân khúc giá trị thường hướng về Hybrid.
+
+\textbf{(2) Biên độ cô lập, tuân thủ pháp lý và độ nhạy cảm nhiễu tải:} Cần phân biệt rạch ròi giữa nhu cầu cô lập vật lý bắt buộc theo yêu cầu về quy định hoặc khóa mã hóa riêng (buộc ưu tiên Silo hoặc nhánh riêng của Hybrid). Nếu nhu cầu cần tách không gian lưu trữ và sao lưu độc lập theo khách hàng thì sẽ nghiêng về Bridge hơn, còn với yêu cầu cô lập ở mức logic chặt chẽ kèm định mức tài nguyên tại tầng phần mềm thì Pool vẫn có thể đáp ứng được.
+
+\textbf{(3) Chiều sâu tùy biến và đặc trưng tiến hóa lược đồ:} Mức độ khác biệt nghiệp vụ quyết định vị trí đặt cơ chế tùy biến. Nếu khách hàng đòi hỏi mở rộng cấu trúc bảng vật lý riêng hoặc can thiệp lược đồ ở mức DDL, mô hình Bridge hoặc Silo đáp ứng trực tiếp hơn. Ngược lại, khi khác biệt về giao diện, quy trình và thuộc tính mở rộng biểu diễn được qua siêu dữ liệu và trường trên cùng một lược đồ, hệ thống duy trì được tốc độ nâng cấp O(1) trên Pool.
+
+\textbf{(4) Sự chuyển dịch độ phức tạp giữa Vận hành và Kỹ thuật Phần mềm:} Cần nhấn mạnh rằng dùng chung một bộ mã nguồn (Tầng 9) không đồng nghĩa với dùng chung tiến trình thực thi lúc chạy. Mô hình Silo giảm bớt phức tạp kiểm soát rò rỉ dữ liệu trong mã nguồn ứng dụng nhưng đẩy gánh nặng sang tự động hóa hạ tầng và vận hành N thể hiện; còn Bridge phải giải quyết bài toán di trú lược đồ tuần tự trên N lược đồ/CSDL; Hybrid bổ sung chi phí xây dựng bộ định tuyến và quản trị đa phân vùng; trong khi Pool tối giản công tác triển khai còn duy nhất một thể hiện hệ thống nhưng chuyển toàn bộ trách nhiệm an toàn sang kỷ luật thiết kế phần mềm ở cả bốn khía cạnh kiểm soát K1--K4.
+
+Vì vậy, trước khi chốt phương án tổ chức tài nguyên, người thiết kế cần làm rõ đối tượng khách hàng mục tiêu, nhu cầu sử dụng, kỳ vọng chi phí, ràng buộc pháp lý cũng như biên độ tùy biến nghiệp vụ thực tế của sản phẩm để định lượng tường minh từng yếu tố trong bốn nhóm tiêu chí nêu trên. Từ sự phân định rõ ràng đó, nhóm phát triển mới đưa ra được quyết định thiết kế Tách -- Gộp chính xác xuyên suốt các cụm tầng cũng như dự phòng lộ trình tiến hóa kiến trúc phù hợp về sau.
+
+\VfourFigureLandscape{2.7}{assets/figures/v4/image15.png}{Khung Đánh đổi Đa yếu tố Tổng quát hỗ trợ Lựa chọn Mô hình Kiến trúc Đa thuê bao.}{fig:v4-2-7}
+
+Từ đó, đặt yêu cầu thực tiễn của ứng dụng quản lý công việc Kanban lên cả bốn yếu tố đó, từng phương án kiến trúc được đối chiếu như sau:
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+  Về kinh tế và quy mô, tệp khách hàng mục tiêu của đề tài là số lượng lớn doanh nghiệp vừa và nhỏ, phòng ban chuyên môn và nhóm dự án cần đăng ký tự phục vụ tức thì với chi phí thuê bao hợp lý và lưu lượng phân bổ theo ca làm việc, khiến chi phí hạ tầng tuyến tính của mô hình Silo trở nên kém hiệu quả.
+\item
+  Về pháp lý và cô lập, ứng dụng cộng tác công việc thuộc phân khúc B2B phổ thông nên không chịu ràng buộc cách ly máy chủ vật lý riêng, do đó cô lập logic có kiểm chứng tại tầng ứng dụng và cơ sở dữ liệu đáp ứng chặt chẽ yêu cầu an toàn.
+\item
+  Về tùy biến và lược đồ, mọi tổ chức đều dùng chung bộ thực thể quan hệ cốt lõi (Bảng -- Cột -- Thẻ) còn các khác biệt về chủ đề giao diện, luật giới hạn WIP và trường động đều có thể mô hình hóa được qua siêu dữ liệu trên một lược đồ thống nhất, nên không cần gánh độ phức tạp di trú N lược đồ của mô hình Bridge.
+\item
+  Về cán cân vận hành -- kỹ thuật, khởi đầu bằng một thể hiện hệ thống tập trung (tránh sớm phát sinh chi phí định tuyến đa phân vùng của Hybrid ở giai đoạn nền tảng) giúp giữ chi phí nâng cấp ở mức O(1) và tập trung giải quyết bài toán kiểm soát phần mềm K1--K4.
+\end{enumerate}
+
+\VfourFigureLandscape{2.8}{assets/figures/v4/image16.png}{Áp dụng Khung Đánh giá Đa yếu tố vào Bài toán SaaS Kanban --- Định vị Mô hình Pool Cấp độ 3 và Lộ trình Tiến hóa Mở.}{fig:v4-2-8}
+
+Từ các luận cứ trên, đề tài quyết định chốt lựa chọn Mô hình Pool ở Cấp độ Trưởng thành 3 làm kiến trúc mục tiêu cho toàn bộ Thể hiện Hệ thống của nền tảng SaaS Kanban. Quyết định này đồng nghĩa với việc toàn bộ các Thể hiện Thành phần xuyên suốt từ Tầng 1 đến Tầng 9 đều được tổ chức theo chiến lược Pool (Gộp dùng chung). Tuy nhiên, việc chốt mô hình Pool ở Chương~\ref{v4-chapter-2} mới giải quyết được bài toán tối ưu chi phí một cách tổng quát. Vì khi các vách ngăn vật lý được dỡ bỏ để gộp chung trên từng cụm tầng, hệ thống sẽ đối mặt trực tiếp với các rủi ro về lẫn lộn ngữ cảnh, rò rỉ dữ liệu chéo và tranh chấp hiệu năng. Chương~\ref{v4-chapter-3} tiếp theo sẽ đi sâu vào từng cụm tầng của mô hình Pool để phân tích nguyên nhân phát sinh thách thức và thiết lập bộ nguyên lý kỹ thuật kiểm soát K1--K4 tương ứng.

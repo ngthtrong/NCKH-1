@@ -5,6 +5,7 @@
 \input{template/packages}
 \input{template/commands}
 \input{template/bibliography}
+\input{template/v4-content}
 \hypersetup{pdftitle={\ProjectTitle},pdfauthor={\PrincipalName}}
 \KOMAoptions{numbers=enddot}
 \setcounter{secnumdepth}{3}
@@ -29,24 +30,28 @@
 \clearpage\pagenumbering{arabic}
 \renewcommand{\theHtable}{\theHchapter.\arabic{table}}
 \include{chapters/introduction}
+\addpart{PHẦN II. KẾT QUẢ NGHIÊN CỨU VÀ PHÂN TÍCH}
 \include{chapters/01-foundations/chapter}
 \include{chapters/02-architecture/chapter}
-\KOMAoptions{chapterprefix=false}
 \include{chapters/03-system/chapter}
 \include{chapters/04-implementation/chapter}
 \include{chapters/04-evaluation/chapter}
-\KOMAoptions{chapterprefix=true}
+\bookmarksetup{startatroot}
 \include{chapters/conclusion}
 \clearpage
+\nocite{*}
 \begingroup\sloppy\PrintReportBibliography\endgroup
 \appendix
-\include{appendices/reproducibility}
-\include{appendices/supplementary-results}
+\addpart{PHỤ LỤC}
+\include{appendices/v4-a}
+\include{appendices/v4-b}
+\include{appendices/v4-c}
+\include{appendices/v4-d}
 % HinhThucBC 3.15: approved proposal, only when the signed/stamped PDF is supplied.
 % \includepdf[pages=-,pagecommand={}]{assets/approved-proposal.pdf}
 % HinhThucBC 3.16: registered group I-III products, using real evidence PDFs.
 % \includepdf[pages=-,pagecommand={}]{assets/product-evidence.pdf}
-\clearpage\pdfbookmark[0]{Bản tin và báo cáo tóm tắt}{product-bulletins}
+\clearpage\bookmarksetup{startatroot}\pdfbookmark[0]{Bản tin và báo cáo tóm tắt}{product-bulletins}
 \pdfbookmark[1]{Bản tin tiếng Việt}{product-bulletin-vi}
 \input{deliverables/content/bulletin-vi}
 \clearpage\pdfbookmark[1]{Bản tin tiếng Anh}{product-bulletin-en}

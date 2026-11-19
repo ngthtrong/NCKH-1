@@ -1,0 +1,22 @@
+// RlsConnectionInterceptor.java (K2: Tiêm biến phiên SET LOCAL bên trong ranh giới giao
+dịch CSDL)
+@Aspect @Component
+public class RlsConnectionInterceptor {
+    @PersistenceContext private EntityManager em;
+    @Before("@annotation(org.springframework.transaction.annotation.Transactional)")
+    public void bindTenantToTransaction() {
+        TenantInfo info = TenantContext.get();
+        if (info == null) return; // Fail-Closed: không đặt SET LOCAL -> RLS chặn tự
+động trả về rỗng
+        Session session = em.unwrap(Session.class);
+        session.doWork(conn -> {
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT
+set_config('app.current_tenant_id', ?, true)")) {
+                ps.setString(1, info.tenantId().toString()); // is_local = true (tương
+đương SET LOCAL)
+                ps.execute();
+            }
+        });
+    }
+}

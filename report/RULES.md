@@ -57,11 +57,11 @@ bắt buộc trích dẫn theo IEEE; đó là các lựa chọn của template.
 | Build | Build quyển một/hai mặt tự dựng lại cả bốn PDF riêng; không xuất số liệu hoặc chạy mô hình | `scripts/build.py` |
 
 Số chương và tên chương là mặc định có thể chỉnh theo đề tài, không phải
-yêu cầu bắt buộc của hướng dẫn hình thức. Bản nội dung local dùng năm
-chương: cơ sở lý thuyết → phương án kiến trúc → yêu cầu/thiết kế → hiện
-thực/triển khai → kiểm thử/thực nghiệm. Phương pháp đánh giá nằm cùng
-chương thực nghiệm. Các chương sau chương 2 mới giữ khung để tiếp tục
-hoàn thiện; xem `LOCAL_REVIEW.md` về phạm vi bản duyệt.
+yêu cầu bắt buộc của hướng dẫn hình thức. Bản V4 cập nhật ngày 19/11/2026
+dùng năm chương: cơ sở lý thuyết/mô hình hóa → kiến trúc đa thuê bao → kỹ
+thuật/nguyên lý Pool 9 tầng → nghiệp vụ/thiết kế/hiện thực Kanban → thực
+nghiệm/kết quả kiểm định. Nội dung lấy từ `Report_V4.md` và `Report_V4.pdf`;
+biểu mẫu và thông tin hành chính kế thừa khung hiện tại.
 
 Quy ước vị trí hình/bảng, cỡ tiêu đề, đánh số và cách dùng nhãn là lựa
 chọn trình bày được kế thừa từ báo cáo. Không diễn giải mọi lựa chọn kỹ

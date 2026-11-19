@@ -1,16 +1,248 @@
-\chapter{}\label{chap:implementation}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{PHÂN TÍCH NGHIỆP VỤ, THIẾT KẾ VÀ HIỆN THỰC HÓA ỨNG DỤNG QUẢN LÝ CÔNG VIỆC KANBAN ĐA THUÊ BAO}\label{v4-chapter-4}
 
-\par\penalty0
-\section{}
+Nếu Chương~\ref{v4-chapter-2} và Chương~\ref{v4-chapter-3} đã xây dựng khung quyết định kiến trúc cùng bộ nguyên lý kỹ thuật kiểm soát đa thuê bao cho mô hình Pool Cấp độ 3, thì Chương~\ref{v4-chapter-4} tập trung hiện thực hóa các cơ sở lý luận đó thành một sản phẩm phần mềm cụ thể: Ứng dụng quản lý công việc trực quan theo phương pháp Kanban. Bám sát phương pháp Tiếp cận Ngoài--Vào định hướng thị trường (Market-Driven Outside-In) đã xác lập từ phần Mở đầu, nội dung chương đi từ phân định phạm vi nghiệp vụ (Bảng~\ref{tab:v4-4-1}), khảo sát nhu cầu thị trường để tổ chức các gói dịch vụ và chức năng phần mềm (Mục~\ref{v4-sec-4-1}), đặc tả yêu cầu và thiết kế kiến trúc hệ thống (Mục~\ref{v4-sec-4-2}--4.3), đến đóng gói và triển khai nguyên mẫu lên môi trường vùng chứa và Internet (Mục~\ref{v4-sec-4-4}).
 
-\par\penalty0
-\section{}
+Về mặt nghiệp vụ thuần túy, cấu trúc bảng Kanban (Bảng -- Cột -- Thẻ công việc) được lựa chọn với mức độ phức tạp vừa phải nhằm tập trung chứng minh trực diện các thuộc tính cốt lõi của kiến trúc Đa thuê bao Pool Cấp độ 3. Nếu chỉ triển khai phân quyền theo trường team\_\allowbreak{}id và lọc dữ liệu bằng mệnh đề WHERE thông thường, hệ thống mới chỉ dừng ở mức Đa người dùng (Multi-User -- MU). Sự khác biệt căn bản giúp nguyên mẫu chứng minh rõ bản chất Đa thuê bao (Multi-Tenant -- MT) được thể hiện trên bốn phương diện đối sánh tại Bảng~\ref{tab:v4-4-1}:
 
-\par\penalty0
-\section{}
+\FloatBarrier
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.24000\linewidth-4.800bp\relax}P{\dimexpr 0.38000\linewidth-7.600bp\relax}P{\dimexpr 0.38000\linewidth-7.600bp\relax}@{}}
+\caption{Đối chiếu Bản chất Kiến trúc giữa Đa người dùng (MU) và Đa thuê bao Cấp độ 3 (MT) trên Bài toán Kanban.}\label{tab:v4-4-1}\\
+\toprule
+Phương diện Kiến trúc & Ứng dụng Đa người dùng (MU) & Ứng dụng SaaS Đa thuê bao Cấp độ 3 (MT -- Đề tài) \\
+\midrule\endfirsthead
+\toprule
+Phương diện Kiến trúc & Ứng dụng Đa người dùng (MU) & Ứng dụng SaaS Đa thuê bao Cấp độ 3 (MT -- Đề tài) \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+Định danh \& Không gian Tổ chức (K1) & Một không gian chung phẳng; tài khoản gắn khóa team\_\allowbreak{}id hoặc workspace\_\allowbreak{}id đơn giản qua tham số URL/body. & Phân giải theo tên miền phụ Host (t-acme, t-lotus); chuyển đổi không gian tái cấp phát JWT chứa tenant\_\allowbreak{}id được khóa chặt tại biên với Host. \\
+Rào chắn Dữ liệu Đáy (K2) & Tin cậy hoàn toàn điều kiện lọc WHERE trong mã nguồn/ORM; dễ rò rỉ chéo nếu lập trình viên quên gắn lọc. & Cưỡng chế FORCE RLS (Fail-Closed) ngay trong PostgreSQL 16 + tiêm biến phiên SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id từng giao dịch. \\
+Kiểm soát Tài nguyên \& Bộ nhớ đệm (K3) & Mọi nhóm dùng chung hàng đợi và khóa cache phẳng; một nhóm gửi bão tải có thể làm chậm toàn bộ hệ thống. & Định mức Token Bucket nguyên tử theo từng thuê bao tại Redis + tiền tố khóa tenant:\{id\}:* kèm bộ lọc W-TinyLFU. \\
+Khả năng Tùy biến Động lúc chạy (K4) & Giao diện và cột quy trình cố định chung; không cho phép mỗi tổ chức tự tạo kiểu trường nghiệp vụ riêng. & Một bộ mã nguồn \& một lược đồ duy nhất vận hành đồng thời 3 lớp tùy biến: Chủ đề UI (CSS Vars), Luật WIP (STRICT/WARN), Trường động (JSONB + GIN). \\
+\end{longtable}
+\endgroup
 
-\par\penalty0
-\section{}
+\section{Phân tích Bài toán Nghiệp vụ và Quy hoạch Dịch vụ theo Tiếp cận Thị trường (Market-Driven Outside-In)}\label{v4-sec-4-1}
 
-\par\penalty0
-\section{}
+Trong phát triển SaaS, ứng dụng không được xây dựng theo quy trình cứng nhắc của một khách hàng đơn lẻ mà phải xuất phát từ việc thu thập và tổng hợp nhu cầu đa dạng của thị trường mục tiêu. Đối với bài toán quản lý công việc theo phương pháp Kanban, mỗi tổ chức thuê bao khi đăng ký sử dụng dịch vụ đều kỳ vọng sở hữu một không gian làm việc (Workspace) phản ánh đúng văn hóa quản trị, quy trình luân chuyển tác vụ và cấu trúc thông tin đặc thù của ngành nghề mình.
+
+\subsection{Khảo sát Nhu cầu Thị trường và Chân dung Tổ chức Thuê bao Điển hình (Customer Personas)}\label{v4-sec-4-1-1}
+
+Qua khảo sát nhu cầu thực tế của các phòng ban chuyên môn trong doanh nghiệp và các nhóm dự án trên thị trường, bài toán quản lý công việc Kanban bộc lộ sự phân hóa rõ rệt giữa hai nhóm văn hóa vận hành đối lập. Để làm cơ sở xuyên suốt cho quá trình thiết kế chức năng, giao diện và đối chứng thực nghiệm, đề tài mô hình hóa hai chân dung tổ chức thuê bao điển hình đại diện cho hai phân khúc thị trường này:
+
+1. Chân dung Thuê bao nhóm ngành Kỹ thuật -- Công nghệ (Đại diện: Tổ chức Acme Software -- mã định danh t-acme): Là một doanh nghiệp phát triển phần mềm vận hành theo quy trình Agile/Scrum kết hợp Kanban nghiêm ngặt. Quy trình luân chuyển công việc của Acme Software gồm bốn giai đoạn kỹ thuật: Chờ xử lý (Backlog) -\textgreater{} Đang lập trình (In-Development) -\textgreater{} Đang kiểm duyệt mã nguồn (Code Review) -\textgreater{} Hoàn thành (Done). Đặc trưng cốt lõi của tổ chức này là yêu cầu kiểm soát chặt chẽ giới hạn số lượng công việc đang làm dở dang (Work-In-Progress Limit -- WIP Limit) nhằm tránh tình trạng lập trình viên ôm đồm nhiều tác vụ gây giảm chất lượng mã nguồn. Do đó, Acme Software yêu cầu hệ thống phải áp dụng chính sách WIP ở chế độ Chặn cứng (STRICT Mode): khi cột In-Development đã đạt ngưỡng tối đa (ví dụ 2 thẻ công việc), hệ thống bắt buộc phải từ chối mọi thao tác kéo thêm thẻ mới vào cột này cho đến khi có thẻ cũ được chuyển sang giai đoạn kế tiếp. Ngoài các thông tin cơ bản (tiêu đề, mô tả, người phụ trách), mỗi thẻ công việc của Acme Software bắt buộc phải lưu trữ thêm các trường dữ liệu kỹ thuật đặc thù gồm Điểm nỗ lực ước lượng (story\_\allowbreak{}points -- kiểu số nguyên) và Chu kỳ phát triển (sprint -- kiểu chuỗi).
+
+2. Chân dung Thuê bao nhóm ngành Truyền thông -- Vận hành (Đại diện: Tổ chức Lotus Media -- mã định danh t-lotus): Là một đơn vị sản xuất nội dung truyền thông và tiếp thị kỹ thuật số với nhịp độ công việc biến động nhanh theo sự kiện thị trường. Bảng công việc của Lotus Media chỉ cần ba giai đoạn gọn nhẹ: Ý tưởng đề xuất (Ideas) -\textgreater{} Đang sản xuất (Producing) -\textgreater{} Đã xuất bản (Published). Khác với đội ngũ kỹ thuật, trong hoạt động truyền thông thường xuyên xuất hiện các chiến dịch tin bài thời sự khẩn cấp cần được đẩy vào giai đoạn sản xuất ngay lập tức. Vì vậy, Lotus Media không muốn hệ thống khóa cứng thao tác của nhân viên mà chỉ yêu cầu chính sách giới hạn công việc ở chế độ Cảnh báo mềm (WARN Mode): khi số lượng thẻ trong cột Producing vượt quá ngưỡng khuyến nghị (ví dụ 2 thẻ), ứng dụng vẫn cho phép lưu thao tác chuyển cột nhưng phải kích hoạt cảnh báo trực quan màu vàng trên tiêu đề cột để trưởng nhóm kịp thời điều phối nhân sự. Về mặt dữ liệu, Lotus Media không sử dụng khái niệm Story Points hay Sprint, mà cần quản lý các thuộc tính kinh doanh gồm Kênh phát hành (channel: TikTok, Facebook, YouTube, Báo chí) và Ngân sách truyền thông dự kiến (budget\_\allowbreak{}usd -- kiểu số thực).
+
+Từ việc đối chiếu hai chân dung tổ chức đối lập trên, nghiên cứu quy nạp nhu cầu thị trường của nền tảng SaaS Kanban thành mô hình Dịch vụ Tùy biến Ba Lớp theo tiếp cận Ngoài--Vào, được minh họa trên Hình~\ref{fig:v4-4-1}: (1) Lớp 1 -- Dịch vụ tùy biến nhận diện thương hiệu và giao diện (cho phép mỗi thuê bao thiết lập bảng màu chủ đạo, biểu trưng và chế độ hiển thị thẻ đầy đủ hay thu gọn); (2) Lớp 2 -- Dịch vụ tùy biến quy trình và quy tắc nghiệp vụ (cho phép tự định nghĩa danh sách cột trạng thái, ngưỡng giới hạn wip\_\allowbreak{}limit trên từng cột và lựa chọn chế độ cưỡng chế STRICT hoặc WARN); và (3) Lớp 3 -- Dịch vụ tùy biến lược đồ dữ liệu mở rộng (cho phép quản trị viên thuê bao tự khai báo thêm các trường thuộc tính động gắn với thẻ công việc ngay trong thời gian chạy):
+
+\VfourFigureLandscape{4.1}{assets/figures/v4/image27.png}{Tiến trình phân tích yêu cầu theo tiếp cận Ngoài--Vào định hướng thị trường và mô hình ba lớp dịch vụ tùy biến của ứng dụng SaaS Kanban.}{fig:v4-4-1}
+
+\subsection{Quy hoạch Dịch vụ Phần mềm thành Chức năng trên Hai Mặt phẳng Kiến trúc và Yêu cầu Phi chức năng}\label{v4-sec-4-1-2}
+
+Theo đúng lý thuyết nền tảng đã xác lập ở Chương~\ref{v4-chapter-1} (Mục~\ref{v4-sec-1-2-2} và Mục~\ref{v4-sec-1-4-4}), trong mô hình SaaS, mỗi gói năng lực Dịch vụ cung ứng cho thị trường được hiện thực hóa trực tiếp thành một nhóm Chức năng phần mềm. Để vừa cung cấp đầy đủ các chức năng quản lý công việc Kanban cho người dùng cuối, vừa quản trị được vòng đời và cấu hình tùy biến của hàng trăm tổ chức thuê bao, kiến trúc hệ thống áp dụng triết lý phân rã toàn bộ năng lực phần mềm thành hai mặt phẳng độc lập về chu kỳ vận hành nhưng gắn kết chặt chẽ qua siêu dữ liệu: Mặt phẳng Điều khiển (Control Plane) và Mặt phẳng Dữ liệu (Data Plane):
+
+Thứ nhất, Mặt phẳng Điều khiển (Control Plane -- Hình~\ref{fig:v4-4-2}): Đóng vai trò cơ quan thiết lập chính sách, quản trị vòng đời và kiểm soát ranh giới vận hành toàn cục của nền tảng SaaS. Đặc trưng kiến trúc của mặt phẳng này là tần suất phát sinh giao dịch ở mức vừa phải nhưng đòi hỏi tính toàn vẹn cao và thẩm quyền quản trị tối cao để quản lý các tổ chức thuê bao. Cấu trúc quy hoạch tổng thể các cụm dịch vụ quản trị thuộc Mặt phẳng Điều khiển được trực quan hóa trên sơ đồ Hình~\ref{fig:v4-4-2}; các ca sử dụng chi tiết tương ứng (UC01 đến UC05) sẽ được đặc tả cụ thể tại Mục 4.2.2.
+
+\VfourFigureLandscape{4.2}{assets/figures/v4/image28.png}{Sơ đồ phân rã các dịch vụ và chức năng quản trị thuộc Mặt phẳng Điều khiển (Control Plane).}{fig:v4-4-2}
+
+Thứ hai, Mặt phẳng Dữ liệu (Data Plane -- Hình~\ref{fig:v4-4-3}): Đóng vai trò môi trường thực thi nghiệp vụ có tần suất truy cập cao, nơi người dùng cuối trực tiếp thao tác hàng ngày để quản lý công việc và cộng tác dự án. Trái ngược với Mặt phẳng Điều khiển, Mặt phẳng Dữ liệu đòi hỏi thông lượng xử lý lớn, độ trễ phản hồi thấp và tính cô lập dữ liệu nghiêm ngặt giữa các không gian làm việc dùng chung. Sơ đồ phân rã chi tiết các cụm dịch vụ nghiệp vụ Kanban thuộc Mặt phẳng Dữ liệu được thể hiện trên Hình~\ref{fig:v4-4-3}; toàn bộ quy trình vận hành và tương tác chi tiết (UC06 đến UC10) sẽ được làm rõ tại Mục 4.2.2.
+
+\VfourFigureLandscape{4.3}{assets/figures/v4/image29.png}{Sơ đồ phân rã các dịch vụ và chức năng nghiệp vụ quản lý công việc Kanban thuộc Mặt phẳng Dữ liệu (Data Plane).}{fig:v4-4-3}
+
+Bên cạnh các yêu cầu chức năng trên, để bảo đảm hệ thống vận hành đạt chuẩn kiến trúc Pool Cấp độ 3, cần đáp ứng sáu yêu cầu phi chức năng (Non-Functional Requirements - NFR) ánh xạ trực tiếp từ bốn khía cạnh kiểm soát K1--K4:
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+  NFR-01 -- Toàn vẹn định danh và ngữ cảnh luồng (K1): Từ chối toàn bộ các yêu cầu giả mạo tham số thuê bao hoặc thẻ bài sai chữ ký ngay tại biên, duy trì 0\% sai lệch ngữ cảnh luồng khi tái sử dụng Thread Pool trên tập mẫu thử nghiệm.
+\item
+  NFR-02 -- Cô lập dữ liệu cấp dòng theo nguyên tắc Đóng an toàn (K2): Ngăn chặn rò rỉ dữ liệu chéo (0 bản ghi vượt rào chắn trên tập tiêm lỗi) ngay cả khi truy vấn tầng ứng dụng bỏ sót điều kiện WHERE hoặc thiếu SET LOCAL.
+\item
+  NFR-03 -- Chi phí hiệu năng của rào chắn bảo mật thấp (K2 \& K3): Độ trễ gia tăng do cơ chế RLS và thiết lập biến phiên SET LOCAL duy trì ở mức dưới 5\% so với truy vấn thông thường nhờ hệ thống chỉ mục tổ hợp.
+\item
+  NFR-04 -- Kháng hiện tượng hàng xóm ồn ào (K3): Khi một thuê bao phát sinh lưu lượng đột biến trong kịch bản tải tổng hợp 80 VUs, độ trễ phân vị p95 của các thuê bao bình thường duy trì dưới ngưỡng SLA 500 ms (thực đo 242--277 ms), còn độ trễ p50 truy xuất cấu hình qua đệm L1/L2 giảm hơn 80\% và đạt dưới 0,5 ms khi trúng L1.
+\item
+  NFR-05 -- Thực thi tùy biến động ba lớp không cần khởi động lại (K4): Áp dụng tức thời sự khác biệt về giao diện, chính sách WIP (STRICT/WARN) và trường mở rộng JSONB giữa các thuê bao trên cùng một bộ mã nguồn.
+\item
+  NFR-06 -- Đồng bộ cấu hình phân tán tức thời (K4): Độ trễ từ lúc quản trị viên thuê bao lưu cấu hình mới đến khi toàn bộ các tiến trình ứng dụng làm mới bộ đệm L1 qua kênh Pub/Sub duy trì ở mức vài chục mili-giây.
+\end{enumerate}
+
+\section{Đặc tả Chức năng, Luồng Tương tác Nghiệp vụ và Giao diện Ứng dụng Nguyên mẫu}\label{v4-sec-4-2}
+
+Mục này cụ thể hóa các gói năng lực dịch vụ tại Mục~\ref{v4-sec-4-1} thành thiết kế phần mềm hướng người dùng của ứng dụng quản lý công việc Kanban, bao gồm: phân rã quyền hạn theo vai trò tác nhân, đặc tả ca sử dụng (Use Cases), phân tích luồng hành trình tương tác của người dùng (User Journeys) và thuyết minh trực quan giao diện thực tế của nguyên mẫu.
+
+\subsection{Phân rã Tác nhân và Vai trò Người dùng trong Ứng dụng (User Roles \& Permissions)}\label{v4-sec-4-2-1}
+
+Hệ thống kiểm soát truy cập của ứng dụng SaaS Kanban được thiết kế theo mô hình phân quyền hai tầng (Cấp độ Nền tảng và Cấp độ Không gian làm việc của Thuê bao), phân định rõ ba nhóm tác nhân:
+
+- Quản trị viên Hệ thống (System Administrator -- Tác nhân Mặt phẳng Điều khiển): Là nhân sự vận hành của nhà cung cấp dịch vụ SaaS. Tác nhân này có quyền khởi tạo hoặc phê duyệt thuê bao mới, thiết lập gói dịch vụ (Tier: Free, Pro, Enterprise) gắn với hạn mức lưu lượng Rate Limit tương ứng, giám sát chỉ số tiêu thụ tài nguyên theo từng thuê bao và tạm khóa (Suspend) các tổ chức vi phạm điều khoản.
+
+- Quản trị viên Không gian làm việc Thuê bao (Tenant Administrator / Workspace Owner): Là người đại diện quản lý của từng tổ chức khách hàng (chẳng hạn Giám đốc dự án của Acme Software hoặc Trưởng phòng truyền thông của Lotus Media). Tác nhân này chỉ có quyền hạn bên trong ranh giới tenant\_\allowbreak{}id của tổ chức mình, chịu trách nhiệm: (1) Thiết lập nhận diện thương hiệu của không gian làm việc (chọn màu chủ đạo, bố cục thẻ); (2) Quản trị quy trình làm việc (tạo dự án, khởi tạo bảng Kanban, cấu hình các cột trạng thái, đặt ngưỡng wip\_\allowbreak{}limit và chọn chế độ kiểm soát STRICT hay WARN); (3) Định nghĩa danh mục các trường dữ liệu tùy biến mở rộng cho tổ chức; và (4) Mời thành viên mới vào không gian làm việc và gán vai trò trong dự án.
+
+- Thành viên Dự án (Project Member): Là các kỹ sư, nhân viên nội dung hoặc cộng tác viên làm việc hàng ngày trên bảng Kanban. Một người dùng (định danh qua địa chỉ email duy nhất) có thể đồng thời là thành viên của nhiều tổ chức thuê bao khác nhau (Multi-Workspace Membership). Khi làm việc trong không gian của một thuê bao cụ thể, Thành viên có quyền xem bảng Kanban, tạo thẻ công việc mới, nhập dữ liệu cho các trường chuẩn và trường mở rộng, thực hiện kéo -- thả (Drag-and-Drop) thẻ giữa các cột trạng thái theo quy tắc WIP của tổ chức đó, viết bình luận trao đổi và lọc/tìm kiếm công việc.
+
+\subsection{Đặc tả Ca sử dụng (Use Cases) và Luồng Hành trình Người dùng Điển hình (User Journeys)}\label{v4-sec-4-2-2}
+
+Từ ba nhóm tác nhân trên, toàn bộ quy hoạch năng lực dịch vụ tại Mục~\ref{v4-sec-4-1} được đặc tả thành 10 ca sử dụng cốt lõi phân theo hai mặt phẳng kiến trúc (Bảng~\ref{tab:v4-4-2}) và trực quan hóa trên Biểu đồ Ca sử dụng UML tại Hình~\ref{fig:v4-4-4}:
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\caption{Đặc tả Danh mục 10 Ca sử dụng Cốt lõi (UC01--UC10) Phân tách theo Hai Mặt phẳng Kiến trúc.}\label{tab:v4-4-2}\\
+\toprule
+Mã UC & Mặt phẳng & Tên Ca sử dụng \& Tác nhân & Mô tả Nghiệp vụ \& Cơ chế Đa thuê bao Trọng tâm \\
+\midrule\endfirsthead
+\toprule
+Mã UC & Mặt phẳng & Tên Ca sử dụng \& Tác nhân & Mô tả Nghiệp vụ \& Cơ chế Đa thuê bao Trọng tâm \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+UC01 & Điều khiển & Khởi tạo \& Vòng đời Thuê bao (System Admin) & Đăng ký tổ chức (UUID, slug duy nhất), gán gói Tier/hạn mức Token Bucket, cấp bảng Kanban mặc định. \\
+UC02 & Điều khiển & Đăng nhập \& Chuyển Không gian (Admin / Member) & Xác thực email, liệt kê Workspace hợp lệ và tái cấp phát JWT chứa tenant\_\allowbreak{}id khớp Subdomain Host (K1). \\
+UC03 & Điều khiển & Cấu hình Thương hiệu \& Chính sách WIP (Tenant Admin) & Chỉnh bảng màu CSS Variables, chế độ thẻ và công tắc WIP STRICT/WARN vào tenants.settings (K4). \\
+UC04 & Điều khiển & Khai báo Trường Mở rộng (Tenant Admin) & Định nghĩa lược đồ trường động (tên, mã trường, kiểu Số/Chuỗi, bắt buộc) lưu trong JSONB và phát Pub/Sub xóa L1. \\
+UC05 & Điều khiển & Quản lý Thành viên \& RBAC (Tenant Admin) & Mời thành viên theo email trong tổ chức, gán vai trò TENANT\_\allowbreak{}ADMIN hoặc MEMBER trên tenant\_\allowbreak{}users. \\
+UC06 & Dữ liệu & Quản trị Bảng Kanban (Admin / Member) & Tạo, xem, đổi tên bảng công việc thuộc phạm vi tenant\_\allowbreak{}id; mọi truy vấn đi qua FORCE RLS (K2). \\
+UC07 & Dữ liệu & Cấu hình Cột \& Hạn mức WIP (Tenant Admin) & Thiết lập cột trạng thái, vị trí position và ngưỡng wip\_\allowbreak{}limit riêng của từng cột (ngoại trừ cột đầu/cuối nếu miễn WIP). \\
+UC08 & Dữ liệu & Tạo \& Sửa Thẻ kèm Trường Động (Admin / Member) & \textless\textless include\textgreater\textgreater{} Kiểm định máy chủ lược đồ custom\_\allowbreak{}fields trước khi ghi cột JSONB trong bảng cards (K4). \\
+UC09 & Dữ liệu & Kéo -- Thả Thẻ dưới Luật WIP (Admin / Member) & \textless\textless include\textgreater\textgreater{} Khóa hàng cột đích (FOR UPDATE), đánh giá STRICT (HTTP 422) hoặc WARN trong giao dịch SET LOCAL (K2+K4). \\
+UC10 & Dữ liệu & Lọc \& Theo dõi Thẻ Công việc (Admin / Member) & Tìm kiếm/lọc theo cột, mức ưu tiên, người thực hiện và cặp khóa JSONB thông qua chỉ mục GIN \& B-Tree dẫn đầu tenant\_\allowbreak{}id (K3). \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\VfourFigure{4.4}{assets/figures/v4/image30.png}{Biểu đồ Ca sử dụng Tổng thể (UML Use Case Diagram) phân tách Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu.}{fig:v4-4-4}
+
+Để làm rõ cách thức người dùng tương tác với ứng dụng và cách các quy tắc đa thuê bao vận hành thực tế trên luồng nghiệp vụ, nghiên cứu phân tích chi tiết hai luồng sử dụng cốt lõi sau:
+
+\textbf{Luồng Sử dụng 1: Chuyển đổi Không gian làm việc và Thiết lập Tùy biến Động (Quản trị viên Thuê bao):}
+
+\FloatBarrier
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable*}{@{}P{\dimexpr 0.10000\linewidth-2.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.60000\linewidth-12.000bp\relax}@{}}
+\toprule
+Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
+\midrule\endfirsthead
+\toprule
+Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{Bước 1: Chọn Không gian làm việc} & Người dùng đăng nhập; chọn tổ chức làm việc mong muốn (như "Acme Software" hoặc "Lotus Media") trên giao diện Workspace Selector. & Máy chủ kiểm chứng tư cách thành viên, cấp phát thẻ bài JWT gắn cứng tenant\_\allowbreak{}id tương ứng và nạp bộ siêu dữ liệu cấu hình 3 lớp. Giao diện SPA lập tức chuyển đổi sang nhận diện thương hiệu của tổ chức. \\
+\textbf{Bước 2: Tùy biến Chính sách \& Trường mở rộng} & Quản trị viên thuê bao mở Bảng điều khiển Cấu hình (Tenant Policy Drawer), chuyển chế độ kiểm soát WIP sang STRICT (hoặc WARN) và khai báo thêm trường mở rộng story\_\allowbreak{}points (hoặc budget\_\allowbreak{}usd). & Dịch vụ cập nhật cột siêu dữ liệu tenants.settings (JSONB) và phát sự kiện qua Redis Pub/Sub để xóa đệm L1 trên toàn cụm ứng dụng, kích hoạt quy tắc mới tức thời mà không cần khởi động lại máy chủ. \\
+\end{longtable*}
+\endgroup
+
+\textbf{Luồng Sử dụng 2: Thao tác Kéo -- Thả Thẻ công việc dưới sự Giám sát của Luật WIP (Thành viên Dự án):}
+
+\FloatBarrier
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable*}{@{}P{\dimexpr 0.10000\linewidth-2.000bp\relax}P{\dimexpr 0.30000\linewidth-6.000bp\relax}P{\dimexpr 0.60000\linewidth-12.000bp\relax}@{}}
+\toprule
+Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
+\midrule\endfirsthead
+\toprule
+Bước & Thao tác Người dùng (Action) & Phản hồi Hệ thống \& Cơ chế Đa thuê bao (System Response) \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{Bước 1: Khởi tạo \& Cập nhật Thẻ} & Thành viên dự án mở bảng Kanban; tạo thẻ công việc mới và nhập các thuộc tính tùy biến (như Story Points hoặc Budget USD). & Hệ thống tự động kiểm định dữ liệu theo lược đồ JSONB và lưu bản ghi vào bảng cards; chính sách RLS tự động gắn kết tenant\_\allowbreak{}id từ ngữ cảnh luồng ThreadLocal, bảo đảm phân vùng dữ liệu an toàn. \\
+\textbf{Bước 2: Kéo -- Thả Thẻ chuyển Cột Trạng thái} & Nhấn giữ và kéo một thẻ công việc từ cột "Backlog" thả sang cột "Đang làm / In-Development" (cột đích đang có 2/2 thẻ, đã chạm ngưỡng wip\_\allowbreak{}limit = 2). & Dịch vụ Kanban nạp chính sách WIP của thuê bao và đánh giá số lượng thẻ tại cột đích: • Đối với Acme Software (chế độ STRICT): Chặn giao dịch (HTTP 422), hoàn trả thẻ về vị trí cũ và hiển thị thông báo lỗi vi phạm giới hạn WIP. • Đối với Lotus Media (chế độ WARN): Chấp nhận lưu vị trí cột mới vào CSDL, đồng thời bật nhãn cảnh báo vượt ngưỡng màu vàng trên tiêu đề cột. \\
+\end{longtable*}
+\endgroup
+
+\subsection{Thiết kế Giao diện Nguyên mẫu và Đối chứng Trực quan Đa thuê bao}\label{v4-sec-4-2-3}
+
+Giao diện người dùng của nguyên mẫu ứng dụng SaaS Kanban (tên giao diện TenantFlow) được xây dựng theo kiến trúc Single-Page Application (SPA) bằng React 18 và TypeScript. Sau khi đăng nhập qua màn hình chọn không gian làm việc và thiết lập tùy biến ở Mặt phẳng Điều khiển (Hình~\ref{fig:v4-4-5}), bố cục màn hình Kanban chính (Hình~\ref{fig:v4-4-6}) tổ chức thành ba khu vực: (1) Thanh điều hướng \& nhận diện tổ chức ở phía trên và bên trái (hiển thị viết tắt AS/LM, tên tổ chức, gói dịch vụ, bộ chuyển nhanh Workspace và mục Cài đặt workspace dành cho Tenant Admin); (2) Thanh trạng thái chính sách \& bộ lọc công việc (hiển thị chế độ WIP STRICT hay WARN, danh sách mã trường mở rộng đang áp dụng và bộ lọc mức ưu tiên / người thực hiện); và (3) Không gian bảng Kanban trung tâm hiển thị bộ đếm tỷ lệ trên tiêu đề cột (như 2/2 hoặc 3/2) và các huy hiệu trường động trên từng thẻ. Ghi chú phạm vi nguyên mẫu (MVP Scope): Các mục điều hướng bổ trợ như Tổng quan, Dự án, Tài nguyên và Thông báo được bố trí trên thanh menu nhằm định hình khung sản phẩm SaaS hoàn chỉnh, trong khi phạm vi xử lý dữ liệu và đo kiểm cốt lõi tập trung vào chu trình Kanban (Workspace -- Board -- Column -- Card).
+
+\VfourFigureLandscape{4.5}{assets/figures/v4/image31.png}{Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow -- (a) Chọn Không gian làm việc \& cấp JWT gắn tenant\_\allowbreak{}id; (b) Khung Cấu hình Tùy biến 3 Lớp.}{fig:v4-4-5}
+
+\VfourFigure{4.6}{assets/figures/v4/image32.png}{Đối chứng giao diện bảng Kanban thực tế của hai thuê bao Acme Software (t-acme) và Lotus Media (t-lotus) vận hành đồng thời trên cùng một phiên bản mã nguồn tại cụm AWS EC2.}{fig:v4-4-6}
+
+Quan sát đối sánh trực tiếp trên Hình~\ref{fig:v4-4-6}, cả hai không gian làm việc cùng chạy từ một bản dựng React 18 SPA và gọi chung một API Spring Boot qua định tuyến tên miền phụ trên Internet (t-acme.47.128.76.180.sslip.io:8080 và t-lotus.47.128.76.180.sslip.io:8080), nhưng hiển thị khác biệt đồng thời trên cả ba lớp tùy biến: (1) Về nhận diện tổ chức \& chủ đề giao diện (Lớp 1): Cả hai sử dụng bộ khung TenantFlow với bảng màu chủ đạo đồng bộ từ cấu hình siêu dữ liệu (Hình 4.5b, chẳng hạn màu chính \#1D4ED8 và màu nhấn \#0EA5E9), nhưng thanh tiêu đề hiển thị rõ định danh riêng (AS -- Acme Software {[}Doanh nghiệp{]} so với LM -- Lotus Media {[}Chuyên nghiệp{]}) kèm nút mở bảng cấu hình riêng theo quyền quản trị; (2) Về quy trình cột và hành vi luật WIP (Lớp 2): Bảng của Acme Software gồm 4 cột (Chờ xử lý, Đang làm, Rà soát, Hoàn thành) chạy ở chế độ STRICT --- khi cột Đang làm chạm trần 2/2, hệ thống hiển thị thanh thông báo đỏ "Chính sách WIP: STRICT" và chặn cứng thao tác kéo thêm thẻ bằng thông báo lỗi "Không thể chuyển công việc: cột đích đã đạt giới hạn WIP"; ngược lại, bảng của Lotus Media gọn 3 cột (Ý tưởng, Sản xuất, Phát hành) chạy ở chế độ WARN --- khi cột Sản xuất vượt ngưỡng 3/2, giao diện bật thanh cảnh báo vàng nhưng vẫn cho phép lưu vị trí thẻ mới; (3) Về trường dữ liệu mở rộng (Lớp 3): Thẻ của Acme Software kết xuất tự động huy hiệu kỹ thuật (Sprint-12, 5 điểm), trong khi thẻ của Lotus Media hiển thị thuộc tính tiếp thị (TikTok \$1.500, Facebook \$1.200, Youtube \$2.000) từ cùng cột JSONB.
+
+\section{Thiết kế Thành phần, Hợp đồng Giao tiếp, Cơ sở Dữ liệu và Ánh xạ Kỹ thuật (K1--K4)}\label{v4-sec-4-3}
+
+Để hiện thực hóa toàn bộ các chức năng nghiệp vụ, luồng tương tác và khả năng tùy biến 3 lớp của ứng dụng Kanban đã đặc tả ở Mục~\ref{v4-sec-4-1} và 4.2 trên mô hình Pool Cấp độ 3, Mục~\ref{v4-sec-4-3} trình bày cách lựa chọn ngăn xếp công nghệ, thiết kế lược đồ cơ sở dữ liệu dùng chung và ánh xạ luồng thao tác nghiệp vụ Kanban sang bốn nguyên lý kỹ thuật K1--K4 đã xây dựng tại Chương 3.
+
+\subsection{Tổ hợp Công nghệ, Kiến trúc Thành phần và Hợp đồng API Cốt lõi}\label{v4-sec-4-3-1}
+
+Tổ hợp công nghệ của nguyên mẫu được lựa chọn đồng bộ với bốn cụm tầng của mô hình kiến trúc 9 tầng đã phân tích tại Chương~\ref{v4-chapter-3}: (1) Cụm Ứng dụng và Môi trường thực thi (Tầng 8--9) sử dụng React 18 (TypeScript, Vite) cho giao diện SPA và khung làm việc Spring Boot 3.3 chạy trên máy ảo Java 21 LTS (Apache Tomcat nhúng) để quản lý ngữ cảnh luồng ThreadLocal, bộ nhớ đệm nội bộ L1 bằng thư viện Caffeine (thuật toán W-TinyLFU) và động cơ đánh giá siêu dữ liệu tùy biến 3 lớp; (2) Cụm Phần mềm trung gian Middleware (Tầng 7) sử dụng chuỗi bộ lọc bảo mật Spring Security Filter Pipeline (xác thực thẻ bài JWT HMAC-SHA256) kết hợp máy chủ Redis 7.2 làm bộ nhớ đệm phân tán L2, bộ đếm giới hạn tốc độ nguyên tử Token Bucket (qua kịch bản Lua) và kênh phát tán sự kiện xóa đệm Pub/Sub; (3) Cụm Cơ sở dữ liệu có cấu trúc (Tầng 4--6) sử dụng hệ quản trị PostgreSQL 16 (kết nối qua bể kết nối HikariCP và quản lý phiên bản lược đồ bằng Flyway), khai thác trực tiếp cơ chế bảo mật cấp dòng nội tại (Row-Level Security -- RLS), biến phiên giao dịch SET LOCAL và kiểu dữ liệu bán cấu trúc JSONB kèm chỉ mục GIN; (4) Cụm Hạ tầng nền tảng (Tầng 1--3) đóng gói toàn bộ hệ thống trên môi trường vùng chứa Docker Compose với lớp điều phối biên Caddy Reverse Proxy và cấu hình giới hạn tài nguyên cgroups chuẩn.
+
+Để một kỹ sư phần mềm có thể triển khai trực tiếp hệ thống, Hình~\ref{fig:v4-4-7} mô hình hóa Kiến trúc Thành phần (Component Architecture) phân rã rõ các mô-đun giao diện React SPA, cổng Reverse Proxy biên (caddy-proxy), chuỗi bộ lọc xuyên tầng trong kanban-api cùng hai khối nghiệp vụ Mặt phẳng Điều khiển và Mặt phẳng Dữ liệu. Các giao diện lập trình ứng dụng (API Contracts) và cấu trúc siêu dữ liệu JSONB trọng yếu được chuẩn hóa tại Bảng 4.3.
+
+\VfourFigure{4.7}{assets/figures/v4/image33.png}{Kiến trúc Thành phần (Component Architecture) của ứng dụng TenantFlow phân định chuỗi kiểm soát K1--K4 và Hai Mặt phẳng.}{fig:v4-4-7}
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\renewcommand{\thetable}{4.3}
+\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\caption{Hợp đồng Giao tiếp API Trọng yếu và Cấu trúc Tải trọng Dữ liệu Đa thuê bao (API \& Metadata Contracts).}\label{tab:v4-4-3}\\
+\toprule
+Điểm cuối API \& Mặt phẳng & Tác nhân \& Kiểm tra Biên & Tải trọng Đầu vào / Siêu dữ liệu (Payload / JWT Claims) & Phản hồi \& Cơ chế Thực thi \\
+\midrule\endfirsthead
+\toprule
+Điểm cuối API \& Mặt phẳng & Tác nhân \& Kiểm tra Biên & Tải trọng Đầu vào / Siêu dữ liệu (Payload / JWT Claims) & Phản hồi \& Cơ chế Thực thi \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+POST /api/auth/loginPOST /api/auth/switch-workspace(Mặt phẳng Điều khiển) & Tất cả người dùng (Pre-tenant \& Chọn tổ chức) & Login: \{email, password\}Switch: \{tenantSlug\}JWT Claims cấp phát: \{sub, tenant\_\allowbreak{}id, slug, role, tier, exp\} & 200 OK + \{accessToken, tenant, workspaces{[}{]}\}. Khóa chặt tenant\_\allowbreak{}id vào chữ ký HMAC-SHA256 của JWT. \\
+GET /api/tenant-settings/kanbanPUT /api/tenant-settings/kanban(Mặt phẳng Điều khiển) & GET: Member+; PUT: Tenant Admin + Kiểm tra Host == JWT.slug & Settings JSONB:\{theme: \{primary, accent\}, wipMode: "STRICT"\textbar"WARN", defaultWipLimit: 2, cardDisplayMode: "FULL"\textbar"COMPACT", defaultColumns: {[}...{]}, customFields: {[}\{key, label, type, required\}{]}\} & 200 OK (đọc L1 Caffeine 0,12ms / L2 Redis). PUT cập nhật tenants.settings, xóa L2 và phát Pub/Sub tenant:config:invalidate. \\
+POST /api/boards/\{id\}/tasks(Mặt phẳng Dữ liệu) & Member+; JwtTenantFilter (K1) + RateLimitFilter (K3) & Body:\{columnId, title, description, assigneeId?, customFields: \{"story\_\allowbreak{}points": 5, "sprint": "S12"\}\} & 201 Created. Kiểm định customFields theo schema trong settings (sai kiểu/thiếu trường bắt buộc -\textgreater{} 400 Bad Request); INSERT qua FORCE RLS. \\
+PATCH /api/cards/\{id\}/move(Mặt phẳng Dữ liệu) & Member+; Trong giao dịch SET LOCAL + SELECT FOR UPDATE cột đích & Body:\{targetColumnId, targetPosition, expectedVersion\} & 200 OK (cập nhật position, column\_\allowbreak{}id, version+1). Cột đạt ngưỡng và wipMode=STRICT -\textgreater{} 422 Unprocessable Entity (Rollback); xung đột phiên bản -\textgreater{} 409 Conflict. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\subsection{Thiết kế Lược đồ Cơ sở Dữ liệu Năm Bảng và Kiểm soát Đồng thời}\label{v4-sec-4-3-2}
+
+Tại Tầng 6, dữ liệu toàn hệ thống lưu trên một lược đồ public duy nhất gồm năm bảng cốt lõi, phân định rành mạch theo hai mặt phẳng như trên Hình~\ref{fig:v4-4-8}:
+
+\VfourFigureLandscape{4.8}{assets/figures/v4/image34.png}{Lược đồ cơ sở dữ liệu đa thuê bao 5 bảng cốt lõi của ứng dụng SaaS Kanban phân định phạm vi Mặt phẳng Điều khiển và FORCE RLS trên Mặt phẳng Dữ liệu.}{fig:v4-4-8}
+
+Quan sát Sơ đồ Thực thể -- Liên kết (ERD) tại Hình~\ref{fig:v4-4-8}, toàn bộ các khóa chính (UUID), khóa ngoại phân cấp và ràng buộc dữ liệu của năm bảng (tenants, tenant\_\allowbreak{}users, boards, board\_\allowbreak{}columns, cards) được thiết kế xoay quanh ba quyết định kỹ thuật trọng tâm sau:
+
+\textbf{Thứ nhất, Áp dụng Phi chuẩn hóa Cột định danh tenant\_\allowbreak{}id (Mục~\ref{v4-sec-3-4-1}):} Đưa trực tiếp cột tenant\_\allowbreak{}id UUID NOT NULL xuống cả ba bảng thuộc Mặt phẳng Dữ liệu (boards, board\_\allowbreak{}columns, cards) trên Hình~\ref{fig:v4-4-8} để biểu thức chính sách RLS kiểm định trực tiếp tại từng dòng với chi phí O(1) qua các chỉ mục tổ hợp B-Tree dẫn đầu bởi tenant\_\allowbreak{}id, loại bỏ nhu cầu thực thi các phép nối bảng JOIN lồng nhau trên từng thao tác đọc/ghi.
+
+\textbf{Thứ hai, Áp dụng Lược đồ Lai JSONB cho Siêu dữ liệu và Trường mở rộng (Mục~\ref{v4-sec-3-4-2}):} Sử dụng cột bán cấu trúc JSONB tenants.settings để lưu trữ trọn vẹn cấu hình tùy biến 3 lớp (màu sắc thương hiệu, chế độ WIP STRICT/WARN và lược đồ định nghĩa trường động) và cột cards.custom\_\allowbreak{}fields (kèm chỉ mục đảo ngược GIN) để lưu trữ linh hoạt cặp khóa--giá trị mở rộng của từng tổ chức như Acme Software hay Lotus Media mà không phải sửa đổi cấu trúc bảng vật lý.
+
+Thứ ba, Phạm vi Áp dụng FORCE RLS, Kiểm soát Tranh chấp Ghi (Concurrency) và Chỉ mục Tổ hợp: Khác với cách hiểu giản lược áp dụng mù FORCE RLS lên mọi bảng, thiết kế phân định chính xác: ba bảng nghiệp vụ Mặt phẳng Dữ liệu (boards, board\_\allowbreak{}columns, cards) bật toàn phần ENABLE và FORCE ROW LEVEL SECURITY cho vai trò thực thi kanban\_\allowbreak{}app\_\allowbreak{}user (quyền tối thiểu NOBYPASSRLS) với mệnh đề USING/WITH CHECK Fail-Closed đọc app.current\_\allowbreak{}tenant\_\allowbreak{}id. Trong khi đó, bảng tenants và tenant\_\allowbreak{}users thuộc Mặt phẳng Điều khiển cho phép truy vấn tra cứu danh sách Workspace hợp lệ theo email ở bước tiền đăng nhập (tránh bế tắc khi chưa chọn thuê bao) và chỉ cho phép ghi/sửa cấu hình dưới kiểm soát của ngữ cảnh tenant\_\allowbreak{}id đã xác thực. Ngoài ra, để chống điều kiện tranh chấp (Race Condition) khi hai thành viên kéo thẻ vào cùng một cột chạm giới hạn WIP đồng thời, giao dịch di chuyển thẻ thực hiện khóa bi quan dòng cột đích (SELECT ... FOR UPDATE) trước khi đếm thẻ dưới chế độ STRICT và sử dụng cột cards.version (Optimistic Locking) nhằm tránh ghi đè vị trí. Cuối cùng, hệ thống chỉ mục B-Tree dẫn đầu bởi tenant\_\allowbreak{}id (idx\_\allowbreak{}boards\_\allowbreak{}tenant\_\allowbreak{}created, idx\_\allowbreak{}columns\_\allowbreak{}tenant\_\allowbreak{}board\_\allowbreak{}pos, idx\_\allowbreak{}cards\_\allowbreak{}tenant\_\allowbreak{}col\_\allowbreak{}pos) kết hợp chỉ mục GIN trên cards.custom\_\allowbreak{}fields giúp mọi truy vấn và kiểm định RLS thu gọn về quét phạm vi hẹp theo từng tổ chức.
+
+\subsection{Ánh xạ Luồng Thao tác Nghiệp vụ Kanban Xuyên tầng sang Bốn Kỹ thuật K1--K4}\label{v4-sec-4-3-3}
+
+Để thấy rõ sự phối hợp nhịp nhàng giữa logic nghiệp vụ của ứng dụng Kanban và bốn cơ chế kiểm soát đa thuê bao K1--K4 trong thời gian chạy, Hình~\ref{fig:v4-4-9} trình bày Biểu đồ tuần tự (Sequence Diagram) gồm chín bước xử lý xuyên tầng khi một thành viên dự án thực hiện thao tác truy xuất bảng hoặc kéo -- thả thẻ công việc trên giao diện React:
+
+\VfourFigureLandscape{4.9}{assets/figures/v4/image35.png}{Biểu đồ tuần tự 9 bước ánh xạ thao tác kéo -- thả thẻ Kanban xuyên tầng qua K1--K4, bao đóng giao dịch SET LOCAL và khối finally.}{fig:v4-4-9}
+
+Theo dõi trên Hình~\ref{fig:v4-4-9}, một thao tác nghiệp vụ của người dùng trên ứng dụng Kanban được bảo vệ và điều phối qua bốn chặng ánh xạ trực tiếp tới K1--K4:
+
+- Chặng 1 -- Ánh xạ Kỹ thuật K1 tại biên và luồng ứng dụng (Bước 1--2): Khi người dùng kéo thả thẻ công việc trên giao diện React, trình duyệt gửi yêu cầu HTTP kèm thẻ bài JWT trong tiêu đề Authorization. Bộ lọc biên JwtTenantFilter giải mã và xác minh chữ ký mật mã HMAC-SHA256 của thẻ bài, trích xuất mã tenant\_\allowbreak{}id và user\_\allowbreak{}id đã xác thực để khởi tạo đối tượng bất biến TenantContext gắn vào ThreadLocal (đồng thời ghi nhận mã thuê bao vào bộ nhật ký chẩn đoán MDC) bên trong khung bảo vệ try ... finally.
+
+- Chặng 2 -- Ánh xạ Kỹ thuật K3 tại tầng điều phối lưu lượng (Bước 3): Yêu cầu tiếp tục đi qua bộ lọc RateLimitFilter. Bộ lọc này lấy mã tenant\_\allowbreak{}id từ TenantContext để kiểm tra và trừ thẻ bài nguyên tử trên Redis thông qua khóa ratelimit:tenant:\{tenant\_\allowbreak{}id\}. Nếu thuê bao đang phát sinh lưu lượng tấn công vượt hạn ngạch gói cước, yêu cầu bị chặn đứng ngay tại Bước 3 với mã HTTP 429; nếu hợp lệ, yêu cầu được chuyển vào tầng dịch vụ nghiệp vụ KanbanService.
+
+- Chặng 3 -- Ánh xạ Kỹ thuật K3 và K4 tại tầng dịch vụ nghiệp vụ và bộ nhớ đệm hai tầng (Bước 4--5): Để kiểm tra quy tắc giới hạn công việc WIP và lược đồ trường mở rộng của tổ chức đang thực hiện thao tác, KanbanService truy xuất siêu dữ liệu cấu hình qua khóa phân vùng tenant:\{tenant\_\allowbreak{}id\}:config (ưu tiên đọc từ bộ đệm cục bộ L1 Caffeine W-TinyLFU với độ trễ dưới 0,1ms; nếu chưa có mới nạp từ L2 Redis hoặc PostgreSQL). Dựa trên siêu dữ liệu nạp được, Động cơ tùy biến kiểm định ngay chế độ wip\_\allowbreak{}mode (chặn cứng với HTTP 422 nếu là STRICT của Acme Software khi cột đích đã đầy, hoặc gắn cờ cảnh báo nếu là WARN của Lotus Media) và xác thực kiểu dữ liệu của các trường trong custom\_\allowbreak{}fields.
+
+- Chặng 4 -- Ánh xạ Kỹ thuật K2 tại ranh giới giao dịch cơ sở dữ liệu và thu hồi ngữ cảnh (Bước 6--9): Khi mở giao dịch ghi trạng thái thẻ mới xuống PostgreSQL trên kết nối mượn từ bể HikariCP, bộ đánh chặn RlsConnectionInterceptor tự động đọc tenant\_\allowbreak{}id từ TenantContext và thực thi lệnh nguyên tử SET LOCAL app.current\_\allowbreak{}tenant\_\allowbreak{}id = \textquotesingle\textless tenant\_\allowbreak{}uuid\textgreater\textquotesingle{} ngay đầu giao dịch (Bước 6). Các câu lệnh SQL đọc/ghi trên bảng board\_\allowbreak{}columns và cards được thực thi dưới sự giám sát bắt buộc của chính sách FORCE RLS (USING và WITH CHECK) cùng chỉ mục tổ hợp dẫn đầu bởi tenant\_\allowbreak{}id (Bước 7). Ngay khi giao dịch COMMIT (Bước 8), PostgreSQL tự động xóa biến phiên SET LOCAL trên kết nối vật lý, dịch vụ làm mới khóa đệm bảng tương ứng (tenant:\{tenant\_\allowbreak{}id\}:board:\{board\_\allowbreak{}id\}), trả kết quả HTTP về cho giao diện React và kích hoạt khối finally (Bước 9) để gọi TenantContext.clear() và MDC.remove("tenant\_\allowbreak{}id"), trả luồng thực thi sạch sẽ về lại Thread Pool.
+
+\section{Đóng gói và Triển khai Nguyên mẫu Hệ thống Đa thuê bao}\label{v4-sec-4-4}
+
+Bước cuối cùng trong quá trình xây dựng nguyên mẫu là đóng gói toàn bộ các thành phần của ứng dụng vào môi trường vùng chứa Docker Compose đồng nhất (Mục~\ref{v4-sec-4-4-1}) và cấu hình hạ tầng định tuyến để cung cấp dịch vụ qua Internet công cộng (Mục~\ref{v4-sec-4-4-2}).
+
+\subsection{Kiến trúc Đóng gói Vùng chứa Đa dịch vụ (Docker Compose)}\label{v4-sec-4-4-1}
+
+Để bảo đảm tính khả chuyển và tái lập đồng nhất môi trường vận hành khi chuyển sang đo kiểm tại Chương~\ref{v4-chapter-5}, nguyên mẫu ứng dụng SaaS Kanban được đóng gói bằng Docker Compose trên mạng cầu nối nội bộ cô lập nckh-ec2-net (chi tiết tệp cấu hình tại Phụ lục C), bao gồm lớp định tuyến biên caddy-proxy (Caddy v2) cùng bốn dịch vụ lõi: (1) caddy-proxy: Máy chủ biên Reverse Proxy tiếp nhận lưu lượng tên miền phụ từ Internet, chuyển tiếp tiêu đề Host, phân luồng /api/* sang hậu đài và /* sang giao diện tĩnh; (2) kanban-web: Phục vụ bản dựng tĩnh React 18 SPA; (3) kanban-api: Vận hành Spring Boot 3.3 (Java 21 LTS) với JwtTenantFilter (K1), RateLimitFilter (K3), Caffeine L1 và RlsConnectionInterceptor (K2); (4) redis-cache: Vận hành Redis 7.2 lưu trữ Token Bucket, L2 Cache và kênh Pub/Sub; và (5) postgres-db: Vận hành PostgreSQL 16 lưu trữ 5 bảng dùng chung và thực thi FORCE RLS (K2).
+
+\subsection{Kiến trúc Triển khai Dịch vụ qua Internet Công cộng (Subdomain Routing, TLS và Tường lửa)}\label{v4-sec-4-4-2}
+
+Nhằm hoàn thiện mục tiêu triển khai ứng dụng dưới dạng dịch vụ phần mềm truy cập trực tiếp qua Internet (Hình~\ref{fig:v4-4-10}), nền tảng giải quyết bốn vấn đề hạ tầng biên khi vận hành SaaS công cộng: (1) Phân giải Tên miền phụ Động (Wildcard DNS): Thay vì cấu hình bản ghi A thủ công cho từng khách hàng mới, tên miền chính dùng bản ghi *.domain (hoặc *.47.128.76.180.sslip.io trên môi trường thực nghiệm AWS EC2) để mọi thuê bao mới (như t-acme hay t-lotus) tự động trỏ về cùng địa chỉ IP máy chủ ngay sau khi đăng ký tại UC01; (2) Đối soát Tiêu đề Host ở Cổng biên: caddy-proxy giữ nguyên tiêu đề Host gốc (t-acme.\textless domain\textgreater) chuyển vào kanban-api để JwtTenantFilter đối chiếu trực tiếp với trường slug/tenant\_\allowbreak{}id đã ký trong JWT, chặn các yêu cầu tráo tên miền giữa các thuê bao; (3) Bảo mật Kênh truyền TLS và Tường lửa AWS Security Group: Ở cấu hình vận hành chính thức, Caddy tự động cấp phát và gia hạn chứng chỉ HTTPS (Let\textquotesingle s Encrypt) trên cổng 443; riêng môi trường trình diễn thực nghiệm dùng dịch vụ DNS miễn phí sslip.io tạm mở cổng HTTP :8080 (hiển thị nhãn "Không bảo mật" trên thanh địa chỉ trình duyệt tại Hình~\ref{fig:v4-4-6}) để kiểm thử nhanh mà không chạm ngưỡng giới hạn cấp chứng chỉ công cộng; đồng thời tường lửa Security Group chặn mọi truy cập trực tiếp từ bên ngoài vào cổng 5432 (PostgreSQL), 6379 (Redis) và cổng nội bộ ứng dụng; (4) Bền vững Dữ liệu: Dữ liệu PostgreSQL được ánh xạ ra Persistent Docker Volume (pgdata) gắn trên ổ đĩa EC2 độc lập với vòng đời vùng chứa.
+
+\VfourFigureLandscape{4.10}{assets/figures/v4/image36.png}{Sơ đồ Triển khai Internet SaaS (UML Deployment Diagram) trên AWS EC2 với Wildcard DNS, AWS Security Group và Caddy Reverse Proxy.}{fig:v4-4-10}
+
+\section{Tiểu kết Chương~\ref{v4-chapter-4}}\label{v4-sec-4-5}
+
+Đề tài đã quy hoạch thành các gói năng lực dịch vụ trên hai mặt phẳng kiến trúc, đặc tả hệ thống vai trò, ca sử dụng, luồng tương tác kéo -- thả thẻ công việc và giao diện trực quan của ứng dụng. Đồng thời, toàn bộ các nguyên lý kỹ thuật K1--K4 từ Chương~\ref{v4-chapter-3} đã được ánh xạ vào lược đồ cơ sở dữ liệu và chu trình xử lý yêu cầu 9 bước, đáp ứng bốn tiêu chí của mô hình Pool Cấp độ 3. Đây là cơ sở thực nghiệm để Chương~\ref{v4-chapter-5} tiến hành các kịch bản tiêm lỗi và kiểm thử chịu tải nhằm kiểm định tính an toàn cô lập và hiệu năng của hệ thống.

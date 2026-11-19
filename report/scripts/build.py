@@ -21,11 +21,13 @@ LAYOUT_ERRORS = re.compile(
 
 def has_package(name):
     return bool(shutil.which('kpsewhich') and subprocess.run(
-        ['kpsewhich', name], capture_output=True, text=True).stdout.strip())
+        ['kpsewhich', name], capture_output=True, text=True,
+        encoding='utf-8', errors='replace').stdout.strip())
 
 
 def run(command, env):
-    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
+    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True,
+                            encoding='utf-8', errors='replace')
     if result.returncode:
         print(result.stdout[-10000:] + result.stderr[-3000:], file=sys.stderr)
         raise SystemExit(result.returncode)
@@ -62,6 +64,9 @@ def main():
     definitions = ('\\def\\TwoSidedReport{1}' if args.twoside else '')
     definitions += '\\def\\UseBiblatex{1}' if use_biber else '\\def\\UseBibtex{1}'
     env = os.environ.copy()
+    # Vietnamese sources and child Python processes must not use Windows' ANSI
+    # code page. XeTeX, Biber and Poppler emit UTF-8 on every supported platform.
+    env['PYTHONUTF8'] = '1'
     env['TEXINPUTS'] = str(out) + os.pathsep + env.get('TEXINPUTS', '') + os.pathsep
     env['BIBINPUTS'] = str(ROOT) + os.pathsep + env.get('BIBINPUTS', '') + os.pathsep
 
@@ -72,7 +77,7 @@ def main():
 
     print(f'Building {name} ({"biblatex/IEEE grouped" if use_biber else "BibTeX/plainurl grouped"})', flush=True)
     latex()
-    aux = '\n'.join(p.read_text(errors='replace') for p in out.rglob('*.aux'))
+    aux = '\n'.join(p.read_text(encoding='utf-8', errors='replace') for p in out.rglob('*.aux'))
     cited = bibliography and bool(re.search(r'\\(?:abx@aux@cite|abx@aux@nocite|citation)\{', aux))
     if cited:
         definitions += '\\def\\TemplateHasReferences{1}'
@@ -85,10 +90,10 @@ def main():
         run(['bibtex', str((out / args.target).relative_to(ROOT))], env)
     for iteration in range(6):
         latex()
-        log = (out / f'{args.target}.log').read_text(errors='replace')
+        log = (out / f'{args.target}.log').read_text(encoding='utf-8', errors='replace')
         if iteration >= 1 and not UNRESOLVED.search(log):
             break
-    log = (out / f'{args.target}.log').read_text(errors='replace')
+    log = (out / f'{args.target}.log').read_text(encoding='utf-8', errors='replace')
     if UNRESOLVED.search(log) or LAYOUT_ERRORS.search(log):
         lines = [line for line in log.splitlines() if UNRESOLVED.search(line) or LAYOUT_ERRORS.search(line)]
         raise SystemExit('PDF validation failed:\n' + '\n'.join(lines) + f'\nSee {out}')

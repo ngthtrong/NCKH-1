@@ -1,7 +1,19 @@
-\addchap{Kết luận và kiến nghị}\label{chap:chapters-conclusion}
+\addchap{PHẦN III. KẾT LUẬN VÀ KIẾN NGHỊ}\label{chap:v4-conclusion}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\addsec{Kết luận}\label{v4-conclusion-kết-luận}
 
-\par\penalty0
-\addsec{Kết luận}\label{addsec:conclusion-2}
+Đề tài "Nghiên cứu và Hiện thực hóa Kiến trúc Đa thuê bao cho Nền tảng SaaS Kanban" đã hoàn thành đầy đủ các mục tiêu học thuật và thực tiễn đề ra. Về mặt lý luận, nghiên cứu đã chuẩn hóa hệ thống khái niệm Thuê bao -- Dịch vụ -- Thể hiện, xây dựng khung phân tích hai trục Tách -- Gộp trên mô hình phân tầng 9 tầng Cloud-Native, và hệ thống hóa bảy thách thức thiết kế cốt lõi cùng bốn khía cạnh kiểm soát kỹ thuật K1--K4. Về mặt thực nghiệm, nghiên cứu đã vận dụng phương pháp tiếp cận Ngoài--Vào để xây dựng hoàn chỉnh nguyên mẫu SaaS Kanban Cấp độ 3 dùng chung toàn phần, và đo kiểm định lượng thành công trên bốn nhóm kịch bản thực nghiệm đa chiều.
 
-\par\penalty0
-\addsec{Kiến nghị}\label{addsec:conclusion-3}
+Kết quả thực nghiệm khẳng định rằng: mô hình dùng chung toàn phần (Pool Cấp độ 3) kết hợp cơ chế phòng thủ chiều sâu trong phần mềm (JWT Filter, ThreadLocal try/finally, PostgreSQL RLS Fail-Closed, SET LOCAL, bộ nhớ đệm hai tầng L1 Caffeine W-TinyLFU + L2 Redis và siêu dữ liệu JSONB) đáp ứng đạt chuẩn các yêu cầu khắt khe về cô lập dữ liệu, kiểm soát hiệu năng và tùy biến quy trình làm việc, đồng thời tối ưu hóa chi phí biên (δ → 0) của nền tảng.
+
+\addsec{Hạn chế của đề tài}\label{v4-conclusion-hạn-chế-của-đề-tài}
+
+Bên cạnh các kết quả đạt được, nghiên cứu ghi nhận bốn giới hạn khách quan trong phạm vi thực nghiệm: (1) Mô hình tải k6 sử dụng kịch bản giả lập trên 80 người dùng ảo trong cửa sổ đo 60 giây/lượt, chưa phản ánh đầy đủ biến động ngẫu nhiên dài hạn và sự tăng trưởng dữ liệu tích lũy qua nhiều năm vận hành thực tế; (2) Toàn bộ cụm dịch vụ triển khai trên máy chủ đám mây đơn nút 2 vCPU bị ghim trần tài nguyên cgroups, dẫn đến hiện tượng bão hòa CPU cục bộ ở phân vị cực đoan p99 khi chịu bão tải đồng thời (cần mở rộng sang cụm đa nút ở Cấp độ 4 để giải tỏa); (3) Nguyên mẫu tập trung vào bài toán Kanban có cấu trúc dữ liệu vừa phải, chưa bao quát các miền nghiệp vụ đòi hỏi cộng tác thời gian thực mật độ cao (như chỉnh sửa đồng thời qua WebSocket) hoặc truy vấn phân tích phức tạp; và (4) Dù ứng dụng đã mở truy cập công cộng qua tên miền phụ Wildcard DNS trên AWS EC2, bộ kịch bản đo tải được thực thi nội vùng (Single-Region) nhằm tách biệt độ trễ kiến trúc khỏi nhiễu WAN, chưa đo kiểm trên cụm phân tán đa vùng (Multi-Region).
+
+\addsec{Kiến nghị}\label{v4-conclusion-kiến-nghị}
+
+Từ kết quả nghiên cứu, đề tài đề xuất hai nhóm kiến nghị: (1) Đối với các nhóm kỹ nghệ phần mềm SaaS, cần kích hoạt cơ chế bảo vệ cấp dòng Fail-Closed ngay tại nhân cơ sở dữ liệu thay vì chỉ phụ thuộc vào tầng ứng dụng, kết hợp gắn nhãn tenant\_\allowbreak{}id vào nhật ký và số liệu giám sát để bảo đảm khả năng quan sát xuyên suốt; (2) Đối với các cơ sở đào tạo chuyên ngành Kỹ thuật Phần mềm và Hệ thống Thông tin, kiến nghị đưa nội dung kiến trúc đa thuê bao, thiết kế phân tầng Cloud-Native và kỹ thuật kiểm thử rò rỉ dữ liệu chéo vào chương trình thực hành kỹ nghệ phần mềm nâng cao.
+
+\addsec{Hướng nghiên cứu tiếp theo}\label{v4-conclusion-hướng-nghiên-cứu-tiếp-theo}
+
+Các hướng phát triển tiếp theo của đề tài tập trung vào ba trọng tâm: (1) Nâng cấp kiến trúc lên Cấp độ 4 thông qua cơ chế điều hướng yêu cầu thông minh ở cổng biên, phân vùng dữ liệu theo cụm (Clustering) và hỗ trợ di trú dữ liệu trực tuyến không gián đoạn; (2) Mở rộng sang mô hình Hybrid linh hoạt, tự động cấp phát cơ sở dữ liệu và khóa mã hóa riêng cho các thuê bao doanh nghiệp lớn có yêu cầu tuân thủ đặc biệt; (3) Tích hợp cơ chế truy vết phân tán (Distributed Tracing) nhận thức thuê bao và tự động cân bằng tải thích ứng dựa trên công nghệ học máy.

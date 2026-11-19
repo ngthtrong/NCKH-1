@@ -1,0 +1,20 @@
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{LƯỢC ĐỒ CƠ SỞ DỮ LIỆU VÀ CHÍNH SÁCH BẢO MẬT DÒNG (POSTGRESQL DDL \& RLS) (Đối ứng Mục~\ref{v4-sec-3-4} \& Mục~\ref{v4-sec-4-3-2})}\label{v4-appendix-A}
+
+\Needspace{397bp}
+\section{Thiết lập vai trò bảo mật (NOBYPASSRLS) và Lược đồ Mặt phẳng Điều khiển (Control Plane)}\label{v4-sec-A-1}
+
+\par\noindent\textbf{A.1. SQL -- Vai trò NOBYPASSRLS \& Bảng Mặt phẳng Điều khiển}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-1.txt}
+
+\Needspace{496bp}
+\section{Lược đồ Mặt phẳng Dữ liệu và Hệ thống Chỉ mục Tổ hợp dẫn đầu bởi tenant\_\allowbreak{}id}\label{v4-sec-A-2}
+
+\par\noindent\textbf{A.2. SQL -- Bảng Mặt phẳng Dữ liệu \& Chỉ mục Dẫn đầu tenant\_\allowbreak{}id + GIN}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-2.txt}
+
+\Needspace{375bp}
+\section{Kịch bản kích hoạt và cưỡng chế chính sách Row-Level Security (ENABLE / FORCE RLS)}\label{v4-sec-A-3}
+
+\par\noindent\textbf{A.3. SQL -- Chính sách ENABLE / FORCE ROW LEVEL SECURITY (Fail-Closed)}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=true,fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-3.txt}

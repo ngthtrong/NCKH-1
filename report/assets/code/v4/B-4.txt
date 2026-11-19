@@ -1,0 +1,24 @@
+// Cấu trúc JSONB trong cột tenants.settings của t-acme (Kỹ thuật) so với t-lotus
+(Truyền thông)
+{
+  "theme": { "primary": "#1D4ED8", "accent": "#0EA5E9" },
+  "wipMode": "STRICT",                 // t-lotus đặt "WARN"
+  "defaultWipLimit": 2,
+  "cardDisplayMode": "FULL",           // "FULL" | "COMPACT"
+  "defaultColumns": ["Chờ xử lý", "Đang làm", "Rà soát", "Hoàn thành"],
+  "customFields": [
+    { "key": "story_points", "label": "Điểm nỗ lực", "type": "NUMBER", "required":
+true },
+    { "key": "sprint",       "label": "Đợt phát triển", "type": "TEXT", "required":
+false }
+  ]
+}
+// Luật chuyển cột chống Race Condition tại KanbanService.moveCard() (đã có SET LOCAL):
+// 1. Khóa dòng cột đích: SELECT * FROM board_columns WHERE id = :targetColId FOR
+UPDATE;
+// 2. Đếm số thẻ hiện có trong targetColId; nếu targetColId là cột đầu/cuối miễn WIP ->
+cho phép.
+// 3. Nếu count >= column.wip_limit && settings.wipMode == "STRICT" -> ném
+WipLimitExceededException (HTTP 422);
+//    ngược lại nếu "WARN" -> lưu vị trí mới kèm cờ wipWarning=true trả về giao diện
+React.

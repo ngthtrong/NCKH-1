@@ -1,0 +1,42 @@
+# docker-compose.yml (Triển khai 5 vùng chứa trên AWS EC2 - mạng nội bộ cô lập nckh-ec2-
+net)
+services:
+  caddy-proxy:
+    image: caddy:2.8-alpine
+    ports: ["80:80", "443:443", "8080:8080"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro"]
+    networks: [nckh-ec2-net]
+  kanban-web:
+    build: ./frontend
+    cpus: "0.25"
+    mem_limit: "256m"
+    networks: [nckh-ec2-net]
+  kanban-api:
+    build: ./backend
+    cpus: "1.25"
+    mem_limit: "2560m"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/kanban_saas_db
+      SPRING_DATASOURCE_USERNAME: kanban_app_user
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 25
+    networks: [nckh-ec2-net]
+  redis-cache:
+    image: redis:7.2-alpine
+    cpus: "0.25"
+    mem_limit: "512m"
+    networks: [nckh-ec2-net]
+  postgres-db:
+    image: postgres:16-alpine
+    cpus: "0.50"
+    mem_limit: "1536m"
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    networks: [nckh-ec2-net]
+volumes: { pgdata: {} }
+networks: { nckh-ec2-net: { driver: bridge } }
+# --- Caddyfile (Định tuyến Subdomain Wildcard trên Internet) ---
+:8080, *.47.128.76.180.sslip.io { # Trong sản phẩm thực thay :8080 bằng tên miền chính
+để bật TLS tự động
+    handle /api/* { reverse_proxy kanban-api:8080 { header_up Host
+{http.request.host} } }
+    handle { reverse_proxy kanban-web:80 }
+}

@@ -1,4 +1,86 @@
-# Kiểm tra template — cập nhật 02/11/2026
+# Kiểm tra báo cáo V4 — 19/11/2026
+
+Nội dung nghiên cứu chỉ lấy từ `../Report_V4.md` và `../Report_V4.pdf`;
+hai nguồn không bị sửa. Hash nguồn và bảng ánh xạ tài nguyên nằm trong
+[`assets/v4-import-manifest.json`](assets/v4-import-manifest.json).
+Hình thức theo `RULES.md`, `HinhThucBC.pdf` và template hiện tại.
+
+## Phạm vi chuyển đổi V4
+
+- Mở đầu với bảy mục, năm chương, kết luận/kiến nghị và phụ lục A–D.
+  Ánh xạ 85 tiêu đề Markdown, thêm cấp mục cho A.1–D.2; giữ tên đề mục
+  và nội dung V4. Mục lục/danh mục do LaTeX sinh.
+- 40 hình nội dung, đúng thứ tự và vị trí tương đối giữa các đoạn nguồn.
+  Dùng nguyên luồng ảnh PDF, không vẽ lại/cắt/chỉnh ảnh. PDF rõ hơn ở
+  39/40 cặp; ảnh còn lại giống từng pixel. Markdown làm méo tỉ lệ hai
+  ảnh nên giữ tỉ lệ tự nhiên của PDF. Giữ số 1.6a/b và 5.3a/b.
+- Chín bảng dữ liệu: bảy bảng có caption và hai bảng hành trình không
+  có caption. Một hàng Markdown bị ngắt giữa ô STRICT/WARN được nối
+  lại theo PDF. Bảng rộng dùng trang ngang, bảng dài lặp tiêu đề; chữ
+  bảng thân bài vẫn 13 bp. Bảng API giữ số 4.3 sau hai bảng không chú thích.
+- Mười khối mã: lấy lại dòng vật lý từ PDF, đối chiếu với Markdown sau
+  khi bỏ khoảng trắng, có hash riêng. Mã không được thực thi. Consolas
+  9 bp vừa toàn bộ dòng gốc trong khổ 160 mm; bản 10 bp gây thêm 38 ngắt dòng.
+  Mã dùng giãn dòng 1 và giữ từng khối cùng phần giới thiệu để tránh dòng
+  chú thích/dấu đóng ngoặc lẻ sang trang; giãn dòng thân bài vẫn 1,3.
+- Đủ 25 tài liệu tham khảo, chỉ dùng metadata V4. Khóa `v4-01`–`v4-25`
+  giữ quan hệ với số cũ; số hiển thị được sắp xếp lại theo nhóm/tác giả.
+  Nguyên văn nguồn tại [`bibliography/v4-reference-map.json`](bibliography/v4-reference-map.json).
+- Giữ bìa, biểu mẫu, thông tin hành chính và các mẫu V4 bị thiếu từ bản
+  hiện tại. Tháng trên bìa là 11/2026 theo V4. Ô nghiên cứu trống trong
+  biểu mẫu tiếp tục để trống; công bố ghi “Không” theo biểu mẫu Việt V4.
+  Tên mẫu “Nguyễn Văn A” không thay thế thông tin chủ nhiệm thật.
+
+## Môi trường và quy trình kiểm tra V4
+
+Đã cài MiKTeX 25.12, GNU Make 4.4.1, Poppler 25.07 và các gói TeX cần
+thiết, gồm biblatex-ieee/Biber, unicode-math, fvextra, fancyvrb, caption,
+lineno, upquote và phụ thuộc. Python 3.11 cùng bốn kiểu Times New Roman
+đã có trên máy. PyMuPDF 1.26.7 và pypandoc_binary 1.17 phục vụ nhập/kiểm
+tra nguồn, không cần cho build thông thường. Script dùng UTF-8 rõ ràng;
+`scripts/build.ps1` làm mới PATH, dùng `python` thay alias Windows Store.
+
+PDF khung bìa được khôi phục đúng byte của Git gốc: auto-CRLF trên Windows
+đã làm sai xref/độ dài stream. `.gitattributes` ngăn đổi xuống dòng trong
+PDF/ảnh; hình học và hash của tài nguyên gốc không đổi.
+
+```powershell
+make -C report doctor PYTHON=python
+make -C report all smoke PYTHON=python BIBLIOGRAPHY=biblatex
+make -C report check PYTHON=python
+python report/scripts/verify_v4.py
+```
+
+Sau điều chỉnh số bảng/cỡ mã, hai quyển được chạy lại XeLaTeX với cùng
+trạng thái Biber đến khi nhãn/mục lục ổn định, rồi kiểm tra PDF lần cuối.
+Bản tin/tóm tắt dùng cùng nguồn giữa bản ghép và bốn PDF riêng. Smoke
+BibTeX cũng đã dựng thành công trên bản sao độc lập, giữ PDF smoke chính
+ở backend Biber.
+
+Đối chiếu Markdown với PDF nguồn: đủ 297 đoạn, 27.470/27.470 cụm năm từ
+khớp. PDF đầu ra dùng Poppler để giữ khoảng trắng tiếng Việt, nối khoảng
+trắng do ngắt định danh sau dấu gạch dưới. Kiểm tra thêm `.lof`/`.lot`,
+hash nguồn/mã, byte ảnh, ảnh nhúng và thứ tự cả 40 hình. Rà soát trực quan
+gồm các trang bảng, chú thích a/b, phụ lục và biểu mẫu.
+
+## Giới hạn của nguồn V4
+
+Đây là chuyển định dạng, không phải xác minh lại kết quả nghiên cứu hoặc
+tính tồn tại/độ chính xác của tài liệu tham khảo. Thông tin thiếu ở [1],
+[9], [12], [13], khoảng năm 1972/2007 ở [17], nhan đề PostgreSQL 16 đi cùng
+URL `/current/` ở [25] được giữ nguyên. Tên đề tài trong đoạn Kết luận
+khác tên trên bìa cũng giữ theo nguồn. Một số chuỗi API dính nhau ở bảng
+4.3 đã có trong PDF V4 và không được tự sửa nội dung.
+
+Ảnh, nhận xét, chữ ký, thuyết minh có ký/đóng dấu và minh chứng nghiệm
+thu chưa được cung cấp vẫn giữ chỗ. Build/check không xác nhận tính đúng
+đắn khoa học hoặc hồ sơ đã đủ điều kiện nộp.
+
+---
+
+## Lịch sử kiểm tra template — 02/11/2026
+
+Phần dưới là lịch sử trước khi nhập V4, không phải trạng thái hiện tại.
 
 Đã đồng bộ các quy tắc dùng lại được từ báo cáo hiện tại và đối chiếu
 trực tiếp [HinhThucBC.pdf](HinhThucBC.pdf), gồm văn bản và trang quy định.

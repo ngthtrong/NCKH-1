@@ -1,0 +1,22 @@
+-- Lua Script Token Bucket nguyên tử chạy trên Redis 7.2 (ratelimit:tenant:{tenant_id})
+local key = KEYS[1]
+local cap, rate, now = tonumber(ARGV[1]), tonumber(ARGV[2]), tonumber(ARGV[3])
+local data = redis.call('HMGET', key, 'tokens', 'ts')
+local tokens = math.min(cap, (tonumber(data[1]) or cap) + (now - (tonumber(data[2]) or
+now)) * rate)
+if tokens < 1 then return 0 end -- Cạn thẻ -> RateLimitFilter trả HTTP 429 Too Many
+Requests
+redis.call('HMSET', key, 'tokens', tokens - 1, 'ts', now)
+redis.call('EXPIRE', key, math.ceil(cap / rate) + 5)
+return 1
+// TwoTierCacheManager.java (K3 & K4: L1 Caffeine W-TinyLFU + L2 Redis + Pub/Sub thu hồi
+phân tán)
+Caffeine<Object, Object> L1 = Caffeine.newBuilder()
+    .maximumSize(2000)           // Caffeine tự động sử dụng Window-TinyLFU chống Cache
+Scan Pollution
+    .expireAfterWrite(Duration.ofMinutes(5));
+// Khóa chuẩn: "tenant:" + tenantId + ":config"
+// Khi PUT /api/tenant-settings/kanban -> ghi DB -> xóa L2 Redis ->
+redisTemplate.convertAndSend("tenant:config:invalidate", tenantId)
+// Mọi bản sao kanban-api nhận thông điệp Pub/Sub gọi ngay: l1Cache.invalidate("tenant:"
++ tenantId + ":config");

@@ -1,0 +1,20 @@
+// k6_noisy_neighbor.js (KB-3: 80 VUs đồng thời, 30s Warm-up -> 60s Measure -> 25s
+Cooldown)
+import http from 'k6/http';
+import { check } from 'k6';
+export const options = {
+  scenarios: {
+    t_acme:     { executor: 'constant-vus', vus: 15, duration: '60s', exec:
+'normalTenant', env: { TENANT: 't-acme' } },
+    pool_demo:  { executor: 'constant-vus', vus: 15, duration: '60s', exec:
+'normalTenant', env: { TENANT: 'pool-demo' } },
+    t_lotus:    { executor: 'constant-vus', vus: 20, duration: '60s', exec:
+'normalTenant', env: { TENANT: 't-lotus' } },
+    t_finance:  { executor: 'constant-vus', vus: 10, duration: '60s', exec:
+'normalTenant', env: { TENANT: 't-finance' } },
+    t_aggressor:{ executor: 'constant-vus', vus: 20, duration: '60s', exec:
+'burstAttack',  env: { TENANT: 't-aggressor' } },
+  },
+  thresholds: { 'http_req_duration{group:::normal}': ['p(95)<500'] }, // SLA mục tiêu <
+500ms
+};

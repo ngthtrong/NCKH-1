@@ -16,7 +16,8 @@ errors = []
 
 
 def output(args):
-    return subprocess.run(args, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(args, capture_output=True, text=True, check=True,
+                          encoding='utf-8', errors='replace').stdout
 
 
 for tool in ['pdfinfo', 'pdftotext', 'pdffonts']:
@@ -28,10 +29,10 @@ source_files = [ROOT / 'main.tex']
 for folder in ['template', 'config', 'frontmatter', 'chapters', 'appendices', 'deliverables', 'examples']:
     source_files.extend((ROOT / folder).rglob('*.tex'))
 for source in source_files:
-    text = '\n'.join(line.split('%', 1)[0] for line in source.read_text().splitlines())
+    text = '\n'.join(line.split('%', 1)[0] for line in source.read_text(encoding='utf-8').splitlines())
     for command, name in re.findall(r'\\(input|include|includegraphics|includepdf)(?:\[[^]]*\])?\{([^}]+)\}', text):
-        if '\\' in name:
-            continue  # Macro paths are validated by the actual LaTeX build.
+        if '\\' in name or re.search(r'#[1-9]', name):
+            continue  # Macro paths/parameters are validated by the actual build.
         candidate = ROOT / name
         if command in ['input', 'include']:
             candidate = candidate.with_suffix('.tex')
@@ -55,7 +56,7 @@ for folder, job in targets.items():
     if not pdf.is_file() or not log.is_file():
         errors.append(f'{folder}: PDF/log missing; run make all smoke.')
         continue
-    log_text = log.read_text(errors='replace')
+    log_text = log.read_text(encoding='utf-8', errors='replace')
     bad = [line for line in log_text.splitlines() if UNRESOLVED.search(line) or LAYOUT_ERRORS.search(line)]
     errors.extend(f'{folder}: {line}' for line in bad)
     info = output(['pdfinfo', str(pdf)])
@@ -74,8 +75,9 @@ for folder, job in targets.items():
             errors.append(f'{folder}: unembedded font: {line}')
     pdf_text = output(['pdftotext', '-layout', str(pdf), '-'])
     if folder in ['content', 'content-twoside']:
+        heading_text = re.sub(r'\s+', ' ', pdf_text).casefold()
         for heading in ['Mở đầu', 'Kết luận và kiến nghị', 'Tài liệu tham khảo', 'Danh mục từ viết tắt']:
-            if heading not in pdf_text:
+            if heading.casefold() not in heading_text:
                 errors.append(f'{folder}: missing section {heading}')
         if 'INFORMATION ON RESEARCH RESULTS' not in pdf_text:
             errors.append(f'{folder}: English form missing')

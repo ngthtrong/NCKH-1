@@ -1,0 +1,27 @@
+-- Vai trò ứng dụng quyền tối thiểu (BẮT BUỘC không có BYPASSRLS để RLS luôn có hiệu
+lực)
+CREATE ROLE kanban_app_user LOGIN PASSWORD '********' NOSUPERUSER NOCREATEDB
+NOCREATEROLE NOBYPASSRLS;
+CREATE ROLE kanban_migrator LOGIN PASSWORD '********'; -- Tài khoản riêng cho Flyway di
+trú O(1)
+-- Bảng Mặt phẳng Điều khiển: Tổ chức Thuê bao & Thành viên (không áp RLS mù trước đăng
+nhập)
+CREATE TABLE tenants (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    slug       VARCHAR(64) NOT NULL UNIQUE,           -- VD: 't-acme', 't-lotus'
+    name       VARCHAR(120) NOT NULL,
+    tier       VARCHAR(20) NOT NULL DEFAULT 'PRO',    -- FREE | PRO | ENTERPRISE
+    status     VARCHAR(20) NOT NULL DEFAULT 'ACTIVE', -- ACTIVE | SUSPENDED
+    settings   JSONB NOT NULL DEFAULT '{}'::jsonb,    -- Cấu hình 3 lớp (Theme, WIP,
+Custom Fields)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE tenant_users (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id     UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    email         VARCHAR(180) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name     VARCHAR(120) NOT NULL,
+    role          VARCHAR(24) NOT NULL DEFAULT 'MEMBER', -- TENANT_ADMIN | MEMBER
+    UNIQUE (tenant_id, email)
+);

@@ -1,0 +1,15 @@
+# KB-1 (Biên ứng dụng): Kiểm thử xâm nhập & toàn vẹn ngữ cảnh luồng (500 + 200 + 1.500
+mẫu)
+1. Gửi 500 request thiếu Authorization hoặc JWT sửa claim tenant_id sai chữ ký HMAC ->
+Khẳng định 500/500 trả HTTP 401.
+2. Gửi 200 request mang JWT hợp lệ của t-acme tới Host "t-lotus.localhost" -> Khẳng định
+200/200 trả HTTP 403.
+3. Gửi 1.500 request xen kẽ giữa 5 thuê bao trên cùng Apache Tomcat Thread Pool -> So
+sánh claim vào == Header X-Tenant-ID == log MDC (0 sai lệch).
+# KB-2 (Nhân CSDL): Tiêm lỗi 600 mẫu chứng minh Fail-Closed FORCE RLS
+1. Chạy 200 lệnh "SELECT * FROM cards" từ phiên t-acme (không viết WHERE tenant_id) ->
+Xác minh toàn bộ thẻ trả về thuộc đúng t-acme.
+2. Dùng tài khoản t-acme gọi API/SQL trỏ vào 300 card_id hợp lệ của t-lotus (IDOR) ->
+Xác minh 0 bản ghi rò rỉ.
+3. Mở 100 truy vấn trực tiếp trên kết nối kanban_app_user KHÔNG chạy SET LOCAL -> Xác
+minh RETURNING/SELECT trả 0 dòng (Fail-Closed).

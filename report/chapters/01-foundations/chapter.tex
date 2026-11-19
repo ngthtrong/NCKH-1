@@ -1,8 +1,246 @@
-\chapter{CƠ SỞ LÝ THUYẾT VÀ MÔ HÌNH HÓA KHÁI NIỆM ĐA THUÊ BAO (MULTI-TENANCY)}
-\label{chap:foundations}
-\input{chapters/01-foundations/sections/saas}
-\input{chapters/01-foundations/sections/definitions}
-\input{chapters/01-foundations/sections/concepts}
-\input{chapters/01-foundations/sections/concept-models}
-\input{chapters/01-foundations/sections/reference-model}
-\input{chapters/01-foundations/sections/challenges}
+% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
+\chapter{CƠ SỞ LÝ THUYẾT VÀ MÔ HÌNH HÓA KIẾN TRÚC ĐA THUÊ BAO}\label{v4-chapter-1}
+
+Sự chuyển dịch của ngành công nghiệp phần mềm từ phương thức cấp phép cài đặt cục bộ sang mô hình cung ứng dịch vụ trên nền tảng điện toán đám mây đã làm thay đổi cách thức thiết kế, vận hành và phân phối các hệ thống thông tin doanh nghiệp. Trọng tâm của quá trình chuyển dịch này là bài toán làm thế nào để một nền tảng phần mềm duy nhất có thể phục vụ đồng thời nhiều tổ chức khách hàng với chi phí vận hành tối ưu, nhưng vẫn đảm bảo mỗi tổ chức sở hữu một không gian dữ liệu, cấu hình nghiệp vụ và chất lượng dịch vụ độc lập. Lời giải cho bài toán đó nằm ở Kiến trúc Đa thuê bao (Multi-Tenant Architecture).
+
+\section{Tổng quan về SaaS và Động lực Kinh tế của Chia sẻ Tài nguyên}\label{v4-sec-1-1}
+
+\subsection{Mô hình Phần mềm dưới dạng Dịch vụ và Tiến trình Tiến hóa của các Mô hình Chia sẻ Tài nguyên Điện toán}\label{v4-sec-1-1-1}
+
+Trong lịch sử phát triển công nghệ phần mềm, phương thức cung cấp truyền thống dựa trên mô hình phần mềm đóng gói cài đặt tại chỗ (On-Premises). Ở mô hình này, mỗi tổ chức khách hàng phải mua giấy phép sử dụng theo phiên bản, tự trang bị hạ tầng máy chủ vật lý và duy trì đội ngũ kỹ thuật nội bộ để cài đặt, cấu hình cũng như bảo trì phần mềm trong phạm vi nội bộ. Điều này làm chi phí đầu tư ban đầu tăng cao, quy trình cập nhật phiên bản phân tán kéo dài, và sự lãng phí tài nguyên tính toán khi mỗi đơn vị phải dự phòng phần cứng theo mức tải cao điểm riêng lẻ.
+
+Sự phổ cập của mạng Internet băng thông rộng kết hợp với công nghệ ảo hóa đã thúc đẩy phương thức cung ứng mới: Phần mềm dưới dạng Dịch vụ (Software as a Service -- SaaS). SaaS là mô hình dịch vụ đám mây cho phép người sử dụng khai thác các ứng dụng của nhà cung cấp đang vận hành trên một hạ tầng điện toán đám mây thông qua giao diện mỏng như trình duyệt web hoặc giao diện lập trình ứng dụng (API). Trong đó khách hàng không trực tiếp quản lý hay kiểm soát hạ tầng mạng, máy chủ, hệ điều hành và phần lưu trữ bên dưới, ngoại trừ một số thiết lập cấu hình ứng dụng trong phạm vi được cấp quyền \cite{v4-14}. Nhờ chuyển đổi chi phí đầu tư vốn ban đầu sang chi phí thuê bao định kỳ và tập trung hóa công tác vận hành về phía nhà cung cấp, SaaS đã xóa bỏ rào cản tiếp cận công nghệ cho các doanh nghiệp.
+
+Tuy nhiên, để nhà cung cấp SaaS có thể phục vụ số lượng lớn khách hàng mà không làm chi phí hạ tầng tăng tỷ lệ thuận với quy mô người dùng, hệ thống phần mềm cần có cơ chế chia sẻ tài nguyên hiệu quả. Dưới góc độ tiến hóa công nghệ, kiến trúc đa thuê bao hiện đại là kết quả kế thừa và khắc phục tuần tự những hạn chế của bốn giai đoạn chia sẻ tài nguyên \cite{v4-05}:
+
+\textbf{- Thập niên 1960 (Chia sẻ thời gian trên máy tính lớn):} Nhiều thiết bị đầu cuối cùng chia sẻ chu kỳ xử lý của một CPU trung tâm qua cơ chế phân phối lát cắt thời gian. Tuy nhiên, phạm vi chia sẻ mới dừng ở tài khoản tính toán cục bộ, chưa hình thành mô hình cung ứng dịch vụ qua mạng diện rộng.
+
+\textbf{- Thập niên 1990 (Nhà cung cấp dịch vụ ứng dụng -- ASP):} Phần mềm được lưu trữ tập trung tại trung tâm dữ liệu để khách hàng truy cập từ xa. Do kiến trúc vốn thiết kế cho đơn khách hàng, nhà cung cấp phải cấp phát máy chủ, tiến trình và cơ sở dữ liệu riêng cho từng tổ chức, làm chi phí vận hành tăng tuyến tính theo số lượng khách hàng.
+
+\textbf{- Thập niên 2000 (Ứng dụng Web đa người dùng):} Phục vụ lượng lớn người dùng cá nhân đồng thời trên cùng một máy chủ web và cơ sở dữ liệu phẳng. Hạn chế của mô hình này là chỉ cung cấp chức năng cố định theo tài khoản cá nhân, thiếu không gian quản trị cấp tổ chức và khả năng tùy biến quy trình cho từng doanh nghiệp.
+
+\textbf{- Hiện nay (SaaS Đa thuê bao hiện đại):} Kết hợp việc chia sẻ môi trường vận hành và cơ sở dữ liệu để tối ưu chi phí với việc duy trì không gian làm việc cô lập, quản trị phân cấp và cấu hình riêng cho từng tổ chức khách hàng.
+
+\VfourFigureLandscape{1.1}{assets/figures/v4/image2.png}{Tiến trình tiến hóa của các mô hình chia sẻ tài nguyên điện toán từ thập niên 1960 đến nay.}{fig:v4-1-1}
+
+Có thể thấy, yếu tố duy trì xuyên suốt lịch sử phát triển là sự dịch chuyển trọng tâm chia sẻ: từ chia sẻ phần cứng cấp thấp, sang tập trung hóa vị trí lưu trữ nhưng phân mảnh môi trường chạy (ASP), tiến tới chia sẻ môi trường chạy cho người dùng cá nhân phẳng, và đạt đến chia sẻ nền tảng phần mềm có nhận thức ngữ cảnh tổ chức và hỗ trợ tùy biến động.
+
+\subsection{Động lực Kinh tế -- Kỹ thuật}\label{v4-sec-1-1-2}
+
+Để lý giải một cách định lượng vì sao đa thuê bao trở thành đòn bẩy kiến trúc cốt lõi của SaaS, cần phân tích mối liên hệ giữa phương thức cấp phát tài nguyên và cấu trúc chi phí của hệ thống. Về mặt kỹ thuật, một dịch vụ SaaS vẫn có thể được triển khai theo mô hình dành riêng, nơi mỗi khách hàng sở hữu một môi trường vận hành độc lập. Cách tổ chức này đơn giản hóa việc thiết kế, nhưng dẫn đến hai hạn chế về chi phí:
+
+\textbf{- Tổng chi phí sở hữu tăng tuyến tính:} Khi phục vụ N khách hàng trên N môi trường riêng biệt, chi phí hạ tầng và công sức bảo trì, sao lưu, nâng cấp sẽ tăng tuyến tính theo công thức: C(N) = N × C\_\allowbreak{}single, trong đó C\_\allowbreak{}single là chi phí cố định để duy trì một môi trường khách hàng đơn lẻ.
+
+\textbf{- Lãng phí tài nguyên do dự phòng theo tải cao điểm:} Nếu mỗi khách hàng được cấp phát một lượng tài nguyên cố định đủ đáp ứng thời điểm hoạt động cao nhất của riêng họ, phần lớn năng lực tính toán đó sẽ không được khai thác trong những khoảng thời gian thông thường.
+
+Ngược lại, khi nhiều khách hàng cùng chia sẻ một tập tài nguyên chung và có thời điểm tải đỉnh không đồng thời trùng khớp nhau, hệ thống có thể phân bổ năng lực xử lý linh hoạt giữa các khách hàng. Cơ chế này vận hành dựa trên Nguyên lý ghép kênh thống kê (Statistical Multiplexing): nhu cầu tải tổng hợp của một tập hợp khách hàng được làm phẳng, cho phép phục vụ cùng một số lượng tổ chức với lượng tài nguyên vật lý thấp hơn đáng kể so với tổng tài nguyên dự phòng rời rạc. Nhờ đó, kiến trúc đa thuê bao hiện thực hóa tính kinh tế theo quy mô, đưa hàm chi phí về dạng: C(N) = C\_\allowbreak{}fixed + δ × N, trong đó C\_\allowbreak{}fixed là chi phí đầu tư ban đầu để thiết kế nền tảng đa thuê bao, còn δ là chi phí biên rất nhỏ khi tiếp nhận thêm một khách hàng mới.
+
+\VfourFigureLandscape{1.2}{assets/figures/v4/image3.png}{Biểu đồ tương quan hàm Tổng chi phí sở hữu (TCO) giữa mô hình Đơn thuê bao và Đa thuê bao theo quy mô khách hàng.}{fig:v4-1-2}
+
+Tại đây ta thấy để xây dựng nền tảng đa thuê bao, nhà cung cấp cần đầu tư chi phí cố định ban đầu cao hơn nhằm thiết kế đảm bảo các đặc trưng của một hệ thống đa thuê bao. Ở quy mô nhỏ, mô hình dành riêng có thể có chi phí khởi đầu thấp hơn, nhưng khi số lượng khách hàng vượt qua Điểm hòa vốn, lợi thế về quy mô trở nên rõ rệt và giúp việc vận hành hệ thống hiệu quả hơn về chi phí.
+
+\section{Chuẩn hóa Khái niệm Nền tảng và Định nghĩa Đa thuê bao}\label{v4-sec-1-2}
+
+Trong một hệ thống phần mềm hướng dịch vụ, mối quan hệ giữa khách hàng sử dụng, chức năng nghiệp vụ cung ứng và môi trường kỹ thuật vận hành được cấu thành từ ba khái niệm cốt lõi: Thuê bao, Dịch vụ và Thể hiện. Mặc dù được sử dụng rộng rãi, cách hiểu về phạm vi và bản chất còn tồn tại nhiều điểm chưa thống nhất vì chưa rõ ràng về sự phân định giữa các thực thể tham gia vào quá trình cung ứng dịch vụ. Do đó, nghiên cứu tiến hành chuẩn hóa ba khái niệm nền tảng trước tiên, đặc biệt làm rõ bản chất hai cấp độ của khái niệm Thể hiện.
+
+\subsection{Thuê bao (Tenant)}\label{v4-sec-1-2-1}
+
+Trong các ứng dụng nhiều người dùng thông thường, tài khoản người dùng sẽ xác định ai là người đang thực hiện thao tác. Còn trong hệ thống đa thuê bao, xuất hiện thêm khái niệm \textbf{Thuê bao} đại diện cho một đơn vị khách hàng tổ chức - chẳng hạn một doanh nghiệp ký kết thỏa thuận sử dụng dịch vụ với nhà cung cấp, nhằm xác định thao tác đó thuộc phạm vi tổ chức nào. Một tài khoản cá nhân có thể tham gia vào nhiều thuê bao khác nhau với các vai trò và quyền hạn độc lập. Do đó, Thuê bao đóng vai trò là không gian tổ chức bao trọn một tập hợp người dùng thành viên, bộ cấu hình nghiệp vụ riêng, chính sách phân quyền nội bộ và phần tài nguyên/dữ liệu được cấp phát cho tổ chức đó. Chẳng hạn, trong ứng dụng quản lý công việc Kanban của đề tài, mỗi không gian làm việc (workspace) của một nhóm nghiên cứu hoặc nhóm đồ án được xác định là một thuê bao độc lập.
+
+\subsection{Dịch vụ (Service)}\label{v4-sec-1-2-2}
+
+Dịch vụ là tập hợp toàn bộ năng lực, quy trình và chức năng nghiệp vụ phần mềm được nhà cung cấp chuẩn hóa, đóng gói và cung ứng qua mạng cho các Thuê bao sử dụng (chẳng hạn Dịch vụ Quản lý công việc trực quan theo phương pháp Kanban trong bối cảnh đề tài). Khác với phần mềm đóng gói đơn lẻ theo đơn đặt hàng cố định, dịch vụ SaaS được thiết kế theo hướng tiếp cận thị trường (Market-Driven Outside-In --- sẽ trình bày kỹ tại Chương~\ref{v4-chapter-4}) nhằm vận hành tập trung trên hạ tầng dùng chung, đi kèm cam kết về tính sẵn sàng, an toàn dữ liệu và khả năng cấu hình linh hoạt theo từng tổ chức.
+
+\subsection{Thể hiện (Instance)}\label{v4-sec-1-2-3}
+
+Khi tiếp cận thuật ngữ \textbf{Instance (Thể hiện)}, người đọc thường hình dung đó là một bản ứng dụng đang nằm trên đĩa cứng và bộ nhớ RAM của máy chủ nhằm giúp phần mềm hoạt động. Tuy nhiên, trong phạm vi đề tài này, cách hiểu đó chỉ tương ứng với khái niệm \textbf{Thể hiện ứng dụng (Application Instance)}, tức là thể hiện của riêng thành phần ứng dụng đơn lẻ trong một tập hợp các thành phần. Để phân tích rõ các mô hình kiến trúc đa thuê bao, đề tài phân biệt tường minh giữa \textbf{thể hiện của cả một hệ thống đang vận hành} để cung cấp dịch vụ cho thuê bao và \textbf{thể hiện của từng thành phần kỹ thuật bên trong nó}:
+
+\textbf{1. Cấp độ vĩ mô -- Thể hiện hệ thống (System Instance):} Đại diện cho toàn bộ một môi trường triển khai hoàn chỉnh ở phía sau và sẵn sàng phục vụ thuê bao, bao gồm tổ hợp các thành phần từ phần cứng cho đến ứng dụng.
+
+\textbf{2. Cấp độ vi mô -- Thể hiện thành phần (Component Instance):} Khi đi sâu vào từng tầng kỹ thuật bên trong một thể hiện hệ thống, mỗi thành phần đang chạy độc lập tại một tầng được gọi là một thể hiện thành phần. Cụ thể bao gồm: Thể hiện ứng dụng (Application Instance), Thể hiện cơ sở dữ liệu (Database Instance),\ldots{}
+
+Thuật ngữ \textbf{Thể hiện hệ thống} được dùng khi đề cập đến tổng thể môi trường phục vụ một hoặc nhiều thuê bao; trong khi tên cụ thể của từng tầng (như \textbf{Thể hiện ứng dụng}, \textbf{Thể hiện cơ sở dữ liệu}) được dùng khi phân tích việc tách hay gộp tài nguyên ở từng tầng kỹ thuật.
+
+\subsection{Định nghĩa Khoa học Chuẩn hóa về Đa thuê bao và Mô hình Khái niệm Tổng quát}\label{v4-sec-1-2-4}
+
+Tổng hợp góc nhìn của cả giới học thuật và công nghiệp, \textbf{Kabbedijk và cộng sự (2015) \cite{v4-05}} đã đúc kết định nghĩa chuẩn hóa về Đa thuê bao như sau:
+
+\emph{``Multi-tenancy is a property of a system where multiple customers, so-called tenants, transparently share the system's resources, such as services, applications, databases, or hardware, with the aim of lowering costs, while still being able to exclusively configure the system to the needs of the tenant.''}
+
+(Đa thuê bao là thuộc tính của một hệ thống trong đó nhiều khách hàng, được gọi là các thuê bao, chia sẻ một cách trong suốt các tài nguyên của hệ thống - chẳng hạn như dịch vụ, ứng dụng, cơ sở dữ liệu hoặc phần cứng - nhằm mục tiêu giảm chi phí, đồng thời vẫn cho phép cấu hình hệ thống một cách riêng biệt theo nhu cầu của từng thuê bao.)
+
+Định nghĩa chuẩn hóa của Kabbedijk và cộng sự đã xác lập bốn trụ cột bản chất của một hệ thống đa thuê bao: (1) tính trong suốt đối với người dùng, (2) chia sẻ tài nguyên linh hoạt, (3) tối ưu hóa chi phí vận hành và (4) năng lực cấu hình riêng biệt theo nhu cầu từng tổ chức.
+
+\VfourFigure{1.3}{assets/figures/v4/image4.png}{Mô hình Đa thuê bao và phạm vi bao phủ Thể hiện Hệ thống.}{fig:v4-1-3}
+
+Mỗi Thuê bao được biểu diễn như một không gian tổ chức dọc bao phủ trọn vẹn những thành phần thuộc quyền sở hữu của tổ chức đó (người dùng thành viên, cấu hình và ngữ cảnh trên tầng ứng dụng, không gian dữ liệu riêng tại tầng cơ sở dữ liệu), đồng thời xuyên suốt qua các tầng trung gian (Middleware, Hệ điều hành và lớp Ảo hóa) xuống tới Phần cứng vật lý dùng chung của Thể hiện Hệ thống.
+
+\section{Phân biệt Bốn Mô hình Hệ thống (ST, MI, MU, MT) và Bốn Cấp độ Trưởng thành Kiến trúc SaaS}\label{v4-sec-1-3}
+
+\subsection{Phân biệt Bốn Mô hình Hệ thống (Đơn thuê bao, Đa thể hiện, Đa người dùng, Đa thuê bao)}\label{v4-sec-1-3-1}
+
+Trong thực tiễn kỹ thuật phần mềm, thuật ngữ Đa thuê bao thường bị nhầm lẫn với ba mô hình lân cận là Đơn thuê bao, Đa thể hiện và Đa người dùng. Khi quan sát từ bên ngoài, cả bốn mô hình này đều có thể cung cấp dịch vụ qua mạng; tuy nhiên, khi đối chiếu qua bộ ba khái niệm Thuê bao -- Dịch vụ -- Thể hiện ở Mục~\ref{v4-sec-1-2}, bản chất khác biệt được phân tách qua ba cặp nhầm lẫn phổ biến:
+
+\textbf{- Sự nhầm lẫn giữa Đa người dùng và Đa thuê bao:} Cả Đa người dùng và Đa thuê bao đều cho phép nhiều người dùng cùng chia sẻ chung một thể hiện hệ thống. Điểm khác biệt cốt lõi nằm ở chỗ Đa người dùng không có khái niệm ``Thuê bao'' (tổ chức) bao bọc bên ngoài tập người dùng: các người dùng cá nhân trong Đa người dùng cùng tồn tại trên một không gian quản trị phẳng duy nhất với chức năng cố định, thiếu vắng cả Tính cô lập cấp tổ chức lẫn Khả năng tùy biến động dựa trên siêu dữ liệu.
+
+\textbf{- Sự nhầm lẫn giữa Đa thể hiện và Đa thuê bao:} Cả Đa thể hiện và Đa thuê bao đều phục vụ nhiều khách hàng tổ chức dưới cùng một thương hiệu Dịch vụ và cho phép cấu hình riêng theo từng tổ chức. Tuy nhiên, mô hình Đa thể hiện cấp phát cho mỗi Thuê bao một thể hiện hệ thống riêng biệt, không thực hiện ghép kênh nhiều thuê bao vào cùng một thể hiện hệ thống nên hiệu quả khai thác tài nguyên bị giới hạn.
+
+\textbf{- Sự nhầm lẫn giữa Đơn thuê bao và Đa thuê bao:} Đơn thuê bao thể hiện qua việc triển khai một phần mềm truyền thống dưới dạng dịch vụ và từ đó thu phí định kỳ, điêu này chỉ thay đổi vị trí đặt hạ tầng và hình thức thanh toán; toàn bộ thể hiện hệ thống đó vẫn chỉ phục vụ độc quyền cho một tổ chức khách hàng duy nhất.
+
+Từ đó, nghiên cứu xác lập Ba Tiêu chí Phân định Bản chất giữa bốn mô hình:
+
+\textbf{1. Sự tồn tại của Thuê bao và Quản trị Định danh Hai lớp:} Hệ thống chỉ quản lý định danh cá nhân phẳng một lớp (user\_\allowbreak{}id trong Đa người dùng), hay có lớp bao phủ tổ chức hai lớp (tenant\_\allowbreak{}id bao bọc tập user\_\allowbreak{}id, cấu hình và tài nguyên của tổ chức đó như trong Đơn thuê bao, Đa thể hiện, Đa thuê bao)?
+
+\textbf{2. Phương thức Cấp phát Thể hiện Hệ thống:} Mỗi Thuê bao chiếm giữ độc quyền một thể hiện hệ thống riêng biệt (Đơn thuê bao, Đa thể hiện), hay nhiều Thuê bao cùng chia sẻ chung một thể hiện hệ thống thông qua cơ chế phân giải ngữ cảnh động (Đa thuê bao)?
+
+\textbf{3. Cơ chế Tùy biến Hành vi Nghiệp vụ:} Tùy biến bằng cách sửa mã nguồn hoặc cấu hình tĩnh trên từng thể hiện hệ thống riêng lẻ (Đơn thuê bao, Đa thể hiện), không hỗ trợ tùy biến cấp tổ chức (Đa người dùng), hay tùy biến động lúc chạy qua siêu dữ liệu trên một bộ mã nguồn duy nhất (Đa thuê bao)?
+
+\VfourFigure{1.4}{assets/figures/v4/image5.png}{So sánh bốn mô hình Đơn thuê bao, Đa thể hiện, Đa người dùng và Đa thuê bao qua ranh giới Thuê bao.}{fig:v4-1-4}
+
+Tổng hợp đối chiếu theo Hình~\ref{fig:v4-1-4} qua ba tiêu chí trên cho thấy: Đơn thuê bao (ST) và Đa thể hiện (MI) đều thiết lập lớp định danh tổ chức ở Tiêu chí 1 và cấp phát độc lập một Thể hiện Hệ thống riêng cho từng khách hàng ở Tiêu chí 2 (tùy biến theo từng bản cài đặt tách rời ở Tiêu chí 3), nên bảo toàn sự cô lập vật lý nhưng chi phí hạ tầng và bảo trì tăng tuyến tính O(N). Ngược lại, Đa người dùng (MU) hợp nhất mọi tài khoản cá nhân vào một Thể hiện Hệ thống dùng chung ở Tiêu chí 2 nhưng thiếu hẳn ranh giới Thuê bao hai lớp ở Tiêu chí 1, kéo theo cấu hình đồng nhất ở Tiêu chí 3 và không đáp ứng được yêu cầu phân quyền hay tùy biến doanh nghiệp. Kiến trúc Đa thuê bao (MT) giải quyết hài hòa cả ba tiêu chí: duy trì một Thể hiện Hệ thống dùng chung như MU để tối ưu chi phí theo quy mô, đồng thời tái thiết lập ranh giới định danh hai lớp xuyên tầng (tenant\_\allowbreak{}id) và thực thi tùy biến động bằng siêu dữ liệu ngay trong thời gian chạy trên cùng một bộ mã nguồn chuẩn.
+
+\subsection{Bốn Cấp độ Trưởng thành Kiến trúc SaaS (Chong \& Carraro, 2006)}\label{v4-sec-1-3-2}
+
+\textbf{Chong và Carraro (2006) \cite{v4-15}} đã mô hình hóa lộ trình phát triển của kiến trúc phần mềm dịch vụ thành bốn cấp độ trưởng thành tuần tự dựa trên sự thay đổi của bộ mã nguồn, cơ chế tùy biến và cách thức tổ chức các thể hiện hệ thống:
+
+\VfourFigure{1.5}{assets/figures/v4/image6.png}{Bốn cấp độ trưởng thành kiến trúc SaaS (Chong \& Carraro, 2006).}{fig:v4-1-5}
+
+Từ Hình~\ref{fig:v4-1-5} và đối chiếu chi tiết tại Bảng~\ref{tab:v4-1-1}, quy luật chuyển dịch kiến trúc qua bốn cấp độ cho thấy một ranh giới phân kỳ rõ rệt giữa hai nhóm mô hình: ở Cấp độ 1 và Cấp độ 2, hệ thống vẫn cấp phát cho mỗi tổ chức một Thể hiện Hệ thống tách rời độc lập (chuyển dịch từ tùy biến phân nhánh mã nguồn cục bộ sang hợp nhất về một bộ mã nguồn chuẩn với cấu hình tĩnh theo bản cài đặt), nên chi phí hạ tầng máy chủ và nỗ lực vận hành môi trường vẫn tăng tuyến tính O(N) theo số khách hàng. Bước ngoặt quyết định diễn ra tại Cấp độ 3 khi toàn bộ vách ngăn vật lý giữa các khách hàng được dỡ bỏ để hợp nhất nhiều Thuê bao vào chia sẻ chung một Thể hiện Hệ thống duy nhất, kết hợp tùy biến động bằng siêu dữ liệu lúc chạy; và Cấp độ 4 kế thừa trọn vẹn kiến trúc Cấp độ 3 để nhân bản theo cụm đa thể hiện phía sau bộ cân bằng tải. Như vậy, kiến trúc Đa thuê bao thực sự bắt đầu từ Cấp độ 3 khi hợp nhất các thuê bao vào chung một Thể hiện Hệ thống.
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}@{}}
+\caption{Đối chiếu sự khác biệt bản chất giữa bốn cấp độ trưởng thành kiến trúc SaaS (Chong \& Carraro, 2006).}\label{tab:v4-1-1}\\
+\toprule
+Tiêu chí Đối chiếu & Cấp độ 1: \emph{Tuỳ biến cục bộ} & Cấp độ 2: \emph{Cấu hình hoá} & Cấp độ 3: Đa thuê bao có khả năng cấu hình & \emph{Cấp độ 4: Đa thuê bao mở rộng quy mô} \\
+\midrule\endfirsthead
+\toprule
+Tiêu chí Đối chiếu & Cấp độ 1: \emph{Tuỳ biến cục bộ} & Cấp độ 2: \emph{Cấu hình hoá} & Cấp độ 3: Đa thuê bao có khả năng cấu hình & \emph{Cấp độ 4: Đa thuê bao mở rộng quy mô} \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{1. Mô hình Hệ thống Tương ứng} & Đơn thuê bao tùy biến & Đa thể hiện. & \textbf{Đa thuê bao trên 1 thể hiện hệ thống.} & \textbf{\emph{Đa thuê bao mở rộng ngang (được phân tán / Cụm Đa thuê bao).}} \\
+\textbf{2. Tổ chức Mã nguồn} & Nhiều nhánh mã nguồn riêng biệt theo từng khách hàng. & Một bộ mã nguồn chuẩn duy nhất & \textbf{Một bộ mã nguồn chuẩn duy nhất} & Một bộ mã nguồn chuẩn duy nhất \\
+\textbf{3. Cấp phát Thể hiện (\emph{thể hiện hệ thống})} & \emph{Mỗi thuê bao 1 thể hiện hệ thống riêng biệt (môi trường).} & \emph{Mỗi thuê bao 1 thể hiện hệ thống riêng biệt (môi trường).} & \textbf{Nhiều thuê bao chia sẻ chung 1 \emph{thể hiện hệ thống} thống nhất.} & \emph{Cụm thể hiện hệ thống đa thuê bao sau bộ cân bằng tải.} \\
+\textbf{4. Cơ chế Tùy biến \& Thuê bao} & Sửa trực tiếp mã nguồn; Thuê bao tách rời vật lý. & Cấu hình tĩnh theo bản cài đặt; Thuê bao tách rời theo \emph{thể hiện}. & \textbf{Tùy biến động lúc chạy qua Siêu dữ liệu; Thuê bao logic xuyên tầng.} & Kế thừa trọn vẹn cơ chế Siêu dữ liệu và logic của Cấp độ 3. \\
+\textbf{5. Hiệu quả Chi phí (TCO) \& Mở rộng} & Chi phí vận hành và bảo trì cao nhất, tăng tuyến tính. & Giảm chi phí bảo trì mã nguồn, nhưng chi phí hạ tầng vẫn tăng. & \textbf{Tối ưu hóa mật độ phần cứng và TCO nhờ ghép kênh thống kê.} & Tối ưu hóa TCO kết hợp khả năng co giãn ngang lên quy mô cực lớn. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\section{Năm Đặc trưng Kiến trúc Cốt lõi của Hệ thống Đa thuê bao (Từ Cấp độ 3)}\label{v4-sec-1-4}
+
+Để vận hành an toàn và hiệu quả ở Cấp độ 3 (đồng thời sẵn sàng mở rộng quy mô theo chiều ngang lên Cấp độ 4), kiến trúc hệ thống bắt buộc phải đáp ứng đồng thời năm đặc trưng kiến trúc cốt lõi sau:
+
+\subsection{Chia sẻ Tài nguyên Trong suốt và Thực thi Phi trạng thái (Stateless)}\label{v4-sec-1-4-1}
+
+Chia sẻ tài nguyên trong suốt là năng lực kiến trúc cho phép nhiều đơn vị thuê bao cùng khai thác chung một thể hiện hệ thống mà người dùng cuối cũng như thuê bao không cần nhận biết hay can thiệp vào cơ chế phân bổ vật lý bên dưới. Hệ thống thực hiện ghép kênh các luồng yêu cầu từ nhiều thuê bao trên cùng tập tài nguyên: đối với thuê bao, họ nhìn thấy một không gian làm việc độc lập về mặt logic; đối với nhà cung cấp, toàn bộ khách hàng được hợp nhất trên một nền tảng hạ tầng chung, giúp tận dụng hiệu ứng bù trừ đỉnh tải thống kê để nâng cao mật độ khai thác phần cứng và giảm chi phí biên.
+
+\textbf{Thực thi Phi trạng thái Phiên Cục bộ để Sẵn sàng cho Cấp độ 4:} Cùng với việc chia sẻ một Thể hiện Hệ thống dùng chung ở Cấp độ 3, mỗi Thể hiện ứng dụng phải được thiết kế theo nguyên lý phi trạng thái phiên cục bộ (Stateless Execution) --- tức không lưu giữ dữ liệu phiên làm việc của thuê bao trong vùng nhớ RAM riêng của một máy chủ đơn lẻ. Điều này bảo đảm mọi yêu cầu kế tiếp của bất kỳ thuê bao nào đều có thể được điều hướng và xử lý đồng nhất bởi bất kỳ nút ứng dụng nào khi mở rộng lên cụm phân tán ở Cấp độ 4.
+
+\subsection{Quản lý Ngữ cảnh Định danh và Tùy biến Động dựa trên Siêu dữ liệu}\label{v4-sec-1-4-2}
+
+\textbf{Nhận thức và Duy trì Ngữ cảnh Định danh Xuyên suốt:} Vì mọi yêu cầu từ nhiều tổ chức cùng đi vào một Thể hiện ứng dụng và truy xuất cùng một Thể hiện cơ sở dữ liệu (không thể phân định qua địa chỉ máy chủ riêng như Cấp độ 1--2), hệ thống bắt buộc phải xác lập mã định danh tenant\_\allowbreak{}id ngay tại điểm tiếp nhận yêu cầu và duy trì ngữ cảnh đó nhất quán, cô lập theo từng luồng xử lý xuyên suốt mọi tầng.
+
+\textbf{Tùy biến Động lúc Chạy dựa trên Siêu dữ liệu (Metadata-Driven Runtime Customization):} Khác với Cấp độ 2 nạp cấu hình tĩnh lúc khởi động theo từng bản cài đặt, một bộ mã nguồn chuẩn duy nhất ở Cấp độ 3 phục vụ xen kẽ nhiều tổ chức đồng thời. Do đó, toàn bộ thiết lập giao diện hiển thị, trường dữ liệu mở rộng, quy tắc nghiệp vụ và hạn mức gói dịch vụ phải được nạp và diễn giải động theo tenant\_\allowbreak{}id ngay trong thời gian chạy thông qua kho siêu dữ liệu mà không cần sửa đổi hay biên dịch lại mã nguồn.
+
+\subsection{Tính Cô lập Đa chiều Nội tại (Dữ liệu, Hiệu năng, Sự cố)}\label{v4-sec-1-4-3}
+
+Khi dỡ bỏ các vách ngăn máy chủ và cơ sở dữ liệu vật lý riêng để hợp nhất về một Thể hiện Hệ thống dùng chung ở Cấp độ 3, trách nhiệm bảo vệ ranh giới thuê bao dịch chuyển vào bên trong lớp phần mềm và dữ liệu, đòi hỏi phải thiết lập đồng thời ba chiều cô lập nội tại:
+
+\textbf{- Cô lập Dữ liệu và Quyền truy cập:} Kiểm soát chặt chẽ mọi thao tác đọc, ghi, cập nhật và xóa dữ liệu theo đúng ngữ cảnh mã định danh thuê bao (có thể là tenant\_\allowbreak{}id), nhằm ngăn chặn việc một thuê bao truy cập hoặc làm biến đổi dữ liệu của thuê bao khác ngay cả khi các bản ghi cùng nằm trong một Thể hiện Cơ sở Dữ liệu dùng chung.
+
+\textbf{- Cô lập Hiệu năng và Tài nguyên:} Kiểm soát mức độ chiếm dụng CPU, bộ nhớ RAM, bộ nhớ đệm và hồ kết nối (Connection Pool) CSDL của từng thuê bao nhằm hạn chế ảnh hưởng từ hiện tượng ``Hàng xóm ồn ào'' (Noisy Neighbor), là một tình huống khi có thuê bao phát sinh lưu lượng đột biến làm cạn kiệt tài nguyên chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận.
+
+\textbf{- Cô lập Sự cố và Kiểm soát Bán kính Ảnh hưởng:} Thiết kế các vách ngăn kỹ thuật để khi xảy ra lỗi phần mềm hay bảo mật tại một thuê bao, phạm vi ảnh hưởng được giới hạn, hạn chế rủi ro lan truyền sự cố sang toàn bộ thể hiện hệ thống làm ảnh hưởng đến những thuê bao đang dùng chung khác.
+
+\subsection{Tự phục vụ Vòng đời và Phân tách Hai Mặt phẳng (Control Plane \& Data Plane)}\label{v4-sec-1-4-4}
+
+Để tiếp nhận số lượng lớn khách hàng và vận hành liên tục mà không cần can thiệp thủ công, nền tảng đa thuê bao đòi hỏi ba năng lực vận hành gắn kết chặt chẽ: (1) Tự động hóa việc đăng ký thuê bao và cấp phát tài nguyên cho thuê bao đó, như khởi tạo định danh thuê bao, thiết lập không gian dữ liệu và cấu hình gói cước (nếu có); (2) Khả năng co giãn linh hoạt, tự động mở rộng hoặc thu hẹp số lượng thể hiện thành phần theo biến động tải thực tế của tập thuê bao; và (3) Nâng cấp không gián đoạn, cho phép phát hành phiên bản mới và di trú lược đồ cơ sở dữ liệu tương thích ngược mà không làm gián đoạn hoạt động của các thuê bao đang trực tuyến.
+
+\textbf{Phân định Hai Mặt phẳng Vận hành (Control Plane và Data Plane):} Để hiện thực hóa khả năng tự phục vụ, cô lập sự cố và tùy biến quy mô lớn trong một hệ thống SaaS, kiến trúc đa thuê bao tách biệt rành mạch toàn bộ chức năng phần mềm theo hai mặt phẳng độc lập:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  Mặt phẳng Điều khiển (Control Plane): Là tập hợp các dịch vụ quản trị vòng đời ở cấp nền tảng và cấp tổ chức (như khởi tạo/tạm ngưng thuê bao, định danh đăng nhập, kiểm soát hạn mức gói dịch vụ, phân quyền thành viên và thiết lập siêu dữ liệu tùy biến), phục vụ trực tiếp Quản trị viên Nền tảng (System Admin) và Quản trị viên Thuê bao (Tenant Admin); đặc trưng bởi tần suất giao dịch vừa phải nhưng đòi hỏi tính toàn vẹn dữ liệu và thẩm quyền bảo mật cao nhất.
+\item
+  Mặt phẳng Dữ liệu (Data Plane): Là môi trường thực thi nghiệp vụ hằng ngày của Người dùng cuối tác nghiệp (như thành viên dự án đăng nhập xem bảng, thao tác dữ liệu và kiểm định quy tắc); đặc trưng bởi tần suất truy cập rất cao, đòi hỏi thông lượng lớn, độ trễ thấp và rào chắn cô lập chặt chẽ theo ngữ cảnh thuê bao. Nguyên lý tách hai mặt phẳng bảo đảm bão tải cục bộ trên Mặt phẳng Dữ liệu không làm tê liệt Mặt phẳng Điều khiển, đồng thời mọi thay đổi cấu hình trên Mặt phẳng Điều khiển được đồng bộ xuống Mặt phẳng Dữ liệu qua siêu dữ liệu và sự kiện bất đồng bộ mà không cần khởi động lại.
+\end{enumerate}
+
+\subsection{Đo lường và Giám sát Mức tiêu thụ Nhận thức Thuê bao}\label{v4-sec-1-4-5}
+
+Trong môi trường chia sẻ tài nguyên, việc chỉ giám sát các chỉ số tổng hợp của toàn máy chủ (như tổng \% CPU hay tổng dung lượng đĩa) là chưa đủ vì giá trị trung bình toàn cục sẽ che khuất sự bất thường của từng thuê bao. Hệ thống đa thuê bao bắt buộc phải gắn nhãn ngữ cảnh mã thuê bao vào luồng thu thập số liệu nhằm hai mục đích: (1) Quan sát vận hành nhận thức thuê bao để theo dõi thông lượng, độ trễ và tỷ lệ lỗi của từng tổ chức; và (2) Đo lường hạn ngạch và ánh xạ định giá để kiểm soát giới hạn sử dụng theo gói dịch vụ và hạch toán chính xác chi phí vận hành trên từng thuê bao cụ thể.
+
+\section{Mô hình Kiến trúc 9 Tầng và Bảy Thách thức Thiết kế Cốt lõi}\label{v4-sec-1-5}
+
+\subsection{Mô hình Kiến trúc 9 Tầng Cloud-Native}\label{v4-sec-1-5-1}
+
+Trong công trình nghiên cứu năm 2015, \textbf{Kabbedijk và cộng sự \cite{v4-05}} đã giới thiệu mô hình phân tầng phần mềm gồm 9 tầng thành phần (Hình~\ref{fig:v4-1-6a}) nhằm cung cấp một khung tham chiếu chỉ ra các vị trí bên trong một thể hiện hệ thống mà tại đó cơ chế đa thuê bao có thể được áp dụng:
+
+\VfourFigureLandscape{1.6a}{assets/figures/v4/image7.png}{Cấu trúc Mô hình Phân tầng Phần mềm nguyên bản gồm 9 tầng của Kabbedijk et al. (2015).}{fig:v4-1-6a}
+
+Trong mô hình nguyên bản (Hình~\ref{fig:v4-1-6a}), Kabbedijk và cộng sự chia hệ thống thành 9 tầng từ thấp lên cao. Đồng thời sử dụng nét liền cho 5 tầng phần mềm nhận thức trực tiếp đa thuê bao (Tầng 4, 5, 6, 8, 9) và nét đứt cho 4 tầng hạ tầng nền hoặc nằm ngoài phạm vi phân tích của bài báo lúc bấy giờ (Tầng 1, 2, 3 và Tầng 7 phần mềm trung gian).
+
+Tuy nhiên, khi đặt vào bối cảnh kiến trúc hiện đại, mô hình nguyên bản cần được cập nhật tại hai điểm cốt lõi:
+
+1. Chuyển Tầng 7 từ nét đứt sang nét liền: Trong các hệ thống SaaS Cấp độ 3--4 hiện nay, các thể hiện phần mềm trung gian --- bao gồm cổng giao tiếp biên (API Gateway), bộ nhớ đệm phân tán, hàng đợi thông điệp và kho lưu trữ đối tượng --- không còn là đường ống truyền tải thụ động mà trực tiếp tham gia nhận diện mã thuê bao, điều tiết tốc độ truy cập và phân vùng không gian khóa lưu trữ theo từng thuê bao.
+
+\textbf{2. Bổ sung cơ chế vùng chứa hóa tại Tầng 2--3:} Bên cạnh máy ảo truyền thống, công nghệ vùng chứa (Containerization) đã trở thành tiêu chuẩn đóng gói các thể hiện thành phần trên nhân hệ điều hành dùng chung, cung cấp cơ chế cô lập không gian tên và giới hạn định mức CPU/RAM hiệu quả.
+
+Trên cơ sở hai cập nhật trên, mô hình kiến trúc 9 tầng điện toán đám mây hiện đại được chuẩn hóa tại Hình~\ref{fig:v4-1-6b} và Bảng~\ref{tab:v4-1-2}:
+
+\VfourFigure{1.6b}{assets/figures/v4/image8.png}{Mô hình kiến trúc đa thuê bao 9 tầng cập nhật cho môi trường Cloud-Native.}{fig:v4-1-6b}
+
+\FloatBarrier
+\begin{landscape}
+\begingroup\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\caption{Định nghĩa bản chất trừu tượng và vai trò trong thể hiện hệ thống của 9 tầng thành phần.}\label{tab:v4-1-2}\\
+\toprule
+Tầng thành phần & Bản chất kỹ thuật trừu tượng của Thể hiện Thành phần & Vai trò trong Kiến trúc Đa thuê bao Cấp độ 3 - 4 & Quy ước Phạm vi \\
+\midrule\endfirsthead
+\toprule
+Tầng thành phần & Bản chất kỹ thuật trừu tượng của Thể hiện Thành phần & Vai trò trong Kiến trúc Đa thuê bao Cấp độ 3 - 4 & Quy ước Phạm vi \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\emph{\textbf{Tầng 9:} Thể hiện ứng dụng} & Tiến trình ứng dụng nghiệp vụ đang trực tiếp chạy để tiếp nhận và xử lý yêu cầu người dùng. & Ghép kênh nhiều thuê bao trên cùng tiến trình hoặc tách tiến trình; thực thi lô-gic nghiệp vụ theo mã thuê bao. & \emph{\textbf{Nét liền} (Trọng tâm phần mềm)} \\
+\emph{\textbf{Tầng 8:} Máy chủ ứng dụng} & Môi trường thực thi nền tảng quản lý luồng và bộ nhớ vùng nhớ tiến trình. & Duy trì ngữ cảnh thuê bao cô lập trên từng luồng xử lý và nạp quy tắc cấu hình động, cờ tính năng. & \emph{\textbf{Nét liền} (Trọng tâm phần mềm)} \\
+\emph{\textbf{Tầng 7:} Phần mềm trung gian} & Lớp dịch vụ điều phối trung gian: cổng giao tiếp lập trình, bộ nhớ đệm, hàng đợi thông điệp, kho lưu trữ đối tượng. & Trích xuất định danh thuê bao ở cửa ngõ, điều tiết lưu lượng và phân vùng khóa bộ nhớ đệm/hàng đợi/tệp. & \emph{\textbf{Nét liền} (Cập nhật điện toán đám mây hiện đại)} \\
+\emph{\textbf{Tầng 6:} Lược đồ cơ sở dữ liệu} & Không gian định nghĩa cấu trúc bảng, thuộc tính, chỉ mục và chính sách ràng buộc dữ liệu. & Vị trí phân định giữa việc tách lược đồ riêng cho từng thuê bao và việc gộp chung bảng kèm chính sách lọc theo mã thuê bao. & \emph{\textbf{Nét liền} (Trọng tâm phần mềm)} \\
+\emph{\textbf{Tầng 5:} Cơ sở dữ liệu lô-gic} & Đơn vị cơ sở dữ liệu lô-gic độc lập được khởi tạo bên trong một máy chủ CSDL. & Vị trí phân định giữa mô hình cấp riêng mỗi thuê bao một cơ sở dữ liệu và mô hình dùng chung cơ sở dữ liệu. & \emph{\textbf{Nét liền} (Trọng tâm phần mềm)} \\
+\emph{\textbf{Tầng 4:} Máy chủ hệ quản trị cơ sở dữ liệu} & Tiến trình hệ quản trị cơ sở dữ liệu (như PostgreSQL) quản lý bộ đệm và kết nối. & Quyết định việc vận hành chung một cụm dịch vụ quản trị CSDL hay tách riêng tiến trình hệ quản trị cơ sở dữ liệu cho khách hàng lớn. & \emph{\textbf{Nét liền} (Trọng tâm phần mềm)} \\
+\emph{\textbf{Tầng 3:} Hệ điều hành và vùng chứa} & Nhân hệ điều hành quản lý tiến trình và vào ra dữ liệu; hỗ trợ cô lập \emph{thể hiện vùng chứa}. & Cung cấp môi trường chạy vùng chứa/nhóm vùng chứa và kiểm soát hạn ngạch bộ xử lý/bộ nhớ truy cập ngẫu nhiên cấp hệ điều hành. & \emph{\textbf{Nét đứt} (Hạ tầng nền)} \\
+\emph{\textbf{Tầng 2:} Máy ảo} & Lớp ảo hóa phần cứng tạo ra các máy tính ảo độc lập. & Cung cấp ranh giới cô lập ở cấp máy ảo và mạng ảo trên hạ tầng đám mây. & \emph{\textbf{Nét đứt} (Hạ tầng nền)} \\
+\emph{\textbf{Tầng 1:} Phần cứng vật lý} & Năng lực tính toán, bộ nhớ, lưu trữ và mạng vật lý thô. & Cung cấp nền tảng vật lý chịu lực dưới cùng cho toàn bộ các tầng phía trên. & \emph{\textbf{Nét đứt} (Hạ tầng nền)} \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+Để thuận tiện cho việc thiết kế kiến trúc và định vị giải pháp kỹ thuật, 9 tầng thành phần trong Bảng~\ref{tab:v4-1-2} được tổ chức thành bốn cụm tầng chức năng chính theo quy ước màu sắc: (1) Màu xám -- Cụm Hạ tầng nền (Tầng 1--3); (2) Màu xanh lá -- Cụm Cơ sở dữ liệu và lưu trữ (Tầng 4--6); (3) Màu cam -- Cụm Phần mềm trung gian (Tầng 7); và (4) Màu xanh dương -- Cụm Ứng dụng và Môi trường Thực thi (Tầng 8--9).
+
+\subsection{Bảy Thách thức Thiết kế Cốt lõi khi Hợp nhất Đa thuê bao trên 9 Tầng}\label{v4-sec-1-5-2}
+
+Khi áp dụng mô hình hợp nhất Cấp độ 3 xuyên qua bốn cụm tầng trên Hình~\ref{fig:v4-1-6b}, việc dỡ bỏ ranh giới vật lý làm nảy sinh trực tiếp bảy thách thức kỹ thuật sau:
+
+\textbf{1. Thách thức 1 -- Rò rỉ và lẫn lộn ngữ cảnh định danh xuyên tầng:} Khi một bể luồng thực thi ở Tầng 8 và bể kết nối CSDL ở Tầng 4 được tái sử dụng xen kẽ cho nhiều thuê bao, bất kỳ sai sót nào trong việc xác thực ở Tầng 7 hoặc quên dọn sạch ngữ cảnh cuối chu kỳ đều có thể làm yêu cầu sau kế thừa nhầm tenant\_\allowbreak{}id của yêu cầu trước. Hệ thống buộc phải khóa chặt ngữ cảnh định danh bất biến và truyền dẫn đồng nhất xuyên tầng.
+
+\textbf{2. Thách thức 2 -- Lộ lọt dữ liệu chéo trên lược đồ và bộ đệm dùng chung:} Do dữ liệu của mọi tổ chức nằm chung trên cùng tập bảng vật lý tại Tầng 6 và cùng không gian đệm tại Tầng 7, chỉ một sơ suất bỏ quên điều kiện lọc ở mã nguồn ứng dụng cũng đủ làm rò rỉ dữ liệu liên thuê bao. Do đó, cần có rào chắn kiểm soát truy cập nội tại ở tầng lưu trữ và vách ngăn khoanh vùng sự cố (Mục~\ref{v4-sec-1-4-3}).
+
+\textbf{3. Thách thức 3 -- Tranh chấp tài nguyên hiệu năng và hàng xóm ồn ào:} Một thuê bao tạo đột biến lưu lượng ở Tầng 7, cấp phát vùng nhớ Heap quá lớn ở Tầng 8 hoặc thực thi truy vấn quét bảng rộng ở Tầng 6 sẽ trực tiếp chiếm cạn tài nguyên dùng chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận. Cần phối hợp đồng bộ cơ chế giới hạn tải tại biên, bộ đệm chống ô nhiễm và chỉ mục dẫn đầu theo thuê bao.
+
+\textbf{4. Thách thức 4 -- Xung đột giữa cấu trúc cố định và nhu cầu tùy biến lúc chạy:} Yêu cầu giữ một bộ mã nguồn chuẩn tại Tầng 9 và một lược đồ bảng chung tại Tầng 6 mâu thuẫn trực tiếp với nhu cầu biến thiên giao diện, quy tắc và trường dữ liệu mở rộng của từng khách hàng. Không thể phân nhánh mã nguồn hay thay đổi cấu trúc bảng vật lý trực tiếp lúc chạy vì sẽ chiếm khóa toàn bảng và phá vỡ khả năng bảo trì tập trung.
+
+\textbf{5. Thách thức 5 -- Độ phức tạp tự động hóa và đồng bộ hai mặt phẳng:} Việc cấp phát tổ chức mới, nâng hạ hạn mức và cập nhật cấu hình ở quy mô lớn không thể thao tác thủ công trực tiếp xuống Tầng 4--9. Cần tự động hóa trọn vẹn trên Mặt phẳng Điều khiển và bảo đảm cơ chế vô hiệu hóa, đồng bộ cấu hình tức thời xuống Mặt phẳng Dữ liệu (Mục~\ref{v4-sec-1-4-4}).
+
+\textbf{6. Thách thức 6 -- Nâng cấp không gián đoạn và khôi phục dữ liệu cấp thuê bao:} Khi nhiều tổ chức đang vận hành đồng thời trên một thể hiện hệ thống duy nhất, mọi thay đổi phiên bản ứng dụng ở Tầng 9 hay di trú lược đồ ở Tầng 6 đều phải tương thích ngược để tránh gián đoạn dịch vụ. Bên cạnh đó, việc trích xuất hoặc khôi phục dữ liệu về quá khứ cho riêng một thuê bao bên trong bảng vật lý dùng chung đòi hỏi quy trình bóc tách chính xác.
+
+\textbf{7. Thách thức 7 -- Phân mảnh quan sát và hạch toán chi phí theo thuê bao:} Các số liệu hạ tầng tổng hợp tại Tầng 1--4 thường che khuất nguyên nhân nghẽn cục bộ phát sinh từ từng khách hàng cụ thể bên trong tiến trình dùng chung ở Tầng 7--9. Mọi luồng thu thập chỉ số vận hành và mức tiêu thụ tài nguyên buộc phải gắn nhãn định danh tenant\_\allowbreak{}id xuyên suốt quá trình thực thi (Mục~\ref{v4-sec-1-4-5}).
+
+\subsection{Tiểu kết Chương~\ref{v4-chapter-1}}\label{v4-sec-1-5-3}
+
+Chương~\ref{v4-chapter-1} đã hoàn thiện hệ thống cơ sở lý thuyết nền tảng cho toàn bộ đề tài theo trình tự từ vĩ mô đến vi mô: luận giải động lực kinh tế SaaS từ hàm chi phí TCO và nguyên lý ghép kênh thống kê (Mục~\ref{v4-sec-1-1}); chuẩn hóa tam giác khái niệm Thuê bao -- Dịch vụ -- Thể hiện cùng định nghĩa Đa thuê bao tổng quát (Mục~\ref{v4-sec-1-2}); phân định bốn mô hình hệ thống và lộ trình bốn cấp độ trưởng thành để xác lập mốc khởi đầu thực sự của Đa thuê bao tại Cấp độ 3 (Mục~\ref{v4-sec-1-3}); xác lập năm đặc trưng kiến trúc cốt lõi bắt buộc ở Cấp độ 3--4 (Mục~\ref{v4-sec-1-4}); và mô hình hóa cấu trúc 9 tầng Cloud-Native kèm bảy thách thức kỹ thuật trọng tâm (Mục~\ref{v4-sec-1-5}).
+
+Từ bảy thách thức thiết kế này, câu hỏi kiến trúc đặt ra là: Làm thế nào để phân bổ chiến lược Tách -- Gộp qua từng tầng nhằm đạt được cấu hình tối ưu chi phí mà vẫn bảo đảm bốn khía cạnh kiểm soát kỹ thuật K1--K4? Lời giải sẽ được làm rõ trong Chương~\ref{v4-chapter-2}: Kiến trúc Hệ thống Đa thuê bao.
