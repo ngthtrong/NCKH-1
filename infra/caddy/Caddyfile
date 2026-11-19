@@ -2,11 +2,11 @@
     admin off
     email {$TLS_EMAIL:huynhhonganhgr@gmail.com}
     on_demand_tls {
-        ask http://api:8080/actuator/health
+        ask http://web:8080/healthz
     }
 }
 
-*.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech} {
+https:// {
     tls {
         on_demand
     }
