@@ -180,9 +180,9 @@ export function AppShell() {
       {/* Workspace Switcher Header */}
       <Box
         sx={{
-          height: 64,
           minHeight: 64,
-          px: 1.5,
+          px: 1.25,
+          py: 1,
           display: 'flex',
           alignItems: 'center',
           borderBottom: '1px solid #e2e8f0',
@@ -198,9 +198,9 @@ export function AppShell() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: 1.25,
+            gap: 1,
             px: 1,
-            py: 0.85,
+            py: 0.75,
             borderRadius: '9px',
             border: '1px solid #e2e8f0',
             backgroundColor: '#f8fafc',
@@ -220,28 +220,30 @@ export function AppShell() {
             src={activeBranding?.logoUrl ?? undefined}
             alt={activeBranding?.logoUrl ? `${tenant?.name ?? 'Tenant'} logo` : undefined}
             sx={{
-              width: 34,
-              height: 34,
-              minWidth: 34,
+              width: 32,
+              height: 32,
+              minWidth: 32,
               borderRadius: '8px',
               backgroundColor: primaryColor,
               display: 'grid',
               placeItems: 'center',
               color: '#ffffff',
               fontWeight: 800,
-              fontSize: '0.875rem',
+              fontSize: '0.85rem',
               boxShadow: '0 2px 5px rgba(15, 23, 42, 0.08)',
               objectFit: 'contain',
+              flexShrink: 0,
             }}
           >
             {activeBranding?.logoUrl ? null : tenant?.name ? initials(tenant.name) : 'T'}
           </Box>
-          <Box sx={{ minWidth: 0, flex: 1 }}>
-            {/* Dòng 1: Tên tổ chức trọn vẹn, không bị cắt chữ */}
+          <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            {/* Dòng 1: Tên tổ chức trọn vẹn */}
             <Typography
               variant="body2"
               fontWeight={750}
               noWrap
+              title={tenant?.name ?? undefined}
               sx={{
                 fontSize: 13,
                 color: '#0f172a',
@@ -251,16 +253,25 @@ export function AppShell() {
               {tenant?.name ?? 'Chọn không gian'}
             </Typography>
 
-            {/* Dòng 2: Subdomain kèm huy hiệu gói cước nhỏ gọn */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mt: 0.25, minWidth: 0 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                noWrap
-                sx={{ fontSize: 10, color: '#64748b', maxWidth: 85 }}
-              >
-                {tenant?.slug ? formatTenantHost(tenant.slug) : 'workspace'}
-              </Typography>
+            {/* Dòng 2: Subdomain đầy đủ không bị cắt chữ */}
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              title={tenant?.slug ? formatTenantHost(tenant.slug) : undefined}
+              sx={{
+                fontSize: 10.5,
+                color: '#64748b',
+                display: 'block',
+                lineHeight: 1.25,
+                mt: 0.2,
+              }}
+            >
+              {tenant?.slug ? formatTenantHost(tenant.slug) : 'workspace'}
+            </Typography>
+
+            {/* Dòng 3: Huy hiệu gói dịch vụ */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.35 }}>
               <Chip
                 label={
                   tenant?.tier

@@ -82,6 +82,9 @@ export function ProjectWorkspacePage() {
     ? Math.round((project.completedTaskCount / project.taskCount) * 100)
     : 0;
   const firstBoardId = boards.data?.[0]?.id ?? project.boardId;
+  const canManageWorkspace = Boolean(
+    session?.activeTenant?.role && ['OWNER', 'ADMIN'].includes(session.activeTenant.role),
+  );
   const roleCounts = (members.data ?? []).reduce<Record<ProjectRole, number>>(
     (counts, member) => ({ ...counts, [member.role]: counts[member.role] + 1 }),
     { MANAGER: 0, MEMBER: 0, VIEWER: 0 },
@@ -281,7 +284,7 @@ export function ProjectWorkspacePage() {
           <Box mb={2.5}>
             <Typography variant="h6" fontWeight={750}>Tài nguyên & Công cụ dự án</Typography>
             <Typography variant="body2" color="text.secondary">
-              Quản lý tệp đính kèm và cấu hình luồng nghiệp vụ riêng cho dự án.
+              Quản lý tệp đính kèm và các quy tắc làm việc áp dụng cho dự án.
             </Typography>
           </Box>
           <Grid container spacing={2}>
@@ -302,15 +305,46 @@ export function ProjectWorkspacePage() {
             <Grid size={{ xs: 12, sm: 6 }}>
               <Card variant="outlined" sx={{ borderRadius: 2.5, p: 2.5 }}>
                 <Stack direction="row" spacing={1.5} alignItems="center" mb={1}>
-                  <TuneOutlined color="secondary" sx={{ fontSize: 28 }} />
-                  <Typography variant="subtitle1" fontWeight={700}>Quy trình & Tự động hóa</Typography>
+                  <ViewKanbanOutlined color="primary" sx={{ fontSize: 28 }} />
+                  <Typography variant="subtitle1" fontWeight={700}>Quy tắc & Dữ liệu Kanban</Typography>
                 </Stack>
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Thiết lập các trường tùy biến động, luồng phê duyệt và tự động hóa chuyển trạng thái.
+                  Dự án áp dụng đồng bộ quy tắc giới hạn WIP và hệ thống trường dữ liệu mở rộng được cấu hình từ không gian làm việc.
                 </Typography>
-                <Button component={RouterLink} to={`/customization?project=${project.id}`} variant="outlined" size="small" endIcon={<ArrowForward />}>
-                  Cấu hình nâng cao
-                </Button>
+                {canManageWorkspace ? (
+                  <Button
+                    component={RouterLink}
+                    to="/settings"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<TuneOutlined />}
+                    endIcon={<ArrowForward />}
+                  >
+                    Cài đặt workspace
+                  </Button>
+                ) : firstBoardId ? (
+                  <Button
+                    component={RouterLink}
+                    to={`/kanban/${firstBoardId}`}
+                    variant="outlined"
+                    size="small"
+                    startIcon={<ViewKanbanOutlined />}
+                    endIcon={<ArrowForward />}
+                  >
+                    Xem bảng công việc
+                  </Button>
+                ) : (
+                  <Button
+                    component={RouterLink}
+                    to="/kanban"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<ViewKanbanOutlined />}
+                    endIcon={<ArrowForward />}
+                  >
+                    Bảng công việc
+                  </Button>
+                )}
               </Card>
             </Grid>
           </Grid>
