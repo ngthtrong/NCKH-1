@@ -1,0 +1,42 @@
+{
+  "description": "Configured only after all measured load runs. Task totals preserved; moves provide visible STRICT/WARN browser states. Branding matches the report palette.",
+  "evidence": [
+    {
+      "role": "small",
+      "status": 200,
+      "wipWarning": false
+    },
+    {
+      "role": "small",
+      "status": 200,
+      "wipWarning": false
+    },
+    {
+      "role": "small",
+      "primaryColor": "#1D4ED8",
+      "occupied": 2,
+      "taskCount": 200
+    },
+    {
+      "role": "large",
+      "status": 200,
+      "wipWarning": false
+    },
+    {
+      "role": "large",
+      "status": 200,
+      "wipWarning": false
+    },
+    {
+      "role": "large",
+      "status": 200,
+      "wipWarning": true
+    },
+    {
+      "role": "large",
+      "primaryColor": "#B45309",
+      "occupied": 3,
+      "taskCount": 1000
+    }
+  ]
+}

@@ -25,6 +25,12 @@ public class Tenant {
     @Column(nullable = false, length = 20)
     private String tier;
 
+    @Column(name = "rate_limit_rpm", nullable = false)
+    private int rateLimitRpm = 120;
+
+    @Column(name = "max_members", nullable = false)
+    private int maxMembers = 50;
+
     @Column(nullable = false, length = 20)
     private String status;
 
@@ -43,6 +49,10 @@ public class Tenant {
     public void setName(String name) { this.name = name; }
     public String getTier() { return tier; }
     public void setTier(String tier) { this.tier = tier; }
+    public int getRateLimitRpm() { return rateLimitRpm; }
+    public void setRateLimitRpm(int rateLimitRpm) { this.rateLimitRpm = rateLimitRpm; }
+    public int getMaxMembers() { return maxMembers; }
+    public void setMaxMembers(int maxMembers) { this.maxMembers = maxMembers; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public TenantSettings getSettings() { return settings; }

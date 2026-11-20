@@ -9,13 +9,15 @@ CREATE TABLE tenants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug VARCHAR(64) UNIQUE NOT NULL,
     name VARCHAR(120) NOT NULL,
-    tier VARCHAR(20) NOT NULL CHECK (tier IN ('FREE', 'PRO', 'ENTERPRISE')),
+    tier VARCHAR(20) NOT NULL CHECK (tier IN ('FREE', 'STANDARD', 'PRO', 'ENTERPRISE')),
+    rate_limit_rpm INT NOT NULL DEFAULT 120 CHECK (rate_limit_rpm > 0),
+    max_members INT NOT NULL DEFAULT 50 CHECK (max_members > 0),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'SUSPENDED')),
     settings JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. Control Plane: tenant_users (Multi-Tenant Membership: 1 email can belong to multiple tenants)
+-- 2. Control Plane: tenant_users (1-to-1 binding: 1 account belongs to 1 tenant_id)
 CREATE TABLE tenant_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,

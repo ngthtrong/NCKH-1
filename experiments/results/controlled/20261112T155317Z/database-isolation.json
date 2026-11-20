@@ -1,0 +1,15 @@
+[
+  {
+    "case": "KB-2.3",
+    "rows": 0
+  },
+  {
+    "case": "KB-2.1",
+    "own_rows": 206,
+    "foreign_rows": 0
+  },
+  {
+    "case": "KB-2.3-reused-connection",
+    "rows": 0
+  }
+]

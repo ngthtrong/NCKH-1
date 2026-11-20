@@ -607,14 +607,31 @@ export const KanbanView: React.FC<Props> = ({ isAdmin, settings }) => {
                       {cf.label} {cf.required && <span className="text-red-500">*</span>}
                       <span className="ml-1 text-[10px] text-slate-400">({cf.type})</span>
                     </label>
-                    <input
-                      type={cf.type === 'NUMBER' ? 'number' : 'text'}
-                      value={cardCustomFields[cf.key] ?? ''}
-                      onChange={(e) =>
-                        setCardCustomFields((prev) => ({ ...prev, [cf.key]: e.target.value }))
-                      }
-                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
-                    />
+                    {cf.type === 'SELECT' ? (
+                      <select
+                        value={cardCustomFields[cf.key] ?? ''}
+                        onChange={(e) =>
+                          setCardCustomFields((prev) => ({ ...prev, [cf.key]: e.target.value }))
+                        }
+                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white"
+                      >
+                        <option value="">-- Chọn --</option>
+                        {(cf.options ?? []).map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={cf.type === 'NUMBER' ? 'number' : cf.type === 'DATE' ? 'date' : 'text'}
+                        value={cardCustomFields[cf.key] ?? ''}
+                        onChange={(e) =>
+                          setCardCustomFields((prev) => ({ ...prev, [cf.key]: e.target.value }))
+                        }
+                        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                      />
+                    )}
                   </div>
                 ))}
               </div>

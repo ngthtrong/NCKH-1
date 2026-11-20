@@ -1,0 +1,16 @@
+{
+  "deviations": [
+    {
+      "type": "harness-input-path",
+      "affected": "pair-1-before-harness-failed",
+      "exit_code": 107,
+      "load_emitted": false,
+      "action": "Controller suspended before pair-1-after. Replay before against same snapshot with fixture mounted from /mnt/d. Restore exact snapshot again before resuming after. Workload, SLO, dataset and application image unchanged. Failed log retained; replay reported separately."
+    },
+    {
+      "type": "helper-source-correction",
+      "affected": "sql.py/sample.py",
+      "action": "SQL temp-schema USAGE grant fixed before SQL execution; sampler extended before first load. Actual helper revisions kept under execution-sources; original source archive retained."
+    }
+  ]
+}

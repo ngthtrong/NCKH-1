@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.1.0",
+  "data_kind": "measured",
+  "run_class": "development",
+  "eligible_for_final_analysis": false,
+  "protocol_id": null,
+  "run_id": "kb3-after-2026-11-12T12-59-58.030Z",
+  "status": "succeeded",
+  "started_at_utc": "2026-11-12T13:00:02.456542Z",
+  "finished_at_utc": "2026-11-12T13:01:03.791684Z",
+  "scenario": "noisy-neighbor",
+  "rate_limit_variant": "after",
+  "source": {
+    "git_commit": "82ce82cbc52f4f2b11888ed64c1b97b2d3804377",
+    "git_dirty": true
+  },
+  "target": {
+    "environment_label": "local",
+    "base_url": "http://caddy",
+    "tenant_hosts": [
+      "pool-demo.localhost",
+      "t-acme.localhost",
+      "t-lotus.localhost"
+    ]
+  },
+  "system": {
+    "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "architecture": "x86_64",
+    "logical_cpu_count": 8,
+    "memory_bytes": 12456685568,
+    "cpu_model": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz"
+  },
+  "tools": {
+    "python": "3.10.12",
+    "k6": null,
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "images": {
+    "api": "sha256:6c3dcb5145c701767e6c76ac9d3543ff6982141f5a92968879b1fbcd37122986",
+    "web": "sha256:ee6b9e21eded3c4a3571caebd448d5d876963ee8e05864bcbec022871c77743c"
+  },
+  "workload": {
+    "noisy_duration": "10s"
+  },
+  "artifacts": {
+    "script": "experiments/report/kb3-load.js",
+    "summary": "summary.json",
+    "raw_metrics": "raw-metrics.json",
+    "resource_metrics": "resource-metrics.json"
+  },
+  "notes": ""
+}

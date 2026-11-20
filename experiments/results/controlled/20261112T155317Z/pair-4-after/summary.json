@@ -1,0 +1,241 @@
+{
+    "metrics": {
+        "http_req_duration": {
+            "med": 3.083819,
+            "max": 5092.016619,
+            "p(95)": 2776.655882299998,
+            "p(99)": 3805.4828048199997,
+            "avg": 273.91567733288315,
+            "min": 1.713431
+        },
+        "http_req_receiving": {
+            "p(95)": 6.5638323499999895,
+            "p(99)": 103.99608347999998,
+            "avg": 3.9252367569209916,
+            "min": 0.027473,
+            "med": 0.124237,
+            "max": 386.045649
+        },
+        "iterations": {
+            "count": 2918,
+            "rate": 31.518465655073513
+        },
+        "victim_latency{role:large}": {
+            "p(95)": 67.00785820000003,
+            "p(99)": 138.1911156300011,
+            "avg": 36.2751102777778,
+            "min": 17.710089,
+            "med": 27.163662000000002,
+            "max": 263.746768,
+            "thresholds": {
+                "p(95)<500": false
+            }
+        },
+        "data_received": {
+            "count": 114560899,
+            "rate": 1237417.3271233193
+        },
+        "iteration_duration": {
+            "max": 5566.890045,
+            "p(95)": 3237.753182300002,
+            "p(99)": 5000.0365713,
+            "avg": 333.8020484585333,
+            "min": 2.001734,
+            "med": 3.4666135000000002
+        },
+        "http_req_connecting": {
+            "avg": 0.05770962761647535,
+            "min": 0,
+            "med": 0,
+            "max": 19.271778,
+            "p(95)": 0.27301564999999994,
+            "p(99)": 0.4990009999999999
+        },
+        "victim_success": {
+            "passes": 145,
+            "fails": 0,
+            "thresholds": {
+                "rate==1": false
+            },
+            "value": 1
+        },
+        "vus_max": {
+            "value": 354,
+            "min": 354,
+            "max": 354
+        },
+        "vus": {
+            "value": 2,
+            "min": 0,
+            "max": 124
+        },
+        "victim_latency": {
+            "max": 263.746768,
+            "p(95)": 61.45245399999998,
+            "p(99)": 182.4343939600004,
+            "avg": 29.089338406896555,
+            "min": 9.982594,
+            "med": 23.154223
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "p(99)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0
+        },
+        "http_req_failed": {
+            "passes": 2510,
+            "fails": 452,
+            "value": 0.8474004051316678
+        },
+        "data_sent": {
+            "rate": 24096.147829529553,
+            "count": 2230837
+        },
+        "checks": {
+            "passes": 1946,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_blocked": {
+            "avg": 0.07795108338960184,
+            "min": 0.003098,
+            "med": 0.006995,
+            "max": 19.348518,
+            "p(95)": 0.37340399999999996,
+            "p(99)": 0.6624916599999975
+        },
+        "dropped_iterations": {
+            "count": 0,
+            "rate": 0,
+            "thresholds": {
+                "count==0": false
+            }
+        },
+        "http_reqs": {
+            "count": 2962,
+            "rate": 31.993726960359062
+        },
+        "http_req_duration{expected_response:true}": {
+            "med": 22.974353,
+            "max": 5092.016619,
+            "p(95)": 3729.974178299999,
+            "p(99)": 4378.61351852,
+            "avg": 440.1240416283186,
+            "min": 6.977837
+        },
+        "http_req_sending": {
+            "avg": 0.05226750742741394,
+            "min": 0.009294,
+            "med": 0.044066,
+            "max": 1.692009,
+            "p(95)": 0.08824369999999987,
+            "p(99)": 0.16751282999999986
+        },
+        "victim_latency{role:small}": {
+            "avg": 22.00200176712329,
+            "min": 9.982594,
+            "med": 16.587613,
+            "max": 257.490987,
+            "p(95)": 28.783338999999994,
+            "p(99)": 115.73563236000024,
+            "thresholds": {
+                "p(95)<500": false
+            }
+        },
+        "http_req_waiting": {
+            "p(99)": 3804.26209824,
+            "avg": 269.938173068534,
+            "min": 1.58372,
+            "med": 2.898335,
+            "max": 4876.382746,
+            "p(95)": 2726.4400132499954
+        },
+        "aggressor_429": {
+            "count": 1681,
+            "rate": 18.157142140568396,
+            "thresholds": {
+                "count>0": false
+            }
+        }
+    },
+    "setup_data": {
+        "aggressor": {
+            "host": "pool-demo.localhost:18081",
+            "projectId": "c9d5313b-7bb7-4c82-9b83-2d526d8519af",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkODMzZmM4My1iY2NlLTQ1YjUtOTNiNy0xNTkxZmU1OWU0MDMiLCJ0ZW5hbnRfc2x1ZyI6InBvb2wtZGVtbyIsImtpbmQiOiJ0ZW5hbnQiLCJyb2xlcyI6WyJVU0VSIiwiVEVOQU5UX09XTkVSIiwiU1lTVEVNX0FETUlOIl0sImlzcyI6Im5ja2gxLWxvY2FsIiwidGlkIjoiYzhmNjlkYmQtM2FiNy00OTFhLWI2YmUtODJkYzE1MGI2MmRjIiwibWVtYmVyc2hpcF92ZXJzaW9uIjoxLCJ0aWVyIjoiU1RBUlRFUiIsInBsYWNlbWVudCI6IlBPT0wiLCJleHAiOjE3OTQ1MDM2MjQsImlhdCI6MTc5NDUwMDAyNCwianRpIjoiMzc0OTQ3MmMtMmIwNS00NjM3LWEzMzAtYzg1ZTE4MmE0YTE3IiwiZW1haWwiOiJvd25lckBleGFtcGxlLnRlc3QifQ.BTwqyTfxP8BG6xVArAbU6EYRHdXwSHo3XpCXNXuSDFY",
+            "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403",
+            "tenantId": "c8f69dbd-3ab7-491a-b6be-82dc150b62dc",
+            "boardId": "1fac403f-5126-489e-b2b7-ad662e64d85b",
+            "columns": [
+                "7e7ed252-2a95-4d30-9588-6b263ec08909",
+                "3cf47207-c8c7-487b-adf6-d7e994055ea5",
+                "9a4e808c-da28-4c7f-a280-048dbe50326b"
+            ],
+            "slug": "pool-demo",
+            "taskId": "961d0938-990f-42e0-8a5c-678c8d4aef4f"
+        },
+        "large": {
+            "host": "t-lotus.localhost:18081",
+            "slug": "t-lotus",
+            "tenantId": "248c6e2c-b7fe-463e-b935-3b93597ff40f",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkODMzZmM4My1iY2NlLTQ1YjUtOTNiNy0xNTkxZmU1OWU0MDMiLCJ0ZW5hbnRfc2x1ZyI6InQtbG90dXMiLCJraW5kIjoidGVuYW50Iiwicm9sZXMiOlsiVVNFUiIsIlRFTkFOVF9PV05FUiIsIlNZU1RFTV9BRE1JTiJdLCJpc3MiOiJuY2toMS1sb2NhbCIsInRpZCI6IjI0OGM2ZTJjLWI3ZmUtNDYzZS1iOTM1LTNiOTM1OTdmZjQwZiIsIm1lbWJlcnNoaXBfdmVyc2lvbiI6MSwidGllciI6IlBST0ZFU1NJT05BTCIsInBsYWNlbWVudCI6IlBPT0wiLCJleHAiOjE3OTQ1MDM2MjQsImlhdCI6MTc5NDUwMDAyNCwianRpIjoiYmQzM2MyMzAtZWNiNy00NDY2LWEzNDUtZGZhZjI4NjA5MTkxIiwiZW1haWwiOiJvd25lckBleGFtcGxlLnRlc3QifQ.u0249Mc_-XMVKkZZX9nTSW63nLJJs-VgGVjpkRANCwA",
+            "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403",
+            "boardId": "8b92d838-f8af-493f-8fcd-adc2b34a5613",
+            "columns": [
+                "668a8852-4c51-42e8-b274-d2dbdbcdce2a",
+                "d5efacab-7cb0-4fc3-b918-ad9c40839c76",
+                "4195ea81-f478-498a-babf-27348fe59fc3"
+            ],
+            "projectId": "3dde92db-a1bb-4b5d-804c-7ff7ce86e117",
+            "taskId": "ffcdeb95-a327-4915-9391-20dfd46ec944"
+        },
+        "small": {
+            "projectId": "557f7390-25a0-46bc-9062-b4f82442f7fe",
+            "slug": "t-acme",
+            "tenantId": "8d4ca849-30b1-4267-9a19-81ca55b01e37",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkODMzZmM4My1iY2NlLTQ1YjUtOTNiNy0xNTkxZmU1OWU0MDMiLCJ0ZW5hbnRfc2x1ZyI6InQtYWNtZSIsImtpbmQiOiJ0ZW5hbnQiLCJyb2xlcyI6WyJVU0VSIiwiVEVOQU5UX09XTkVSIiwiU1lTVEVNX0FETUlOIl0sImlzcyI6Im5ja2gxLWxvY2FsIiwidGlkIjoiOGQ0Y2E4NDktMzBiMS00MjY3LTlhMTktODFjYTU1YjAxZTM3IiwibWVtYmVyc2hpcF92ZXJzaW9uIjoxLCJ0aWVyIjoiUFJPRkVTU0lPTkFMIiwicGxhY2VtZW50IjoiUE9PTCIsImV4cCI6MTc5NDUwMzYyNCwiaWF0IjoxNzk0NTAwMDI0LCJqdGkiOiI5ODc0MTJlNi03NDNmLTRhYjQtODM5OC04Y2UzYzBhZjUwOGQiLCJlbWFpbCI6Im93bmVyQGV4YW1wbGUudGVzdCJ9.8Vr9jv_egSwrgiZT5CS7neQuswW9DXskTTwMeFJZYDc",
+            "boardId": "23b03a14-af7d-43ae-86f6-61848d8fd6e8",
+            "columns": [
+                "598330fa-acda-499a-b000-8b2c49d137b7",
+                "3efad6d9-e8af-46d5-84e1-25a8e7e6885b",
+                "80e970e1-5d53-4d7c-a4e6-7c76fb4fb6ba",
+                "3f5d365e-281d-4cdf-9341-99327f5353ce"
+            ],
+            "host": "t-acme.localhost:18081",
+            "taskId": "5dbbb636-c0aa-4eb6-9e1c-313da99f1ddf",
+            "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403"
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "aggressor 200 or 429": {
+                    "name": "aggressor 200 or 429",
+                    "path": "::aggressor 200 or 429",
+                    "id": "7b6dda9d7800c4abb2c7efd7bd7994fe",
+                    "passes": 1801,
+                    "fails": 0
+                },
+                "victim own board and header": {
+                    "name": "victim own board and header",
+                    "path": "::victim own board and header",
+                    "id": "c8703a8b4fe6687b5f8578666cfe27d8",
+                    "passes": 121,
+                    "fails": 0
+                },
+                "single writer succeeds": {
+                    "name": "single writer succeeds",
+                    "path": "::single writer succeeds",
+                    "id": "b78df35b7224b7238fa12e8e913fcf9e",
+                    "passes": 24,
+                    "fails": 0
+                }
+            }
+    }
+}

@@ -31,9 +31,14 @@ public class JwtTenantFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
+        String method = request.getMethod();
 
-        // Public endpoints
-        if (path.equals("/api/auth/login") || path.equals("/api/health") || path.startsWith("/actuator")) {
+        // Public endpoints (Edge branding, self-service onboarding, login, health)
+        if (path.equals("/api/auth/login")
+                || path.equals("/api/health")
+                || path.startsWith("/api/public/")
+                || (path.equals("/api/platform/tenants") && "POST".equalsIgnoreCase(method))
+                || path.startsWith("/actuator")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -53,11 +58,9 @@ public class JwtTenantFilter extends OncePerRequestFilter {
             return;
         }
 
-        String tokenType = claims.get("token_type", String.class);
         TenantInfo info = jwtService.toTenantInfo(claims);
 
-        // Allow /api/auth/switch-workspace and /api/auth/me with PRE_AUTH or ACCESS token
-        if (path.equals("/api/auth/switch-workspace") || path.equals("/api/auth/me")) {
+        if (path.equals("/api/auth/me")) {
             try {
                 TenantContext.set(info);
                 filterChain.doFilter(request, response);
@@ -68,20 +71,15 @@ public class JwtTenantFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!"ACCESS".equals(tokenType)) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Workspace access token required");
-            return;
-        }
-
-        // Control Plane: System Admin endpoints
-        if (path.startsWith("/api/admin/")) {
+        // Control Plane: Platform Admin endpoints
+        if (path.startsWith("/api/admin/") || path.startsWith("/api/platform/")) {
             if (!info.systemAdmin()) {
-                sendError(response, HttpServletResponse.SC_FORBIDDEN, "System Admin privileges required");
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Platform Admin privileges required");
                 return;
             }
             try {
                 TenantContext.set(info);
-                MDC.put("tenant_id", "SYSTEM_ADMIN");
+                MDC.put("tenant_id", "PLATFORM_ADMIN");
                 filterChain.doFilter(request, response);
             } finally {
                 TenantContext.clear();
@@ -104,31 +102,34 @@ public class JwtTenantFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Check tenant status (ACTIVE vs SUSPENDED)
         Tenant tenant = tenantRepository.findById(info.tenantId()).orElse(null);
         if (tenant == null || !"ACTIVE".equals(tenant.getStatus())) {
             sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant organization is suspended or unavailable");
             return;
         }
 
+        long startNs = System.nanoTime();
         try {
             TenantContext.set(info);
             MDC.put("tenant_id", info.tenantId().toString());
             response.setHeader("X-Tenant-ID", info.tenantId().toString());
+            response.setHeader("X-Tenant-Slug", info.slug());
+            response.setHeader("X-Subdomain-Match", hostSubdomain != null ? "EXACT_MATCH" : "LOCALHOST_DIRECT");
+            response.setHeader("X-RLS-Context", "SET LOCAL app.current_tenant_id");
             filterChain.doFilter(request, response);
+            String cacheStatus = TenantContext.getCacheStatus();
+            if (cacheStatus != null) {
+                response.setHeader("X-Cache-Status", cacheStatus);
+            }
+            long elapsedMs = Math.max(1, (System.nanoTime() - startNs) / 1_000_000);
+            response.setHeader("X-Response-Time-Ms", String.valueOf(elapsedMs));
         } finally {
             TenantContext.clear();
             MDC.remove("tenant_id");
         }
     }
 
-    /**
-     * Extracts tenant slug from Host header such as:
-     * - t-acme.localhost:8080 -> t-acme
-     * - t-lotus.tenantflow.vn -> t-lotus
-     * Returns null for bare localhost, 127.0.0.1, or internal docker hostnames (e.g. kanban-api:8080).
-     */
-    private String extractSubdomain(String hostHeader) {
+    public static String extractSubdomain(String hostHeader) {
         if (hostHeader == null || hostHeader.isBlank()) {
             return null;
         }

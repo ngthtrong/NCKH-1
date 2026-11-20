@@ -1,0 +1,47 @@
+Five cache-path probes and Pub/Sub handler checks passed
+Five direct SQL read/update/delete/insert and rollback-context trials passed
+Saved five actual application query plans per role
+
+> saas-multitenancy-web@0.1.0 test:e2e
+> playwright test controlled-report.e2e.ts
+
+
+Running 1 test using 1 worker
+
+(node:540862) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:540862) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 5)
+  ✘  1 [chromium] › e2e/controlled-report.e2e.ts:5:1 › controlled report: five browser trials per tenant with board render measurements (8.1s)
+
+
+  1) [chromium] › e2e/controlled-report.e2e.ts:5:1 › controlled report: five browser trials per tenant with board render measurements 
+
+    Error: ENOENT: no such file or directory, open '/mnt/d/NCKH/apps/web/test-results/.playwright-artifacts-0/traces/697ad2a9a9a8ccf3f996-ffaf73415607f1d19cd6.trace'
+
+    Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, open '/mnt/d/NCKH/apps/web/test-results/.playwright-artifacts-0/traces/697ad2a9a9a8ccf3f996-ffaf73415607f1d19cd6.trace'
+
+      46 |    await page.screenshot({path:resolve(output,`${role}-settings-mobile.png`),fullPage:true});
+      47 |   }
+    > 48 |   await context.close();
+         |                 ^
+      49 |   await writeFile(resolve(output,'browser-measurements.json'),JSON.stringify({description:'Fresh browser contexts; login/transfer excluded from board-ready timer; LCP/long tasks are local lab observations, not field Web Vitals.',samples},null,2));
+      50 |  }
+      51 | });
+        at /mnt/d/NCKH/apps/web/e2e/controlled-report.e2e.ts:48:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/controlled-report.e2e.ts-c-f4803-h-board-render-measurements-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/controlled-report.e2e.ts-c-f4803-h-board-render-measurements-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/controlled-report.e2e.ts-c-f4803-h-board-render-measurements-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/controlled-report.e2e.ts-c-f4803-h-board-render-measurements-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › e2e/controlled-report.e2e.ts:5:1 › controlled report: five browser trials per tenant with board render measurements 

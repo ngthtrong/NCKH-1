@@ -1,0 +1,1848 @@
+{
+  "runId": "2026-11-12T14-29-54.529Z",
+  "runClass": "development",
+  "dataKind": "measured",
+  "startedAt": "2026-11-12T14:29:54.537Z",
+  "commit": "b03bc6bf187d1123a0c68b131e24ece5a96a05f7",
+  "reportSha256": "4428dd78cf137427b8bf94b6a46113740c89ca0448f9090b959062ab40e6519a",
+  "cases": [
+    {
+      "id": "KB-1",
+      "name": "Identity, host/token mismatch, expiry and concurrent tenant context",
+      "status": "PASS",
+      "durationMs": 713.0469999999998,
+      "details": {
+        "concurrentReads": 24,
+        "foreignProjectsReturned": 0
+      }
+    },
+    {
+      "id": "KB-2",
+      "name": "Cross-tenant IDs and shared JSONB schema validation",
+      "status": "PASS",
+      "durationMs": 333.31089199999997,
+      "details": {
+        "crossTenantBoard": "denied",
+        "crossTenantTask": "denied",
+        "invalidMetadata": "rejected",
+        "databaseChecks": "Run kb2-database.sql for direct RLS and query-plan evidence"
+      }
+    },
+    {
+      "id": "KB-4",
+      "name": "Acme STRICT and Lotus WARN on the same API and shared tables",
+      "status": "PASS",
+      "durationMs": 500.60998400000017,
+      "details": {
+        "strictRejectedWith": 422,
+        "warnSaved": true,
+        "acmeTasksInProgress": 2,
+        "lotusTasksInProgress": 3,
+        "cacheTiming": "Request durations are recorded; distributed propagation needs a separate multi-process run"
+      }
+    },
+    {
+      "id": "KB-3-smoke",
+      "name": "Per-tenant 429 isolation (functional; use k6 for latency conclusions)",
+      "status": "FAIL",
+      "message": "No 429 observed; verify RATE_LIMIT_ENABLED=true"
+    }
+  ],
+  "requests": [
+    {
+      "path": "/architecture",
+      "host": "accounts.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 117.1766869999999
+    },
+    {
+      "path": "/auth/login",
+      "host": "accounts.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 308.4067090000001
+    },
+    {
+      "path": "/auth/tenant-transfer",
+      "host": "accounts.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 29.44940399999996
+    },
+    {
+      "path": "/auth/exchange",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 55.7045149999999
+    },
+    {
+      "path": "/auth/tenant-transfer",
+      "host": "accounts.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 33.977802999999994
+    },
+    {
+      "path": "/auth/exchange",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 44.016521999999895
+    },
+    {
+      "path": "/auth/tenant-transfer",
+      "host": "accounts.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 72.13492099999985
+    },
+    {
+      "path": "/auth/exchange",
+      "host": "pool-demo.localhost:18080",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 36.88704399999983
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 143.84691699999985
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 143.2265890000001
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 83.53856300000007
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 86.39734599999997
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 401,
+      "durationMs": 5.498888999999963
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 401,
+      "durationMs": 5.685163000000102
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 401,
+      "durationMs": 7.961868999999979
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 375.39361099999974
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 381.05086300000016
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 374.799974
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 481.9626260000002
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 481.81296700000007
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 490.58765900000003
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 567.0639969999997
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 583.45012
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 583.414505
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 578.3935070000002
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 583.8189660000003
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 583.0126449999998
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 666.7966919999999
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 665.404538
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 671.2332569999999
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 673.306083
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 672.2999820000002
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 674.6565199999998
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 675.0591799999997
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 673.8249900000001
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 675.4032169999998
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 684.5596620000001
+    },
+    {
+      "path": "/projects",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 677.5445700000002
+    },
+    {
+      "path": "/projects",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 690.061451
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 404,
+      "durationMs": 89.984015
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719/tasks",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 110.68935499999998
+    },
+    {
+      "path": "/tasks/98a7c48c-4f6c-4b46-b61d-6c3cba0dd8d1",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 404,
+      "durationMs": 21.062382999999954
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719/tasks",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 400,
+      "durationMs": 71.60710500000005
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa/tasks",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 400,
+      "durationMs": 22.04313000000002
+    },
+    {
+      "path": "/tasks/98a7c48c-4f6c-4b46-b61d-6c3cba0dd8d1",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 17.473837999999887
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 53.73808800000006
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 18.960657999999967
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-acme.localhost:18080",
+      "method": "PUT",
+      "status": 200,
+      "durationMs": 79.53397799999993
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-lotus.localhost:18080",
+      "method": "PUT",
+      "status": 200,
+      "durationMs": 21.128370999999788
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719/tasks",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 64.71048800000017
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719/tasks",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 29.931460000000243
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719/tasks",
+      "host": "t-acme.localhost:18080",
+      "method": "POST",
+      "status": 422,
+      "durationMs": 25.592732999999953
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa/tasks",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 64.32327899999973
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa/tasks",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 26.00925099999995
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa/tasks",
+      "host": "t-lotus.localhost:18080",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 24.23754999999983
+    },
+    {
+      "path": "/boards/f50204f2-9b56-4c96-a01b-ae6708f06719",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 49.82868300000018
+    },
+    {
+      "path": "/boards/b1aef725-3b13-4afe-9157-ebd3283d5afa",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 24.97185800000034
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 16.86366599999974
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 143.36841900000036
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 142.7257370000002
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 143.49635500000022
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 144.74290800000017
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 150.1781430000001
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 150.04640599999993
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 151.77359399999978
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 151.61755099999982
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.1694620000003
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.76947999999993
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 184.58836900000006
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 185.68027800000027
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 186.30065300000024
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.10786300000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 191.0505949999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 191.18063200000006
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.4206479999998
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.93961000000036
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.66853100000026
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 112.98010400000021
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 191.1558829999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 192.40652799999998
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 193.6345369999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 195.6949179999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.32914100000016
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.1748590000002
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.56866599999967
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 110.06807600000002
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 222.642926
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 223.54890899999964
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 224.91533200000003
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 228.9871149999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 164.02407699999958
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 171.3107310000005
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 172.1843340000005
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 176.83588800000007
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 178.21920100000034
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 177.87119900000016
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 178.7592940000004
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 179.12498499999947
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.23833800000011
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.56988000000001
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.26407800000015
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 185.3969160000006
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.5366299999996
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.3909450000001
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 191.97607400000015
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 192.6758749999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 18.15317199999936
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.25296700000035
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.20038999999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.22293900000022
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.73594700000012
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.16126700000041
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.29579100000046
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.13380700000016
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 96.65240899999935
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 98.53853499999968
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 181.70504699999947
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 182.99562100000003
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 184.85218900000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 186.05597900000066
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.4794039999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 190.6730060000009
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.07977300000039
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.5438809999996
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.13653299999987
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.09196199999951
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.80609300000015
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.33224700000028
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 107.28046600000016
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.23558099999991
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 96.47257200000058
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.65639399999964
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.62102899999991
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 185.8573039999992
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 187.18013400000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 187.63603499999954
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.77928299999985
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 192.49833799999942
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.32021499999973
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.79360400000041
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.2842499999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.23956499999986
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.99071399999957
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.28550799999994
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 190.4623759999995
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 191.61821599999985
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.18166099999962
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.93742199999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.3967189999994
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.91987599999993
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.29413000000022
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 107.10627999999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 107.33273099999951
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 107.44605800000045
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 95.54118400000061
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 98.5079340000002
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.22384799999963
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.9580649999998
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.33401800000047
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.1108920000006
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.34548099999938
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.78092199999992
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 93.69859600000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 95.62862700000005
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 179.68496200000027
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 184.14003299999968
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 184.85076600000048
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 186.20177700000022
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 187.21890899999926
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 187.90465700000004
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.06468700000005
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.49291799999992
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 111.20623599999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 111.62541500000043
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.48053100000016
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.90743099999963
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 192.047192
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 192.5684170000004
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.91467000000011
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 102.3602719999999
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.79458299999988
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.45113500000025
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 108.16980200000035
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 109.2128359999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 108.62646700000005
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 108.98800100000062
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 98.56855900000028
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.69899299999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 185.43611600000077
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 186.29138800000055
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.59899200000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.68382999999994
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 190.02584299999944
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 190.5884300000007
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 18.09610100000009
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 96.25206099999923
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.91576900000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.1081180000001
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.91382599999997
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 107.65847900000063
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 108.6243689999992
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 111.46867799999927
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 96.81544699999995
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.52622399999927
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.99827800000003
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.55833100000018
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.11222399999951
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.43542199999956
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 188.20977799999946
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 190.98813700000028
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 98.80538500000057
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 98.99514499999987
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.53624800000034
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.22264300000006
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.10089699999935
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.28948899999978
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.43001599999934
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.0125879999996
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 90.35529399999996
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.65702799999963
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 97.89315499999975
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.92779000000064
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 187.9589990000004
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.1814089999998
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.408101
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.65999100000045
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.36703599999964
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.67788299999938
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 100.24263299999984
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.71403799999916
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 110.10831299999973
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 113.93434199999956
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 114.01347900000019
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 193.0231560000002
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.42717700000048
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 103.95225500000015
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 105.71663900000021
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 106.41308000000026
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 111.10561300000063
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 111.46902200000022
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 112.28426600000057
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 113.82952699999987
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 92.26953299999968
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 99.6898769999998
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.35923600000024
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.55577900000026
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 101.36662999999953
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 104.53208899999936
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.29574800000046
+    },
+    {
+      "path": "/projects",
+      "host": "pool-demo.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 189.85070300000007
+    },
+    {
+      "path": "/projects/02fcb0d1-663e-4800-954a-4c905228fb8d",
+      "host": "t-lotus.localhost:18080",
+      "method": "DELETE",
+      "status": 204,
+      "durationMs": 20.214772999999695
+    },
+    {
+      "path": "/projects/bfa87276-a750-4211-a206-9c0d8b092f42",
+      "host": "t-acme.localhost:18080",
+      "method": "DELETE",
+      "status": 204,
+      "durationMs": 18.505644999999276
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-acme.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 62.862239000000045
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-acme.localhost:18080",
+      "method": "PUT",
+      "status": 200,
+      "durationMs": 18.162320999999793
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-lotus.localhost:18080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 17.765339999999924
+    },
+    {
+      "path": "/tenant-settings/kanban",
+      "host": "t-lotus.localhost:18080",
+      "method": "PUT",
+      "status": 200,
+      "durationMs": 76.45043100000021
+    }
+  ],
+  "cleanupErrors": [],
+  "finishedAt": "2026-11-12T14:30:01.751Z",
+  "status": "FAILED"
+}

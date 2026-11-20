@@ -1,34 +1,43 @@
 export interface CustomFieldDef {
   key: string;
   label: string;
-  type: 'TEXT' | 'NUMBER';
+  type: 'TEXT' | 'NUMBER' | 'SELECT' | 'DATE';
   required: boolean;
+  options?: string[];
 }
 
 export interface TenantSettings {
   theme: {
     primary: string;
     accent: string;
+    logoText?: string;
+    tagline?: string;
   };
-  wipMode: 'STRICT' | 'WARN';
+  wipMode: 'STRICT' | 'WARN' | 'OFF';
   defaultWipLimit: number | null;
   cardDisplayMode: 'FULL' | 'COMPACT';
   defaultColumns: string[];
   customFields: CustomFieldDef[];
 }
 
-export interface WorkspaceSummary {
-  tenantId: string;
+export interface PublicBranding {
+  id: string;
   slug: string;
   name: string;
-  tier: 'FREE' | 'PRO' | 'ENTERPRISE';
-  status: 'ACTIVE' | 'SUSPENDED';
-  role: 'TENANT_ADMIN' | 'MEMBER';
+  tier: string;
+  status: string;
+  theme: {
+    primary: string;
+    accent: string;
+    logoText?: string;
+    tagline?: string;
+  };
 }
 
 export interface AuthUser {
   email: string;
   fullName: string;
+  role: string;
   systemAdmin: boolean;
 }
 
@@ -84,8 +93,25 @@ export interface AdminTenant {
   id: string;
   slug: string;
   name: string;
-  tier: 'FREE' | 'PRO' | 'ENTERPRISE';
+  tier: 'FREE' | 'STANDARD' | 'PRO' | 'ENTERPRISE';
+  rateLimitRpm: number;
+  maxMembers: number;
   status: 'ACTIVE' | 'SUSPENDED';
+  memberCount?: number;
+  blocked429Count?: number;
   settings: TenantSettings;
   createdAt: string;
+}
+
+export interface InspectorTelemetry {
+  timestamp: string;
+  method: string;
+  path: string;
+  status: number;
+  tenantId: string;
+  subdomainMatch: string;
+  cacheStatus: string;
+  rateLimit: string;
+  rlsContext: string;
+  responseTimeMs: string;
 }

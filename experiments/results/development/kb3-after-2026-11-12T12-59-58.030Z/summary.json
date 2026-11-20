@@ -1,0 +1,194 @@
+{
+    "metrics": {
+        "aggressor_429": {
+            "count": 186,
+            "rate": 3.3217016136996826,
+            "thresholds": {
+                "count>0": false
+            }
+        },
+        "data_received": {
+            "count": 860027,
+            "rate": 15358.887493146758
+        },
+        "iterations": {
+            "count": 320,
+            "rate": 5.714755464429562
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 207.98551885858586,
+            "min": 8.712694,
+            "med": 171.2973975,
+            "max": 670.372619,
+            "p(90)": 381.51806300000004,
+            "p(95)": 450.85971824999956
+        },
+        "iteration_duration": {
+            "p(90)": 353.7848865,
+            "p(95)": 396.50288109999997,
+            "avg": 178.94546590312513,
+            "min": 10.310781,
+            "med": 153.861334,
+            "max": 597.776926
+        },
+        "http_req_duration": {
+            "min": 8.712694,
+            "med": 133.762117,
+            "max": 670.372619,
+            "p(90)": 340.4891698,
+            "p(95)": 385.11757279999995,
+            "avg": 167.70444187272716
+        },
+        "http_req_connecting": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.02629048311688312,
+            "min": 0,
+            "med": 0,
+            "max": 2.431549
+        },
+        "http_req_waiting": {
+            "p(95)": 384.5823243999999,
+            "avg": 164.16754783116878,
+            "min": 7.2445,
+            "med": 131.996355,
+            "max": 669.522871,
+            "p(90)": 335.85671740000004
+        },
+        "dropped_iterations": {
+            "rate": 0.05357583247902714,
+            "count": 3
+        },
+        "checks": {
+            "fails": 0,
+            "passes": 324,
+            "thresholds": {
+                "rate==1": false
+            },
+            "value": 1
+        },
+        "vus_max": {
+            "value": 17,
+            "min": 14,
+            "max": 17
+        },
+        "data_sent": {
+            "count": 284580,
+            "rate": 5082.203468960514
+        },
+        "victim_success": {
+            "passes": 26,
+            "fails": 0,
+            "thresholds": {
+                "rate==1": false
+            },
+            "value": 1
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_reqs": {
+            "count": 385,
+            "rate": 6.875565168141817
+        },
+        "http_req_receiving": {
+            "min": 0.028361,
+            "med": 0.320728,
+            "max": 83.845521,
+            "p(90)": 4.613542800000006,
+            "p(95)": 11.266165599999963,
+            "avg": 3.45688221298701
+        },
+        "vus": {
+            "value": 0,
+            "min": 0,
+            "max": 13
+        },
+        "http_req_sending": {
+            "p(90)": 0.11727660000000001,
+            "p(95)": 0.1768107999999998,
+            "avg": 0.08001182857142859,
+            "min": 0.011966,
+            "med": 0.045509,
+            "max": 3.728886
+        },
+        "victim_latency": {
+            "avg": 276.4167909545454,
+            "min": 102.991496,
+            "med": 268.3011955,
+            "max": 577.440224,
+            "p(90)": 395.15152960000006,
+            "p(95)": 554.5457174999999
+        },
+        "http_req_blocked": {
+            "med": 0.008982,
+            "max": 5.495264,
+            "p(90)": 0.024007400000000005,
+            "p(95)": 0.2626227999999892,
+            "avg": 0.06058239220779233,
+            "min": 0.003675
+        },
+        "http_req_failed": {
+            "fails": 198,
+            "passes": 187,
+            "value": 0.4857142857142857
+        }
+    },
+    "setup_data": {
+        "aggressor": {
+            "boardId": "b21a5089-3439-4406-9f6e-086e4b60f918",
+            "host": "pool-demo.localhost:8080",
+            "projectId": "232c11d0-8b01-46e0-a2e1-1a88d9a9df05",
+            "taskId": "aae038fb-e2df-439f-baad-09ed137066e8",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2ZjY4Y2VjZi00M2VlLTQ2ZGEtYWM2MS0yOGY1MTcxZTUzYzUiLCJ0ZW5hbnRfc2x1ZyI6InBvb2wtZGVtbyIsImtpbmQiOiJ0ZW5hbnQiLCJyb2xlcyI6WyJVU0VSIiwiVEVOQU5UX09XTkVSIiwiU1lTVEVNX0FETUlOIl0sImlzcyI6Im5ja2gxLWxvY2FsIiwidGlkIjoiNGYwOTdiYzUtNTM3MS00Zjc5LTkyMjUtODVkM2NjYzEzOTY3IiwibWVtYmVyc2hpcF92ZXJzaW9uIjoxLCJ0aWVyIjoiU1RBUlRFUiIsInBsYWNlbWVudCI6IlBPT0wiLCJleHAiOjE3OTQ0ODkwMTIsImlhdCI6MTc5NDQ4ODQxMiwianRpIjoiYzZhMDJlZjktYzg3Mi00OTZmLTkyMTAtOTE4NjlmYzIzOTBkIiwiZW1haWwiOiJvd25lckBleGFtcGxlLnRlc3QifQ.1Y7D4INwzLphrgeMZX8k4T4L_5b0VGehGSHTd8nRYfg"
+        },
+        "large": {
+            "boardId": "85632b1d-de93-426a-b7fe-349215a5d539",
+            "host": "t-lotus.localhost:8080",
+            "projectId": "a598d346-d984-4e05-94a0-79322d0a229b",
+            "taskId": "cb518160-3f84-48ed-b106-0895e9cb81ee",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2ZjY4Y2VjZi00M2VlLTQ2ZGEtYWM2MS0yOGY1MTcxZTUzYzUiLCJ0ZW5hbnRfc2x1ZyI6InQtbG90dXMiLCJraW5kIjoidGVuYW50Iiwicm9sZXMiOlsiVVNFUiIsIlRFTkFOVF9PV05FUiIsIlNZU1RFTV9BRE1JTiJdLCJpc3MiOiJuY2toMS1sb2NhbCIsInRpZCI6IjBiYTFkMDI2LWE2ZGQtNGJkMi04Nzk5LTE5ODc0MzNkMjdmYiIsIm1lbWJlcnNoaXBfdmVyc2lvbiI6MSwidGllciI6IlBST0ZFU1NJT05BTCIsInBsYWNlbWVudCI6IlBPT0wiLCJleHAiOjE3OTQ0ODkwMDcsImlhdCI6MTc5NDQ4ODQwNywianRpIjoiYWZlYmY4Y2EtMzYzMy00NDAxLWI3MjAtYjQ5YmJjYWQ2ZmFjIiwiZW1haWwiOiJvd25lckBleGFtcGxlLnRlc3QifQ.X1QM8-qt-Bt05qBCk8cCbQqF3uvV7mCsE776WAQQnE0"
+        },
+        "small": {
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2ZjY4Y2VjZi00M2VlLTQ2ZGEtYWM2MS0yOGY1MTcxZTUzYzUiLCJ0ZW5hbnRfc2x1ZyI6InQtYWNtZSIsImtpbmQiOiJ0ZW5hbnQiLCJyb2xlcyI6WyJVU0VSIiwiVEVOQU5UX09XTkVSIiwiU1lTVEVNX0FETUlOIl0sImlzcyI6Im5ja2gxLWxvY2FsIiwidGlkIjoiOTIyMTRjYjEtYzJhYi00OGIxLTgyNDMtMmJkODBiZjkxNmNmIiwibWVtYmVyc2hpcF92ZXJzaW9uIjoxLCJ0aWVyIjoiUFJPRkVTU0lPTkFMIiwicGxhY2VtZW50IjoiUE9PTCIsImV4cCI6MTc5NDQ4OTAwNiwiaWF0IjoxNzk0NDg4NDA2LCJqdGkiOiJiMmJjM2IxOC00ODc3LTQ3NmYtOWVjOS1jMGY4MjQ1NWY3OWEiLCJlbWFpbCI6Im93bmVyQGV4YW1wbGUudGVzdCJ9.XHqYrBlMNjTJ2OknClmUM6wEaBhEOhRMUUHMs-7HX70",
+            "boardId": "e25db8d5-e69b-4c4e-a7c2-da749ea51798",
+            "host": "t-acme.localhost:8080",
+            "projectId": "19717b92-1c1e-4530-a2bb-bb161d0ca45f",
+            "taskId": "66a2daac-c986-432c-88bd-c85aaa47c413"
+        }
+    },
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "aggressor succeeds or is throttled": {
+                    "name": "aggressor succeeds or is throttled",
+                    "path": "::aggressor succeeds or is throttled",
+                    "id": "ce52a8fafa5572671739ca40090f2e82",
+                    "passes": 298,
+                    "fails": 0
+                },
+                "victim reads its own board": {
+                    "fails": 0,
+                    "name": "victim reads its own board",
+                    "path": "::victim reads its own board",
+                    "id": "9f9b4236f0c3400fcbf9044ed97b91be",
+                    "passes": 22
+                },
+                "victim can drag its task": {
+                    "name": "victim can drag its task",
+                    "path": "::victim can drag its task",
+                    "id": "495ab463e70467a146bb2573773d5407",
+                    "passes": 4,
+                    "fails": 0
+                }
+            },
+        "name": "",
+        "path": ""
+    }
+}

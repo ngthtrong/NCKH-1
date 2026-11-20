@@ -34,8 +34,8 @@ public class TenantSettingsService {
             throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Chỉ TENANT_ADMIN mới có quyền thay đổi cài đặt tổ chức");
         }
 
-        if (updated.wipMode() == null || (!"STRICT".equals(updated.wipMode()) && !"WARN".equals(updated.wipMode()))) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_WIP_MODE", "wipMode phải là STRICT hoặc WARN");
+        if (updated.wipMode() == null || (!"STRICT".equals(updated.wipMode()) && !"WARN".equals(updated.wipMode()) && !"OFF".equals(updated.wipMode()))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_WIP_MODE", "wipMode phải là STRICT, WARN hoặc OFF");
         }
         if (updated.cardDisplayMode() == null || (!"FULL".equals(updated.cardDisplayMode()) && !"COMPACT".equals(updated.cardDisplayMode()))) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_DISPLAY_MODE", "cardDisplayMode phải là FULL hoặc COMPACT");
@@ -45,8 +45,8 @@ public class TenantSettingsService {
                 if (cf.key() == null || cf.key().isBlank() || cf.label() == null || cf.label().isBlank()) {
                     throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_CUSTOM_FIELD", "Mỗi trường mở rộng phải có key và label");
                 }
-                if (!"TEXT".equals(cf.type()) && !"NUMBER".equals(cf.type())) {
-                    throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_CUSTOM_FIELD_TYPE", "Kiểu trường mở rộng phải là TEXT hoặc NUMBER");
+                if (!"TEXT".equals(cf.type()) && !"NUMBER".equals(cf.type()) && !"SELECT".equals(cf.type()) && !"DATE".equals(cf.type())) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_CUSTOM_FIELD_TYPE", "Kiểu trường mở rộng phải là TEXT, NUMBER, SELECT hoặc DATE");
                 }
             }
         }

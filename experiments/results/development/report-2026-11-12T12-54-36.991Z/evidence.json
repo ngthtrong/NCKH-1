@@ -1,0 +1,22 @@
+{
+  "runId": "2026-11-12T12-54-36.991Z",
+  "runClass": "development",
+  "dataKind": "measured",
+  "startedAt": "2026-11-12T12:54:37.002Z",
+  "commit": "82ce82cbc52f4f2b11888ed64c1b97b2d3804377",
+  "reportSha256": "4428dd78cf137427b8bf94b6a46113740c89ca0448f9090b959062ab40e6519a",
+  "cases": [],
+  "requests": [
+    {
+      "path": "/architecture",
+      "host": "accounts.localhost:8080",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 68.16082
+    }
+  ],
+  "cleanupErrors": [],
+  "fatal": "Cannot read properties of null (reading 'mode')",
+  "finishedAt": "2026-11-12T12:54:37.227Z",
+  "status": "FAILED"
+}

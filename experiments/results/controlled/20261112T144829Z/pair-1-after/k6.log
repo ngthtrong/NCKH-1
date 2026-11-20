@@ -1,0 +1,8 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+time="2026-11-12T14:59:34Z" level=error msg="GoError: stat /private/fixtures.json: no such file or directory\n\tat go.k6.io/k6/internal/js.(*Bundle).setInitGlobals.func3 (native)\n\tat file:///scripts/load.js:5:30(48)\n" hint="script exception"

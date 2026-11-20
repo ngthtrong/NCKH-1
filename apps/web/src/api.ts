@@ -1,12 +1,14 @@
 import type {
   AdminTenant,
+  AuthUser,
   Board,
   BoardColumn,
   Card,
+  InspectorTelemetry,
+  PublicBranding,
   TenantInfo,
   TenantMember,
   TenantSettings,
-  WorkspaceSummary,
 } from './types';
 
 export class ApiError extends Error {
@@ -34,8 +36,34 @@ export function setStoredToken(token: string | null) {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}, overrideToken?: string): Promise<T> {
-  const token = overrideToken ?? getStoredToken();
+type TelemetryListener = (entry: InspectorTelemetry) => void;
+const telemetryListeners = new Set<TelemetryListener>();
+
+export function subscribeTelemetry(fn: TelemetryListener): () => void {
+  telemetryListeners.add(fn);
+  return () => telemetryListeners.delete(fn);
+}
+
+function emitTelemetry(method: string, path: string, res: Response) {
+  const limit = res.headers.get('X-RateLimit-Limit');
+  const rem = res.headers.get('X-RateLimit-Remaining');
+  const entry: InspectorTelemetry = {
+    timestamp: new Date().toLocaleTimeString('vi-VN'),
+    method,
+    path,
+    status: res.status,
+    tenantId: res.headers.get('X-Tenant-ID') || '—',
+    subdomainMatch: res.headers.get('X-Subdomain-Match') || '—',
+    cacheStatus: res.headers.get('X-Cache-Status') || 'N/A',
+    rateLimit: limit && rem ? `${rem}/${limit}` : '—',
+    rlsContext: res.headers.get('X-RLS-Context') || '—',
+    responseTimeMs: res.headers.get('X-Response-Time-Ms') ? `${res.headers.get('X-Response-Time-Ms')} ms` : '—',
+  };
+  telemetryListeners.forEach((fn) => fn(entry));
+}
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = getStoredToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> | undefined),
@@ -44,7 +72,10 @@ async function request<T>(path: string, options: RequestInit = {}, overrideToken
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const method = options.method || 'GET';
   const res = await fetch(path, { ...options, headers });
+  emitTelemetry(method, path, res);
+
   if (res.status === 204) {
     return undefined as T;
   }
@@ -68,51 +99,44 @@ async function request<T>(path: string, options: RequestInit = {}, overrideToken
 }
 
 export const api = {
-  login: (email: string, password: string) =>
-    request<{
-      user: { email: string; fullName: string; systemAdmin: boolean };
-      preAuthToken: string;
-      accessToken?: string;
-      workspaces: WorkspaceSummary[];
-    }>('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    }),
+  getPublicBranding: () => request<PublicBranding>('/api/public/tenant-branding'),
 
-  switchWorkspace: (tenantSlug: string, preAuthToken: string) =>
+  login: (email: string, password: string, tenantSlug?: string) =>
     request<{
       accessToken: string;
-      tenant: { id: string; slug: string; name: string; tier: string; status: string; role: string; settings: TenantSettings };
-    }>(
-      '/api/auth/switch-workspace',
-      {
-        method: 'POST',
-        body: JSON.stringify({ tenantSlug }),
-      },
-      preAuthToken
-    ),
+      user: AuthUser;
+      tenant?: { id: string; slug: string; name: string; tier: string; settings: TenantSettings };
+    }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, tenantSlug }),
+    }),
 
   me: () => request<TenantInfo>('/api/auth/me'),
 
-  // Admin (UC01)
-  listTenants: () => request<AdminTenant[]>('/api/admin/tenants'),
+  // Platform Admin & Self-Service Onboarding
+  listTenants: () => request<AdminTenant[]>('/api/platform/tenants'),
   createTenant: (payload: {
     slug: string;
     name: string;
-    tier: string;
+    tier?: string;
+    industryTemplate?: string;
+    rateLimitRpm?: number;
+    maxMembers?: number;
     adminEmail?: string;
     adminName?: string;
     adminPassword?: string;
-  }) => request<AdminTenant>('/api/admin/tenants', { method: 'POST', body: JSON.stringify(payload) }),
-  updateTenantStatus: (id: string, status: 'ACTIVE' | 'SUSPENDED') =>
-    request<AdminTenant>(`/api/admin/tenants/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  }) => request<AdminTenant>('/api/platform/tenants', { method: 'POST', body: JSON.stringify(payload) }),
+  updateTenant: (
+    id: string,
+    payload: { status?: 'ACTIVE' | 'SUSPENDED'; tier?: string; rateLimitRpm?: number; maxMembers?: number }
+  ) => request<AdminTenant>(`/api/platform/tenants/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
 
-  // Settings (UC03, UC04)
+  // Settings (K4)
   getSettings: () => request<TenantSettings>('/api/tenant-settings/kanban'),
   updateSettings: (settings: TenantSettings) =>
     request<TenantSettings>('/api/tenant-settings/kanban', { method: 'PUT', body: JSON.stringify(settings) }),
 
-  // Members (UC05)
+  // Members
   listMembers: () => request<TenantMember[]>('/api/tenant-users'),
   addMember: (payload: { email: string; fullName: string; password?: string; role: string }) =>
     request<TenantMember>('/api/tenant-users', { method: 'POST', body: JSON.stringify(payload) }),
@@ -120,7 +144,7 @@ export const api = {
     request<TenantMember>(`/api/tenant-users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
   removeMember: (id: string) => request<void>(`/api/tenant-users/${id}`, { method: 'DELETE' }),
 
-  // Boards & Columns (UC06, UC07)
+  // Boards & Columns
   listBoards: () => request<Board[]>('/api/boards'),
   createBoard: (name: string) => request<Board>('/api/boards', { method: 'POST', body: JSON.stringify({ name }) }),
   renameBoard: (id: string, name: string) =>
@@ -149,7 +173,7 @@ export const api = {
     request<BoardColumn>(`/api/columns/${columnId}`, { method: 'PATCH', body: JSON.stringify(payload) }),
   deleteColumn: (columnId: string) => request<void>(`/api/columns/${columnId}`, { method: 'DELETE' }),
 
-  // Cards (UC08, UC09, UC10)
+  // Cards
   createCard: (
     boardId: string,
     payload: {

@@ -1,0 +1,575 @@
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{application="multi-tenant-task-api",main_application_class="vn.edu.ctu.saas.MultiTenantTaskApplication"} 76.587
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+application_started_time_seconds{application="multi-tenant-task-api",main_application_class="vn.edu.ctu.saas.MultiTenantTaskApplication"} 75.92
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{application="multi-tenant-task-api",path="/app/."} 9.58226976768E11
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{application="multi-tenant-task-api",path="/app/."} 1.081101176832E12
+# HELP executor_active_threads The approximate number of threads that are actively executing tasks
+# TYPE executor_active_threads gauge
+executor_active_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_active_threads{application="multi-tenant-task-api",name="taskScheduler"} 0.0
+# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution
+# TYPE executor_completed_tasks_total counter
+executor_completed_tasks_total{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_completed_tasks_total{application="multi-tenant-task-api",name="taskScheduler"} 2.0
+# HELP executor_pool_core_threads The core number of threads for the pool
+# TYPE executor_pool_core_threads gauge
+executor_pool_core_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 8.0
+executor_pool_core_threads{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP executor_pool_max_threads The maximum allowed number of threads in the pool
+# TYPE executor_pool_max_threads gauge
+executor_pool_max_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 2.147483647E9
+executor_pool_max_threads{application="multi-tenant-task-api",name="taskScheduler"} 2.147483647E9
+# HELP executor_pool_size_threads The current number of threads in the pool
+# TYPE executor_pool_size_threads gauge
+executor_pool_size_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_pool_size_threads{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking
+# TYPE executor_queue_remaining_tasks gauge
+executor_queue_remaining_tasks{application="multi-tenant-task-api",name="applicationTaskExecutor"} 2.147483647E9
+executor_queue_remaining_tasks{application="multi-tenant-task-api",name="taskScheduler"} 2.147483647E9
+# HELP executor_queued_tasks The approximate number of tasks that are queued for execution
+# TYPE executor_queued_tasks gauge
+executor_queued_tasks{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_queued_tasks{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP hikaricp_connections Total connections
+# TYPE hikaricp_connections gauge
+hikaricp_connections{application="multi-tenant-task-api",pool="HikariPool-1"} 4.0
+# HELP hikaricp_connections_acquire_seconds Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds summary
+hikaricp_connections_acquire_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 1324
+hikaricp_connections_acquire_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 2.186105612
+# HELP hikaricp_connections_acquire_seconds_max Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds_max gauge
+hikaricp_connections_acquire_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 0.109510392
+# HELP hikaricp_connections_active Active connections
+# TYPE hikaricp_connections_active gauge
+hikaricp_connections_active{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_creation_seconds Connection creation time
+# TYPE hikaricp_connections_creation_seconds summary
+hikaricp_connections_creation_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 2
+hikaricp_connections_creation_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 0.316
+# HELP hikaricp_connections_creation_seconds_max Connection creation time
+# TYPE hikaricp_connections_creation_seconds_max gauge
+hikaricp_connections_creation_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 0.204
+# HELP hikaricp_connections_idle Idle connections
+# TYPE hikaricp_connections_idle gauge
+hikaricp_connections_idle{application="multi-tenant-task-api",pool="HikariPool-1"} 4.0
+# HELP hikaricp_connections_max Max connections
+# TYPE hikaricp_connections_max gauge
+hikaricp_connections_max{application="multi-tenant-task-api",pool="HikariPool-1"} 5.0
+# HELP hikaricp_connections_min Min connections
+# TYPE hikaricp_connections_min gauge
+hikaricp_connections_min{application="multi-tenant-task-api",pool="HikariPool-1"} 1.0
+# HELP hikaricp_connections_pending Pending threads
+# TYPE hikaricp_connections_pending gauge
+hikaricp_connections_pending{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_timeout_total Connection timeout total count
+# TYPE hikaricp_connections_timeout_total counter
+hikaricp_connections_timeout_total{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_usage_seconds Connection usage time
+# TYPE hikaricp_connections_usage_seconds summary
+hikaricp_connections_usage_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 1324
+hikaricp_connections_usage_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 20.06
+# HELP hikaricp_connections_usage_seconds_max Connection usage time
+# TYPE hikaricp_connections_usage_seconds_max gauge
+hikaricp_connections_usage_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 1.605
+# HELP http_server_requests_active_seconds  
+# TYPE http_server_requests_active_seconds summary
+http_server_requests_active_seconds_count{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 1
+http_server_requests_active_seconds_sum{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.004159198
+http_server_requests_active_seconds_count{application="multi-tenant-task-api",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0
+http_server_requests_active_seconds_sum{application="multi-tenant-task-api",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.0
+http_server_requests_active_seconds_count{application="multi-tenant-task-api",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0
+http_server_requests_active_seconds_sum{application="multi-tenant-task-api",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.0
+# HELP http_server_requests_active_seconds_max  
+# TYPE http_server_requests_active_seconds_max gauge
+http_server_requests_active_seconds_max{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.004168597
+http_server_requests_active_seconds_max{application="multi-tenant-task-api",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.0
+http_server_requests_active_seconds_max{application="multi-tenant-task-api",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.0
+# HELP http_server_requests_seconds  
+# TYPE http_server_requests_seconds summary
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="IOException",exception="IOException",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 3
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="IOException",exception="IOException",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 0.9301929
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="CLIENT_ERROR",status="429",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/boards/{boardId}"} 2511
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="CLIENT_ERROR",status="429",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/boards/{boardId}"} 91.512166407
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 91
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 58.220190031
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 17
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 3.619228153
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 90
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 27.596769518
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 17
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 3.6787953
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc",tenant_placement="POOL",tenant_tier="STARTER",uri="/api/v1/boards/{boardId}"} 190
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc",tenant_placement="POOL",tenant_tier="STARTER",uri="/api/v1/boards/{boardId}"} 85.232063662
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 11
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.589739136
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 22
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 1.881990983
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 2
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 0.0700353
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 17
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 7.740429065
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 17
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 4.773370062
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/exchange"} 3
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/exchange"} 0.401136052
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/login"} 1
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/login"} 2.549531523
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/tenant-transfer"} 3
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/tenant-transfer"} 0.495477087
+# HELP http_server_requests_seconds_max  
+# TYPE http_server_requests_seconds_max gauge
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="IOException",exception="IOException",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 0.409770705
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="CLIENT_ERROR",status="429",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/boards/{boardId}"} 0.604150546
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 5.975342211
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 1.274288378
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}"} 3.178163768
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/tasks/{taskId}"} 1.380103218
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc",tenant_placement="POOL",tenant_tier="STARTER",uri="/api/v1/boards/{boardId}"} 4.504778301
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.211067321
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 0.487398507
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 0.053179016
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 2.796878325
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="PATCH",outcome="SUCCESS",status="200",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37",tenant_placement="POOL",tenant_tier="PROFESSIONAL",uri="/api/v1/boards/{boardId}/tasks/{taskId}/position"} 0.801489835
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/exchange"} 0.216055275
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/login"} 2.549531523
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/auth/tenant-transfer"} 0.385864807
+# HELP jdbc_connections_active Current number of active connections that have been allocated from the data source.
+# TYPE jdbc_connections_active gauge
+jdbc_connections_active{application="multi-tenant-task-api",name="dataSource"} 0.0
+# HELP jdbc_connections_idle Number of established but idle connections.
+# TYPE jdbc_connections_idle gauge
+jdbc_connections_idle{application="multi-tenant-task-api",name="dataSource"} 4.0
+# HELP jdbc_connections_max Maximum number of active connections that can be allocated at the same time.
+# TYPE jdbc_connections_max gauge
+jdbc_connections_max{application="multi-tenant-task-api",name="dataSource"} 5.0
+# HELP jdbc_connections_min Minimum number of idle connections in the pool.
+# TYPE jdbc_connections_min gauge
+jdbc_connections_min{application="multi-tenant-task-api",name="dataSource"} 1.0
+# HELP jvm_info JVM version info
+# TYPE jvm_info gauge
+jvm_info{application="multi-tenant-task-api",runtime="OpenJDK Runtime Environment",vendor="Eclipse Adoptium",version="21.0.13+9-LTS"} 1
+# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool
+# TYPE jvm_buffer_count_buffers gauge
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="direct"} 13.0
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool
+# TYPE jvm_buffer_memory_used_bytes gauge
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="direct"} 8472577.0
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="direct"} 8472576.0
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine
+# TYPE jvm_classes_loaded_classes gauge
+jvm_classes_loaded_classes{application="multi-tenant-task-api"} 22755.0
+# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine
+# TYPE jvm_classes_unloaded_classes_total counter
+jvm_classes_unloaded_classes_total{application="multi-tenant-task-api"} 64.0
+# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation
+# TYPE jvm_compilation_time_ms_total counter
+jvm_compilation_time_ms_total{application="multi-tenant-task-api",compiler="HotSpot 64-Bit Tiered Compilers"} 182084.0
+# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation
+# TYPE jvm_gc_live_data_size_bytes gauge
+jvm_gc_live_data_size_bytes{application="multi-tenant-task-api"} 7.3515792E7
+# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool
+# TYPE jvm_gc_max_data_size_bytes gauge
+jvm_gc_max_data_size_bytes{application="multi-tenant-task-api"} 4.02653184E8
+# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next
+# TYPE jvm_gc_memory_allocated_bytes_total counter
+jvm_gc_memory_allocated_bytes_total{application="multi-tenant-task-api"} 2.135368008E9
+# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC
+# TYPE jvm_gc_memory_promoted_bytes_total counter
+jvm_gc_memory_promoted_bytes_total{application="multi-tenant-task-api"} 4.6509944E7
+# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]
+# TYPE jvm_gc_overhead gauge
+jvm_gc_overhead{application="multi-tenant-task-api"} 0.01751629249053153
+# HELP jvm_gc_pause_seconds Time spent in GC pause
+# TYPE jvm_gc_pause_seconds summary
+jvm_gc_pause_seconds_count{action="end of major GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="MarkSweepCompact"} 2
+jvm_gc_pause_seconds_sum{action="end of major GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="MarkSweepCompact"} 0.764
+jvm_gc_pause_seconds_count{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 59
+jvm_gc_pause_seconds_sum{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 1.273
+# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+# TYPE jvm_gc_pause_seconds_max gauge
+jvm_gc_pause_seconds_max{action="end of major GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="MarkSweepCompact"} 0.445
+jvm_gc_pause_seconds_max{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 0.103
+# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use
+# TYPE jvm_memory_committed_bytes gauge
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 4.9152E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 6094848.0
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 1.22527744E8
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 2555904.0
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.1534336E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 3.8535168E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.6777216E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} 1.23011072E8
+# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management
+# TYPE jvm_memory_max_bytes gauge
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 1.61087488E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 2.0119552E7
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 4.02653184E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 5828608.0
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.22916864E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 1.22912768E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.073741824E9
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} -1.0
+# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]
+# TYPE jvm_memory_usage_after_gc gauge
+jvm_memory_usage_after_gc{application="multi-tenant-task-api",area="heap",pool="long-lived"} 0.182578444480896
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 3.6817184E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 0.0
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 7.3515792E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 1564416.0
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.0600704E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 3.7213056E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.612548E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} 1.21548288E8
+# HELP jvm_threads_daemon_threads The current number of live daemon threads
+# TYPE jvm_threads_daemon_threads gauge
+jvm_threads_daemon_threads{application="multi-tenant-task-api"} 23.0
+# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads
+# TYPE jvm_threads_live_threads gauge
+jvm_threads_live_threads{application="multi-tenant-task-api"} 28.0
+# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset
+# TYPE jvm_threads_peak_threads gauge
+jvm_threads_peak_threads{application="multi-tenant-task-api"} 30.0
+# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM
+# TYPE jvm_threads_started_threads_total counter
+jvm_threads_started_threads_total{application="multi-tenant-task-api"} 33.0
+# HELP jvm_threads_states_threads The current number of threads
+# TYPE jvm_threads_states_threads gauge
+jvm_threads_states_threads{application="multi-tenant-task-api",state="blocked"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="new"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="runnable"} 9.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="terminated"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="timed-waiting"} 17.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="waiting"} 2.0
+# HELP lettuce_command_completion_seconds Latency between command send and command completion (complete response received
+# TYPE lettuce_command_completion_seconds summary
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 4
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.011868682
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 2950
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 19.365892787
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 46
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 0.239584095
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 2
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.074588305
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 44
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 0.369121952
+# HELP lettuce_command_completion_seconds_max Latency between command send and command completion (complete response received
+# TYPE lettuce_command_completion_seconds_max gauge
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.005184815
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 0.206565813
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 0.093672905
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.070395696
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 0.093832413
+# HELP lettuce_command_firstresponse_seconds Latency between command send and first response (first response received)
+# TYPE lettuce_command_firstresponse_seconds summary
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 4
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.011516258
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 2950
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 18.817231442
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 46
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 0.232231845
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 2
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.062387788
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 44
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 0.364629383
+# HELP lettuce_command_firstresponse_seconds_max Latency between command send and first response (first response received)
+# TYPE lettuce_command_firstresponse_seconds_max gauge
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.005164125
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="EVALSHA",local="local:any",remote="redis/172.23.0.2:6379"} 0.175817233
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="GET",local="local:any",remote="redis/172.23.0.2:6379"} 0.093632297
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.061336912
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="SET",local="local:any",remote="redis/172.23.0.2:6379"} 0.093806637
+# HELP logback_events_total Number of log events that were enabled by the effective log level
+# TYPE logback_events_total counter
+logback_events_total{application="multi-tenant-task-api",level="debug"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="error"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="info"} 444.0
+logback_events_total{application="multi-tenant-task-api",level="trace"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="warn"} 0.0
+# HELP process_cpu_time_ns_total The "cpu time" used by the Java Virtual Machine process
+# TYPE process_cpu_time_ns_total counter
+process_cpu_time_ns_total{application="multi-tenant-task-api"} 1.5189E11
+# HELP process_cpu_usage The "recent cpu usage" for the Java Virtual Machine process
+# TYPE process_cpu_usage gauge
+process_cpu_usage{application="multi-tenant-task-api"} 0.05
+# HELP process_files_max_files The maximum file descriptor count
+# TYPE process_files_max_files gauge
+process_files_max_files{application="multi-tenant-task-api"} 1048576.0
+# HELP process_files_open_files The open file descriptor count
+# TYPE process_files_open_files gauge
+process_files_open_files{application="multi-tenant-task-api"} 29.0
+# HELP process_start_time_seconds Start time of the process since unix epoch.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds{application="multi-tenant-task-api"} 1.794499759371E9
+# HELP process_uptime_seconds The uptime of the Java virtual machine
+# TYPE process_uptime_seconds gauge
+process_uptime_seconds{application="multi-tenant-task-api"} 191.186
+# HELP spring_data_repository_invocations_seconds Duration of repository invocations
+# TYPE spring_data_repository_invocations_seconds summary
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findAllByUserIdAndActiveTrue",repository="TenantMembershipRepository",state="SUCCESS"} 1
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findAllByUserIdAndActiveTrue",repository="TenantMembershipRepository",state="SUCCESS"} 0.014251594
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findByCodeHash",repository="TenantSessionGrantRepository",state="SUCCESS"} 3
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findByCodeHash",repository="TenantSessionGrantRepository",state="SUCCESS"} 0.081934869
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findByEmailIgnoreCase",repository="UserAccountRepository",state="SUCCESS"} 1
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findByEmailIgnoreCase",repository="UserAccountRepository",state="SUCCESS"} 0.538399121
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findById",repository="TenantRepository",state="SUCCESS"} 445
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findById",repository="TenantRepository",state="SUCCESS"} 5.827354256
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findById",repository="UserAccountRepository",state="SUCCESS"} 3
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findById",repository="UserAccountRepository",state="SUCCESS"} 0.008245217
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findBySlug",repository="TenantRepository",state="SUCCESS"} 3
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findBySlug",repository="TenantRepository",state="SUCCESS"} 0.074858915
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findByTenantId",repository="TenantPlacementRepository",state="SUCCESS"} 445
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findByTenantId",repository="TenantPlacementRepository",state="SUCCESS"} 9.993354935
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="findByTenantIdAndUserId",repository="TenantMembershipRepository",state="SUCCESS"} 445
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="findByTenantIdAndUserId",repository="TenantMembershipRepository",state="SUCCESS"} 12.090669975
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="save",repository="RefreshSessionRepository",state="SUCCESS"} 3
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="save",repository="RefreshSessionRepository",state="SUCCESS"} 0.002592625
+spring_data_repository_invocations_seconds_count{application="multi-tenant-task-api",exception="None",method="save",repository="TenantSessionGrantRepository",state="SUCCESS"} 6
+spring_data_repository_invocations_seconds_sum{application="multi-tenant-task-api",exception="None",method="save",repository="TenantSessionGrantRepository",state="SUCCESS"} 0.069903337
+# HELP spring_data_repository_invocations_seconds_max Duration of repository invocations
+# TYPE spring_data_repository_invocations_seconds_max gauge
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findAllByUserIdAndActiveTrue",repository="TenantMembershipRepository",state="SUCCESS"} 0.014251594
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findByCodeHash",repository="TenantSessionGrantRepository",state="SUCCESS"} 0.061713677
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findByEmailIgnoreCase",repository="UserAccountRepository",state="SUCCESS"} 0.538399121
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findById",repository="TenantRepository",state="SUCCESS"} 0.204018416
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findById",repository="UserAccountRepository",state="SUCCESS"} 0.003127117
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findBySlug",repository="TenantRepository",state="SUCCESS"} 0.067692275
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findByTenantId",repository="TenantPlacementRepository",state="SUCCESS"} 0.314055831
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="findByTenantIdAndUserId",repository="TenantMembershipRepository",state="SUCCESS"} 0.28918047
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="save",repository="RefreshSessionRepository",state="SUCCESS"} 0.002109093
+spring_data_repository_invocations_seconds_max{application="multi-tenant-task-api",exception="None",method="save",repository="TenantSessionGrantRepository",state="SUCCESS"} 0.065770885
+# HELP spring_security_authentications_active_seconds  
+# TYPE spring_security_authentications_active_seconds summary
+spring_security_authentications_active_seconds_count{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="n/a"} 0
+spring_security_authentications_active_seconds_sum{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="n/a"} 0.0
+# HELP spring_security_authentications_active_seconds_max  
+# TYPE spring_security_authentications_active_seconds_max gauge
+spring_security_authentications_active_seconds_max{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="n/a"} 0.0
+# HELP spring_security_authentications_seconds  
+# TYPE spring_security_authentications_seconds summary
+spring_security_authentications_seconds_count{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="JwtAuthenticationToken",error="none"} 2953
+spring_security_authentications_seconds_sum{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="JwtAuthenticationToken",error="none"} 15.550861942
+# HELP spring_security_authentications_seconds_max  
+# TYPE spring_security_authentications_seconds_max gauge
+spring_security_authentications_seconds_max{application="multi-tenant-task-api",authentication_failure_type="n/a",authentication_method="ProviderManager",authentication_request_type="BearerTokenAuthenticationToken",authentication_result_type="JwtAuthenticationToken",error="none"} 0.453484655
+# HELP spring_security_authorizations_active_seconds  
+# TYPE spring_security_authorizations_active_seconds summary
+spring_security_authorizations_active_seconds_count{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0
+spring_security_authorizations_active_seconds_sum{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0.0
+# HELP spring_security_authorizations_active_seconds_max  
+# TYPE spring_security_authorizations_active_seconds_max gauge
+spring_security_authorizations_active_seconds_max{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0.0
+# HELP spring_security_authorizations_seconds  
+# TYPE spring_security_authorizations_seconds summary
+spring_security_authorizations_seconds_count{application="multi-tenant-task-api",error="none",spring_security_authentication_type="JwtAuthenticationToken",spring_security_authorization_decision="true",spring_security_object="request"} 442
+spring_security_authorizations_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_authentication_type="JwtAuthenticationToken",spring_security_authorization_decision="true",spring_security_object="request"} 0.555897966
+spring_security_authorizations_seconds_count{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 43
+spring_security_authorizations_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 0.017131704
+# HELP spring_security_authorizations_seconds_max  
+# TYPE spring_security_authorizations_seconds_max gauge
+spring_security_authorizations_seconds_max{application="multi-tenant-task-api",error="none",spring_security_authentication_type="JwtAuthenticationToken",spring_security_authorization_decision="true",spring_security_object="request"} 0.096714564
+spring_security_authorizations_seconds_max{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 0.004231005
+# HELP spring_security_filterchains_AuthenticationFilter_after_total  
+# TYPE spring_security_filterchains_AuthenticationFilter_after_total counter
+spring_security_filterchains_AuthenticationFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_AuthenticationFilter_before_total  
+# TYPE spring_security_filterchains_AuthenticationFilter_before_total counter
+spring_security_filterchains_AuthenticationFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_TenantContextFilter_after_total  
+# TYPE spring_security_filterchains_TenantContextFilter_after_total counter
+spring_security_filterchains_TenantContextFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_TenantContextFilter_before_total  
+# TYPE spring_security_filterchains_TenantContextFilter_before_total counter
+spring_security_filterchains_TenantContextFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_TenantRateLimitFilter_after_total  
+# TYPE spring_security_filterchains_TenantRateLimitFilter_after_total counter
+spring_security_filterchains_TenantRateLimitFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_TenantRateLimitFilter_before_total  
+# TYPE spring_security_filterchains_TenantRateLimitFilter_before_total counter
+spring_security_filterchains_TenantRateLimitFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_access_exceptions_after_total  
+# TYPE spring_security_filterchains_access_exceptions_after_total counter
+spring_security_filterchains_access_exceptions_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_access_exceptions_before_total  
+# TYPE spring_security_filterchains_access_exceptions_before_total counter
+spring_security_filterchains_access_exceptions_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_active_seconds  
+# TYPE spring_security_filterchains_active_seconds summary
+spring_security_filterchains_active_seconds_count{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0
+spring_security_filterchains_active_seconds_sum{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0.0
+spring_security_filterchains_active_seconds_count{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0
+spring_security_filterchains_active_seconds_sum{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0.0
+# HELP spring_security_filterchains_active_seconds_max  
+# TYPE spring_security_filterchains_active_seconds_max gauge
+spring_security_filterchains_active_seconds_max{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0.0
+spring_security_filterchains_active_seconds_max{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0.0
+# HELP spring_security_filterchains_authentication_anonymous_after_total  
+# TYPE spring_security_filterchains_authentication_anonymous_after_total counter
+spring_security_filterchains_authentication_anonymous_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_authentication_anonymous_before_total  
+# TYPE spring_security_filterchains_authentication_anonymous_before_total counter
+spring_security_filterchains_authentication_anonymous_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_authentication_bearer_after_total  
+# TYPE spring_security_filterchains_authentication_bearer_after_total counter
+spring_security_filterchains_authentication_bearer_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_authentication_bearer_before_total  
+# TYPE spring_security_filterchains_authentication_bearer_before_total counter
+spring_security_filterchains_authentication_bearer_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_authorization_after_total  
+# TYPE spring_security_filterchains_authorization_after_total counter
+spring_security_filterchains_authorization_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_authorization_before_total  
+# TYPE spring_security_filterchains_authorization_before_total counter
+spring_security_filterchains_authorization_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_context_async_after_total  
+# TYPE spring_security_filterchains_context_async_after_total counter
+spring_security_filterchains_context_async_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_context_async_before_total  
+# TYPE spring_security_filterchains_context_async_before_total counter
+spring_security_filterchains_context_async_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_context_holder_after_total  
+# TYPE spring_security_filterchains_context_holder_after_total counter
+spring_security_filterchains_context_holder_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_context_holder_before_total  
+# TYPE spring_security_filterchains_context_holder_before_total counter
+spring_security_filterchains_context_holder_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_context_servlet_after_total  
+# TYPE spring_security_filterchains_context_servlet_after_total counter
+spring_security_filterchains_context_servlet_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_context_servlet_before_total  
+# TYPE spring_security_filterchains_context_servlet_before_total counter
+spring_security_filterchains_context_servlet_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_cors_after_total  
+# TYPE spring_security_filterchains_cors_after_total counter
+spring_security_filterchains_cors_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_cors_before_total  
+# TYPE spring_security_filterchains_cors_before_total counter
+spring_security_filterchains_cors_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_header_after_total  
+# TYPE spring_security_filterchains_header_after_total counter
+spring_security_filterchains_header_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_header_before_total  
+# TYPE spring_security_filterchains_header_before_total counter
+spring_security_filterchains_header_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_logout_after_total  
+# TYPE spring_security_filterchains_logout_after_total counter
+spring_security_filterchains_logout_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_logout_before_total  
+# TYPE spring_security_filterchains_logout_before_total counter
+spring_security_filterchains_logout_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_filterchains_requestcache_after_total  
+# TYPE spring_security_filterchains_requestcache_after_total counter
+spring_security_filterchains_requestcache_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_requestcache_before_total  
+# TYPE spring_security_filterchains_requestcache_before_total counter
+spring_security_filterchains_requestcache_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_seconds  
+# TYPE spring_security_filterchains_seconds summary
+spring_security_filterchains_seconds_count{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 485
+spring_security_filterchains_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 54.166105921
+spring_security_filterchains_seconds_count{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 2995
+spring_security_filterchains_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 4.080924889
+spring_security_filterchains_seconds_count{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="8",spring_security_filterchain_size="16",spring_security_reached_filter_name="TenantRateLimitFilter",spring_security_reached_filter_section="before"} 2511
+spring_security_filterchains_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="8",spring_security_filterchain_size="16",spring_security_reached_filter_name="TenantRateLimitFilter",spring_security_reached_filter_section="before"} 79.472387995
+# HELP spring_security_filterchains_seconds_max  
+# TYPE spring_security_filterchains_seconds_max gauge
+spring_security_filterchains_seconds_max{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 0.77198592
+spring_security_filterchains_seconds_max{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 0.199868641
+spring_security_filterchains_seconds_max{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="8",spring_security_filterchain_size="16",spring_security_reached_filter_name="TenantRateLimitFilter",spring_security_reached_filter_section="before"} 0.593414458
+# HELP spring_security_filterchains_session_management_after_total  
+# TYPE spring_security_filterchains_session_management_after_total counter
+spring_security_filterchains_session_management_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 484.0
+# HELP spring_security_filterchains_session_management_before_total  
+# TYPE spring_security_filterchains_session_management_before_total counter
+spring_security_filterchains_session_management_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 485.0
+# HELP spring_security_filterchains_session_urlencoding_after_total  
+# TYPE spring_security_filterchains_session_urlencoding_after_total counter
+spring_security_filterchains_session_urlencoding_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 2995.0
+# HELP spring_security_filterchains_session_urlencoding_before_total  
+# TYPE spring_security_filterchains_session_urlencoding_before_total counter
+spring_security_filterchains_session_urlencoding_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 2996.0
+# HELP spring_security_http_secured_requests_active_seconds  
+# TYPE spring_security_http_secured_requests_active_seconds summary
+spring_security_http_secured_requests_active_seconds_count{application="multi-tenant-task-api"} 1
+spring_security_http_secured_requests_active_seconds_sum{application="multi-tenant-task-api"} 0.004167997
+# HELP spring_security_http_secured_requests_active_seconds_max  
+# TYPE spring_security_http_secured_requests_active_seconds_max gauge
+spring_security_http_secured_requests_active_seconds_max{application="multi-tenant-task-api"} 0.004173396
+# HELP spring_security_http_secured_requests_seconds  
+# TYPE spring_security_http_secured_requests_seconds summary
+spring_security_http_secured_requests_seconds_count{application="multi-tenant-task-api",error="none"} 484
+spring_security_http_secured_requests_seconds_sum{application="multi-tenant-task-api",error="none"} 138.719490763
+# HELP spring_security_http_secured_requests_seconds_max  
+# TYPE spring_security_http_secured_requests_seconds_max gauge
+spring_security_http_secured_requests_seconds_max{application="multi-tenant-task-api",error="none"} 5.201608231
+# HELP system_cpu_count The number of processors available to the Java virtual machine
+# TYPE system_cpu_count gauge
+system_cpu_count{application="multi-tenant-task-api"} 1.0
+# HELP system_cpu_usage The "recent cpu usage" of the system the application is running in
+# TYPE system_cpu_usage gauge
+system_cpu_usage{application="multi-tenant-task-api"} 0.102822
+# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time
+# TYPE system_load_average_1m gauge
+system_load_average_1m{application="multi-tenant-task-api"} 3.08740234375
+# HELP tasks_scheduled_execution_active_seconds  
+# TYPE tasks_scheduled_execution_active_seconds summary
+tasks_scheduled_execution_active_seconds_count{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_active_seconds_max  
+# TYPE tasks_scheduled_execution_active_seconds_max gauge
+tasks_scheduled_execution_active_seconds_max{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_seconds  
+# TYPE tasks_scheduled_execution_seconds summary
+tasks_scheduled_execution_seconds_count{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 2
+tasks_scheduled_execution_seconds_sum{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 0.013495211
+# HELP tasks_scheduled_execution_seconds_max  
+# TYPE tasks_scheduled_execution_seconds_max gauge
+tasks_scheduled_execution_seconds_max{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 0.013342048
+# HELP tenant_cache_requests_total  
+# TYPE tenant_cache_requests_total counter
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:1fac403f-5126-489e-b2b7-ad662e64d85b",result="hit",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc"} 185.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:1fac403f-5126-489e-b2b7-ad662e64d85b",result="miss",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc"} 5.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:23b03a14-af7d-43ae-86f6-61848d8fd6e8",result="hit",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37"} 72.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:23b03a14-af7d-43ae-86f6-61848d8fd6e8",result="miss",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37"} 18.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:8b92d838-f8af-493f-8fcd-adc2b34a5613",result="hit",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f"} 68.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l1",resource="board:8b92d838-f8af-493f-8fcd-adc2b34a5613",result="miss",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f"} 23.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l2",resource="board:1fac403f-5126-489e-b2b7-ad662e64d85b",result="hit",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc"} 2.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l2",resource="board:1fac403f-5126-489e-b2b7-ad662e64d85b",result="miss",tenant_id="c8f69dbd-3ab7-491a-b6be-82dc150b62dc"} 3.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l2",resource="board:23b03a14-af7d-43ae-86f6-61848d8fd6e8",result="miss",tenant_id="8d4ca849-30b1-4267-9a19-81ca55b01e37"} 18.0
+tenant_cache_requests_total{application="multi-tenant-task-api",layer="l2",resource="board:8b92d838-f8af-493f-8fcd-adc2b34a5613",result="miss",tenant_id="248c6e2c-b7fe-463e-b935-3b93597ff40f"} 23.0
+# HELP tomcat_sessions_active_current_sessions  
+# TYPE tomcat_sessions_active_current_sessions gauge
+tomcat_sessions_active_current_sessions{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_active_max_sessions  
+# TYPE tomcat_sessions_active_max_sessions gauge
+tomcat_sessions_active_max_sessions{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_alive_max_seconds  
+# TYPE tomcat_sessions_alive_max_seconds gauge
+tomcat_sessions_alive_max_seconds{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_created_sessions_total  
+# TYPE tomcat_sessions_created_sessions_total counter
+tomcat_sessions_created_sessions_total{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_expired_sessions_total  
+# TYPE tomcat_sessions_expired_sessions_total counter
+tomcat_sessions_expired_sessions_total{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_rejected_sessions_total  
+# TYPE tomcat_sessions_rejected_sessions_total counter
+tomcat_sessions_rejected_sessions_total{application="multi-tenant-task-api"} 0.0

@@ -12,9 +12,7 @@ import vn.tenantflow.domain.repository.TenantUserRepository;
 import vn.tenantflow.security.JwtService;
 import vn.tenantflow.security.TenantInfo;
 
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -37,12 +35,15 @@ public class AuthService {
         this.appProperties = appProperties;
     }
 
-    public Map<String, Object> login(String email, String password) {
+    public Map<String, Object> login(String email, String password, String hostSubdomain, String requestedSlug) {
         String normalizedEmail = email.trim().toLowerCase();
 
-        // Check System Admin credentials
-        boolean isSysAdmin = appProperties.sysadmin().email().equalsIgnoreCase(normalizedEmail);
-        if (isSysAdmin) {
+        // 1. Platform Admin login (allowed on admin.<domain> or bare localhost)
+        if (appProperties.sysadmin().email().equalsIgnoreCase(normalizedEmail)) {
+            if (hostSubdomain != null && !"admin".equalsIgnoreCase(hostSubdomain)) {
+                throw new ApiException(HttpStatus.FORBIDDEN, "SUBDOMAIN_MISMATCH",
+                        "Tài khoản Quản trị Nền tảng chỉ đăng nhập tại cổng admin");
+            }
             if (!appProperties.sysadmin().password().equals(password)) {
                 throw new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Email hoặc mật khẩu không đúng");
             }
@@ -50,83 +51,54 @@ public class AuthService {
                     null, "admin", null,
                     appProperties.sysadmin().email(),
                     appProperties.sysadmin().fullName(),
-                    "SYSTEM_ADMIN", "ENTERPRISE", true
+                    "PLATFORM_ADMIN", "ENTERPRISE", true
             );
             String adminToken = jwtService.generateWorkspaceToken(sysInfo);
             return Map.of(
+                    "accessToken", adminToken,
                     "user", Map.of(
                             "email", appProperties.sysadmin().email(),
                             "fullName", appProperties.sysadmin().fullName(),
+                            "role", "PLATFORM_ADMIN",
                             "systemAdmin", true
-                    ),
-                    "preAuthToken", adminToken,
-                    "accessToken", adminToken,
-                    "workspaces", List.of()
+                    )
             );
         }
 
-        List<TenantUser> memberships = tenantUserRepository.findByEmailIgnoreCase(normalizedEmail);
-        if (memberships.isEmpty()) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Email hoặc mật khẩu không đúng");
+        // 2. Tenant User login (strict 1-to-1 binding with subdomain)
+        String targetSlug = (hostSubdomain != null && !hostSubdomain.isBlank())
+                ? hostSubdomain
+                : (requestedSlug != null && !requestedSlug.isBlank() ? requestedSlug.trim().toLowerCase() : null);
+
+        if (targetSlug == null || "admin".equalsIgnoreCase(targetSlug)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "TENANT_SUBDOMAIN_REQUIRED",
+                    "Vui lòng đăng nhập qua tên miền phụ của tổ chức (vd: t-acme.localhost)");
         }
 
-        // Verify password against any matching membership
-        TenantUser matched = memberships.stream()
-                .filter(u -> passwordEncoder.matches(password, u.getPasswordHash()))
-                .findFirst()
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Email hoặc mật khẩu không đúng"));
-
-        List<UUID> tenantIds = memberships.stream().map(TenantUser::getTenantId).toList();
-        Map<UUID, Tenant> tenantMap = tenantRepository.findAllById(tenantIds).stream()
-                .collect(java.util.stream.Collectors.toMap(Tenant::getId, t -> t));
-
-        List<Map<String, Object>> workspaces = memberships.stream()
-                .map(m -> {
-                    Tenant t = tenantMap.get(m.getTenantId());
-                    if (t == null) return null;
-                    return Map.<String, Object>of(
-                            "tenantId", t.getId(),
-                            "slug", t.getSlug(),
-                            "name", t.getName(),
-                            "tier", t.getTier(),
-                            "status", t.getStatus(),
-                            "role", m.getRole()
-                    );
-                })
-                .filter(java.util.Objects::nonNull)
-                .toList();
-
-        String preAuthToken = jwtService.generatePreAuthToken(matched.getEmail(), matched.getFullName(), false);
-
-        return Map.of(
-                "user", Map.of(
-                        "email", matched.getEmail(),
-                        "fullName", matched.getFullName(),
-                        "systemAdmin", false
-                ),
-                "preAuthToken", preAuthToken,
-                "workspaces", workspaces
-        );
-    }
-
-    public Map<String, Object> switchWorkspace(String email, String tenantSlug) {
-        Tenant tenant = tenantRepository.findBySlug(tenantSlug.trim().toLowerCase())
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "TENANT_NOT_FOUND", "Không tìm thấy tổ chức: " + tenantSlug));
+        Tenant tenant = tenantRepository.findBySlug(targetSlug)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "TENANT_NOT_FOUND",
+                        "Không tìm thấy tổ chức: " + targetSlug));
 
         if (!"ACTIVE".equals(tenant.getStatus())) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "TENANT_SUSPENDED", "Tổ chức đang bị tạm khóa (SUSPENDED)");
+            throw new ApiException(HttpStatus.FORBIDDEN, "TENANT_SUSPENDED",
+                    "Tổ chức '" + targetSlug + "' đang bị tạm ngưng (SUSPENDED)");
         }
 
-        TenantUser membership = tenantUserRepository.findByTenantIdAndEmailIgnoreCase(tenant.getId(), email)
-                .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "NOT_A_MEMBER", "Bạn không phải thành viên của tổ chức này"));
+        TenantUser user = tenantUserRepository.findByTenantIdAndEmailIgnoreCase(tenant.getId(), normalizedEmail)
+                .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "TENANT_ACCESS_DENIED",
+                        "Tài khoản " + normalizedEmail + " không thuộc tổ chức '" + targetSlug + "'"));
+
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Email hoặc mật khẩu không đúng");
+        }
 
         TenantInfo info = new TenantInfo(
                 tenant.getId(),
                 tenant.getSlug(),
-                membership.getId(),
-                membership.getEmail(),
-                membership.getFullName(),
-                membership.getRole(),
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole(),
                 tenant.getTier(),
                 false
         );
@@ -139,15 +111,17 @@ public class AuthService {
                         "slug", tenant.getSlug(),
                         "name", tenant.getName(),
                         "tier", tenant.getTier(),
+                        "rateLimitRpm", tenant.getRateLimitRpm(),
+                        "maxMembers", tenant.getMaxMembers(),
                         "status", tenant.getStatus(),
-                        "role", membership.getRole(),
                         "settings", tenant.getSettings()
                 ),
                 "user", Map.of(
-                        "id", membership.getId(),
-                        "email", membership.getEmail(),
-                        "fullName", membership.getFullName(),
-                        "role", membership.getRole()
+                        "id", user.getId(),
+                        "email", user.getEmail(),
+                        "fullName", user.getFullName(),
+                        "role", user.getRole(),
+                        "systemAdmin", false
                 )
         );
     }

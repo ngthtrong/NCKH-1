@@ -1,0 +1,4 @@
+{
+  "capturedAt": "2026-11-12T14:31:20.079Z",
+  "containers": "/nckh-report-api-1 saas-research-api:local sha256:11bfe76e2cf83519caed2b8a4a9f5995c6b34e1bc8b4ccc1860a37ff7d5d5424 memory_bytes=805306368 nano_cpus=1000000000\n/nckh-report-web-1 saas-research-web:local sha256:2144e8bb010d3980183bc8220d0c2e894c876133c3430d84aa903a42b1140e54 memory_bytes=134217728 nano_cpus=250000000\n/nckh-report-postgres-1 postgres:16-alpine sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139 memory_bytes=805306368 nano_cpus=1000000000\n/nckh-report-redis-1 redis:7-alpine sha256:7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe memory_bytes=268435456 nano_cpus=250000000\n"
+}

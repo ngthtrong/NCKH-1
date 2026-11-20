@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0.0",
+  "data_kind": "measured",
+  "run_id": "kb3-after-2026-11-12T12-59-58.030Z",
+  "source": "http://127.0.0.1:9090",
+  "started_at_utc": "2026-11-12T13:00:02.456542Z",
+  "finished_at_utc": "2026-11-12T13:01:03.791684Z",
+  "step_seconds": 15,
+  "queries": [
+    {
+      "name": "api_cpu_ratio",
+      "query": "sum(process_cpu_usage{job=\"saas-api\"})",
+      "unit": "ratio",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488402.457,
+              "0.767"
+            ],
+            [
+              1794488417.457,
+              "0.5021739130434782"
+            ],
+            [
+              1794488432.457,
+              "0.992"
+            ],
+            [
+              1794488447.457,
+              "0.16551724137931034"
+            ],
+            [
+              1794488462.457,
+              "0.02857142857142857"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "api_rss_bytes",
+      "query": "sum(process_resident_memory_bytes{job=\"saas-api\"})",
+      "unit": "bytes",
+      "series": []
+    },
+    {
+      "name": "api_heap_bytes",
+      "query": "sum(jvm_memory_used_bytes{job=\"saas-api\",area=\"heap\"})",
+      "unit": "bytes",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488402.457,
+              "88847496"
+            ],
+            [
+              1794488417.457,
+              "92289072"
+            ],
+            [
+              1794488432.457,
+              "85965424"
+            ],
+            [
+              1794488447.457,
+              "89081608"
+            ],
+            [
+              1794488462.457,
+              "90765688"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "db_active_connections",
+      "query": "sum(hikaricp_connections_active{job=\"saas-api\"})",
+      "unit": "count",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488402.457,
+              "0"
+            ],
+            [
+              1794488417.457,
+              "1"
+            ],
+            [
+              1794488432.457,
+              "0"
+            ],
+            [
+              1794488447.457,
+              "0"
+            ],
+            [
+              1794488462.457,
+              "0"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "db_max_connections",
+      "query": "sum(hikaricp_connections_max{job=\"saas-api\"})",
+      "unit": "count",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488402.457,
+              "5"
+            ],
+            [
+              1794488417.457,
+              "5"
+            ],
+            [
+              1794488432.457,
+              "5"
+            ],
+            [
+              1794488447.457,
+              "5"
+            ],
+            [
+              1794488462.457,
+              "5"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

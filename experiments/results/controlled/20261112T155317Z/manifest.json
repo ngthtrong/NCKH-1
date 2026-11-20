@@ -1,0 +1,211 @@
+{
+  "protocol_id": "NCKH-POOL3-20261112-v3",
+  "run_class": "controlled",
+  "data_kind": "measured",
+  "started_at": "2026-11-12T15:53:17.122344+00:00",
+  "status": "completed",
+  "protocol_sha256": "1b6c12ba9503cf266b6820800b40f4a00b371ba0b8346a3221a68c6799f4acbd",
+  "runs": [
+    {
+      "kind": "functional",
+      "repeat": 1,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-1"
+    },
+    {
+      "kind": "functional",
+      "repeat": 2,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-2"
+    },
+    {
+      "kind": "functional",
+      "repeat": 3,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-3"
+    },
+    {
+      "kind": "functional",
+      "repeat": 4,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-4"
+    },
+    {
+      "kind": "functional",
+      "repeat": 5,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-5"
+    },
+    {
+      "kind": "load",
+      "pair": 1,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:54:42.031780+00:00",
+      "finished_at": "2026-11-12T15:56:39.490294+00:00",
+      "directory": "pair-1-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 1,
+      "variant": "after",
+      "exit_code": 0,
+      "started_at": "2026-11-12T15:58:11.673776+00:00",
+      "finished_at": "2026-11-12T15:59:50.737115+00:00",
+      "directory": "pair-1-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 2,
+      "variant": "after",
+      "exit_code": 0,
+      "started_at": "2026-11-12T16:00:58.090833+00:00",
+      "finished_at": "2026-11-12T16:02:39.226894+00:00",
+      "directory": "pair-2-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 2,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T16:03:46.371088+00:00",
+      "finished_at": "2026-11-12T16:05:37.895372+00:00",
+      "directory": "pair-2-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 3,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T16:06:56.813727+00:00",
+      "finished_at": "2026-11-12T16:08:53.434715+00:00",
+      "directory": "pair-3-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 3,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T16:10:42.098700+00:00",
+      "finished_at": "2026-11-12T16:12:30.576887+00:00",
+      "directory": "pair-3-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 4,
+      "variant": "after",
+      "exit_code": 0,
+      "started_at": "2026-11-12T16:13:41.635629+00:00",
+      "finished_at": "2026-11-12T16:15:16.573411+00:00",
+      "directory": "pair-4-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 4,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T16:16:14.060046+00:00",
+      "finished_at": "2026-11-12T16:18:05.318232+00:00",
+      "directory": "pair-4-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 5,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T16:19:14.565493+00:00",
+      "finished_at": "2026-11-12T16:21:12.328943+00:00",
+      "directory": "pair-5-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 5,
+      "variant": "after",
+      "exit_code": 0,
+      "started_at": "2026-11-12T16:22:46.827573+00:00",
+      "finished_at": "2026-11-12T16:24:23.444128+00:00",
+      "directory": "pair-5-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    }
+  ],
+  "private_state": "/mnt/d/NCKH/.data/experiment-snapshots/20261112T155317Z",
+  "limitations": [
+    "Local WSL host shared with demo and load generator.",
+    "Protocol fills report placeholders; no external approval or population significance claimed.",
+    "Combined cache/limiter comparison does not isolate individual effects."
+  ],
+  "source_archive_sha256": "23de7ffbe85d36ce1b07aecc31f4583d464d0739976244736ca310d533ed9421",
+  "git_commit": "cccf60054e40837e6b6f052d4b3539516f4dd3a6",
+  "git_dirty": true,
+  "report_sha256": "4428dd78cf137427b8bf94b6a46113740c89ca0448f9090b959062ab40e6519a",
+  "environment": "/nckh-experiment-api-1 nckh-experiment-api:20261112 sha256:4def2517c8eb58a846954a708dd34597cc532be053f3ad372cba1d9965c16717 CPU=1000000000 RAM=805306368\n/nckh-experiment-postgres-1 postgres:16-alpine sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139 CPU=1000000000 RAM=805306368\n/nckh-experiment-redis-1 redis:7-alpine sha256:7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe CPU=250000000 RAM=268435456\n/nckh-experiment-web-1 saas-research-web:local sha256:9b5630940b07b84c5d14ddd6e4006c8023da9a77d36bc102c1c0c33894964eb0 CPU=250000000 RAM=134217728\n",
+  "tools": {
+    "node": "v22.23.4",
+    "k6": "k6 v0.57.0 (commit/50afd82c18, go1.23.6, linux/amd64)",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "snapshots": {
+    "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+    "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+  },
+  "component_provenance": {
+    "directory": "/mnt/d/NCKH/experiments/results/controlled/20261112T144829Z",
+    "protocol_id": "NCKH-POOL3-20261112-v1",
+    "reason": "Canonical dataset snapshot reuse. When CONTROLLED_REVERIFY=true all functional and SQL measurements are rerun on this application image; earlier load results are never copied."
+  },
+  "finished_at": "2026-11-12T16:24:23.448523+00:00",
+  "original_private_state": "/tmp/nckh-controlled-20261112T144829Z",
+  "private_snapshot_note": "Ignored private snapshots, contains password hashes; never include in public artifacts.",
+  "supplements": {
+    "cache_probe": "completed",
+    "sql_security_repeated": "completed",
+    "browser": "completed",
+    "application_plans": "completed",
+    "resource_analysis": "completed",
+    "report_appendix": "completed"
+  }
+}

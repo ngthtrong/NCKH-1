@@ -1,9 +1,11 @@
 package vn.tenantflow.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.tenantflow.security.JwtTenantFilter;
 import vn.tenantflow.security.TenantContext;
 import vn.tenantflow.security.TenantInfo;
 import vn.tenantflow.service.AuthService;
@@ -20,8 +22,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    public record LoginRequest(@NotBlank String email, @NotBlank String password) {}
-    public record SwitchWorkspaceRequest(@NotBlank String tenantSlug) {}
+    public record LoginRequest(@NotBlank String email, @NotBlank String password, String tenantSlug) {}
 
     @GetMapping("/health")
     public Map<String, String> health() {
@@ -29,14 +30,9 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest req) {
-        return ResponseEntity.ok(authService.login(req.email(), req.password()));
-    }
-
-    @PostMapping("/auth/switch-workspace")
-    public ResponseEntity<Map<String, Object>> switchWorkspace(@Valid @RequestBody SwitchWorkspaceRequest req) {
-        TenantInfo current = TenantContext.get();
-        return ResponseEntity.ok(authService.switchWorkspace(current.email(), req.tenantSlug()));
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest req, HttpServletRequest request) {
+        String hostSubdomain = JwtTenantFilter.extractSubdomain(request.getHeader("Host"));
+        return ResponseEntity.ok(authService.login(req.email(), req.password(), hostSubdomain, req.tenantSlug()));
     }
 
     @GetMapping("/auth/me")

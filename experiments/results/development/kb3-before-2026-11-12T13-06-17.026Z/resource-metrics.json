@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "data_kind": "measured",
+  "run_id": "kb3-before-2026-11-12T13-06-17.026Z",
+  "source": "http://127.0.0.1:9090",
+  "started_at_utc": "2026-11-12T13:06:18.799872Z",
+  "finished_at_utc": "2026-11-12T13:06:36.968982Z",
+  "step_seconds": 15,
+  "queries": [
+    {
+      "name": "api_cpu_ratio",
+      "query": "sum(process_cpu_usage{job=\"saas-api\"})",
+      "unit": "ratio",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488778.8,
+              "0.018333333333333333"
+            ],
+            [
+              1794488793.8,
+              "0.6223404255319149"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "api_rss_bytes",
+      "query": "sum(process_resident_memory_bytes{job=\"saas-api\"})",
+      "unit": "bytes",
+      "series": []
+    },
+    {
+      "name": "api_heap_bytes",
+      "query": "sum(jvm_memory_used_bytes{job=\"saas-api\",area=\"heap\"})",
+      "unit": "bytes",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488778.8,
+              "58762232"
+            ],
+            [
+              1794488793.8,
+              "62125480"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "db_active_connections",
+      "query": "sum(hikaricp_connections_active{job=\"saas-api\"})",
+      "unit": "count",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488778.8,
+              "0"
+            ],
+            [
+              1794488793.8,
+              "2"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "db_max_connections",
+      "query": "sum(hikaricp_connections_max{job=\"saas-api\"})",
+      "unit": "count",
+      "series": [
+        {
+          "metric": {},
+          "values": [
+            [
+              1794488778.8,
+              "5"
+            ],
+            [
+              1794488793.8,
+              "5"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

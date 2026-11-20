@@ -288,16 +288,18 @@ public class KanbanService {
         boolean movingAcrossColumns = !sourceColumnId.equals(targetColumnId);
         boolean wipWarning = false;
 
-        // 3. WIP Limit Enforcement (K4)
+        // 3. WIP Limit Enforcement (K4: STRICT | WARN | OFF)
         if (movingAcrossColumns && targetCol.getWipLimit() != null) {
-            long countInTarget = cardRepository.countByColumnId(targetColumnId);
-            if (countInTarget >= targetCol.getWipLimit()) {
-                TenantSettings settings = cacheService.getTenantSettings(info.tenantId());
-                if ("STRICT".equalsIgnoreCase(settings.wipMode())) {
-                    throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "WIP_LIMIT_EXCEEDED",
-                            "Cột '" + targetCol.getName() + "' đã đạt giới hạn WIP (" + countInTarget + "/" + targetCol.getWipLimit() + ") ở chế độ STRICT");
-                } else {
-                    wipWarning = true;
+            TenantSettings settings = cacheService.getTenantSettings(info.tenantId());
+            if (!"OFF".equalsIgnoreCase(settings.wipMode())) {
+                long countInTarget = cardRepository.countByColumnId(targetColumnId);
+                if (countInTarget >= targetCol.getWipLimit()) {
+                    if ("STRICT".equalsIgnoreCase(settings.wipMode())) {
+                        throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "WIP_LIMIT_EXCEEDED",
+                                "Cột '" + targetCol.getName() + "' đã đạt giới hạn WIP (" + countInTarget + "/" + targetCol.getWipLimit() + ") ở chế độ STRICT");
+                    } else if ("WARN".equalsIgnoreCase(settings.wipMode())) {
+                        wipWarning = true;
+                    }
                 }
             }
         }
@@ -332,6 +334,14 @@ public class KanbanService {
             if (def.required() && isEmpty) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "CUSTOM_FIELD_REQUIRED",
                         "Trường bắt buộc '" + def.label() + "' (" + def.key() + ") không được để trống");
+            }
+
+            if (!isEmpty && "SELECT".equalsIgnoreCase(def.type()) && def.options() != null && !def.options().isEmpty()) {
+                String valStr = String.valueOf(rawVal);
+                if (!def.options().contains(valStr)) {
+                    throw new ApiException(HttpStatus.BAD_REQUEST, "CUSTOM_FIELD_INVALID_OPTION",
+                            "Giá trị '" + valStr + "' của trường '" + def.label() + "' không nằm trong danh sách hợp lệ");
+                }
             }
 
             if (!isEmpty && "NUMBER".equalsIgnoreCase(def.type())) {

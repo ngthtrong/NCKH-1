@@ -9,10 +9,11 @@ import vn.tenantflow.domain.entity.Tenant;
 import vn.tenantflow.service.AdminTenantService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/tenants")
+@RequestMapping({"/api/platform/tenants", "/api/admin/tenants"})
 public class AdminTenantController {
 
     private final AdminTenantService adminTenantService;
@@ -24,30 +25,34 @@ public class AdminTenantController {
     public record CreateTenantRequest(
             @NotBlank String slug,
             @NotBlank String name,
-            @NotBlank String tier,
+            String tier,
+            String industryTemplate,
+            Integer rateLimitRpm,
+            Integer maxMembers,
             String adminEmail,
             String adminName,
             String adminPassword
     ) {}
 
-    public record UpdateStatusRequest(@NotBlank String status) {}
+    public record UpdateTenantRequest(String status, String tier, Integer rateLimitRpm, Integer maxMembers) {}
 
     @GetMapping
-    public List<Tenant> listTenants() {
+    public List<Map<String, Object>> listTenants() {
         return adminTenantService.listAllTenants();
     }
 
     @PostMapping
     public ResponseEntity<Tenant> createTenant(@Valid @RequestBody CreateTenantRequest req) {
         Tenant created = adminTenantService.createTenant(
-                req.slug(), req.name(), req.tier(),
+                req.slug(), req.name(), req.tier(), req.industryTemplate(),
+                req.rateLimitRpm(), req.maxMembers(),
                 req.adminEmail(), req.adminName(), req.adminPassword()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PatchMapping("/{id}/status")
-    public Tenant updateStatus(@PathVariable UUID id, @Valid @RequestBody UpdateStatusRequest req) {
-        return adminTenantService.updateTenantStatus(id, req.status());
+    @PatchMapping({"/{id}", "/{id}/status"})
+    public Tenant updateTenant(@PathVariable UUID id, @RequestBody UpdateTenantRequest req) {
+        return adminTenantService.updateTenant(id, req.status(), req.tier(), req.rateLimitRpm(), req.maxMembers());
     }
 }

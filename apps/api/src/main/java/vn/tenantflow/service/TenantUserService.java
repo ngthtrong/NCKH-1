@@ -4,8 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.tenantflow.domain.entity.Tenant;
 import vn.tenantflow.domain.entity.TenantUser;
 import vn.tenantflow.domain.model.ApiException;
+import vn.tenantflow.domain.repository.TenantRepository;
 import vn.tenantflow.domain.repository.TenantUserRepository;
 import vn.tenantflow.security.TenantContext;
 import vn.tenantflow.security.TenantInfo;
@@ -18,10 +20,14 @@ import java.util.UUID;
 public class TenantUserService {
 
     private final TenantUserRepository tenantUserRepository;
+    private final TenantRepository tenantRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public TenantUserService(TenantUserRepository tenantUserRepository, PasswordEncoder passwordEncoder) {
+    public TenantUserService(TenantUserRepository tenantUserRepository,
+                             TenantRepository tenantRepository,
+                             PasswordEncoder passwordEncoder) {
         this.tenantUserRepository = tenantUserRepository;
+        this.tenantRepository = tenantRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -43,6 +49,15 @@ public class TenantUserService {
         TenantInfo info = TenantContext.get();
         if (!info.isTenantAdmin()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Chỉ TENANT_ADMIN mới có quyền thêm thành viên");
+        }
+
+        Tenant tenant = tenantRepository.findById(info.tenantId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "TENANT_NOT_FOUND", "Không tìm thấy tổ chức"));
+
+        List<TenantUser> currentMembers = tenantUserRepository.findByTenantIdOrderByCreatedAtAsc(info.tenantId());
+        if (currentMembers.size() >= tenant.getMaxMembers()) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "MAX_MEMBERS_REACHED",
+                    "Tổ chức đã đạt giới hạn tối đa " + tenant.getMaxMembers() + " thành viên của gói " + tenant.getTier());
         }
 
         String normalizedEmail = email.trim().toLowerCase();

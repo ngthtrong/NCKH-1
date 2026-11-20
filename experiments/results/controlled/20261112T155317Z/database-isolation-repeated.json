@@ -1,0 +1,127 @@
+[
+  {
+    "repeat": 1,
+    "status": "PASS",
+    "checks": [
+      {
+        "missing_context": 0
+      },
+      {
+        "foreign_rows": 0,
+        "own_rows": 203
+      },
+      {
+        "foreign_updates": 0
+      },
+      {
+        "foreign_deletes": 0
+      },
+      {
+        "context_after_rollback": 0
+      }
+    ],
+    "foreign_insert_sqlstate": "42501",
+    "sql_session_roundtrip_ms": 373.5306070011575,
+    "insert_roundtrip_ms": 263.4726779979246
+  },
+  {
+    "repeat": 2,
+    "status": "PASS",
+    "checks": [
+      {
+        "missing_context": 0
+      },
+      {
+        "foreign_rows": 0,
+        "own_rows": 203
+      },
+      {
+        "foreign_updates": 0
+      },
+      {
+        "foreign_deletes": 0
+      },
+      {
+        "context_after_rollback": 0
+      }
+    ],
+    "foreign_insert_sqlstate": "42501",
+    "sql_session_roundtrip_ms": 238.76763400039636,
+    "insert_roundtrip_ms": 288.8919370016083
+  },
+  {
+    "repeat": 3,
+    "status": "PASS",
+    "checks": [
+      {
+        "missing_context": 0
+      },
+      {
+        "foreign_rows": 0,
+        "own_rows": 203
+      },
+      {
+        "foreign_updates": 0
+      },
+      {
+        "foreign_deletes": 0
+      },
+      {
+        "context_after_rollback": 0
+      }
+    ],
+    "foreign_insert_sqlstate": "42501",
+    "sql_session_roundtrip_ms": 221.2391490029404,
+    "insert_roundtrip_ms": 235.50579999937327
+  },
+  {
+    "repeat": 4,
+    "status": "PASS",
+    "checks": [
+      {
+        "missing_context": 0
+      },
+      {
+        "foreign_rows": 0,
+        "own_rows": 203
+      },
+      {
+        "foreign_updates": 0
+      },
+      {
+        "foreign_deletes": 0
+      },
+      {
+        "context_after_rollback": 0
+      }
+    ],
+    "foreign_insert_sqlstate": "42501",
+    "sql_session_roundtrip_ms": 230.60709299898008,
+    "insert_roundtrip_ms": 223.00909600016894
+  },
+  {
+    "repeat": 5,
+    "status": "PASS",
+    "checks": [
+      {
+        "missing_context": 0
+      },
+      {
+        "foreign_rows": 0,
+        "own_rows": 203
+      },
+      {
+        "foreign_updates": 0
+      },
+      {
+        "foreign_deletes": 0
+      },
+      {
+        "context_after_rollback": 0
+      }
+    ],
+    "foreign_insert_sqlstate": "42501",
+    "sql_session_roundtrip_ms": 228.19608099962352,
+    "insert_roundtrip_ms": 223.00689600160695
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.1.0",
+  "data_kind": "measured",
+  "run_class": "development",
+  "eligible_for_final_analysis": false,
+  "protocol_id": null,
+  "run_id": "kb3-before-2026-11-12T13-06-17.026Z",
+  "status": "succeeded",
+  "started_at_utc": "2026-11-12T13:06:18.799872Z",
+  "finished_at_utc": "2026-11-12T13:06:36.968982Z",
+  "scenario": "noisy-neighbor",
+  "rate_limit_variant": "before",
+  "source": {
+    "git_commit": "82ce82cbc52f4f2b11888ed64c1b97b2d3804377",
+    "git_dirty": true
+  },
+  "target": {
+    "environment_label": "local",
+    "base_url": "http://caddy",
+    "tenant_hosts": [
+      "pool-demo.localhost",
+      "t-acme.localhost",
+      "t-lotus.localhost"
+    ]
+  },
+  "system": {
+    "os": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "architecture": "x86_64",
+    "logical_cpu_count": 8,
+    "memory_bytes": 12456685568,
+    "cpu_model": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz"
+  },
+  "tools": {
+    "python": "3.10.12",
+    "k6": "k6 v0.57.0 (commit/50afd82c18, go1.23.6, linux/amd64)",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "images": {
+    "api": "sha256:33e9ef9d89dcbb9df285eca2c7e812cc74bf54289a42f7ea724d816fca371a3c",
+    "web": "sha256:2144e8bb010d3980183bc8220d0c2e894c876133c3430d84aa903a42b1140e54"
+  },
+  "workload": {
+    "noisy_duration": "10s"
+  },
+  "artifacts": {
+    "script": "experiments/report/kb3-load.js",
+    "summary": "summary.json",
+    "raw_metrics": "raw-metrics.json",
+    "resource_metrics": "resource-metrics.json"
+  },
+  "notes": " Report workload and actual container image/resource limits are in workload.json and environment.json."
+}

@@ -1,0 +1,42 @@
+{
+  "small": {
+    "slug": "t-acme",
+    "tenantId": "8d4ca849-30b1-4267-9a19-81ca55b01e37",
+    "projectId": "557f7390-25a0-46bc-9062-b4f82442f7fe",
+    "boardId": "23b03a14-af7d-43ae-86f6-61848d8fd6e8",
+    "columns": [
+      "598330fa-acda-499a-b000-8b2c49d137b7",
+      "3efad6d9-e8af-46d5-84e1-25a8e7e6885b",
+      "80e970e1-5d53-4d7c-a4e6-7c76fb4fb6ba",
+      "3f5d365e-281d-4cdf-9341-99327f5353ce"
+    ],
+    "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403",
+    "taskId": "5dbbb636-c0aa-4eb6-9e1c-313da99f1ddf"
+  },
+  "medium": {
+    "slug": "pool-demo",
+    "tenantId": "c8f69dbd-3ab7-491a-b6be-82dc150b62dc",
+    "projectId": "c9d5313b-7bb7-4c82-9b83-2d526d8519af",
+    "boardId": "1fac403f-5126-489e-b2b7-ad662e64d85b",
+    "columns": [
+      "7e7ed252-2a95-4d30-9588-6b263ec08909",
+      "3cf47207-c8c7-487b-adf6-d7e994055ea5",
+      "9a4e808c-da28-4c7f-a280-048dbe50326b"
+    ],
+    "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403",
+    "taskId": "961d0938-990f-42e0-8a5c-678c8d4aef4f"
+  },
+  "large": {
+    "slug": "t-lotus",
+    "tenantId": "248c6e2c-b7fe-463e-b935-3b93597ff40f",
+    "projectId": "3dde92db-a1bb-4b5d-804c-7ff7ce86e117",
+    "boardId": "8b92d838-f8af-493f-8fcd-adc2b34a5613",
+    "columns": [
+      "668a8852-4c51-42e8-b274-d2dbdbcdce2a",
+      "d5efacab-7cb0-4fc3-b918-ad9c40839c76",
+      "4195ea81-f478-498a-babf-27348fe59fc3"
+    ],
+    "userId": "d833fc83-bcce-45b5-93b7-1591fe59e403",
+    "taskId": "ffcdeb95-a327-4915-9391-20dfd46ec944"
+  }
+}

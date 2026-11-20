@@ -1,0 +1,940 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/load.js
+        output: json (/results/raw-metrics.json)
+
+     scenarios: (100.00%) 5 scenarios, 154 max VUs, 2m0s max duration (incl. graceful stop):
+              * aggressor: 30.00 iterations/s for 1m30s (maxVUs: 30-120, exec: aggressor, gracefulStop: 30s)
+              * large: 1.00 iterations/s for 1m30s (maxVUs: 4-16, exec: large, gracefulStop: 30s)
+              * large_writer: 1 looping VUs for 1m30s (exec: largeWriter, gracefulStop: 30s)
+              * small: 1.00 iterations/s for 1m30s (maxVUs: 4-16, exec: small, gracefulStop: 30s)
+              * small_writer: 1 looping VUs for 1m30s (exec: smallWriter, gracefulStop: 30s)
+
+
+Run            [ 100% ] setup()
+aggressor      [   0% ]
+large          [   0% ]
+large_writer   [   0% ]
+small          [   0% ]
+small_writer   [   0% ]
+
+Run            [ 100% ] setup()
+aggressor      [   0% ]
+large          [   0% ]
+large_writer   [   0% ]
+small          [   0% ]
+small_writer   [   0% ]
+
+running (0m03.0s), 029/040 VUs, 0 complete and 0 interrupted iterations
+aggressor      [   1% ] 025/030 VUs  0m00.8s/1m30s  30.00 iters/s
+large          [   1% ] 01/04 VUs    0m00.8s/1m30s  1.00 iters/s
+large_writer   [   1% ] 1 VUs        0m00.8s/1m30s 
+small          [   1% ] 01/04 VUs    0m00.8s/1m30s  1.00 iters/s
+small_writer   [   1% ] 1 VUs        0m00.8s/1m30s 
+
+running (0m04.0s), 048/053 VUs, 0 complete and 0 interrupted iterations
+aggressor      [   2% ] 042/043 VUs  0m01.8s/1m30s  30.00 iters/s
+large          [   2% ] 02/04 VUs    0m01.8s/1m30s  1.00 iters/s
+large_writer   [   2% ] 1 VUs        0m01.8s/1m30s 
+small          [   2% ] 02/04 VUs    0m01.8s/1m30s  1.00 iters/s
+small_writer   [   2% ] 1 VUs        0m01.8s/1m30s 
+
+running (0m05.0s), 065/068 VUs, 1 complete and 0 interrupted iterations
+aggressor      [   3% ] 058/058 VUs  0m02.8s/1m30s  30.00 iters/s
+large          [   3% ] 03/04 VUs    0m02.8s/1m30s  1.00 iters/s
+large_writer   [   3% ] 1 VUs        0m02.8s/1m30s 
+small          [   3% ] 02/04 VUs    0m02.8s/1m30s  1.00 iters/s
+small_writer   [   3% ] 1 VUs        0m02.8s/1m30s 
+
+running (0m06.0s), 080/081 VUs, 4 complete and 0 interrupted iterations
+aggressor      [   4% ] 071/071 VUs  0m03.8s/1m30s  30.00 iters/s
+large          [   4% ] 04/04 VUs    0m03.8s/1m30s  1.00 iters/s
+large_writer   [   4% ] 1 VUs        0m03.8s/1m30s 
+small          [   4% ] 03/04 VUs    0m03.8s/1m30s  1.00 iters/s
+small_writer   [   4% ] 1 VUs        0m03.8s/1m30s 
+
+running (0m07.0s), 093/096 VUs, 8 complete and 0 interrupted iterations
+aggressor      [   5% ] 083/085 VUs  0m04.8s/1m30s  30.00 iters/s
+large          [   5% ] 04/05 VUs    0m04.8s/1m30s  1.00 iters/s
+large_writer   [   5% ] 1 VUs        0m04.8s/1m30s 
+small          [   5% ] 04/04 VUs    0m04.8s/1m30s  1.00 iters/s
+small_writer   [   5% ] 1 VUs        0m04.8s/1m30s 
+
+running (0m08.0s), 107/110 VUs, 13 complete and 0 interrupted iterations
+aggressor      [   6% ] 097/098 VUs  0m05.8s/1m30s  30.00 iters/s
+large          [   6% ] 04/05 VUs    0m05.8s/1m30s  1.00 iters/s
+large_writer   [   6% ] 1 VUs        0m05.8s/1m30s 
+small          [   6% ] 04/05 VUs    0m05.8s/1m30s  1.00 iters/s
+small_writer   [   6% ] 1 VUs        0m05.8s/1m30s 
+
+running (0m09.0s), 120/121 VUs, 21 complete and 0 interrupted iterations
+aggressor      [   8% ] 108/109 VUs  0m06.8s/1m30s  30.00 iters/s
+large          [   8% ] 05/05 VUs    0m06.8s/1m30s  1.00 iters/s
+large_writer   [   8% ] 1 VUs        0m06.8s/1m30s 
+small          [   8% ] 05/05 VUs    0m06.8s/1m30s  1.00 iters/s
+small_writer   [   8% ] 1 VUs        0m06.8s/1m30s 
+time="2026-11-12T15:01:34Z" level=warning msg="Insufficient VUs, reached 120 active VUs and cannot initialize more" executor=constant-arrival-rate scenario=aggressor
+
+running (0m10.0s), 132/134 VUs, 27 complete and 0 interrupted iterations
+aggressor      [   9% ] 120/120 VUs  0m07.8s/1m30s  30.00 iters/s
+large          [   9% ] 05/06 VUs    0m07.8s/1m30s  1.00 iters/s
+large_writer   [   9% ] 1 VUs        0m07.8s/1m30s 
+small          [   9% ] 05/06 VUs    0m07.8s/1m30s  1.00 iters/s
+small_writer   [   9% ] 1 VUs        0m07.8s/1m30s 
+
+running (0m11.0s), 131/134 VUs, 37 complete and 0 interrupted iterations
+aggressor      [  10% ] 118/120 VUs  0m08.8s/1m30s  30.00 iters/s
+large          [  10% ] 06/06 VUs    0m08.8s/1m30s  1.00 iters/s
+large_writer   [  10% ] 1 VUs        0m08.8s/1m30s 
+small          [  10% ] 05/06 VUs    0m08.8s/1m30s  1.00 iters/s
+small_writer   [  10% ] 1 VUs        0m08.8s/1m30s 
+
+running (0m12.0s), 133/135 VUs, 47 complete and 0 interrupted iterations
+aggressor      [  11% ] 120/120 VUs  0m09.8s/1m30s  30.00 iters/s
+large          [  11% ] 05/07 VUs    0m09.8s/1m30s  1.00 iters/s
+large_writer   [  11% ] 1 VUs        0m09.8s/1m30s 
+small          [  11% ] 06/06 VUs    0m09.8s/1m30s  1.00 iters/s
+small_writer   [  11% ] 1 VUs        0m09.8s/1m30s 
+
+running (0m13.0s), 132/136 VUs, 57 complete and 0 interrupted iterations
+aggressor      [  12% ] 120/120 VUs  0m10.8s/1m30s  30.00 iters/s
+large          [  12% ] 05/07 VUs    0m10.8s/1m30s  1.00 iters/s
+large_writer   [  12% ] 1 VUs        0m10.8s/1m30s 
+small          [  12% ] 05/07 VUs    0m10.8s/1m30s  1.00 iters/s
+small_writer   [  12% ] 1 VUs        0m10.8s/1m30s 
+
+running (0m14.0s), 133/136 VUs, 71 complete and 0 interrupted iterations
+aggressor      [  13% ] 120/120 VUs  0m11.8s/1m30s  30.00 iters/s
+large          [  13% ] 06/07 VUs    0m11.8s/1m30s  1.00 iters/s
+large_writer   [  13% ] 1 VUs        0m11.8s/1m30s 
+small          [  13% ] 05/07 VUs    0m11.8s/1m30s  1.00 iters/s
+small_writer   [  13% ] 1 VUs        0m11.8s/1m30s 
+
+running (0m15.0s), 134/136 VUs, 80 complete and 0 interrupted iterations
+aggressor      [  14% ] 120/120 VUs  0m12.8s/1m30s  30.00 iters/s
+large          [  14% ] 06/07 VUs    0m12.8s/1m30s  1.00 iters/s
+large_writer   [  14% ] 1 VUs        0m12.8s/1m30s 
+small          [  14% ] 06/07 VUs    0m12.8s/1m30s  1.00 iters/s
+small_writer   [  14% ] 1 VUs        0m12.8s/1m30s 
+
+running (0m16.0s), 134/136 VUs, 91 complete and 0 interrupted iterations
+aggressor      [  15% ] 119/120 VUs  0m13.8s/1m30s  30.00 iters/s
+large          [  15% ] 07/07 VUs    0m13.8s/1m30s  1.00 iters/s
+large_writer   [  15% ] 1 VUs        0m13.8s/1m30s 
+small          [  15% ] 06/07 VUs    0m13.8s/1m30s  1.00 iters/s
+small_writer   [  15% ] 1 VUs        0m13.8s/1m30s 
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m17.0s), 135/137 VUs, 103 complete and 0 interrupted iterations
+aggressor      [  16% ] 119/120 VUs  0m14.8s/1m30s  30.00 iters/s
+large          [  16% ] 07/08 VUs    0m14.8s/1m30s  1.00 iters/s
+large_writer   [  16% ] 1 VUs        0m14.8s/1m30s 
+small          [  16% ] 07/07 VUs    0m14.8s/1m30s  1.00 iters/s
+small_writer   [  16% ] 1 VUs        0m14.8s/1m30s 
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:41Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m18.0s), 135/138 VUs, 121 complete and 0 interrupted iterations
+aggressor      [  18% ] 119/120 VUs  0m15.8s/1m30s  30.00 iters/s
+large          [  18% ] 07/08 VUs    0m15.8s/1m30s  1.00 iters/s
+large_writer   [  18% ] 1 VUs        0m15.8s/1m30s 
+small          [  18% ] 07/08 VUs    0m15.8s/1m30s  1.00 iters/s
+small_writer   [  18% ] 1 VUs        0m15.8s/1m30s 
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:42Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m19.0s), 135/138 VUs, 142 complete and 0 interrupted iterations
+aggressor      [  19% ] 119/120 VUs  0m16.8s/1m30s  30.00 iters/s
+large          [  19% ] 07/08 VUs    0m16.8s/1m30s  1.00 iters/s
+large_writer   [  19% ] 1 VUs        0m16.8s/1m30s 
+small          [  19% ] 07/08 VUs    0m16.8s/1m30s  1.00 iters/s
+small_writer   [  19% ] 1 VUs        0m16.8s/1m30s 
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:43Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m20.0s), 138/138 VUs, 160 complete and 0 interrupted iterations
+aggressor      [  20% ] 120/120 VUs  0m17.8s/1m30s  30.00 iters/s
+large          [  20% ] 08/08 VUs    0m17.8s/1m30s  1.00 iters/s
+large_writer   [  20% ] 1 VUs        0m17.8s/1m30s 
+small          [  20% ] 08/08 VUs    0m17.8s/1m30s  1.00 iters/s
+small_writer   [  20% ] 1 VUs        0m17.8s/1m30s 
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:44Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m21.0s), 136/140 VUs, 169 complete and 0 interrupted iterations
+aggressor      [  21% ] 120/120 VUs  0m18.8s/1m30s  30.00 iters/s
+large          [  21% ] 07/09 VUs    0m18.8s/1m30s  1.00 iters/s
+large_writer   [  21% ] 1 VUs        0m18.8s/1m30s 
+small          [  21% ] 07/09 VUs    0m18.8s/1m30s  1.00 iters/s
+small_writer   [  21% ] 1 VUs        0m18.8s/1m30s 
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:45Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m22.0s), 137/140 VUs, 180 complete and 0 interrupted iterations
+aggressor      [  22% ] 120/120 VUs  0m19.8s/1m30s  30.00 iters/s
+large          [  22% ] 08/09 VUs    0m19.8s/1m30s  1.00 iters/s
+large_writer   [  22% ] 1 VUs        0m19.8s/1m30s 
+small          [  22% ] 07/09 VUs    0m19.8s/1m30s  1.00 iters/s
+small_writer   [  22% ] 1 VUs        0m19.8s/1m30s 
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/tasks/ffcdeb95-a327-4915-9391-20dfd46ec944\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:46Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m23.0s), 138/140 VUs, 189 complete and 0 interrupted iterations
+aggressor      [  23% ] 120/120 VUs  0m20.8s/1m30s  30.00 iters/s
+large          [  23% ] 08/09 VUs    0m20.8s/1m30s  1.00 iters/s
+large_writer   [  23% ] 1 VUs        0m20.8s/1m30s 
+small          [  23% ] 08/09 VUs    0m20.8s/1m30s  1.00 iters/s
+small_writer   [  23% ] 1 VUs        0m20.8s/1m30s 
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:47Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m24.0s), 137/140 VUs, 204 complete and 0 interrupted iterations
+aggressor      [  24% ] 119/120 VUs  0m21.8s/1m30s  30.00 iters/s
+large          [  24% ] 08/09 VUs    0m21.8s/1m30s  1.00 iters/s
+large_writer   [  24% ] 1 VUs        0m21.8s/1m30s 
+small          [  24% ] 08/09 VUs    0m21.8s/1m30s  1.00 iters/s
+small_writer   [  24% ] 1 VUs        0m21.8s/1m30s 
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:48Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m25.0s), 138/140 VUs, 214 complete and 0 interrupted iterations
+aggressor      [  25% ] 120/120 VUs  0m22.8s/1m30s  30.00 iters/s
+large          [  25% ] 08/09 VUs    0m22.8s/1m30s  1.00 iters/s
+large_writer   [  25% ] 1 VUs        0m22.8s/1m30s 
+small          [  25% ] 08/09 VUs    0m22.8s/1m30s  1.00 iters/s
+small_writer   [  25% ] 1 VUs        0m22.8s/1m30s 
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:49Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m26.0s), 138/140 VUs, 225 complete and 0 interrupted iterations
+aggressor      [  26% ] 120/120 VUs  0m23.8s/1m30s  30.00 iters/s
+large          [  26% ] 08/09 VUs    0m23.8s/1m30s  1.00 iters/s
+large_writer   [  26% ] 1 VUs        0m23.8s/1m30s 
+small          [  26% ] 08/09 VUs    0m23.8s/1m30s  1.00 iters/s
+small_writer   [  26% ] 1 VUs        0m23.8s/1m30s 
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:50Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="request timeout"
+
+running (0m27.0s), 138/140 VUs, 239 complete and 0 interrupted iterations
+aggressor      [  28% ] 119/120 VUs  0m24.8s/1m30s  30.00 iters/s
+large          [  28% ] 09/09 VUs    0m24.8s/1m30s  1.00 iters/s
+large_writer   [  28% ] 1 VUs        0m24.8s/1m30s 
+small          [  28% ] 08/09 VUs    0m24.8s/1m30s  1.00 iters/s
+small_writer   [  28% ] 1 VUs        0m24.8s/1m30s 
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:51Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="request timeout"
+
+running (0m28.0s), 138/141 VUs, 257 complete and 0 interrupted iterations
+aggressor      [  29% ] 119/120 VUs  0m25.8s/1m30s  30.00 iters/s
+large          [  29% ] 08/10 VUs    0m25.8s/1m30s  1.00 iters/s
+large_writer   [  29% ] 1 VUs        0m25.8s/1m30s 
+small          [  29% ] 09/09 VUs    0m25.8s/1m30s  1.00 iters/s
+small_writer   [  29% ] 1 VUs        0m25.8s/1m30s 
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:52Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m29.0s), 137/142 VUs, 277 complete and 0 interrupted iterations
+aggressor      [  30% ] 119/120 VUs  0m26.8s/1m30s  30.00 iters/s
+large          [  30% ] 08/10 VUs    0m26.8s/1m30s  1.00 iters/s
+large_writer   [  30% ] 1 VUs        0m26.8s/1m30s 
+small          [  30% ] 08/10 VUs    0m26.8s/1m30s  1.00 iters/s
+small_writer   [  30% ] 1 VUs        0m26.8s/1m30s 
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/23b03a14-af7d-43ae-86f6-61848d8fd6e8\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:53Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m30.0s), 137/142 VUs, 298 complete and 0 interrupted iterations
+aggressor      [  31% ] 119/120 VUs  0m27.8s/1m30s  30.00 iters/s
+large          [  31% ] 08/10 VUs    0m27.8s/1m30s  1.00 iters/s
+large_writer   [  31% ] 1 VUs        0m27.8s/1m30s 
+small          [  31% ] 08/10 VUs    0m27.8s/1m30s  1.00 iters/s
+small_writer   [  31% ] 1 VUs        0m27.8s/1m30s 
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:54Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m31.0s), 140/142 VUs, 305 complete and 0 interrupted iterations
+aggressor      [  32% ] 120/120 VUs  0m28.8s/1m30s  30.00 iters/s
+large          [  32% ] 09/10 VUs    0m28.8s/1m30s  1.00 iters/s
+large_writer   [  32% ] 1 VUs        0m28.8s/1m30s 
+small          [  32% ] 09/10 VUs    0m28.8s/1m30s  1.00 iters/s
+small_writer   [  32% ] 1 VUs        0m28.8s/1m30s 
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/8b92d838-f8af-493f-8fcd-adc2b34a5613\": request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:55Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:56Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:56Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+time="2026-11-12T15:01:56Z" level=warning msg="Request Failed" error="Get \"http://api:8080/api/v1/boards/1fac403f-5126-489e-b2b7-ad662e64d85b\": request timeout"
+
+running (0m32.0s), 139/142 VUs, 319 complete and 0 interrupted iterations
+aggressor      [  33% ] 120/120 VUs  0m29.8s/1m30s  30.00 iters/s
+large          [  33% ] 09/10 VUs    0m29.8s/1m30s  1.00 iters/s
+large_writer   [  33% ] 1 VUs        0m29.8s/1m30s 
+small          [  33% ] 08/10 VUs    0m29.8s/1m30s  1.00 iters/s
+small_writer   [  33% ] 1 VUs        0m29.8s/1m30s 
+time="2026-11-12T15:01:56Z" level=warning msg="Request Failed" error="request timeout"
+time="2026-11-12T15:01:56Z" level=warning msg="Request Failed" error="request timeout"
+
+running (0m33.0s), 138/142 VUs, 333 complete and 0 interrupted iterations
+aggressor      [  34% ] 119/120 VUs  0m30.8s/1m30s  30.00 iters/s
+large          [  34% ] 09/10 VUs    0m30.8s/1m30s  1.00 iters/s
+large_writer   [  34% ] 1 VUs        0m30.8s/1m30s 
+small          [  34% ] 08/10 VUs    0m30.8s/1m30s  1.00 iters/s
+small_writer   [  34% ] 1 VUs        0m30.8s/1m30s 
+time="2026-11-12T15:01:57Z" level=warning msg="Request Failed" error="request timeout"
+
+running (0m34.0s), 137/142 VUs, 347 complete and 0 interrupted iterations
+aggressor      [  35% ] 120/120 VUs  0m31.8s/1m30s  30.00 iters/s
+large          [  35% ] 08/10 VUs    0m31.8s/1m30s  1.00 iters/s
+large_writer   [  35% ] 1 VUs        0m31.8s/1m30s 
+small          [  35% ] 07/10 VUs    0m31.8s/1m30s  1.00 iters/s
+small_writer   [  35% ] 1 VUs        0m31.8s/1m30s 
+
+running (0m35.0s), 138/142 VUs, 363 complete and 0 interrupted iterations
+aggressor      [  36% ] 120/120 VUs  0m32.8s/1m30s  30.00 iters/s
+large          [  36% ] 08/10 VUs    0m32.8s/1m30s  1.00 iters/s
+large_writer   [  36% ] 1 VUs        0m32.8s/1m30s 
+small          [  36% ] 08/10 VUs    0m32.8s/1m30s  1.00 iters/s
+small_writer   [  36% ] 1 VUs        0m32.8s/1m30s 
+
+running (0m36.0s), 136/142 VUs, 376 complete and 0 interrupted iterations
+aggressor      [  38% ] 118/120 VUs  0m33.8s/1m30s  30.00 iters/s
+large          [  38% ] 08/10 VUs    0m33.8s/1m30s  1.00 iters/s
+large_writer   [  38% ] 1 VUs        0m33.8s/1m30s 
+small          [  38% ] 08/10 VUs    0m33.8s/1m30s  1.00 iters/s
+small_writer   [  38% ] 1 VUs        0m33.8s/1m30s 
+
+running (0m37.0s), 139/142 VUs, 394 complete and 0 interrupted iterations
+aggressor      [  39% ] 120/120 VUs  0m34.8s/1m30s  30.00 iters/s
+large          [  39% ] 09/10 VUs    0m34.8s/1m30s  1.00 iters/s
+large_writer   [  39% ] 1 VUs        0m34.8s/1m30s 
+small          [  39% ] 08/10 VUs    0m34.8s/1m30s  1.00 iters/s
+small_writer   [  39% ] 1 VUs        0m34.8s/1m30s 
+
+running (0m38.0s), 139/142 VUs, 413 complete and 0 interrupted iterations
+aggressor      [  40% ] 119/120 VUs  0m35.8s/1m30s  30.00 iters/s
+large          [  40% ] 09/10 VUs    0m35.8s/1m30s  1.00 iters/s
+large_writer   [  40% ] 1 VUs        0m35.8s/1m30s 
+small          [  40% ] 09/10 VUs    0m35.8s/1m30s  1.00 iters/s
+small_writer   [  40% ] 1 VUs        0m35.8s/1m30s 
+
+running (0m39.0s), 138/142 VUs, 430 complete and 0 interrupted iterations
+aggressor      [  41% ] 118/120 VUs  0m36.8s/1m30s  30.00 iters/s
+large          [  41% ] 09/10 VUs    0m36.8s/1m30s  1.00 iters/s
+large_writer   [  41% ] 1 VUs        0m36.8s/1m30s 
+small          [  41% ] 09/10 VUs    0m36.8s/1m30s  1.00 iters/s
+small_writer   [  41% ] 1 VUs        0m36.8s/1m30s 
+
+running (0m40.0s), 139/142 VUs, 447 complete and 0 interrupted iterations
+aggressor      [  42% ] 120/120 VUs  0m37.8s/1m30s  30.00 iters/s
+large          [  42% ] 09/10 VUs    0m37.8s/1m30s  1.00 iters/s
+large_writer   [  42% ] 1 VUs        0m37.8s/1m30s 
+small          [  42% ] 08/10 VUs    0m37.8s/1m30s  1.00 iters/s
+small_writer   [  42% ] 1 VUs        0m37.8s/1m30s 
+
+running (0m41.0s), 137/142 VUs, 465 complete and 0 interrupted iterations
+aggressor      [  43% ] 119/120 VUs  0m38.8s/1m30s  30.00 iters/s
+large          [  43% ] 08/10 VUs    0m38.8s/1m30s  1.00 iters/s
+large_writer   [  43% ] 1 VUs        0m38.8s/1m30s 
+small          [  43% ] 08/10 VUs    0m38.8s/1m30s  1.00 iters/s
+small_writer   [  43% ] 1 VUs        0m38.8s/1m30s 
+
+running (0m42.0s), 136/142 VUs, 484 complete and 0 interrupted iterations
+aggressor      [  44% ] 118/120 VUs  0m39.8s/1m30s  30.00 iters/s
+large          [  44% ] 08/10 VUs    0m39.8s/1m30s  1.00 iters/s
+large_writer   [  44% ] 1 VUs        0m39.8s/1m30s 
+small          [  44% ] 08/10 VUs    0m39.8s/1m30s  1.00 iters/s
+small_writer   [  44% ] 1 VUs        0m39.8s/1m30s 
+
+running (0m43.0s), 136/142 VUs, 503 complete and 0 interrupted iterations
+aggressor      [  45% ] 119/120 VUs  0m40.8s/1m30s  30.00 iters/s
+large          [  45% ] 08/10 VUs    0m40.8s/1m30s  1.00 iters/s
+large_writer   [  45% ] 1 VUs        0m40.8s/1m30s 
+small          [  45% ] 07/10 VUs    0m40.8s/1m30s  1.00 iters/s
+small_writer   [  45% ] 1 VUs        0m40.8s/1m30s 
+
+running (0m44.0s), 137/142 VUs, 521 complete and 0 interrupted iterations
+aggressor      [  46% ] 120/120 VUs  0m41.8s/1m30s  30.00 iters/s
+large          [  46% ] 08/10 VUs    0m41.8s/1m30s  1.00 iters/s
+large_writer   [  46% ] 1 VUs        0m41.8s/1m30s 
+small          [  46% ] 07/10 VUs    0m41.8s/1m30s  1.00 iters/s
+small_writer   [  46% ] 1 VUs        0m41.8s/1m30s 
+
+running (0m45.0s), 134/142 VUs, 543 complete and 0 interrupted iterations
+aggressor      [  48% ] 118/120 VUs  0m42.8s/1m30s  30.00 iters/s
+large          [  48% ] 07/10 VUs    0m42.8s/1m30s  1.00 iters/s
+large_writer   [  48% ] 1 VUs        0m42.8s/1m30s 
+small          [  48% ] 07/10 VUs    0m42.8s/1m30s  1.00 iters/s
+small_writer   [  48% ] 1 VUs        0m42.8s/1m30s 
+
+running (0m46.0s), 136/142 VUs, 562 complete and 0 interrupted iterations
+aggressor      [  49% ] 120/120 VUs  0m43.8s/1m30s  30.00 iters/s
+large          [  49% ] 07/10 VUs    0m43.8s/1m30s  1.00 iters/s
+large_writer   [  49% ] 1 VUs        0m43.8s/1m30s 
+small          [  49% ] 07/10 VUs    0m43.8s/1m30s  1.00 iters/s
+small_writer   [  49% ] 1 VUs        0m43.8s/1m30s 
+
+running (0m47.0s), 134/142 VUs, 582 complete and 0 interrupted iterations
+aggressor      [  50% ] 118/120 VUs  0m44.8s/1m30s  30.00 iters/s
+large          [  50% ] 07/10 VUs    0m44.8s/1m30s  1.00 iters/s
+large_writer   [  50% ] 1 VUs        0m44.8s/1m30s 
+small          [  50% ] 07/10 VUs    0m44.8s/1m30s  1.00 iters/s
+small_writer   [  50% ] 1 VUs        0m44.8s/1m30s 
+
+running (0m48.0s), 135/142 VUs, 598 complete and 0 interrupted iterations
+aggressor      [  51% ] 119/120 VUs  0m45.8s/1m30s  30.00 iters/s
+large          [  51% ] 07/10 VUs    0m45.8s/1m30s  1.00 iters/s
+large_writer   [  51% ] 1 VUs        0m45.8s/1m30s 
+small          [  51% ] 07/10 VUs    0m45.8s/1m30s  1.00 iters/s
+small_writer   [  51% ] 1 VUs        0m45.8s/1m30s 
+
+running (0m49.0s), 134/142 VUs, 618 complete and 0 interrupted iterations
+aggressor      [  52% ] 118/120 VUs  0m46.8s/1m30s  30.00 iters/s
+large          [  52% ] 07/10 VUs    0m46.8s/1m30s  1.00 iters/s
+large_writer   [  52% ] 1 VUs        0m46.8s/1m30s 
+small          [  52% ] 07/10 VUs    0m46.8s/1m30s  1.00 iters/s
+small_writer   [  52% ] 1 VUs        0m46.8s/1m30s 
+
+running (0m50.0s), 137/142 VUs, 633 complete and 0 interrupted iterations
+aggressor      [  53% ] 120/120 VUs  0m47.8s/1m30s  30.00 iters/s
+large          [  53% ] 08/10 VUs    0m47.8s/1m30s  1.00 iters/s
+large_writer   [  53% ] 1 VUs        0m47.8s/1m30s 
+small          [  53% ] 07/10 VUs    0m47.8s/1m30s  1.00 iters/s
+small_writer   [  53% ] 1 VUs        0m47.8s/1m30s 
+
+running (0m51.0s), 135/142 VUs, 650 complete and 0 interrupted iterations
+aggressor      [  54% ] 119/120 VUs  0m48.8s/1m30s  30.00 iters/s
+large          [  54% ] 07/10 VUs    0m48.8s/1m30s  1.00 iters/s
+large_writer   [  54% ] 1 VUs        0m48.8s/1m30s 
+small          [  54% ] 07/10 VUs    0m48.8s/1m30s  1.00 iters/s
+small_writer   [  54% ] 1 VUs        0m48.8s/1m30s 
+
+running (0m52.0s), 137/142 VUs, 666 complete and 0 interrupted iterations
+aggressor      [  55% ] 120/120 VUs  0m49.8s/1m30s  30.00 iters/s
+large          [  55% ] 08/10 VUs    0m49.8s/1m30s  1.00 iters/s
+large_writer   [  55% ] 1 VUs        0m49.8s/1m30s 
+small          [  55% ] 07/10 VUs    0m49.8s/1m30s  1.00 iters/s
+small_writer   [  55% ] 1 VUs        0m49.8s/1m30s 
+
+running (0m53.0s), 138/142 VUs, 682 complete and 0 interrupted iterations
+aggressor      [  56% ] 120/120 VUs  0m50.8s/1m30s  30.00 iters/s
+large          [  56% ] 08/10 VUs    0m50.8s/1m30s  1.00 iters/s
+large_writer   [  56% ] 1 VUs        0m50.8s/1m30s 
+small          [  56% ] 08/10 VUs    0m50.8s/1m30s  1.00 iters/s
+small_writer   [  56% ] 1 VUs        0m50.8s/1m30s 
+
+running (0m54.0s), 136/142 VUs, 699 complete and 0 interrupted iterations
+aggressor      [  58% ] 118/120 VUs  0m51.8s/1m30s  30.00 iters/s
+large          [  58% ] 08/10 VUs    0m51.8s/1m30s  1.00 iters/s
+large_writer   [  58% ] 1 VUs        0m51.8s/1m30s 
+small          [  58% ] 08/10 VUs    0m51.8s/1m30s  1.00 iters/s
+small_writer   [  58% ] 1 VUs        0m51.8s/1m30s 
+
+running (0m55.0s), 136/142 VUs, 717 complete and 0 interrupted iterations
+aggressor      [  59% ] 118/120 VUs  0m52.8s/1m30s  30.00 iters/s
+large          [  59% ] 08/10 VUs    0m52.8s/1m30s  1.00 iters/s
+large_writer   [  59% ] 1 VUs        0m52.8s/1m30s 
+small          [  59% ] 08/10 VUs    0m52.8s/1m30s  1.00 iters/s
+small_writer   [  59% ] 1 VUs        0m52.8s/1m30s 
+
+running (0m56.0s), 137/142 VUs, 732 complete and 0 interrupted iterations
+aggressor      [  60% ] 119/120 VUs  0m53.8s/1m30s  30.00 iters/s
+large          [  60% ] 08/10 VUs    0m53.8s/1m30s  1.00 iters/s
+large_writer   [  60% ] 1 VUs        0m53.8s/1m30s 
+small          [  60% ] 08/10 VUs    0m53.8s/1m30s  1.00 iters/s
+small_writer   [  60% ] 1 VUs        0m53.8s/1m30s 
+
+running (0m57.0s), 137/142 VUs, 745 complete and 0 interrupted iterations
+aggressor      [  61% ] 118/120 VUs  0m54.8s/1m30s  30.00 iters/s
+large          [  61% ] 09/10 VUs    0m54.8s/1m30s  1.00 iters/s
+large_writer   [  61% ] 1 VUs        0m54.8s/1m30s 
+small          [  61% ] 08/10 VUs    0m54.8s/1m30s  1.00 iters/s
+small_writer   [  61% ] 1 VUs        0m54.8s/1m30s 
+
+running (0m58.0s), 140/142 VUs, 754 complete and 0 interrupted iterations
+aggressor      [  62% ] 120/120 VUs  0m55.8s/1m30s  30.00 iters/s
+large          [  62% ] 09/10 VUs    0m55.8s/1m30s  1.00 iters/s
+large_writer   [  62% ] 1 VUs        0m55.8s/1m30s 
+small          [  62% ] 09/10 VUs    0m55.8s/1m30s  1.00 iters/s
+small_writer   [  62% ] 1 VUs        0m55.8s/1m30s 
+
+running (0m59.0s), 139/142 VUs, 774 complete and 0 interrupted iterations
+aggressor      [  63% ] 119/120 VUs  0m56.8s/1m30s  30.00 iters/s
+large          [  63% ] 09/10 VUs    0m56.8s/1m30s  1.00 iters/s
+large_writer   [  63% ] 1 VUs        0m56.8s/1m30s 
+small          [  63% ] 09/10 VUs    0m56.8s/1m30s  1.00 iters/s
+small_writer   [  63% ] 1 VUs        0m56.8s/1m30s 
+
+running (1m00.0s), 137/142 VUs, 795 complete and 0 interrupted iterations
+aggressor      [  64% ] 118/120 VUs  0m57.8s/1m30s  30.00 iters/s
+large          [  64% ] 09/10 VUs    0m57.8s/1m30s  1.00 iters/s
+large_writer   [  64% ] 1 VUs        0m57.8s/1m30s 
+small          [  64% ] 08/10 VUs    0m57.8s/1m30s  1.00 iters/s
+small_writer   [  64% ] 1 VUs        0m57.8s/1m30s 
+
+running (1m01.0s), 137/142 VUs, 814 complete and 0 interrupted iterations
+aggressor      [  65% ] 118/120 VUs  0m58.8s/1m30s  30.00 iters/s
+large          [  65% ] 09/10 VUs    0m58.8s/1m30s  1.00 iters/s
+large_writer   [  65% ] 1 VUs        0m58.8s/1m30s 
+small          [  65% ] 08/10 VUs    0m58.8s/1m30s  1.00 iters/s
+small_writer   [  65% ] 1 VUs        0m58.8s/1m30s 
+
+running (1m02.0s), 136/142 VUs, 837 complete and 0 interrupted iterations
+aggressor      [  66% ] 118/120 VUs  0m59.8s/1m30s  30.00 iters/s
+large          [  66% ] 08/10 VUs    0m59.8s/1m30s  1.00 iters/s
+large_writer   [  66% ] 1 VUs        0m59.8s/1m30s 
+small          [  66% ] 08/10 VUs    0m59.8s/1m30s  1.00 iters/s
+small_writer   [  66% ] 1 VUs        0m59.8s/1m30s 
+
+running (1m03.0s), 136/142 VUs, 858 complete and 0 interrupted iterations
+aggressor      [  68% ] 118/120 VUs  1m00.8s/1m30s  30.00 iters/s
+large          [  68% ] 08/10 VUs    1m00.8s/1m30s  1.00 iters/s
+large_writer   [  68% ] 1 VUs        1m00.8s/1m30s 
+small          [  68% ] 08/10 VUs    1m00.8s/1m30s  1.00 iters/s
+small_writer   [  68% ] 1 VUs        1m00.8s/1m30s 
+
+running (1m04.0s), 137/142 VUs, 876 complete and 0 interrupted iterations
+aggressor      [  69% ] 120/120 VUs  1m01.8s/1m30s  30.00 iters/s
+large          [  69% ] 08/10 VUs    1m01.8s/1m30s  1.00 iters/s
+large_writer   [  69% ] 1 VUs        1m01.8s/1m30s 
+small          [  69% ] 07/10 VUs    1m01.8s/1m30s  1.00 iters/s
+small_writer   [  69% ] 1 VUs        1m01.8s/1m30s 
+
+running (1m05.0s), 134/142 VUs, 899 complete and 0 interrupted iterations
+aggressor      [  70% ] 118/120 VUs  1m02.8s/1m30s  30.00 iters/s
+large          [  70% ] 07/10 VUs    1m02.8s/1m30s  1.00 iters/s
+large_writer   [  70% ] 1 VUs        1m02.8s/1m30s 
+small          [  70% ] 07/10 VUs    1m02.8s/1m30s  1.00 iters/s
+small_writer   [  70% ] 1 VUs        1m02.8s/1m30s 
+
+running (1m06.0s), 131/142 VUs, 921 complete and 0 interrupted iterations
+aggressor      [  71% ] 115/120 VUs  1m03.8s/1m30s  30.00 iters/s
+large          [  71% ] 07/10 VUs    1m03.8s/1m30s  1.00 iters/s
+large_writer   [  71% ] 1 VUs        1m03.8s/1m30s 
+small          [  71% ] 07/10 VUs    1m03.8s/1m30s  1.00 iters/s
+small_writer   [  71% ] 1 VUs        1m03.8s/1m30s 
+
+running (1m07.0s), 133/142 VUs, 942 complete and 0 interrupted iterations
+aggressor      [  72% ] 118/120 VUs  1m04.8s/1m30s  30.00 iters/s
+large          [  72% ] 07/10 VUs    1m04.8s/1m30s  1.00 iters/s
+large_writer   [  72% ] 1 VUs        1m04.8s/1m30s 
+small          [  72% ] 06/10 VUs    1m04.8s/1m30s  1.00 iters/s
+small_writer   [  72% ] 1 VUs        1m04.8s/1m30s 
+
+running (1m08.0s), 135/142 VUs, 958 complete and 0 interrupted iterations
+aggressor      [  73% ] 119/120 VUs  1m05.8s/1m30s  30.00 iters/s
+large          [  73% ] 07/10 VUs    1m05.8s/1m30s  1.00 iters/s
+large_writer   [  73% ] 1 VUs        1m05.8s/1m30s 
+small          [  73% ] 07/10 VUs    1m05.8s/1m30s  1.00 iters/s
+small_writer   [  73% ] 1 VUs        1m05.8s/1m30s 
+
+running (1m09.0s), 135/142 VUs, 977 complete and 0 interrupted iterations
+aggressor      [  74% ] 119/120 VUs  1m06.8s/1m30s  30.00 iters/s
+large          [  74% ] 07/10 VUs    1m06.8s/1m30s  1.00 iters/s
+large_writer   [  74% ] 1 VUs        1m06.8s/1m30s 
+small          [  74% ] 07/10 VUs    1m06.8s/1m30s  1.00 iters/s
+small_writer   [  74% ] 1 VUs        1m06.8s/1m30s 
+
+running (1m10.0s), 135/142 VUs, 996 complete and 0 interrupted iterations
+aggressor      [  75% ] 119/120 VUs  1m07.8s/1m30s  30.00 iters/s
+large          [  75% ] 07/10 VUs    1m07.8s/1m30s  1.00 iters/s
+large_writer   [  75% ] 1 VUs        1m07.8s/1m30s 
+small          [  75% ] 07/10 VUs    1m07.8s/1m30s  1.00 iters/s
+small_writer   [  75% ] 1 VUs        1m07.8s/1m30s 
+
+running (1m11.0s), 135/142 VUs, 1013 complete and 0 interrupted iterations
+aggressor      [  76% ] 119/120 VUs  1m08.8s/1m30s  30.00 iters/s
+large          [  76% ] 07/10 VUs    1m08.8s/1m30s  1.00 iters/s
+large_writer   [  76% ] 1 VUs        1m08.8s/1m30s 
+small          [  76% ] 07/10 VUs    1m08.8s/1m30s  1.00 iters/s
+small_writer   [  76% ] 1 VUs        1m08.8s/1m30s 
+
+running (1m12.0s), 137/142 VUs, 1025 complete and 0 interrupted iterations
+aggressor      [  78% ] 120/120 VUs  1m09.8s/1m30s  30.00 iters/s
+large          [  78% ] 08/10 VUs    1m09.8s/1m30s  1.00 iters/s
+large_writer   [  78% ] 1 VUs        1m09.8s/1m30s 
+small          [  78% ] 07/10 VUs    1m09.8s/1m30s  1.00 iters/s
+small_writer   [  78% ] 1 VUs        1m09.8s/1m30s 
+
+running (1m13.0s), 138/142 VUs, 1039 complete and 0 interrupted iterations
+aggressor      [  79% ] 120/120 VUs  1m10.8s/1m30s  30.00 iters/s
+large          [  79% ] 08/10 VUs    1m10.8s/1m30s  1.00 iters/s
+large_writer   [  79% ] 1 VUs        1m10.8s/1m30s 
+small          [  79% ] 08/10 VUs    1m10.8s/1m30s  1.00 iters/s
+small_writer   [  79% ] 1 VUs        1m10.8s/1m30s 
+
+running (1m14.0s), 137/142 VUs, 1059 complete and 0 interrupted iterations
+aggressor      [  80% ] 119/120 VUs  1m11.8s/1m30s  30.00 iters/s
+large          [  80% ] 08/10 VUs    1m11.8s/1m30s  1.00 iters/s
+large_writer   [  80% ] 1 VUs        1m11.8s/1m30s 
+small          [  80% ] 08/10 VUs    1m11.8s/1m30s  1.00 iters/s
+small_writer   [  80% ] 1 VUs        1m11.8s/1m30s 
+
+running (1m15.0s), 138/142 VUs, 1077 complete and 0 interrupted iterations
+aggressor      [  81% ] 120/120 VUs  1m12.8s/1m30s  30.00 iters/s
+large          [  81% ] 08/10 VUs    1m12.8s/1m30s  1.00 iters/s
+large_writer   [  81% ] 1 VUs        1m12.8s/1m30s 
+small          [  81% ] 08/10 VUs    1m12.8s/1m30s  1.00 iters/s
+small_writer   [  81% ] 1 VUs        1m12.8s/1m30s 
+
+running (1m16.0s), 138/142 VUs, 1099 complete and 0 interrupted iterations
+aggressor      [  82% ] 120/120 VUs  1m13.8s/1m30s  30.00 iters/s
+large          [  82% ] 08/10 VUs    1m13.8s/1m30s  1.00 iters/s
+large_writer   [  82% ] 1 VUs        1m13.8s/1m30s 
+small          [  82% ] 08/10 VUs    1m13.8s/1m30s  1.00 iters/s
+small_writer   [  82% ] 1 VUs        1m13.8s/1m30s 
+
+running (1m17.0s), 136/142 VUs, 1120 complete and 0 interrupted iterations
+aggressor      [  83% ] 118/120 VUs  1m14.8s/1m30s  30.00 iters/s
+large          [  83% ] 08/10 VUs    1m14.8s/1m30s  1.00 iters/s
+large_writer   [  83% ] 1 VUs        1m14.8s/1m30s 
+small          [  83% ] 08/10 VUs    1m14.8s/1m30s  1.00 iters/s
+small_writer   [  83% ] 1 VUs        1m14.8s/1m30s 
+
+running (1m18.0s), 137/142 VUs, 1136 complete and 0 interrupted iterations
+aggressor      [  84% ] 119/120 VUs  1m15.8s/1m30s  30.00 iters/s
+large          [  84% ] 08/10 VUs    1m15.8s/1m30s  1.00 iters/s
+large_writer   [  84% ] 1 VUs        1m15.8s/1m30s 
+small          [  84% ] 08/10 VUs    1m15.8s/1m30s  1.00 iters/s
+small_writer   [  84% ] 1 VUs        1m15.8s/1m30s 
+
+running (1m19.0s), 136/142 VUs, 1158 complete and 0 interrupted iterations
+aggressor      [  85% ] 120/120 VUs  1m16.8s/1m30s  30.00 iters/s
+large          [  85% ] 07/10 VUs    1m16.8s/1m30s  1.00 iters/s
+large_writer   [  85% ] 1 VUs        1m16.8s/1m30s 
+small          [  85% ] 07/10 VUs    1m16.8s/1m30s  1.00 iters/s
+small_writer   [  85% ] 1 VUs        1m16.8s/1m30s 
+
+running (1m20.0s), 133/142 VUs, 1180 complete and 0 interrupted iterations
+aggressor      [  86% ] 117/120 VUs  1m17.8s/1m30s  30.00 iters/s
+large          [  86% ] 07/10 VUs    1m17.8s/1m30s  1.00 iters/s
+large_writer   [  86% ] 1 VUs        1m17.8s/1m30s 
+small          [  86% ] 07/10 VUs    1m17.8s/1m30s  1.00 iters/s
+small_writer   [  86% ] 1 VUs        1m17.8s/1m30s 
+
+running (1m21.0s), 133/142 VUs, 1204 complete and 0 interrupted iterations
+aggressor      [  88% ] 118/120 VUs  1m18.8s/1m30s  30.00 iters/s
+large          [  88% ] 07/10 VUs    1m18.8s/1m30s  1.00 iters/s
+large_writer   [  88% ] 1 VUs        1m18.8s/1m30s 
+small          [  88% ] 06/10 VUs    1m18.8s/1m30s  1.00 iters/s
+small_writer   [  88% ] 1 VUs        1m18.8s/1m30s 
+
+running (1m22.0s), 132/142 VUs, 1227 complete and 0 interrupted iterations
+aggressor      [  89% ] 118/120 VUs  1m19.8s/1m30s  30.00 iters/s
+large          [  89% ] 06/10 VUs    1m19.8s/1m30s  1.00 iters/s
+large_writer   [  89% ] 1 VUs        1m19.8s/1m30s 
+small          [  89% ] 06/10 VUs    1m19.8s/1m30s  1.00 iters/s
+small_writer   [  89% ] 1 VUs        1m19.8s/1m30s 
+
+running (1m23.0s), 133/142 VUs, 1252 complete and 0 interrupted iterations
+aggressor      [  90% ] 119/120 VUs  1m20.8s/1m30s  30.00 iters/s
+large          [  90% ] 06/10 VUs    1m20.8s/1m30s  1.00 iters/s
+large_writer   [  90% ] 1 VUs        1m20.8s/1m30s 
+small          [  90% ] 06/10 VUs    1m20.8s/1m30s  1.00 iters/s
+small_writer   [  90% ] 1 VUs        1m20.8s/1m30s 
+
+running (1m24.0s), 132/142 VUs, 1276 complete and 0 interrupted iterations
+aggressor      [  91% ] 119/120 VUs  1m21.8s/1m30s  30.00 iters/s
+large          [  91% ] 06/10 VUs    1m21.8s/1m30s  1.00 iters/s
+large_writer   [  91% ] 1 VUs        1m21.8s/1m30s 
+small          [  91% ] 05/10 VUs    1m21.8s/1m30s  1.00 iters/s
+small_writer   [  91% ] 1 VUs        1m21.8s/1m30s 
+
+running (1m25.0s), 129/142 VUs, 1307 complete and 0 interrupted iterations
+aggressor      [  92% ] 117/120 VUs  1m22.8s/1m30s  30.00 iters/s
+large          [  92% ] 05/10 VUs    1m22.8s/1m30s  1.00 iters/s
+large_writer   [  92% ] 1 VUs        1m22.8s/1m30s 
+small          [  92% ] 05/10 VUs    1m22.8s/1m30s  1.00 iters/s
+small_writer   [  92% ] 1 VUs        1m22.8s/1m30s 
+
+running (1m26.0s), 130/142 VUs, 1331 complete and 0 interrupted iterations
+aggressor      [  93% ] 118/120 VUs  1m23.8s/1m30s  30.00 iters/s
+large          [  93% ] 05/10 VUs    1m23.8s/1m30s  1.00 iters/s
+large_writer   [  93% ] 1 VUs        1m23.8s/1m30s 
+small          [  93% ] 05/10 VUs    1m23.8s/1m30s  1.00 iters/s
+small_writer   [  93% ] 1 VUs        1m23.8s/1m30s 
+
+running (1m27.0s), 131/142 VUs, 1357 complete and 0 interrupted iterations
+aggressor      [  94% ] 119/120 VUs  1m24.8s/1m30s  30.00 iters/s
+large          [  94% ] 05/10 VUs    1m24.8s/1m30s  1.00 iters/s
+large_writer   [  94% ] 1 VUs        1m24.8s/1m30s 
+small          [  94% ] 05/10 VUs    1m24.8s/1m30s  1.00 iters/s
+small_writer   [  94% ] 1 VUs        1m24.8s/1m30s 
+
+running (1m28.0s), 130/142 VUs, 1383 complete and 0 interrupted iterations
+aggressor      [  95% ] 118/120 VUs  1m25.8s/1m30s  30.00 iters/s
+large          [  95% ] 05/10 VUs    1m25.8s/1m30s  1.00 iters/s
+large_writer   [  95% ] 1 VUs        1m25.8s/1m30s 
+small          [  95% ] 05/10 VUs    1m25.8s/1m30s  1.00 iters/s
+small_writer   [  95% ] 1 VUs        1m25.8s/1m30s 
+
+running (1m29.0s), 129/142 VUs, 1410 complete and 0 interrupted iterations
+aggressor      [  96% ] 117/120 VUs  1m26.8s/1m30s  30.00 iters/s
+large          [  96% ] 05/10 VUs    1m26.8s/1m30s  1.00 iters/s
+large_writer   [  96% ] 1 VUs        1m26.8s/1m30s 
+small          [  96% ] 05/10 VUs    1m26.8s/1m30s  1.00 iters/s
+small_writer   [  96% ] 1 VUs        1m26.8s/1m30s 
+
+running (1m30.0s), 127/142 VUs, 1439 complete and 0 interrupted iterations
+aggressor      [  98% ] 115/120 VUs  1m27.8s/1m30s  30.00 iters/s
+large          [  98% ] 05/10 VUs    1m27.8s/1m30s  1.00 iters/s
+large_writer   [  98% ] 1 VUs        1m27.8s/1m30s 
+small          [  98% ] 05/10 VUs    1m27.8s/1m30s  1.00 iters/s
+small_writer   [  98% ] 1 VUs        1m27.8s/1m30s 
+
+running (1m31.0s), 132/142 VUs, 1461 complete and 0 interrupted iterations
+aggressor      [  99% ] 120/120 VUs  1m28.8s/1m30s  30.00 iters/s
+large          [  99% ] 05/10 VUs    1m28.8s/1m30s  1.00 iters/s
+large_writer   [  99% ] 1 VUs        1m28.8s/1m30s 
+small          [  99% ] 05/10 VUs    1m28.8s/1m30s  1.00 iters/s
+small_writer   [  99% ] 1 VUs        1m28.8s/1m30s 
+
+running (1m32.0s), 130/142 VUs, 1487 complete and 0 interrupted iterations
+aggressor      [ 100% ] 118/120 VUs  1m29.8s/1m30s  30.00 iters/s
+large          [ 100% ] 05/10 VUs    1m29.8s/1m30s  1.00 iters/s
+large_writer   [ 100% ] 1 VUs        1m29.8s/1m30s 
+small          [ 100% ] 05/10 VUs    1m29.8s/1m30s  1.00 iters/s
+small_writer   [ 100% ] 1 VUs        1m29.8s/1m30s 
+
+running (1m33.0s), 113/142 VUs, 1508 complete and 0 interrupted iterations
+aggressor    ↓ [ 100% ] 120/120 VUs  1m30s  30.00 iters/s
+large        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+large_writer ↓ [ 100% ] 1 VUs        1m30s 
+small        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+small_writer ↓ [ 100% ] 1 VUs        1m30s 
+
+running (1m34.0s), 091/142 VUs, 1530 complete and 0 interrupted iterations
+aggressor    ↓ [ 100% ] 120/120 VUs  1m30s  30.00 iters/s
+large        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+large_writer ↓ [ 100% ] 1 VUs        1m30s 
+small        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+small_writer ↓ [ 100% ] 1 VUs        1m30s 
+
+running (1m35.0s), 066/142 VUs, 1555 complete and 0 interrupted iterations
+aggressor    ↓ [ 100% ] 120/120 VUs  1m30s  30.00 iters/s
+large        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+large_writer ✓ [ 100% ] 1 VUs        1m30s 
+small        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+small_writer ↓ [ 100% ] 1 VUs        1m30s 
+
+running (1m36.0s), 039/142 VUs, 1582 complete and 0 interrupted iterations
+aggressor    ↓ [ 100% ] 120/120 VUs  1m30s  30.00 iters/s
+large        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+large_writer ✓ [ 100% ] 1 VUs        1m30s 
+small        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+small_writer ↓ [ 100% ] 1 VUs        1m30s 
+
+running (1m37.0s), 009/142 VUs, 1612 complete and 0 interrupted iterations
+aggressor    ↓ [ 100% ] 120/120 VUs  1m30s  30.00 iters/s
+large        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+large_writer ✓ [ 100% ] 1 VUs        1m30s 
+small        ↓ [ 100% ] 06/10 VUs    1m30s  1.00 iters/s
+small_writer ↓ [ 100% ] 1 VUs        1m30s 
+
+     ✓ aggressor 200 or 429
+     ✓ victim own board and header
+     ✓ single writer succeeds
+
+     aggressor_429..................: 0       0/s
+     checks.........................: 100.00% 1163 out of 1163
+     data_received..................: 388 MB  4.0 MB/s
+     data_sent......................: 1.2 MB  13 kB/s
+   ✗ dropped_iterations.............: 1276    13.117884/s
+     http_req_blocked...............: avg=155.99µs min=3.6µs    med=9.98µs  max=27.31ms  p(95)=462.89µs p(99)=1.25ms  
+     http_req_connecting............: avg=121.66µs min=0s       med=0s      max=27.19ms  p(95)=354.11µs p(99)=732.1µs 
+     http_req_duration..............: avg=7.41s    min=21.17ms  med=7.71s   max=10s      p(95)=10s      p(99)=10s     
+       { expected_response:true }...: avg=7.04s    min=21.17ms  med=7.48s   max=9.99s    p(95)=9.35s    p(99)=9.84s   
+     http_req_failed................: 12.47%  205 out of 1643
+     http_req_receiving.............: avg=60.68ms  min=0s       med=45.67ms max=696.15ms p(95)=189.03ms p(99)=289.74ms
+     http_req_sending...............: avg=73.22µs  min=9.49µs   med=51.95µs max=6.32ms   p(95)=134.97µs p(99)=386.82µs
+     http_req_tls_handshaking.......: avg=0s       min=0s       med=0s      max=0s       p(95)=0s       p(99)=0s      
+     http_req_waiting...............: avg=7.35s    min=19.84ms  med=7.65s   max=10s      p(95)=10s      p(99)=10s     
+     http_reqs......................: 1643    16.890818/s
+     iteration_duration.............: avg=7.52s    min=141.25ms med=7.77s   max=19.57s   p(95)=10s      p(99)=10s     
+     iterations.....................: 1621    16.664647/s
+     victim_latency.................: avg=7.14s    min=498.63ms med=7.49s   max=9.52s    p(95)=8.86s    p(99)=9.29s   
+     ✗ { role:large }...............: avg=7.33s    min=5.08s    med=7.68s   max=9.52s    p(95)=9.13s    p(99)=9.39s   
+     ✗ { role:small }...............: avg=6.95s    min=498.63ms med=7.28s   max=9.19s    p(95)=8.76s    p(99)=9.06s   
+   ✓ victim_success.................: 100.00% 131 out of 131
+     vus............................: 9       min=0            max=140
+     vus_max........................: 142     min=40           max=142
+
+
+running (1m37.3s), 000/142 VUs, 1621 complete and 0 interrupted iterations
+aggressor    ✓ [ 100% ] 000/120 VUs  1m30s  30.00 iters/s
+large        ✓ [ 100% ] 00/10 VUs    1m30s  1.00 iters/s
+large_writer ✓ [ 100% ] 1 VUs        1m30s 
+small        ✓ [ 100% ] 00/10 VUs    1m30s  1.00 iters/s
+small_writer ✓ [ 100% ] 1 VUs        1m30s 
+time="2026-11-12T15:03:02Z" level=error msg="thresholds on metrics 'dropped_iterations, victim_latency{role:large}, victim_latency{role:small}' have been crossed"

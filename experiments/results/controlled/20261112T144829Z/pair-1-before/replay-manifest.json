@@ -1,0 +1,11 @@
+{
+  "variant": "before",
+  "exit_code": 99,
+  "started_at": "2026-11-12T15:01:23.500210+00:00",
+  "finished_at": "2026-11-12T15:03:05.001529+00:00",
+  "snapshot_sha256": {
+    "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+    "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+  },
+  "reason": "Original branch emitted no load because Docker could not mount the WSL /tmp fixture. Input location corrected, workload and protocol unchanged."
+}

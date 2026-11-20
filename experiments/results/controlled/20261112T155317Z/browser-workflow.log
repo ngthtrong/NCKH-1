@@ -1,0 +1,19 @@
+
+> saas-multitenancy-web@0.1.0 test:e2e
+> playwright test controlled-report.e2e.ts --output=/mnt/d/NCKH/experiments/results/controlled/20261112T155317Z/browser/test-results
+
+
+Running 1 test using 1 worker
+
+(node:558477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/controlled-report.e2e.ts:5:1 › controlled report: five browser trials per tenant with board render measurements (1.1m)
+
+  1 passed (1.2m)
+Wrote RESULTS.md, CSV, analysis.json and latency PNG/PDF
+Traceback (most recent call last):
+  File "/mnt/d/NCKH/experiments/report/controlled/analyze-resources.py", line 21, in <module>
+    if d.get('type')=='Point'and d.get('metric')=='http_req_duration'and d['data'].get('tags',{}).get('phase')=='measure':times.append(stamp(d['data']['time'])-d['data']['value']/1000)
+  File "/mnt/d/NCKH/experiments/report/controlled/analyze-resources.py", line 5, in stamp
+    def stamp(s):return datetime.fromisoformat(s.replace('Z','+00:00')).timestamp()
+ValueError: Invalid isoformat string: '2026-11-12T15:55:26.477180204+00:00'

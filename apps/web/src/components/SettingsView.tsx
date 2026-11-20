@@ -51,6 +51,7 @@ export const SettingsView: React.FC<Props> = ({ settings, onSettingsUpdated }) =
       label: 'Trường mới',
       type: 'TEXT',
       required: false,
+      options: [],
     };
     setForm({ ...form, customFields: [...form.customFields, next] });
   };
@@ -104,6 +105,28 @@ export const SettingsView: React.FC<Props> = ({ settings, onSettingsUpdated }) =
         <h3 className="font-semibold text-slate-800 flex items-center gap-2 text-sm">
           <Palette className="w-4 h-4 text-primary" /> Lớp 1: Nhận diện Thương hiệu & Hiển thị
         </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Chữ viết tắt Logo (Logo Text)</label>
+            <input
+              type="text"
+              value={form.theme.logoText ?? ''}
+              onChange={(e) => setForm({ ...form, theme: { ...form.theme, logoText: e.target.value } })}
+              placeholder="VD: ACME"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Khẩu hiệu (Tagline)</label>
+            <input
+              type="text"
+              value={form.theme.tagline ?? ''}
+              onChange={(e) => setForm({ ...form, theme: { ...form.theme, tagline: e.target.value } })}
+              placeholder="VD: Phát triển phần mềm chuẩn mực"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Màu chủ đạo (Primary)</label>
@@ -161,11 +184,12 @@ export const SettingsView: React.FC<Props> = ({ settings, onSettingsUpdated }) =
             <label className="block text-xs font-medium text-slate-600 mb-1">Chế độ cưỡng chế WIP</label>
             <select
               value={form.wipMode}
-              onChange={(e) => setForm({ ...form, wipMode: e.target.value as 'STRICT' | 'WARN' })}
+              onChange={(e) => setForm({ ...form, wipMode: e.target.value as 'STRICT' | 'WARN' | 'OFF' })}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
             >
               <option value="STRICT">STRICT (Chặn cứng HTTP 422 khi vượt ngưỡng)</option>
               <option value="WARN">WARN (Cho phép lưu, bật cảnh báo vàng)</option>
+              <option value="OFF">OFF (Tắt kiểm soát WIP)</option>
             </select>
           </div>
           <div>
@@ -253,12 +277,32 @@ export const SettingsView: React.FC<Props> = ({ settings, onSettingsUpdated }) =
               />
               <select
                 value={cf.type}
-                onChange={(e) => updateCustomField(idx, { type: e.target.value as 'TEXT' | 'NUMBER' })}
+                onChange={(e) =>
+                  updateCustomField(idx, { type: e.target.value as 'TEXT' | 'NUMBER' | 'SELECT' | 'DATE' })
+                }
                 className="md:col-span-2 px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
               >
                 <option value="TEXT">TEXT</option>
                 <option value="NUMBER">NUMBER</option>
+                <option value="SELECT">SELECT</option>
+                <option value="DATE">DATE</option>
               </select>
+              {cf.type === 'SELECT' && (
+                <input
+                  type="text"
+                  placeholder="Options cách nhau dấu phẩy (Low,Medium,High)"
+                  value={(cf.options ?? []).join(',')}
+                  onChange={(e) =>
+                    updateCustomField(idx, {
+                      options: e.target.value
+                        .split(',')
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  className="md:col-span-12 px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white"
+                />
+              )}
               <label className="md:col-span-2 flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
                 <input
                   type="checkbox"

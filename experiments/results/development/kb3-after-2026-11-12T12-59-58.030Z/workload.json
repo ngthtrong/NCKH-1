@@ -1,0 +1,8 @@
+{
+  "variant": "after",
+  "smallTasks": 5,
+  "largeTasks": 30,
+  "duration": "10s",
+  "aggressorRate": 30,
+  "mutationWorkload": "one drag per five board reads for each victim"
+}

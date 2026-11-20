@@ -1,0 +1,8 @@
+{
+  "variant": "after",
+  "smallTasks": 5,
+  "largeTasks": 30,
+  "duration": "10s",
+  "aggressorRate": 30,
+  "mutationWorkload": "one writer per victim, one drag every five seconds"
+}

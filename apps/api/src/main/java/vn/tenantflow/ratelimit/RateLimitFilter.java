@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import vn.tenantflow.cache.TenantConfigCacheService;
 import vn.tenantflow.security.TenantContext;
 import vn.tenantflow.security.TenantInfo;
 
@@ -52,10 +53,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
             """;
 
     private final StringRedisTemplate redisTemplate;
+    private final TenantConfigCacheService cacheService;
     private final DefaultRedisScript<List> rateLimitScript;
 
-    public RateLimitFilter(StringRedisTemplate redisTemplate) {
+    public RateLimitFilter(StringRedisTemplate redisTemplate, TenantConfigCacheService cacheService) {
         this.redisTemplate = redisTemplate;
+        this.cacheService = cacheService;
         this.rateLimitScript = new DefaultRedisScript<>();
         this.rateLimitScript.setScriptText(TOKEN_BUCKET_LUA);
         this.rateLimitScript.setResultType(List.class);
@@ -71,7 +74,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        int capacity = resolveCapacity(info.tier());
+        int capacity = cacheService.getRateLimitRpm(info.tenantId());
         double refillRate = capacity / 60.0;
         String key = "ratelimit:tenant:" + info.tenantId();
         long nowMs = System.currentTimeMillis();
@@ -93,29 +96,20 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 response.setHeader("X-RateLimit-Limit", String.valueOf(capacity));
                 response.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, remaining)));
                 if (allowed == 0L) {
+                    cacheService.incrementBlocked429Count(info.tenantId());
                     response.setStatus(429);
                     response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     response.getWriter().write(
-                            "{\"error\":\"Rate limit exceeded for tenant tier " + info.tier() + "\",\"code\":\"RATE_LIMIT_EXCEEDED\"}"
+                            "{\"error\":\"Rate limit exceeded (" + capacity + " req/min) for tenant " + info.slug() + "\",\"code\":\"RATE_LIMIT_EXCEEDED\"}"
                     );
                     return;
                 }
             }
         } catch (Exception ignored) {
-            // Fail-open on Redis transient error to preserve availability
+            // Fail-open on Redis transient error
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private int resolveCapacity(String tier) {
-        if ("ENTERPRISE".equalsIgnoreCase(tier)) {
-            return 600;
-        }
-        if ("PRO".equalsIgnoreCase(tier)) {
-            return 120;
-        }
-        return 30; // FREE
     }
 }

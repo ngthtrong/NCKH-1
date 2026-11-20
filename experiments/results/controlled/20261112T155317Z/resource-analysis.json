@@ -1,0 +1,1025 @@
+{
+  "description": "Docker CPU percent is 100% per CPU core; memory in MiB. Samples confined to measured HTTP interval. Cache rate uses first/last counter samples inside that interval; boundaries quantized by approx. 5-second scrape interval. None means no lookup, not 0% hit rate.",
+  "runs": [
+    {
+      "pair": 1,
+      "variant": "before",
+      "measurement_points_start": 1794498916.4725795,
+      "measurement_points_end": 1794498976.4725795,
+      "sampling_window_start": "2026-11-12T15:55:17.329831+00:00",
+      "sampling_window_end": "2026-11-12T15:56:15.639669+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 99.48125,
+            "sd": 4.345738265407683,
+            "min": 94.39,
+            "max": 108.87
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 426.475,
+            "sd": 18.019969081945874,
+            "min": 396.6,
+            "max": 452.9
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 31.82125,
+            "sd": 7.896200600831481,
+            "min": 21.98,
+            "max": 42.28
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 102.2125,
+            "sd": 1.548674548490698,
+            "min": 100.8,
+            "max": 105.4
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 2.8537500000000002,
+            "sd": 3.3034351709351633,
+            "min": 0.44,
+            "max": 8.21
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 7.508375,
+            "sd": 1.6095399464709517,
+            "min": 6.395,
+            "max": 11.26
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "after",
+      "measurement_points_start": 1794499126.1688855,
+      "measurement_points_end": 1794499186.1688855,
+      "sampling_window_start": "2026-11-12T15:58:51.178426+00:00",
+      "sampling_window_end": "2026-11-12T15:59:41.274908+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 35.214,
+            "sd": 19.199834027060408,
+            "min": 15.98,
+            "max": 72.77
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 404.19,
+            "sd": 8.704207156440061,
+            "min": 392.9,
+            "max": 417.4
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 3.654,
+            "sd": 4.494199224185179,
+            "min": 0.62,
+            "max": 11.78
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 102.37,
+            "sd": 0.5850925852660708,
+            "min": 101.3,
+            "max": 103.0
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 2.406,
+            "sd": 2.516943472635896,
+            "min": 0.89,
+            "max": 8.45
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 16.227,
+            "sd": 2.0926647021335154,
+            "min": 13.44,
+            "max": 19.22
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 41.0,
+          "misses": 10.0,
+          "hit_rate": 0.803921568627451
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 10.0,
+          "hit_rate": 0.0
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 100.0,
+          "misses": 1.0,
+          "hit_rate": 0.9900990099009901
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 1.0,
+          "misses": 0.0,
+          "hit_rate": 1.0
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 41.0,
+          "misses": 10.0,
+          "hit_rate": 0.803921568627451
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 10.0,
+          "hit_rate": 0.0
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "variant": "after",
+      "measurement_points_start": 1794499293.3622878,
+      "measurement_points_end": 1794499353.3622878,
+      "sampling_window_start": "2026-11-12T16:01:35.910360+00:00",
+      "sampling_window_end": "2026-11-12T16:02:30.590951+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 37.68909090909091,
+            "sd": 26.145381410316222,
+            "min": 18.01,
+            "max": 111.89
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 404.6272727272727,
+            "sd": 9.841452220997766,
+            "min": 392.0,
+            "max": 418.8
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 1.8690909090909091,
+            "sd": 1.8272244226993821,
+            "min": 0.69,
+            "max": 6.85
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 102.3,
+            "sd": 0.7589466384404099,
+            "min": 101.0,
+            "max": 103.6
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 2.4927272727272727,
+            "sd": 1.7686101374191594,
+            "min": 0.93,
+            "max": 5.1
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 15.82,
+            "sd": 2.288112759459201,
+            "min": 12.32,
+            "max": 18.91
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 44.0,
+          "misses": 11.0,
+          "hit_rate": 0.8
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 108.0,
+          "misses": 1.0,
+          "hit_rate": 0.9908256880733946
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 1.0,
+          "misses": 0.0,
+          "hit_rate": 1.0
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 44.0,
+          "misses": 11.0,
+          "hit_rate": 0.8
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "variant": "before",
+      "measurement_points_start": 1794499460.4346583,
+      "measurement_points_end": 1794499520.4346583,
+      "sampling_window_start": "2026-11-12T16:04:23.713403+00:00",
+      "sampling_window_end": "2026-11-12T16:05:13.324139+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 103.11714285714285,
+            "sd": 3.7592850130741344,
+            "min": 99.29,
+            "max": 110.13
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 421.64285714285717,
+            "sd": 17.355004767391765,
+            "min": 392.9,
+            "max": 442.8
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 37.09428571428572,
+            "sd": 12.145015242398639,
+            "min": 25.37,
+            "max": 61.34
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 102.2,
+            "sd": 1.5916448515084423,
+            "min": 101.5,
+            "max": 105.8
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 1.6742857142857142,
+            "sd": 1.9100423829752848,
+            "min": 0.48,
+            "max": 4.63
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 7.087142857142857,
+            "sd": 0.2337772647709985,
+            "min": 6.766,
+            "max": 7.418
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        }
+      ]
+    },
+    {
+      "pair": 3,
+      "variant": "before",
+      "measurement_points_start": 1794499650.1033728,
+      "measurement_points_end": 1794499710.1033728,
+      "sampling_window_start": "2026-11-12T16:07:32.284436+00:00",
+      "sampling_window_end": "2026-11-12T16:08:29.595831+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 101.7525,
+            "sd": 3.528398058204723,
+            "min": 98.19,
+            "max": 107.69
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 428.0375,
+            "sd": 19.53238610981407,
+            "min": 400.5,
+            "max": 454.6
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 32.526250000000005,
+            "sd": 9.309041591761359,
+            "min": 17.19,
+            "max": 43.45
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 103.025,
+            "sd": 0.654107898482463,
+            "min": 101.8,
+            "max": 103.7
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 1.1575,
+            "sd": 1.69276401190479,
+            "min": 0.44,
+            "max": 5.34
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 7.22275,
+            "sd": 0.1733606892332531,
+            "min": 6.906,
+            "max": 7.504
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        }
+      ]
+    },
+    {
+      "pair": 3,
+      "variant": "after",
+      "measurement_points_start": 1794499877.7786715,
+      "measurement_points_end": 1794499937.7786715,
+      "sampling_window_start": "2026-11-12T16:11:19.993254+00:00",
+      "sampling_window_end": "2026-11-12T16:12:13.709188+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 70.328,
+            "sd": 34.9577836826078,
+            "min": 15.37,
+            "max": 102.88
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 410.46,
+            "sd": 7.266697247642075,
+            "min": 396.4,
+            "max": 418.2
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 7.546,
+            "sd": 6.4917523742737515,
+            "min": 1.14,
+            "max": 19.87
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 102.52,
+            "sd": 0.7099295739719526,
+            "min": 101.6,
+            "max": 104.1
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 10,
+            "mean": 2.102,
+            "sd": 1.8181785757546844,
+            "min": 1.0,
+            "max": 6.22
+          },
+          "memory_mib": {
+            "n": 10,
+            "mean": 15.288,
+            "sd": 2.2617436734617926,
+            "min": 11.46,
+            "max": 18.53
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 43.0,
+          "misses": 11.0,
+          "hit_rate": 0.7962962962962963
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 106.0,
+          "misses": 2.0,
+          "hit_rate": 0.9814814814814815
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 2.0,
+          "misses": 0.0,
+          "hit_rate": 1.0
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 43.0,
+          "misses": 11.0,
+          "hit_rate": 0.7962962962962963
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        }
+      ]
+    },
+    {
+      "pair": 4,
+      "variant": "after",
+      "measurement_points_start": 1794500054.509758,
+      "measurement_points_end": 1794500114.509758,
+      "sampling_window_start": "2026-11-12T16:14:19.644232+00:00",
+      "sampling_window_end": "2026-11-12T16:15:13.330273+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 25.51909090909091,
+            "sd": 9.186676716359898,
+            "min": 14.26,
+            "max": 40.3
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 407.54545454545456,
+            "sd": 10.121004262064472,
+            "min": 391.3,
+            "max": 417.2
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 2.849090909090909,
+            "sd": 3.4414545022285408,
+            "min": 0.65,
+            "max": 10.72
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 102.48181818181818,
+            "sd": 0.43085538598973694,
+            "min": 101.6,
+            "max": 103.0
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 2.2245454545454546,
+            "sd": 1.7595076790759605,
+            "min": 0.89,
+            "max": 5.12
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 16.47,
+            "sd": 2.683728749333658,
+            "min": 12.52,
+            "max": 20.22
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 42.0,
+          "misses": 11.0,
+          "hit_rate": 0.7924528301886793
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 107.0,
+          "misses": 1.0,
+          "hit_rate": 0.9907407407407407
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 1.0,
+          "misses": 0.0,
+          "hit_rate": 1.0
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 42.0,
+          "misses": 11.0,
+          "hit_rate": 0.7924528301886793
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0.0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        }
+      ]
+    },
+    {
+      "pair": 4,
+      "variant": "before",
+      "measurement_points_start": 1794500208.6815047,
+      "measurement_points_end": 1794500268.6815047,
+      "sampling_window_start": "2026-11-12T16:16:49.541544+00:00",
+      "sampling_window_end": "2026-11-12T16:17:46.244539+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 99.87375,
+            "sd": 1.2073103222807784,
+            "min": 98.21,
+            "max": 102.13
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 420.7875,
+            "sd": 16.75908602178872,
+            "min": 399.1,
+            "max": 446.6
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 36.205,
+            "sd": 10.503593942755295,
+            "min": 19.82,
+            "max": 48.87
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 102.88749999999999,
+            "sd": 0.7954109450017448,
+            "min": 101.0,
+            "max": 103.6
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 8,
+            "mean": 0.98125,
+            "sd": 1.2957340721437736,
+            "min": 0.43,
+            "max": 4.18
+          },
+          "memory_mib": {
+            "n": 8,
+            "mean": 6.902625,
+            "sd": 0.19316309725943304,
+            "min": 6.531,
+            "max": 7.09
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        }
+      ]
+    },
+    {
+      "pair": 5,
+      "variant": "before",
+      "measurement_points_start": 1794500393.8398623,
+      "measurement_points_end": 1794500453.8398623,
+      "sampling_window_start": "2026-11-12T16:19:55.439962+00:00",
+      "sampling_window_end": "2026-11-12T16:20:45.556305+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 101.02857142857142,
+            "sd": 5.76032819832177,
+            "min": 97.34,
+            "max": 111.39
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 420.3142857142857,
+            "sd": 14.944835068949256,
+            "min": 395.9,
+            "max": 440.5
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 32.49285714285714,
+            "sd": 8.113911334421712,
+            "min": 24.97,
+            "max": 47.15
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 103.51428571428572,
+            "sd": 2.273344504929959,
+            "min": 100.9,
+            "max": 107.7
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 7,
+            "mean": 3.255714285714286,
+            "sd": 5.683962400599476,
+            "min": 0.43,
+            "max": 15.69
+          },
+          "memory_mib": {
+            "n": 7,
+            "mean": 7.157,
+            "sd": 0.2783187620936351,
+            "min": 6.773,
+            "max": 7.605
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 0,
+          "hit_rate": null
+        }
+      ]
+    },
+    {
+      "pair": 5,
+      "variant": "after",
+      "measurement_points_start": 1794500600.0576153,
+      "measurement_points_end": 1794500660.0576153,
+      "sampling_window_start": "2026-11-12T16:23:20.569384+00:00",
+      "sampling_window_end": "2026-11-12T16:24:14.736359+00:00",
+      "resource": {
+        "nckh-experiment-api-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 28.197272727272725,
+            "sd": 13.299886534034108,
+            "min": 11.16,
+            "max": 64.47
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 436.09999999999997,
+            "sd": 10.957006890570064,
+            "min": 420.7,
+            "max": 448.9
+          }
+        },
+        "nckh-experiment-postgres-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 2.6545454545454548,
+            "sd": 2.940681429996672,
+            "min": 0.62,
+            "max": 8.81
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 94.46363636363637,
+            "sd": 0.8181597976834695,
+            "min": 93.29,
+            "max": 95.53
+          }
+        },
+        "nckh-experiment-redis-1": {
+          "cpu_percent": {
+            "n": 11,
+            "mean": 2.4363636363636365,
+            "sd": 1.9191522749759735,
+            "min": 1.03,
+            "max": 6.04
+          },
+          "memory_mib": {
+            "n": 11,
+            "mean": 15.59909090909091,
+            "sd": 2.402134278284436,
+            "min": 11.73,
+            "max": 18.84
+          }
+        }
+      },
+      "cache": [
+        {
+          "role": "small",
+          "layer": "l1",
+          "hits": 43.0,
+          "misses": 11.0,
+          "hit_rate": 0.7962962962962963
+        },
+        {
+          "role": "small",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        },
+        {
+          "role": "medium",
+          "layer": "l1",
+          "hits": 106.0,
+          "misses": 2.0,
+          "hit_rate": 0.9814814814814815
+        },
+        {
+          "role": "medium",
+          "layer": "l2",
+          "hits": 2.0,
+          "misses": 0.0,
+          "hit_rate": 1.0
+        },
+        {
+          "role": "large",
+          "layer": "l1",
+          "hits": 43.0,
+          "misses": 11.0,
+          "hit_rate": 0.7962962962962963
+        },
+        {
+          "role": "large",
+          "layer": "l2",
+          "hits": 0,
+          "misses": 11.0,
+          "hit_rate": 0.0
+        }
+      ]
+    }
+  ]
+}

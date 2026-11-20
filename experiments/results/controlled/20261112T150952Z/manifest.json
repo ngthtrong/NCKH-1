@@ -1,0 +1,201 @@
+{
+  "protocol_id": "NCKH-POOL3-20261112-v3",
+  "run_class": "controlled",
+  "data_kind": "measured",
+  "started_at": "2026-11-12T15:09:52.688933+00:00",
+  "status": "completed",
+  "protocol_sha256": "8ccd345b18477012481188fedc2d4fcf655debb342453be818c5d40f0cb45d0d",
+  "runs": [
+    {
+      "kind": "functional",
+      "repeat": 1,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-1"
+    },
+    {
+      "kind": "functional",
+      "repeat": 2,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-2"
+    },
+    {
+      "kind": "functional",
+      "repeat": 3,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-3"
+    },
+    {
+      "kind": "functional",
+      "repeat": 4,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-4"
+    },
+    {
+      "kind": "functional",
+      "repeat": 5,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-5"
+    },
+    {
+      "kind": "load",
+      "pair": 1,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:11:18.924757+00:00",
+      "finished_at": "2026-11-12T15:13:16.104332+00:00",
+      "directory": "pair-1-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 1,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:14:46.085384+00:00",
+      "finished_at": "2026-11-12T15:16:28.047679+00:00",
+      "directory": "pair-1-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 2,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:17:49.501184+00:00",
+      "finished_at": "2026-11-12T15:19:31.066427+00:00",
+      "directory": "pair-2-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 2,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:20:40.575801+00:00",
+      "finished_at": "2026-11-12T15:22:32.281158+00:00",
+      "directory": "pair-2-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 3,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:24:12.833986+00:00",
+      "finished_at": "2026-11-12T15:26:12.873600+00:00",
+      "directory": "pair-3-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 3,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:28:07.583203+00:00",
+      "finished_at": "2026-11-12T15:29:49.274193+00:00",
+      "directory": "pair-3-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 4,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:30:48.197861+00:00",
+      "finished_at": "2026-11-12T15:32:30.263201+00:00",
+      "directory": "pair-4-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 4,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:33:27.227018+00:00",
+      "finished_at": "2026-11-12T15:35:34.536536+00:00",
+      "directory": "pair-4-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 5,
+      "variant": "before",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:37:25.000882+00:00",
+      "finished_at": "2026-11-12T15:39:26.433533+00:00",
+      "directory": "pair-5-before",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    },
+    {
+      "kind": "load",
+      "pair": 5,
+      "variant": "after",
+      "exit_code": 99,
+      "started_at": "2026-11-12T15:40:48.516263+00:00",
+      "finished_at": "2026-11-12T15:42:25.726918+00:00",
+      "directory": "pair-5-after",
+      "snapshot_sha256": {
+        "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+        "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+      }
+    }
+  ],
+  "private_state": "/tmp/nckh-controlled-20261112T144829Z",
+  "limitations": [
+    "Local WSL host shared with demo and load generator.",
+    "Protocol fills report placeholders; no external approval or population significance claimed.",
+    "Combined cache/limiter comparison does not isolate individual effects."
+  ],
+  "source_archive_sha256": "8657e00b47f8f7df1087fbed0e039401e55fa3eec3bff5366907904d896a01ad",
+  "git_commit": "30b4d90d3897626ffb8c9945cedbd828273b979c",
+  "git_dirty": true,
+  "report_sha256": "4428dd78cf137427b8bf94b6a46113740c89ca0448f9090b959062ab40e6519a",
+  "environment": "/nckh-experiment-api-1 nckh-experiment-api:20261112 sha256:1fbe6afa98586ce78b947bd4d1d8cd1ba4e6cc52f5e7297bfbd6e3737d2a49a4 CPU=1000000000 RAM=805306368\n/nckh-experiment-postgres-1 postgres:16-alpine sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139 CPU=1000000000 RAM=805306368\n/nckh-experiment-redis-1 redis:7-alpine sha256:7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe CPU=250000000 RAM=268435456\n/nckh-experiment-web-1 saas-research-web:local sha256:4048fc1ad7017ab322f73183c9f4d907fe2d9c79ac2b3dda6661f70cd65cada1 CPU=250000000 RAM=134217728\n",
+  "tools": {
+    "node": "v22.23.4",
+    "k6": "k6 v0.57.0 (commit/50afd82c18, go1.23.6, linux/amd64)",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "snapshots": {
+    "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+    "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+  },
+  "component_provenance": {
+    "directory": "/mnt/d/NCKH/experiments/results/controlled/20261112T144829Z",
+    "protocol_id": "NCKH-POOL3-20261112-v1",
+    "reason": "Same application and data; functional/SQL design unchanged. V2 fixes generator allocation and mount. V1 load pilot not part of final five pairs."
+  },
+  "finished_at": "2026-11-12T15:42:25.734374+00:00"
+}

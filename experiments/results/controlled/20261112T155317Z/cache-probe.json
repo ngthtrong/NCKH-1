@@ -1,0 +1,168 @@
+{
+  "description": "API round-trip timings include authentication, tenant resolution and database version lookup. Cache paths verified by metric deltas. Pub/Sub bound includes Docker CLI, metrics polling and HTTP; it is not intrinsic Redis propagation latency or a multi-API measurement.",
+  "samples": [
+    {
+      "repeat": 1,
+      "dbMs": 222.02652500000022,
+      "l1Ms": [
+        40.095288999999866,
+        44.34071100000074,
+        25.16133500000069,
+        42.82310400000006,
+        55.70482300000003,
+        35.13529899999958,
+        24.575025999999525,
+        23.777384999999413,
+        22.13101800000004,
+        30.99724200000037
+      ],
+      "l2Ms": 31.74884699999984,
+      "pubsub": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 810.4835039999998
+      },
+      "coldInvalidation": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 789.6142689999997
+      },
+      "paths": {
+        "coldL1Miss": 1,
+        "coldL2Miss": 1,
+        "l2Hit": 1
+      }
+    },
+    {
+      "repeat": 2,
+      "dbMs": 36.024703000000954,
+      "l1Ms": [
+        15.461554999999862,
+        14.305241000000024,
+        16.546124000000418,
+        12.756027999999787,
+        10.19768799999838,
+        9.955574000001434,
+        11.608507000000827,
+        10.094167000001107,
+        10.82220899999993,
+        16.813819999999396
+      ],
+      "l2Ms": 16.566028999999617,
+      "pubsub": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 696.3640239999986
+      },
+      "coldInvalidation": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 567.9349490000013
+      },
+      "paths": {
+        "coldL1Miss": 1,
+        "coldL2Miss": 1,
+        "l2Hit": 1
+      }
+    },
+    {
+      "repeat": 3,
+      "dbMs": 21.445369999999457,
+      "l1Ms": [
+        24.09668000000056,
+        25.976454999999987,
+        693.386321,
+        17.0904129999999,
+        17.78070800000023,
+        14.413260000001173,
+        28.557356999999683,
+        19.09125800000038,
+        19.74818199999936,
+        17.32180999999946
+      ],
+      "l2Ms": 18.804716000000553,
+      "pubsub": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 696.0795400000006
+      },
+      "coldInvalidation": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 912.0594689999998
+      },
+      "paths": {
+        "coldL1Miss": 1,
+        "coldL2Miss": 1,
+        "l2Hit": 1
+      }
+    },
+    {
+      "repeat": 4,
+      "dbMs": 29.32216200000039,
+      "l1Ms": [
+        94.77101000000039,
+        70.55542200000127,
+        37.230718999999226,
+        34.04458199999863,
+        50.25922999999966,
+        44.079852999999275,
+        35.2151589999994,
+        15.756162000001495,
+        15.962940000001254,
+        16.519373999999516
+      ],
+      "l2Ms": 15.724114000000554,
+      "pubsub": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 989.1188770000008
+      },
+      "coldInvalidation": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 844.7186819999988
+      },
+      "paths": {
+        "coldL1Miss": 1,
+        "coldL2Miss": 1,
+        "l2Hit": 1
+      }
+    },
+    {
+      "repeat": 5,
+      "dbMs": 28.671629999997094,
+      "l1Ms": [
+        21.860239000001457,
+        19.923361000001023,
+        69.68199800000002,
+        19.334288000001834,
+        20.760355000002164,
+        57.38311199999953,
+        18.455824000000575,
+        23.54753400000118,
+        70.17943799999921,
+        20.778041000001394
+      ],
+      "l2Ms": 52.34443699999974,
+      "pubsub": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 927.3676619999969
+      },
+      "coldInvalidation": {
+        "subscribers": 1,
+        "handlerObserved": true,
+        "clientObservedUpperBoundMs": 738.4872289999985
+      },
+      "paths": {
+        "coldL1Miss": 1,
+        "coldL2Miss": 1,
+        "l2Hit": 1
+      }
+    }
+  ],
+  "redisKeyCount": 2,
+  "allKeysTenantPrefixed": true,
+  "cachedBoards": []
+}

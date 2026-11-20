@@ -1,0 +1,449 @@
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{application="multi-tenant-task-api",main_application_class="vn.edu.ctu.saas.MultiTenantTaskApplication"} 48.625
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+application_started_time_seconds{application="multi-tenant-task-api",main_application_class="vn.edu.ctu.saas.MultiTenantTaskApplication"} 48.391
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{application="multi-tenant-task-api",path="/app/."} 9.58636142592E11
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{application="multi-tenant-task-api",path="/app/."} 1.081101176832E12
+# HELP executor_active_threads The approximate number of threads that are actively executing tasks
+# TYPE executor_active_threads gauge
+executor_active_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_active_threads{application="multi-tenant-task-api",name="taskScheduler"} 0.0
+# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution
+# TYPE executor_completed_tasks_total counter
+executor_completed_tasks_total{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_completed_tasks_total{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP executor_pool_core_threads The core number of threads for the pool
+# TYPE executor_pool_core_threads gauge
+executor_pool_core_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 8.0
+executor_pool_core_threads{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP executor_pool_max_threads The maximum allowed number of threads in the pool
+# TYPE executor_pool_max_threads gauge
+executor_pool_max_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 2.147483647E9
+executor_pool_max_threads{application="multi-tenant-task-api",name="taskScheduler"} 2.147483647E9
+# HELP executor_pool_size_threads The current number of threads in the pool
+# TYPE executor_pool_size_threads gauge
+executor_pool_size_threads{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_pool_size_threads{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking
+# TYPE executor_queue_remaining_tasks gauge
+executor_queue_remaining_tasks{application="multi-tenant-task-api",name="applicationTaskExecutor"} 2.147483647E9
+executor_queue_remaining_tasks{application="multi-tenant-task-api",name="taskScheduler"} 2.147483647E9
+# HELP executor_queued_tasks The approximate number of tasks that are queued for execution
+# TYPE executor_queued_tasks gauge
+executor_queued_tasks{application="multi-tenant-task-api",name="applicationTaskExecutor"} 0.0
+executor_queued_tasks{application="multi-tenant-task-api",name="taskScheduler"} 1.0
+# HELP hikaricp_connections Total connections
+# TYPE hikaricp_connections gauge
+hikaricp_connections{application="multi-tenant-task-api",pool="HikariPool-1"} 2.0
+# HELP hikaricp_connections_acquire_seconds Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds summary
+hikaricp_connections_acquire_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 0
+hikaricp_connections_acquire_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_acquire_seconds_max Connection acquire time
+# TYPE hikaricp_connections_acquire_seconds_max gauge
+hikaricp_connections_acquire_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_active Active connections
+# TYPE hikaricp_connections_active gauge
+hikaricp_connections_active{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_creation_seconds Connection creation time
+# TYPE hikaricp_connections_creation_seconds summary
+hikaricp_connections_creation_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 0
+hikaricp_connections_creation_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_creation_seconds_max Connection creation time
+# TYPE hikaricp_connections_creation_seconds_max gauge
+hikaricp_connections_creation_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_idle Idle connections
+# TYPE hikaricp_connections_idle gauge
+hikaricp_connections_idle{application="multi-tenant-task-api",pool="HikariPool-1"} 2.0
+# HELP hikaricp_connections_max Max connections
+# TYPE hikaricp_connections_max gauge
+hikaricp_connections_max{application="multi-tenant-task-api",pool="HikariPool-1"} 5.0
+# HELP hikaricp_connections_min Min connections
+# TYPE hikaricp_connections_min gauge
+hikaricp_connections_min{application="multi-tenant-task-api",pool="HikariPool-1"} 1.0
+# HELP hikaricp_connections_pending Pending threads
+# TYPE hikaricp_connections_pending gauge
+hikaricp_connections_pending{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_timeout_total Connection timeout total count
+# TYPE hikaricp_connections_timeout_total counter
+hikaricp_connections_timeout_total{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_usage_seconds Connection usage time
+# TYPE hikaricp_connections_usage_seconds summary
+hikaricp_connections_usage_seconds_count{application="multi-tenant-task-api",pool="HikariPool-1"} 0
+hikaricp_connections_usage_seconds_sum{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP hikaricp_connections_usage_seconds_max Connection usage time
+# TYPE hikaricp_connections_usage_seconds_max gauge
+hikaricp_connections_usage_seconds_max{application="multi-tenant-task-api",pool="HikariPool-1"} 0.0
+# HELP http_server_requests_active_seconds  
+# TYPE http_server_requests_active_seconds summary
+http_server_requests_active_seconds_count{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 1
+http_server_requests_active_seconds_sum{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.008536776
+# HELP http_server_requests_active_seconds_max  
+# TYPE http_server_requests_active_seconds_max gauge
+http_server_requests_active_seconds_max{application="multi-tenant-task-api",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="UNKNOWN"} 0.008548162
+# HELP http_server_requests_seconds  
+# TYPE http_server_requests_seconds summary
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SERVER_ERROR",status="503",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 1
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SERVER_ERROR",status="503",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.778041861
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 2
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.020552468
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 1
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 0.075646749
+http_server_requests_seconds_count{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 1
+http_server_requests_seconds_sum{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 0.034789988
+# HELP http_server_requests_seconds_max  
+# TYPE http_server_requests_seconds_max gauge
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SERVER_ERROR",status="503",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.778041861
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/health/**"} 0.010791569
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/actuator/prometheus"} 0.075646749
+http_server_requests_seconds_max{application="multi-tenant-task-api",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",tenant_id="none",tenant_placement="none",tenant_tier="none",uri="/api/v1/architecture"} 0.034789988
+# HELP jdbc_connections_active Current number of active connections that have been allocated from the data source.
+# TYPE jdbc_connections_active gauge
+jdbc_connections_active{application="multi-tenant-task-api",name="dataSource"} 0.0
+# HELP jdbc_connections_idle Number of established but idle connections.
+# TYPE jdbc_connections_idle gauge
+jdbc_connections_idle{application="multi-tenant-task-api",name="dataSource"} 2.0
+# HELP jdbc_connections_max Maximum number of active connections that can be allocated at the same time.
+# TYPE jdbc_connections_max gauge
+jdbc_connections_max{application="multi-tenant-task-api",name="dataSource"} 5.0
+# HELP jdbc_connections_min Minimum number of idle connections in the pool.
+# TYPE jdbc_connections_min gauge
+jdbc_connections_min{application="multi-tenant-task-api",name="dataSource"} 1.0
+# HELP jvm_info JVM version info
+# TYPE jvm_info gauge
+jvm_info{application="multi-tenant-task-api",runtime="OpenJDK Runtime Environment",vendor="Eclipse Adoptium",version="21.0.13+9-LTS"} 1
+# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool
+# TYPE jvm_buffer_count_buffers gauge
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="direct"} 8.0
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_count_buffers{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool
+# TYPE jvm_buffer_memory_used_bytes gauge
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="direct"} 8431617.0
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_memory_used_bytes{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="direct"} 8431616.0
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="mapped"} 0.0
+jvm_buffer_total_capacity_bytes{application="multi-tenant-task-api",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine
+# TYPE jvm_classes_loaded_classes gauge
+jvm_classes_loaded_classes{application="multi-tenant-task-api"} 21487.0
+# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine
+# TYPE jvm_classes_unloaded_classes_total counter
+jvm_classes_unloaded_classes_total{application="multi-tenant-task-api"} 0.0
+# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation
+# TYPE jvm_compilation_time_ms_total counter
+jvm_compilation_time_ms_total{application="multi-tenant-task-api",compiler="HotSpot 64-Bit Tiered Compilers"} 56231.0
+# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation
+# TYPE jvm_gc_live_data_size_bytes gauge
+jvm_gc_live_data_size_bytes{application="multi-tenant-task-api"} 0.0
+# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool
+# TYPE jvm_gc_max_data_size_bytes gauge
+jvm_gc_max_data_size_bytes{application="multi-tenant-task-api"} 4.02653184E8
+# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next
+# TYPE jvm_gc_memory_allocated_bytes_total counter
+jvm_gc_memory_allocated_bytes_total{application="multi-tenant-task-api"} 7.2351744E7
+# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC
+# TYPE jvm_gc_memory_promoted_bytes_total counter
+jvm_gc_memory_promoted_bytes_total{application="multi-tenant-task-api"} 2598664.0
+# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]
+# TYPE jvm_gc_overhead gauge
+jvm_gc_overhead{application="multi-tenant-task-api"} 0.0028811067963063503
+# HELP jvm_gc_pause_seconds Time spent in GC pause
+# TYPE jvm_gc_pause_seconds summary
+jvm_gc_pause_seconds_count{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 2
+jvm_gc_pause_seconds_sum{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 0.04
+# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+# TYPE jvm_gc_pause_seconds_max gauge
+jvm_gc_pause_seconds_max{action="end of minor GC",application="multi-tenant-task-api",cause="Allocation Failure",gc="Copy"} 0.023
+# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use
+# TYPE jvm_memory_committed_bytes gauge
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 3.6175872E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 4456448.0
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 9.0099712E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 2555904.0
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 5701632.0
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 1.5990784E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.572864E7
+jvm_memory_committed_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} 1.09838336E8
+# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management
+# TYPE jvm_memory_max_bytes gauge
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 1.61087488E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 2.0119552E7
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 4.02653184E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 5828608.0
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.22916864E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 1.22912768E8
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.073741824E9
+jvm_memory_max_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} -1.0
+# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]
+# TYPE jvm_memory_usage_after_gc gauge
+jvm_memory_usage_after_gc{application="multi-tenant-task-api",area="heap",pool="long-lived"} 0.21451866626739502
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Eden Space"} 3.291544E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Survivor Space"} 4168680.0
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="heap",id="Tenured Gen"} 8.6376624E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-nmethods'"} 1531520.0
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 5685632.0
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="CodeHeap 'profiled nmethods'"} 1.5931136E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="Compressed Class Space"} 1.5201808E7
+jvm_memory_used_bytes{application="multi-tenant-task-api",area="nonheap",id="Metaspace"} 1.08664824E8
+# HELP jvm_threads_daemon_threads The current number of live daemon threads
+# TYPE jvm_threads_daemon_threads gauge
+jvm_threads_daemon_threads{application="multi-tenant-task-api"} 18.0
+# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads
+# TYPE jvm_threads_live_threads gauge
+jvm_threads_live_threads{application="multi-tenant-task-api"} 23.0
+# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset
+# TYPE jvm_threads_peak_threads gauge
+jvm_threads_peak_threads{application="multi-tenant-task-api"} 23.0
+# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM
+# TYPE jvm_threads_started_threads_total counter
+jvm_threads_started_threads_total{application="multi-tenant-task-api"} 25.0
+# HELP jvm_threads_states_threads The current number of threads
+# TYPE jvm_threads_states_threads gauge
+jvm_threads_states_threads{application="multi-tenant-task-api",state="blocked"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="new"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="runnable"} 9.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="terminated"} 0.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="timed-waiting"} 9.0
+jvm_threads_states_threads{application="multi-tenant-task-api",state="waiting"} 5.0
+# HELP lettuce_command_completion_seconds Latency between command send and command completion (complete response received
+# TYPE lettuce_command_completion_seconds summary
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 4
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.151412378
+lettuce_command_completion_seconds_count{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 2
+lettuce_command_completion_seconds_sum{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.100065414
+# HELP lettuce_command_completion_seconds_max Latency between command send and command completion (complete response received
+# TYPE lettuce_command_completion_seconds_max gauge
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.074025455
+lettuce_command_completion_seconds_max{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.097483375
+# HELP lettuce_command_firstresponse_seconds Latency between command send and first response (first response received)
+# TYPE lettuce_command_firstresponse_seconds summary
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 4
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.150916477
+lettuce_command_firstresponse_seconds_count{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 2
+lettuce_command_firstresponse_seconds_sum{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.083606063
+# HELP lettuce_command_firstresponse_seconds_max Latency between command send and first response (first response received)
+# TYPE lettuce_command_firstresponse_seconds_max gauge
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="CLIENT",local="local:any",remote="redis/172.23.0.2:6379"} 0.073972687
+lettuce_command_firstresponse_seconds_max{application="multi-tenant-task-api",command="HELLO",local="local:any",remote="redis/172.23.0.2:6379"} 0.08303221
+# HELP logback_events_total Number of log events that were enabled by the effective log level
+# TYPE logback_events_total counter
+logback_events_total{application="multi-tenant-task-api",level="debug"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="error"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="info"} 5.0
+logback_events_total{application="multi-tenant-task-api",level="trace"} 0.0
+logback_events_total{application="multi-tenant-task-api",level="warn"} 0.0
+# HELP process_cpu_time_ns_total The "cpu time" used by the Java Virtual Machine process
+# TYPE process_cpu_time_ns_total counter
+process_cpu_time_ns_total{application="multi-tenant-task-api"} 5.182E10
+# HELP process_cpu_usage The "recent cpu usage" for the Java Virtual Machine process
+# TYPE process_cpu_usage gauge
+process_cpu_usage{application="multi-tenant-task-api"} 0.08648648648648649
+# HELP process_files_max_files The maximum file descriptor count
+# TYPE process_files_max_files gauge
+process_files_max_files{application="multi-tenant-task-api"} 1048576.0
+# HELP process_files_open_files The open file descriptor count
+# TYPE process_files_open_files gauge
+process_files_open_files{application="multi-tenant-task-api"} 23.0
+# HELP process_start_time_seconds Start time of the process since unix epoch.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds{application="multi-tenant-task-api"} 1.794496424205E9
+# HELP process_uptime_seconds The uptime of the Java virtual machine
+# TYPE process_uptime_seconds gauge
+process_uptime_seconds{application="multi-tenant-task-api"} 61.869
+# HELP spring_security_authorizations_active_seconds  
+# TYPE spring_security_authorizations_active_seconds summary
+spring_security_authorizations_active_seconds_count{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0
+spring_security_authorizations_active_seconds_sum{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0.0
+# HELP spring_security_authorizations_active_seconds_max  
+# TYPE spring_security_authorizations_active_seconds_max gauge
+spring_security_authorizations_active_seconds_max{application="multi-tenant-task-api",spring_security_authentication_type="n/a",spring_security_authorization_decision="unknown",spring_security_object="request"} 0.0
+# HELP spring_security_authorizations_seconds  
+# TYPE spring_security_authorizations_seconds summary
+spring_security_authorizations_seconds_count{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 6
+spring_security_authorizations_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 0.014559926
+# HELP spring_security_authorizations_seconds_max  
+# TYPE spring_security_authorizations_seconds_max gauge
+spring_security_authorizations_seconds_max{application="multi-tenant-task-api",error="none",spring_security_authentication_type="n/a",spring_security_authorization_decision="true",spring_security_object="request"} 0.006977749
+# HELP spring_security_filterchains_AuthenticationFilter_after_total  
+# TYPE spring_security_filterchains_AuthenticationFilter_after_total counter
+spring_security_filterchains_AuthenticationFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_AuthenticationFilter_before_total  
+# TYPE spring_security_filterchains_AuthenticationFilter_before_total counter
+spring_security_filterchains_AuthenticationFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_TenantContextFilter_after_total  
+# TYPE spring_security_filterchains_TenantContextFilter_after_total counter
+spring_security_filterchains_TenantContextFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_TenantContextFilter_before_total  
+# TYPE spring_security_filterchains_TenantContextFilter_before_total counter
+spring_security_filterchains_TenantContextFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_TenantRateLimitFilter_after_total  
+# TYPE spring_security_filterchains_TenantRateLimitFilter_after_total counter
+spring_security_filterchains_TenantRateLimitFilter_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_TenantRateLimitFilter_before_total  
+# TYPE spring_security_filterchains_TenantRateLimitFilter_before_total counter
+spring_security_filterchains_TenantRateLimitFilter_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_access_exceptions_after_total  
+# TYPE spring_security_filterchains_access_exceptions_after_total counter
+spring_security_filterchains_access_exceptions_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_access_exceptions_before_total  
+# TYPE spring_security_filterchains_access_exceptions_before_total counter
+spring_security_filterchains_access_exceptions_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_active_seconds  
+# TYPE spring_security_filterchains_active_seconds summary
+spring_security_filterchains_active_seconds_count{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0
+spring_security_filterchains_active_seconds_sum{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0.0
+spring_security_filterchains_active_seconds_count{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0
+spring_security_filterchains_active_seconds_sum{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0.0
+# HELP spring_security_filterchains_active_seconds_max  
+# TYPE spring_security_filterchains_active_seconds_max gauge
+spring_security_filterchains_active_seconds_max{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 0.0
+spring_security_filterchains_active_seconds_max{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 0.0
+# HELP spring_security_filterchains_authentication_anonymous_after_total  
+# TYPE spring_security_filterchains_authentication_anonymous_after_total counter
+spring_security_filterchains_authentication_anonymous_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_authentication_anonymous_before_total  
+# TYPE spring_security_filterchains_authentication_anonymous_before_total counter
+spring_security_filterchains_authentication_anonymous_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_authentication_bearer_after_total  
+# TYPE spring_security_filterchains_authentication_bearer_after_total counter
+spring_security_filterchains_authentication_bearer_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_authentication_bearer_before_total  
+# TYPE spring_security_filterchains_authentication_bearer_before_total counter
+spring_security_filterchains_authentication_bearer_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_authorization_after_total  
+# TYPE spring_security_filterchains_authorization_after_total counter
+spring_security_filterchains_authorization_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_authorization_before_total  
+# TYPE spring_security_filterchains_authorization_before_total counter
+spring_security_filterchains_authorization_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_context_async_after_total  
+# TYPE spring_security_filterchains_context_async_after_total counter
+spring_security_filterchains_context_async_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_context_async_before_total  
+# TYPE spring_security_filterchains_context_async_before_total counter
+spring_security_filterchains_context_async_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_context_holder_after_total  
+# TYPE spring_security_filterchains_context_holder_after_total counter
+spring_security_filterchains_context_holder_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_context_holder_before_total  
+# TYPE spring_security_filterchains_context_holder_before_total counter
+spring_security_filterchains_context_holder_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_context_servlet_after_total  
+# TYPE spring_security_filterchains_context_servlet_after_total counter
+spring_security_filterchains_context_servlet_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_context_servlet_before_total  
+# TYPE spring_security_filterchains_context_servlet_before_total counter
+spring_security_filterchains_context_servlet_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_cors_after_total  
+# TYPE spring_security_filterchains_cors_after_total counter
+spring_security_filterchains_cors_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_cors_before_total  
+# TYPE spring_security_filterchains_cors_before_total counter
+spring_security_filterchains_cors_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_header_after_total  
+# TYPE spring_security_filterchains_header_after_total counter
+spring_security_filterchains_header_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_header_before_total  
+# TYPE spring_security_filterchains_header_before_total counter
+spring_security_filterchains_header_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_logout_after_total  
+# TYPE spring_security_filterchains_logout_after_total counter
+spring_security_filterchains_logout_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_logout_before_total  
+# TYPE spring_security_filterchains_logout_before_total counter
+spring_security_filterchains_logout_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_requestcache_after_total  
+# TYPE spring_security_filterchains_requestcache_after_total counter
+spring_security_filterchains_requestcache_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_requestcache_before_total  
+# TYPE spring_security_filterchains_requestcache_before_total counter
+spring_security_filterchains_requestcache_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_seconds  
+# TYPE spring_security_filterchains_seconds summary
+spring_security_filterchains_seconds_count{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 6
+spring_security_filterchains_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 0.102235487
+spring_security_filterchains_seconds_count{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 5
+spring_security_filterchains_seconds_sum{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 0.005394492
+# HELP spring_security_filterchains_seconds_max  
+# TYPE spring_security_filterchains_seconds_max gauge
+spring_security_filterchains_seconds_max{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="AuthorizationFilter",spring_security_reached_filter_section="before"} 0.088429499
+spring_security_filterchains_seconds_max{application="multi-tenant-task-api",error="none",spring_security_filterchain_position="16",spring_security_filterchain_size="16",spring_security_reached_filter_name="DisableEncodeUrlFilter",spring_security_reached_filter_section="after"} 0.001765133
+# HELP spring_security_filterchains_session_management_after_total  
+# TYPE spring_security_filterchains_session_management_after_total counter
+spring_security_filterchains_session_management_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_session_management_before_total  
+# TYPE spring_security_filterchains_session_management_before_total counter
+spring_security_filterchains_session_management_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_filterchains_session_urlencoding_after_total  
+# TYPE spring_security_filterchains_session_urlencoding_after_total counter
+spring_security_filterchains_session_urlencoding_after_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="after"} 5.0
+# HELP spring_security_filterchains_session_urlencoding_before_total  
+# TYPE spring_security_filterchains_session_urlencoding_before_total counter
+spring_security_filterchains_session_urlencoding_before_total{application="multi-tenant-task-api",spring_security_filterchain_position="0",spring_security_filterchain_size="0",spring_security_reached_filter_name="none",spring_security_reached_filter_section="before"} 6.0
+# HELP spring_security_http_secured_requests_active_seconds  
+# TYPE spring_security_http_secured_requests_active_seconds summary
+spring_security_http_secured_requests_active_seconds_count{application="multi-tenant-task-api"} 1
+spring_security_http_secured_requests_active_seconds_sum{application="multi-tenant-task-api"} 0.007523696
+# HELP spring_security_http_secured_requests_active_seconds_max  
+# TYPE spring_security_http_secured_requests_active_seconds_max gauge
+spring_security_http_secured_requests_active_seconds_max{application="multi-tenant-task-api"} 0.007530787
+# HELP spring_security_http_secured_requests_seconds  
+# TYPE spring_security_http_secured_requests_seconds summary
+spring_security_http_secured_requests_seconds_count{application="multi-tenant-task-api",error="none"} 5
+spring_security_http_secured_requests_seconds_sum{application="multi-tenant-task-api",error="none"} 0.581363522
+# HELP spring_security_http_secured_requests_seconds_max  
+# TYPE spring_security_http_secured_requests_seconds_max gauge
+spring_security_http_secured_requests_seconds_max{application="multi-tenant-task-api",error="none"} 0.478448337
+# HELP system_cpu_count The number of processors available to the Java virtual machine
+# TYPE system_cpu_count gauge
+system_cpu_count{application="multi-tenant-task-api"} 1.0
+# HELP system_cpu_usage The "recent cpu usage" of the system the application is running in
+# TYPE system_cpu_usage gauge
+system_cpu_usage{application="multi-tenant-task-api"} 0.11246973684210526
+# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time
+# TYPE system_load_average_1m gauge
+system_load_average_1m{application="multi-tenant-task-api"} 2.521484375
+# HELP tasks_scheduled_execution_active_seconds  
+# TYPE tasks_scheduled_execution_active_seconds summary
+tasks_scheduled_execution_active_seconds_count{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_active_seconds_max  
+# TYPE tasks_scheduled_execution_active_seconds_max gauge
+tasks_scheduled_execution_active_seconds_max{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_seconds  
+# TYPE tasks_scheduled_execution_seconds summary
+tasks_scheduled_execution_seconds_count{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 1
+tasks_scheduled_execution_seconds_sum{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 0.00142374
+# HELP tasks_scheduled_execution_seconds_max  
+# TYPE tasks_scheduled_execution_seconds_max gauge
+tasks_scheduled_execution_seconds_max{application="multi-tenant-task-api",code_function="evictIdleDataSources",code_namespace="vn.edu.ctu.saas.tenant.DefaultTenantDataSourceResolver",error="none",exception="none",outcome="SUCCESS"} 0.00142374
+# HELP tomcat_sessions_active_current_sessions  
+# TYPE tomcat_sessions_active_current_sessions gauge
+tomcat_sessions_active_current_sessions{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_active_max_sessions  
+# TYPE tomcat_sessions_active_max_sessions gauge
+tomcat_sessions_active_max_sessions{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_alive_max_seconds  
+# TYPE tomcat_sessions_alive_max_seconds gauge
+tomcat_sessions_alive_max_seconds{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_created_sessions_total  
+# TYPE tomcat_sessions_created_sessions_total counter
+tomcat_sessions_created_sessions_total{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_expired_sessions_total  
+# TYPE tomcat_sessions_expired_sessions_total counter
+tomcat_sessions_expired_sessions_total{application="multi-tenant-task-api"} 0.0
+# HELP tomcat_sessions_rejected_sessions_total  
+# TYPE tomcat_sessions_rejected_sessions_total counter
+tomcat_sessions_rejected_sessions_total{application="multi-tenant-task-api"} 0.0

@@ -9,37 +9,44 @@ import {
 } from 'lucide-react';
 import { api, getStoredToken, setStoredToken } from './api';
 import { AdminView } from './components/AdminView';
+import { InspectorDrawer } from './components/InspectorDrawer';
 import { KanbanView } from './components/KanbanView';
+import { LandingOnboardingView } from './components/LandingOnboardingView';
 import { LoginView } from './components/LoginView';
 import { MembersView } from './components/MembersView';
 import { SettingsView } from './components/SettingsView';
-import { WorkspaceSelector } from './components/WorkspaceSelector';
-import type { AuthUser, TenantInfo, TenantSettings, WorkspaceSummary } from './types';
+import type { TenantInfo, TenantSettings } from './types';
 
 type Tab = 'kanban' | 'members' | 'settings' | 'admin';
 
+function getHostSubdomain(): string | null {
+  const host = window.location.hostname.toLowerCase();
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return null;
+  }
+  if (host.endsWith('.localhost')) {
+    const sub = host.slice(0, -'.localhost'.length);
+    return sub || null;
+  }
+  const parts = host.split('.');
+  return parts.length >= 3 ? parts[0] : null;
+}
+
 function applyThemeCss(settings: TenantSettings | null) {
-  const primary = settings?.theme?.primary || '#1D4ED8';
-  const accent = settings?.theme?.accent || '#0EA5E9';
+  const primary = settings?.theme?.primary || '#0d6efd';
+  const accent = settings?.theme?.accent || '#0ea5e9';
   document.documentElement.style.setProperty('--color-primary', primary);
   document.documentElement.style.setProperty('--color-accent', accent);
 }
 
 export default function App() {
-  const [booting, setBooting] = useState(true);
+  const subdomain = getHostSubdomain();
+  const [booting, setBooting] = useState(Boolean(subdomain));
   const [me, setMe] = useState<TenantInfo | null>(null);
   const [settings, setSettings] = useState<TenantSettings | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('kanban');
-  const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Pre-auth workspace selection state
-  const [preAuth, setPreAuth] = useState<{
-    user: AuthUser;
-    preAuthToken: string;
-    workspaces: WorkspaceSummary[];
-  } | null>(null);
-
-  const loadWorkspaceSession = async () => {
+  const loadSession = async () => {
     const token = getStoredToken();
     if (!token) {
       setBooting(false);
@@ -67,83 +74,22 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Check for cross-subdomain token passed in URL hash (#token=...)
-    const hash = window.location.hash;
-    if (hash.startsWith('#token=')) {
-      const token = decodeURIComponent(hash.slice('#token='.length));
-      setStoredToken(token);
-      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (subdomain) {
+      loadSession();
     }
-    loadWorkspaceSession();
-  }, []);
-
-  const handleLoginSuccess = async (data: {
-    user: AuthUser;
-    preAuthToken: string;
-    accessToken?: string;
-    workspaces: WorkspaceSummary[];
-  }) => {
-    if (data.user.systemAdmin && data.accessToken) {
-      setStoredToken(data.accessToken);
-      setPreAuth(null);
-      loadWorkspaceSession();
-      return;
-    }
-
-    setLoginError(null);
-    const hostSub = window.location.hostname.endsWith('.localhost')
-      ? window.location.hostname.replace('.localhost', '')
-      : null;
-
-    // If user is on a specific tenant subdomain (e.g. t-acme.localhost), reject accounts not belonging to that tenant
-    if (hostSub) {
-      const matched = data.workspaces.find((w) => w.slug === hostSub);
-      if (!matched) {
-        const allowed = data.workspaces.map((w) => w.slug).join(', ') || 'không có';
-        setLoginError(
-          `Lỗi 403 — Tài khoản ${data.user.email} không thuộc tổ chức "${hostSub}" (tổ chức hợp lệ: ${allowed}).`
-        );
-        return;
-      }
-      if (matched.status !== 'ACTIVE') {
-        setLoginError(`Tổ chức "${hostSub}" đang bị tạm khóa (SUSPENDED).`);
-        return;
-      }
-      const res = await api.switchWorkspace(matched.slug, data.preAuthToken);
-      setStoredToken(res.accessToken);
-      setPreAuth(null);
-      loadWorkspaceSession();
-      return;
-    }
-
-    // On root localhost: auto-enter if user belongs to only 1 Tenant
-    if (data.workspaces.length === 1) {
-      const target = data.workspaces[0];
-      if (target.status !== 'ACTIVE') {
-        setLoginError(`Tổ chức "${target.slug}" đang bị tạm khóa (SUSPENDED).`);
-        return;
-      }
-      const res = await api.switchWorkspace(target.slug, data.preAuthToken);
-      const { protocol, port } = window.location;
-      const portPart = port ? `:${port}` : '';
-      window.location.href = `${protocol}//${target.slug}.localhost${portPart}/#token=${encodeURIComponent(res.accessToken)}`;
-      return;
-    }
-
-    setPreAuth({
-      user: data.user,
-      preAuthToken: data.preAuthToken,
-      workspaces: data.workspaces,
-    });
-  };
+  }, [subdomain]);
 
   const handleLogout = () => {
     setStoredToken(null);
     setMe(null);
     setSettings(null);
-    setPreAuth(null);
     applyThemeCss(null);
   };
+
+  // Door 1A: Root SaaS Landing & Self-Service Onboarding (bare localhost)
+  if (!subdomain) {
+    return <LandingOnboardingView />;
+  }
 
   if (booting) {
     return (
@@ -153,23 +99,17 @@ export default function App() {
     );
   }
 
+  // Door 1B (admin.localhost) or Door 2 ({tenant}.localhost) Login
   if (!me) {
-    if (preAuth) {
-      return (
-        <WorkspaceSelector
-          user={preAuth.user}
-          workspaces={preAuth.workspaces}
-          preAuthToken={preAuth.preAuthToken}
-          onSwitchedSameOrigin={(accessToken) => {
-            setStoredToken(accessToken);
-            setPreAuth(null);
-            loadWorkspaceSession();
-          }}
-          onLogout={handleLogout}
-        />
-      );
-    }
-    return <LoginView externalError={loginError} onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <LoginView
+        subdomain={subdomain}
+        onLoginSuccess={(data) => {
+          setStoredToken(data.accessToken);
+          loadSession();
+        }}
+      />
+    );
   }
 
   const isTenantAdmin = me.role === 'TENANT_ADMIN';
@@ -179,13 +119,15 @@ export default function App() {
       {/* Sidebar */}
       <aside className="w-60 bg-slate-900 text-slate-200 flex flex-col shrink-0">
         <div className="p-4 border-b border-slate-800 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-primary text-white">
-            <Layers className="w-5 h-5" />
+          <div className="p-2 rounded-lg bg-primary text-white font-bold text-xs">
+            {me.systemAdmin ? <Layers className="w-5 h-5" /> : settings?.theme?.logoText || me.slug.toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-white text-sm truncate">TenantFlow</div>
+            <div className="font-bold text-white text-sm truncate">
+              {me.systemAdmin ? 'TenantFlow' : me.slug}
+            </div>
             <div className="text-[11px] text-slate-400 font-mono truncate">
-              {me.systemAdmin ? 'SYSTEM ADMIN' : `${me.slug} • ${me.tier}`}
+              {me.systemAdmin ? 'PLATFORM_ADMIN' : `${me.tier} • ${me.role}`}
             </div>
           </div>
         </div>
@@ -201,7 +143,7 @@ export default function App() {
                     : 'text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                <Kanban className="w-4 h-4" /> Kanban
+                <Kanban className="w-4 h-4" /> Bảng Kanban
               </button>
 
               <button
@@ -212,7 +154,7 @@ export default function App() {
                     : 'text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                <Users className="w-4 h-4" /> Thành viên
+                <Users className="w-4 h-4" /> Nhân sự
               </button>
 
               {isTenantAdmin && (
@@ -256,7 +198,7 @@ export default function App() {
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition"
           >
-            <LogOut className="w-3.5 h-3.5" /> Đăng xuất / Đổi tổ chức
+            <LogOut className="w-3.5 h-3.5" /> Đăng xuất
           </button>
         </div>
       </aside>
@@ -265,41 +207,53 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 border-t-[3px]" style={{ borderTopColor: 'var(--color-primary)' }}>
         <header className="h-14 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between">
           <div className="flex items-center gap-3 text-xs text-slate-600">
-            <span className="font-semibold text-slate-900">{me.systemAdmin ? 'Bảng điều khiển Hệ thống' : me.slug}</span>
+            <span
+              className="px-2.5 py-1 rounded-md text-white font-semibold"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+            >
+              {me.systemAdmin ? 'Platform Admin' : settings?.theme?.logoText || me.slug}
+            </span>
             <code className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/70">
               {window.location.host}
             </code>
             {!me.systemAdmin && settings && (
               <>
-                <span className="px-2 py-0.5 rounded-md text-xs font-medium border" style={{
-                  borderColor: settings.wipMode === 'STRICT' ? '#FECACA' : '#FDE68A',
-                  backgroundColor: settings.wipMode === 'STRICT' ? '#FEF2F2' : '#FFFBEB',
-                  color: settings.wipMode === 'STRICT' ? '#B91C1C' : '#B45309',
-                }}>
+                <span className="px-2 py-0.5 rounded bg-slate-100 font-medium text-slate-700">
+                  Gói {me.tier}
+                </span>
+                <span
+                  className={`px-2 py-0.5 rounded font-semibold ${
+                    settings.wipMode === 'STRICT'
+                      ? 'bg-red-50 text-red-700 border border-red-200'
+                      : settings.wipMode === 'WARN'
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
                   WIP: {settings.wipMode}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium">
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                   Thẻ: {settings.cardDisplayMode}
                 </span>
               </>
             )}
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span>Nhận diện</span>
+            <span className="hidden sm:inline">{settings?.theme?.tagline}</span>
             <span
-              className="w-3.5 h-3.5 rounded-full inline-block ring-2 ring-slate-200"
+              className="w-3.5 h-3.5 rounded-full inline-block border border-slate-200"
               style={{ backgroundColor: 'var(--color-primary)' }}
-              title="Màu chủ đạo"
+              title="Primary Color"
             />
             <span
-              className="w-3.5 h-3.5 rounded-full inline-block ring-2 ring-slate-200"
+              className="w-3.5 h-3.5 rounded-full inline-block border border-slate-200"
               style={{ backgroundColor: 'var(--color-accent)' }}
-              title="Màu nhấn"
+              title="Accent Color"
             />
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto pb-16">
           {activeTab === 'kanban' && settings && <KanbanView isAdmin={isTenantAdmin} settings={settings} />}
           {activeTab === 'members' && <MembersView isAdmin={isTenantAdmin} currentUserId={me.userId} />}
           {activeTab === 'settings' && settings && isTenantAdmin && (
@@ -314,6 +268,9 @@ export default function App() {
           {activeTab === 'admin' && me.systemAdmin && <AdminView />}
         </main>
       </div>
+
+      {/* Live Architecture Inspector Drawer */}
+      <InspectorDrawer />
     </div>
   );
 }

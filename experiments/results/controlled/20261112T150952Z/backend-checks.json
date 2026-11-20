@@ -1,0 +1,14 @@
+{
+  "command": "./mvnw -q -Dtest=ProjectAuthorizationIntegrationTest,TenantContextFilterTest test",
+  "exit_code": 0,
+  "tests": 27,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "classes": {
+    "ProjectAuthorizationIntegrationTest": 21,
+    "TenantContextFilterTest": 6
+  },
+  "log": "/tmp/nckh-controlled-api-tests.log",
+  "scope": "Focused regression checks for API contract, WIP/metadata and tenant context changes; completed before controlled load series."
+}

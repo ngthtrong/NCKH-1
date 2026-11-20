@@ -1,0 +1,43 @@
+{
+  "backend_regression_reports": [
+    {
+      "name": "vn.edu.ctu.saas.application.ProjectAuthorizationIntegrationTest",
+      "tests": "21",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "vn.edu.ctu.saas.security.TenantContextFilterTest",
+      "tests": "6",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "vn.edu.ctu.saas.security.TenantRateLimitFilterTest",
+      "tests": "3",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "vn.edu.ctu.saas.security.RedisRateBucketIntegrationTest",
+      "tests": "1",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    }
+  ],
+  "frontend": {
+    "numTotalTests": 22,
+    "numPassedTests": 22,
+    "numFailedTests": 0,
+    "success": true
+  },
+  "ui_e2e": "passed desktop1842x1000 and mobile390x844; final screenshot review ship",
+  "notes": [
+    "Initial parallel frontend run had three 5-second timeouts during concurrent image build; full single-worker run passed22/22.",
+    "First browser supplement attempt failed due shared trace output directory; corrected unique output directory; raw failure retained in browser-harness-failed."
+  ]
+}

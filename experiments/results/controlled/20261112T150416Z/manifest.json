@@ -1,0 +1,72 @@
+{
+  "protocol_id": "NCKH-POOL3-20261112-v2",
+  "run_class": "controlled",
+  "data_kind": "measured",
+  "started_at": "2026-11-12T15:04:16.916155+00:00",
+  "status": "interrupted",
+  "protocol_sha256": "82c8b7616356d4a1da3a56f7e9523c93df2f50ddc110a76f8c570deb76a634e4",
+  "runs": [
+    {
+      "kind": "functional",
+      "repeat": 1,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-1"
+    },
+    {
+      "kind": "functional",
+      "repeat": 2,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-2"
+    },
+    {
+      "kind": "functional",
+      "repeat": 3,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-3"
+    },
+    {
+      "kind": "functional",
+      "repeat": 4,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-4"
+    },
+    {
+      "kind": "functional",
+      "repeat": 5,
+      "exit_code": 0,
+      "audit_mismatches": 0,
+      "directory": "functional-5"
+    }
+  ],
+  "private_state": "/tmp/nckh-controlled-20261112T144829Z",
+  "limitations": [
+    "Local WSL host shared with demo and load generator.",
+    "Protocol fills report placeholders; no external approval or population significance claimed.",
+    "Combined cache/limiter comparison does not isolate individual effects."
+  ],
+  "source_archive_sha256": "a95a0d0690270a1a569f541686da3b627f03b84af6089e9354a5f3900fc08ced",
+  "git_commit": "30b4d90d3897626ffb8c9945cedbd828273b979c",
+  "git_dirty": true,
+  "report_sha256": "4428dd78cf137427b8bf94b6a46113740c89ca0448f9090b959062ab40e6519a",
+  "environment": "/nckh-experiment-api-1 nckh-experiment-api:20261112 sha256:1fbe6afa98586ce78b947bd4d1d8cd1ba4e6cc52f5e7297bfbd6e3737d2a49a4 CPU=1000000000 RAM=805306368\n/nckh-experiment-postgres-1 postgres:16-alpine sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139 CPU=1000000000 RAM=805306368\n/nckh-experiment-redis-1 redis:7-alpine sha256:7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe CPU=250000000 RAM=268435456\n/nckh-experiment-web-1 saas-research-web:local sha256:4048fc1ad7017ab322f73183c9f4d907fe2d9c79ac2b3dda6661f70cd65cada1 CPU=250000000 RAM=134217728\n",
+  "tools": {
+    "node": "v22.23.4",
+    "k6": "k6 v0.57.0 (commit/50afd82c18, go1.23.6, linux/amd64)",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "snapshots": {
+    "control_db": "8f901e1b0228dcdfbb67ae448751d0d077cdfd8dbcfa43432730ffc8d5c50a72",
+    "pool_db": "a79f6290cbf16773c9240c37e89a79b9b32d6db9aa3862152a52d10f6de87fb1"
+  },
+  "component_provenance": {
+    "directory": "/mnt/d/NCKH/experiments/results/controlled/20261112T144829Z",
+    "protocol_id": "NCKH-POOL3-20261112-v1",
+    "reason": "Same application and data; functional/SQL design unchanged. V2 fixes generator allocation and mount. V1 load pilot not part of final five pairs."
+  },
+  "error": "Command '['/usr/bin/python3', '/mnt/d/NCKH/experiments/report/controlled/sample.py', '/mnt/d/NCKH/experiments/results/controlled/20261112T150416Z/pair-1-before/sampler.stop', '/mnt/d/NCKH/experiments/results/controlled/20261112T150416Z/pair-1-before/docker-stats.jsonl']' timed out after 30 seconds",
+  "finished_at": "2026-11-12T15:07:52.121822+00:00"
+}
