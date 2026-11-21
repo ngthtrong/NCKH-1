@@ -10,7 +10,11 @@ echo "🚀 Deploying TenantFlow Pool Level 3 Multi-Tenant SaaS"
 echo "   Domain: tenantflow.tech"
 echo "========================================================"
 
-# 1. Ensure .env exists
+# 1. Clean any legacy orphan files left over from previous branches
+echo "🧹 Checking and cleaning orphan files from previous branches..."
+rm -rf apps/web/src/auth apps/web/src/pages
+
+# 2. Ensure .env exists
 if [ ! -f .env ]; then
   if [ -f .env.ec2 ]; then
     echo "📄 Copying .env.ec2 to .env..."
@@ -18,7 +22,7 @@ if [ ! -f .env ]; then
   fi
 fi
 
-# 2. Recreate containers with EC2 overlay
+# 3. Recreate containers with EC2 overlay
 echo "🐳 Building and starting containers..."
 docker compose -f docker-compose.yml -f docker-compose.ec2.yml down
 docker compose -f docker-compose.yml -f docker-compose.ec2.yml up -d --build
