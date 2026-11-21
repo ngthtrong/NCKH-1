@@ -6,6 +6,44 @@
 	}
 }
 
+admin.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech}, t-acme.{$BASE_DOMAIN:tenantflow.tech}, t-lotus.{$BASE_DOMAIN:tenantflow.tech}, t-noisy.{$BASE_DOMAIN:tenantflow.tech} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	handle /actuator/health {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+		}
+	}
+
+	handle {
+		reverse_proxy kanban-web:80 {
+			header_up Host {http.request.host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
 https:// {
 	tls {
 		on_demand
