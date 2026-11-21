@@ -13,6 +13,7 @@ services:
       - "443:443"
     environment:
       BASE_DOMAIN: ${BASE_DOMAIN:-tenantflow.tech}
+      APP_DOMAIN: ${BASE_DOMAIN:-tenantflow.tech}
       TLS_EMAIL: ${TLS_EMAIL:-huynhhonganhgr@gmail.com}
     volumes:
       - ./infra/proxy/Caddyfile.ec2:/etc/caddy/Caddyfile:ro

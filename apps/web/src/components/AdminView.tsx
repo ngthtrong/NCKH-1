@@ -636,17 +636,17 @@ export const AdminView: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left min-w-[960px]">
+            <table className="w-full text-xs text-left min-w-[880px]">
               <thead className="bg-slate-50 border-b border-slate-200/80 text-slate-600 font-semibold">
                 <tr>
-                  <th className="px-4 py-3.5 min-w-[190px]">Tổ chức</th>
-                  <th className="px-4 py-3.5 min-w-[180px]">Tên miền Subdomain</th>
-                  <th className="px-4 py-3.5 w-24">Gói cước</th>
-                  <th className="px-4 py-3.5 min-w-[160px]">Lưu lượng (RPM)</th>
-                  <th className="px-4 py-3.5 min-w-[150px]">Nhân sự</th>
-                  <th className="px-4 py-3.5 w-24 text-center">Chặn 429</th>
-                  <th className="px-4 py-3.5 w-36">Trạng thái</th>
-                  <th className="px-4 py-3.5 w-40 text-right whitespace-nowrap">Thao tác</th>
+                  <th className="px-3 py-3">Tổ chức</th>
+                  <th className="px-3 py-3 whitespace-nowrap">Tên miền Subdomain</th>
+                  <th className="px-2.5 py-3 text-center whitespace-nowrap">Gói cước</th>
+                  <th className="px-3 py-3 min-w-[140px]">Lưu lượng (RPM)</th>
+                  <th className="px-3 py-3 min-w-[130px]">Nhân sự</th>
+                  <th className="px-2 py-3 text-center whitespace-nowrap">Chặn 429</th>
+                  <th className="px-2.5 py-3 text-center whitespace-nowrap">Trạng thái</th>
+                  <th className="px-3 py-3 text-right whitespace-nowrap">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -674,44 +674,44 @@ export const AdminView: React.FC = () => {
                       className="hover:bg-slate-50/90 transition cursor-pointer group"
                     >
                       {/* 1. Tổ chức */}
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-3">
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2.5">
                           <div
-                            className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs"
                             style={{ backgroundColor: color }}
                           >
                             {t.name.charAt(0).toUpperCase()}
                           </div>
-                          <div>
-                            <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition">
+                          <div className="min-w-0">
+                            <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition truncate max-w-[160px]">
                               {t.name}
                             </div>
-                            <div className="text-[10px] font-mono text-slate-400">
+                            <div className="text-[10px] font-mono text-slate-400 truncate">
                               {t.slug}
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* 2. Subdomain Link */}
-                      <td className="px-4 py-3.5">
+                      {/* 2. Subdomain Link (Nowrap to prevent breaking on hyphens) */}
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <a
                           href={buildTenantUrl(t.slug)}
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 font-mono text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-semibold"
+                          className="inline-flex items-center gap-1 font-mono text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-semibold whitespace-nowrap"
                           title="Mở cổng làm việc của tổ chức này"
                         >
-                          <span>{getTenantHost(t.slug)}</span>
-                          <ExternalLink className="w-3 h-3 text-indigo-500" />
+                          <span className="whitespace-nowrap">{getTenantHost(t.slug)}</span>
+                          <ExternalLink className="w-3 h-3 text-indigo-500 shrink-0" />
                         </a>
                       </td>
 
                       {/* 3. Gói cước */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-2.5 py-3 text-center whitespace-nowrap">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono ${
+                          className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold font-mono whitespace-nowrap ${
                             t.tier === 'ENTERPRISE'
                               ? 'bg-purple-100 text-purple-700'
                               : t.tier === 'PRO'
@@ -724,7 +724,7 @@ export const AdminView: React.FC = () => {
                       </td>
 
                       {/* 4. Lưu lượng (RPM) với Mini Progress Bar */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-[11px] font-mono">
                             <span className="font-bold text-slate-900">{currentRpm} <span className="font-normal text-slate-400">/ {rpmLimit}</span></span>
@@ -746,7 +746,7 @@ export const AdminView: React.FC = () => {
                       </td>
 
                       {/* 5. Nhân sự với Mini Progress Bar */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-[11px] font-mono">
                             <span className="font-bold text-slate-900">{memberCount} <span className="font-normal text-slate-400">/ {maxMem}</span></span>
@@ -762,9 +762,9 @@ export const AdminView: React.FC = () => {
                       </td>
 
                       {/* 6. Chặn 429 */}
-                      <td className="px-4 py-3.5 text-center">
+                      <td className="px-2 py-3 text-center whitespace-nowrap">
                         {blocked429 > 0 ? (
-                          <span className="inline-block px-2 py-0.5 rounded font-mono text-xs font-bold bg-rose-100 text-rose-700 animate-pulse">
+                          <span className="inline-block px-1.5 py-0.5 rounded font-mono text-xs font-bold bg-rose-100 text-rose-700 animate-pulse">
                             {blocked429}
                           </span>
                         ) : (
@@ -773,21 +773,21 @@ export const AdminView: React.FC = () => {
                       </td>
 
                       {/* 7. Trạng thái (ĐANG HOẠT ĐỘNG / TẠM NGƯNG) */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-2.5 py-3 text-center whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${
                             isActive
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : 'bg-rose-50 text-rose-700 border border-rose-200'
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                          {isActive ? 'ĐANG HOẠT ĐỘNG' : 'TẠM NGƯNG'}
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                          <span>{isActive ? 'ĐANG HOẠT ĐỘNG' : 'TẠM NGƯNG'}</span>
                         </span>
                       </td>
 
                       {/* 8. Thao tác */}
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                      <td className="px-3 py-3 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                           <button
                             type="button"
@@ -795,7 +795,7 @@ export const AdminView: React.FC = () => {
                               e.stopPropagation();
                               openConfigDrawer(t);
                             }}
-                            className="px-2.5 py-1 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition text-[11px] font-semibold border border-slate-200 whitespace-nowrap shrink-0"
+                            className="px-2.5 py-1 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition text-[11px] font-semibold border border-slate-200 whitespace-nowrap shrink-0 cursor-pointer"
                             title="Chỉnh sửa cấu hình gói cước và hạn mức"
                           >
                             Cấu hình
@@ -804,7 +804,7 @@ export const AdminView: React.FC = () => {
                           <button
                             type="button"
                             onClick={(e) => handleToggleStatus(t, e)}
-                            className={`p-1 rounded-lg border transition shrink-0 ${
+                            className={`p-1 rounded-lg border transition shrink-0 cursor-pointer ${
                               isActive
                                 ? 'text-rose-600 hover:bg-rose-50 border-rose-200'
                                 : 'text-emerald-600 hover:bg-emerald-50 border-emerald-200'

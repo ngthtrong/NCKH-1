@@ -2,11 +2,11 @@
 	admin off
 	email {$TLS_EMAIL:huynhhonganhgr@gmail.com}
 	on_demand_tls {
-		ask http://kanban-api:8080/api/health
+		ask http://kanban-api:8080/api/public/tls-check
 	}
 }
 
-admin.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech}, t-acme.{$BASE_DOMAIN:tenantflow.tech}, t-lotus.{$BASE_DOMAIN:tenantflow.tech}, t-noisy.{$BASE_DOMAIN:tenantflow.tech} {
+admin.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech} {
 	encode zstd gzip
 
 	handle /api/* {
@@ -44,7 +44,7 @@ admin.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech}, t-acme.{$B
 	}
 }
 
-https:// {
+*.{$BASE_DOMAIN:tenantflow.tech}, *.{$APP_DOMAIN:tenantflow.tech}, https:// {
 	tls {
 		on_demand
 	}

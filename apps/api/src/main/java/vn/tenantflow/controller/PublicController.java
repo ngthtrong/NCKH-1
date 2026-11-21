@@ -2,6 +2,7 @@ package vn.tenantflow.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.tenantflow.config.AppProperties;
 import vn.tenantflow.domain.entity.Tenant;
@@ -30,6 +31,51 @@ public class PublicController {
     }
 
     public record DiscoverTenantRequest(String email) {}
+
+    /**
+     * Endpoint for Caddy On-Demand TLS verification.
+     * Caddy issues: GET http://kanban-api:8080/api/public/tls-check?domain={domain}
+     * Must return 200 OK if certificate should be issued/renewed, or 403 Forbidden to reject.
+     */
+    @GetMapping("/tls-check")
+    public ResponseEntity<Void> checkTlsDomain(@RequestParam(value = "domain", required = false) String domain) {
+        if (domain == null || domain.isBlank()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String host = domain.split(":")[0].trim().toLowerCase();
+
+        // 1. Root domain, admin portal, or internal hosts -> Allow 200 OK
+        if (host.equals("tenantflow.tech") || host.equals("admin.tenantflow.tech")
+                || host.equals("tenantflow.vn") || host.equals("admin.tenantflow.vn")
+                || host.equals("localhost") || host.equals("admin") || host.equals("kanban-api")
+                || host.equals("127.0.0.1")) {
+            return ResponseEntity.ok().build();
+        }
+
+        // 2. Extract first subdomain label (e.g. t-nova.tenantflow.tech -> t-nova)
+        String slug = JwtTenantFilter.extractSubdomain(host);
+        if (slug == null) {
+            String[] parts = host.split("\\.");
+            if (parts.length >= 3) {
+                slug = parts[0];
+            }
+        }
+
+        // If domain has no subdomain or is admin -> allow
+        if (slug == null || slug.isBlank() || "admin".equalsIgnoreCase(slug)) {
+            return ResponseEntity.ok().build();
+        }
+
+        // 3. Query Tenant in DB: Must exist and have status = ACTIVE
+        final String searchSlug = slug.toLowerCase();
+        Optional<Tenant> tenantOpt = tenantRepository.findBySlug(searchSlug);
+        if (tenantOpt.isPresent() && "ACTIVE".equalsIgnoreCase(tenantOpt.get().getStatus())) {
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     @GetMapping("/tenant-branding")
     public Map<String, Object> getTenantBranding(@RequestParam(required = false) String slug,
