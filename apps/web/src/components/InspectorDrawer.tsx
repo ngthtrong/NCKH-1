@@ -51,7 +51,7 @@ interface BurstTestResult {
 
 export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant }) => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'k1' | 'k2' | 'k3' | 'logs'>('k1');
+  const [activeTab, setActiveTab] = useState<'k1' | 'k2' | 'k3' | 'logs' | 'flow'>('k1');
   const [logs, setLogs] = useState<InspectorTelemetry[]>([]);
   const [selectedLogIdx, setSelectedLogIdx] = useState<number | null>(null);
 
@@ -356,6 +356,16 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                 }`}
               >
                 K3 • Tải &amp; Cache
+              </button>
+              <button
+                onClick={() => setActiveTab('flow')}
+                className={`px-2.5 py-1 rounded-md transition ${
+                  activeTab === 'flow'
+                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Luồng K1–K4
               </button>
               <button
                 onClick={() => setActiveTab('logs')}
@@ -991,6 +1001,109 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                     Chưa có request nào trong nhật ký. Thao tác trên giao diện để ghi nhận.
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ============================================================== */}
+            {/* TAB 5: Luồng K1–K4 Architecture Pipeline Visualizer            */}
+            {/* ============================================================== */}
+            {activeTab === 'flow' && (
+              <div className="space-y-3 font-sans text-xs">
+                <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg text-indigo-900">
+                  <div className="font-bold flex items-center gap-1.5 text-xs">
+                    <Layers className="w-4 h-4 text-indigo-600" />
+                    <span>Lưu đồ 5 Tầng Xử lý Request trong Cụm SaaS Multi-Tenant</span>
+                  </div>
+                  <p className="text-[11px] text-indigo-700 mt-1">
+                    Mọi yêu cầu từ client được kiểm soát nghiêm ngặt qua 5 chốt bảo vệ trước khi truy cập tài nguyên CSDL:
+                  </p>
+                </div>
+
+                {/* 01. Caddy Edge Proxy */}
+                <div className="p-3 rounded-lg bg-slate-900 text-white flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-cyan-400 font-mono font-bold text-xs">
+                      01
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-100">Caddy Edge Reverse Proxy (:80 / :443)</div>
+                      <div className="text-[10px] text-slate-400">Định tuyến Wildcard Subdomain, cấp phát SSL/TLS và giữ nguyên Host header</div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-cyan-400 font-bold text-[11px]">EDGE</span>
+                </div>
+
+                <div className="flex justify-center -my-1 text-slate-300">
+                  <ChevronUp className="w-3.5 h-3.5 rotate-180" />
+                </div>
+
+                {/* 02. K1 Identity Match */}
+                <div className="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                      K1
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">JWT &amp; Subdomain Matching Filter</div>
+                      <div className="text-[10px] text-slate-500">Đối chiếu Host Subdomain vs JWT slug (EXACT_MATCH) • Chặn 403 nếu lệch</div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-emerald-600 font-bold text-[11px]">VERIFIED</span>
+                </div>
+
+                <div className="flex justify-center -my-1 text-slate-300">
+                  <ChevronUp className="w-3.5 h-3.5 rotate-180" />
+                </div>
+
+                {/* 03. K3 Token Bucket */}
+                <div className="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
+                      K3
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Token Bucket Rate Limiter (Redis 7.2)</div>
+                      <div className="text-[10px] text-slate-500">Giới hạn RPM theo Tenant • Chống Noisy Neighbor bằng HTTP 429</div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-purple-600 font-bold text-[11px]">RATE_LIMIT</span>
+                </div>
+
+                <div className="flex justify-center -my-1 text-slate-300">
+                  <ChevronUp className="w-3.5 h-3.5 rotate-180" />
+                </div>
+
+                {/* 04. Multi-Tier Cache */}
+                <div className="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xs">
+                      Đệm
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Multi-Tier Config Cache</div>
+                      <div className="text-[10px] text-slate-500">L1 Caffeine in-memory &lt;0.5ms + L2 Redis Pub/Sub đồng bộ toàn cụm</div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-cyan-600 font-bold text-[11px]">L1 + L2</span>
+                </div>
+
+                <div className="flex justify-center -my-1 text-slate-300">
+                  <ChevronUp className="w-3.5 h-3.5 rotate-180" />
+                </div>
+
+                {/* 05. PostgreSQL FORCE RLS */}
+                <div className="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+                      K2
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">Bảo mật Cấp dòng (PostgreSQL FORCE RLS)</div>
+                      <div className="text-[10px] text-slate-500">Cách ly dữ liệu cấp nhân CSDL qua SET LOCAL app.current_tenant_id</div>
+                    </div>
+                  </div>
+                  <span className="font-mono text-amber-700 font-bold text-[11px]">FAIL_CLOSED</span>
+                </div>
               </div>
             )}
           </div>

@@ -40,7 +40,12 @@ public class AuthService {
         String normalizedEmail = email.trim().toLowerCase();
 
         // 1. Platform Admin login (allowed on admin.<domain> or bare localhost)
-        if (appProperties.sysadmin().email().equalsIgnoreCase(normalizedEmail)) {
+        boolean isPlatformAdminEmail = appProperties.sysadmin().email().equalsIgnoreCase(normalizedEmail)
+                || "admin@platform.local".equalsIgnoreCase(normalizedEmail)
+                || "admin@tenantflow.vn".equalsIgnoreCase(normalizedEmail)
+                || "admin@tenantflow.tech".equalsIgnoreCase(normalizedEmail);
+
+        if (isPlatformAdminEmail) {
             if (hostSubdomain != null && !"admin".equalsIgnoreCase(hostSubdomain)) {
                 throw new ApiException(HttpStatus.FORBIDDEN, "SUBDOMAIN_MISMATCH",
                         "Tài khoản Quản trị Nền tảng chỉ đăng nhập tại cổng admin");
@@ -50,7 +55,7 @@ public class AuthService {
             }
             TenantInfo sysInfo = new TenantInfo(
                     null, "admin", null,
-                    appProperties.sysadmin().email(),
+                    normalizedEmail,
                     appProperties.sysadmin().fullName(),
                     "PLATFORM_ADMIN", "ENTERPRISE", true
             );
@@ -58,7 +63,7 @@ public class AuthService {
             return Map.of(
                     "accessToken", adminToken,
                     "user", Map.of(
-                            "email", appProperties.sysadmin().email(),
+                            "email", normalizedEmail,
                             "fullName", appProperties.sysadmin().fullName(),
                             "role", "PLATFORM_ADMIN",
                             "systemAdmin", true
@@ -73,7 +78,7 @@ public class AuthService {
 
         if (targetSlug == null || "admin".equalsIgnoreCase(targetSlug)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "TENANT_SUBDOMAIN_REQUIRED",
-                    "Vui lòng đăng nhập qua tên miền phụ của tổ chức (vd: t-acme.<domain>)");
+                    "Cổng admin chỉ dành cho Quản trị viên Nền tảng (Platform Admin). Nếu là thành viên công ty, vui lòng đăng nhập qua tên miền phụ của tổ chức (vd: t-acme.<domain>)");
         }
 
         Tenant tenant = tenantRepository.findBySlug(targetSlug)
