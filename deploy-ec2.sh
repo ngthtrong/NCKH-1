@@ -12,7 +12,8 @@ echo "========================================================"
 
 # 1. Clean any legacy orphan files left over from previous branches
 echo "🧹 Checking and cleaning orphan files from previous branches..."
-rm -rf apps/web/src/auth apps/web/src/pages apps/api/src/test
+git clean -fd apps/
+rm -rf apps/api/src/main/resources/db/migration/control apps/api/src/main/resources/db/migration/pool apps/api/src/main/resources/db/migration/tenant apps/api/src/test
 
 # 2. Ensure .env exists
 if [ ! -f .env ]; then
