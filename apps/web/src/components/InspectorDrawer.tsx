@@ -103,28 +103,6 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
     });
   }, []);
 
-  // Fetch available tenants for dropdowns when opened
-  useEffect(() => {
-    if (!open) return;
-    const originalToken = getStoredToken() || '';
-    if (!k1Token) {
-      setK1Token(originalToken);
-    }
-    api
-      .listTenants({ skipTelemetryLog: true })
-      .then((tenants: AdminTenant[]) => {
-        if (tenants && tenants.length > 0) {
-          const list = tenants.map((t) => ({ slug: t.slug, name: t.name }));
-          setAvailableTenants(list);
-          if (!k2TargetSlug) setK2TargetSlug(list[0].slug);
-          if (!k3CacheTargetSlug) setK3CacheTargetSlug(list[0].slug);
-        }
-      })
-      .catch(() => {
-        // Fallback already set to DEFAULT_TENANTS
-      });
-  }, [open]);
-
   // Parse JWT token payload if currentTenant is not provided
   const jwtClaims = useMemo(() => {
     const token = getStoredToken();
@@ -147,19 +125,6 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
   // Derived Identity Info
   const currentHost = typeof window !== 'undefined' ? window.location.host : '';
   const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
-  const tenantSlug = currentTenant?.slug || jwtClaims?.slug || 't-acme';
-  const tenantId = currentTenant?.tenantId || jwtClaims?.tenantId || '—';
-  const userRole = currentTenant?.role || jwtClaims?.role || (jwtClaims?.systemAdmin ? 'PLATFORM_ADMIN' : 'MEMBER');
-  const isSystemAdmin = currentTenant?.systemAdmin || jwtClaims?.systemAdmin || false;
-
-  // Set initial target slugs if empty
-  useEffect(() => {
-    if (!k2TargetSlug) setK2TargetSlug(tenantSlug !== 'unknown' ? tenantSlug : 't-acme');
-    if (!k3CacheTargetSlug) setK3CacheTargetSlug(tenantSlug !== 'unknown' ? tenantSlug : 't-acme');
-    if (k1TargetSlug === tenantSlug) {
-      setK1TargetSlug(tenantSlug === 't-lotus' ? 't-acme' : 't-lotus');
-    }
-  }, [tenantSlug]);
 
   // Subdomain match check
   const extractedSubdomain = useMemo(() => {
@@ -173,6 +138,55 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
     if (parts.length >= 3) return parts[0];
     return null;
   }, [currentHostname]);
+
+  const tenantSlug = currentTenant?.slug || (extractedSubdomain && extractedSubdomain !== 'admin' ? extractedSubdomain : null) || jwtClaims?.slug || 't-acme';
+  const tenantName = currentTenant?.name || tenantSlug;
+  const tenantId = currentTenant?.tenantId || jwtClaims?.tenantId || '—';
+  const userRole = currentTenant?.role || jwtClaims?.role || (jwtClaims?.systemAdmin ? 'PLATFORM_ADMIN' : 'MEMBER');
+  const isSystemAdmin = currentTenant?.systemAdmin || jwtClaims?.systemAdmin || userRole === 'PLATFORM_ADMIN';
+
+  const isAdminPortal = isSystemAdmin || extractedSubdomain === 'admin';
+  const isTenantPortal = !isAdminPortal;
+  const currentSlug = tenantSlug;
+  const currentTenantName = tenantName;
+
+  // Fetch available tenants for dropdowns when opened (Admin Portal gets full dynamic list)
+  useEffect(() => {
+    if (!open) return;
+    const originalToken = getStoredToken() || '';
+    if (!k1Token) {
+      setK1Token(originalToken);
+    }
+
+    if (isAdminPortal) {
+      api
+        .listTenants({ skipTelemetryLog: true })
+        .then((tenants: AdminTenant[]) => {
+          if (tenants && tenants.length > 0) {
+            const list = tenants.map((t) => ({ slug: t.slug, name: t.name }));
+            setAvailableTenants(list);
+            if (!k2TargetSlug || !list.some((x) => x.slug === k2TargetSlug)) {
+              setK2TargetSlug(list[0].slug);
+            }
+            if (!k3CacheTargetSlug || !list.some((x) => x.slug === k3CacheTargetSlug)) {
+              setK3CacheTargetSlug(list[0].slug);
+            }
+          }
+        })
+        .catch(() => {
+          // Keep DEFAULT_TENANTS fallback
+        });
+    } else {
+      // In Tenant Portal: strictly bind targets to currentSlug
+      setK2TargetSlug(currentSlug);
+      setK3CacheTargetSlug(currentSlug);
+      const forgeryTargets = DEFAULT_TENANTS.filter((t) => t.slug !== currentSlug);
+      setAvailableTenants(forgeryTargets.length > 0 ? forgeryTargets : DEFAULT_TENANTS);
+      if (k1TargetSlug === currentSlug) {
+        setK1TargetSlug(currentSlug === 't-acme' ? 't-lotus' : 't-acme');
+      }
+    }
+  }, [open, isAdminPortal, currentSlug]);
 
   const isSubdomainExactMatch = useMemo(() => {
     if (!extractedSubdomain) return true; // Direct localhost
@@ -271,7 +285,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
   const handleRunRlsProbe = async () => {
     setRlsLoading(true);
     try {
-      const res = await api.probeRls(k2TargetSlug || tenantSlug);
+      const target = isTenantPortal ? currentSlug : (k2TargetSlug || currentSlug);
+      const res = await api.probeRls(target);
       setRlsResult(res);
     } catch (err: any) {
       alert(`Lỗi kiểm định RLS: ${err.message}`);
@@ -354,7 +369,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
   const handleRunCacheProbe = async () => {
     setCacheLoading(true);
     try {
-      const res = await api.probeCache(k3CacheTargetSlug || tenantSlug);
+      const target = isTenantPortal ? currentSlug : (k3CacheTargetSlug || currentSlug);
+      const res = await api.probeCache(target);
       setCacheResult(res);
     } catch (err: any) {
       alert(`Lỗi kiểm định Cache: ${err.message}`);
@@ -681,17 +697,25 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <select
-                        value={k2TargetSlug}
-                        onChange={(e) => setK2TargetSlug(e.target.value)}
-                        className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
-                      >
-                        {availableTenants.map((t) => (
-                          <option key={t.slug} value={t.slug}>
-                            {t.slug} ({t.name})
-                          </option>
-                        ))}
-                      </select>
+                      {isAdminPortal ? (
+                        <select
+                          value={k2TargetSlug}
+                          onChange={(e) => setK2TargetSlug(e.target.value)}
+                          className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                          title="Chọn tổ chức mục tiêu để kiểm định RLS"
+                        >
+                          {availableTenants.map((t) => (
+                            <option key={t.slug} value={t.slug}>
+                              {t.slug} ({t.name})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-lg text-xs font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Tổ chức hiện tại: <strong className="font-mono text-indigo-700">{currentSlug}</strong>{currentTenantName !== currentSlug && <span className="text-slate-500 font-normal ml-1">({currentTenantName})</span>}</span>
+                        </div>
+                      )}
 
                       <button
                         onClick={handleRunRlsProbe}
@@ -1071,17 +1095,25 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <select
-                        value={k3CacheTargetSlug}
-                        onChange={(e) => setK3CacheTargetSlug(e.target.value)}
-                        className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
-                      >
-                        {availableTenants.map((t) => (
-                          <option key={t.slug} value={t.slug}>
-                            {t.slug}
-                          </option>
-                        ))}
-                      </select>
+                      {isAdminPortal ? (
+                        <select
+                          value={k3CacheTargetSlug}
+                          onChange={(e) => setK3CacheTargetSlug(e.target.value)}
+                          className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                          title="Chọn tổ chức mục tiêu để đo bộ đệm"
+                        >
+                          {availableTenants.map((t) => (
+                            <option key={t.slug} value={t.slug}>
+                              {t.slug} ({t.name})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-cyan-50 border border-cyan-200 text-cyan-900 rounded-lg text-xs font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                          <span>Tổ chức hiện tại: <strong className="font-mono text-cyan-700">{currentSlug}</strong>{currentTenantName !== currentSlug && <span className="text-slate-500 font-normal ml-1">({currentTenantName})</span>}</span>
+                        </div>
+                      )}
 
                       <button
                         onClick={handleRunCacheProbe}

@@ -54,6 +54,7 @@ export interface AuthUser {
 export interface TenantInfo {
   tenantId: string | null;
   slug: string;
+  name?: string;
   userId: string | null;
   email: string;
   fullName: string;

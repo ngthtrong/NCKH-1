@@ -79,6 +79,62 @@ public class InspectorProbeController {
     }
 
     /**
+     * Helper to resolve target tenant based on caller's role:
+     * - PLATFORM_ADMIN: Allowed to target any tenant specified by targetSlug.
+     * - TENANT_ADMIN / MEMBER: Strictly restricted to their own tenant (TenantContext.get().slug()).
+     *   Attempting to access any other tenant results in HTTP 403 Forbidden.
+     */
+    private Tenant resolveTargetTenant(String targetSlug) {
+        TenantInfo info = TenantContext.get();
+        if (info == null) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Yêu cầu đăng nhập");
+        }
+
+        boolean isPlatformAdmin = info.systemAdmin() || "PLATFORM_ADMIN".equalsIgnoreCase(info.role());
+
+        if (isPlatformAdmin) {
+            if (targetSlug != null && !targetSlug.isBlank()) {
+                String cleanSlug = targetSlug.trim().toLowerCase();
+                return tenantRepository.findBySlug(cleanSlug)
+                        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "TENANT_NOT_FOUND",
+                                "Không tìm thấy tổ chức: " + cleanSlug));
+            }
+            return tenantRepository.findBySlug("t-acme")
+                    .orElseGet(() -> tenantRepository.findAll().stream()
+                            .filter(t -> "ACTIVE".equals(t.getStatus()))
+                            .findFirst()
+                            .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_AVAILABLE",
+                                    "Không có tổ chức đang hoạt động")));
+        }
+
+        // Regular Tenant User (TENANT_ADMIN or MEMBER)
+        String callerSlug = info.slug();
+        if (callerSlug == null || callerSlug.isBlank()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_CONTEXT", "Thiếu thông tin tổ chức người dùng");
+        }
+
+        if (targetSlug != null && !targetSlug.isBlank() && !targetSlug.trim().equalsIgnoreCase(callerSlug)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN_TENANT_ACCESS",
+                    "Người dùng tổ chức '" + callerSlug + "' không có quyền kiểm định hoặc truy xuất dữ liệu của tổ chức khác ('" + targetSlug + "')");
+        }
+
+        Tenant tenant = null;
+        if (info.tenantId() != null) {
+            tenant = tenantRepository.findById(info.tenantId()).orElse(null);
+        }
+        if (tenant == null) {
+            tenant = tenantRepository.findBySlug(callerSlug.trim().toLowerCase()).orElse(null);
+        }
+
+        if (tenant == null || !"ACTIVE".equalsIgnoreCase(tenant.getStatus())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "TENANT_UNAVAILABLE",
+                    "Tổ chức '" + callerSlug + "' đang bị tạm ngưng hoặc không khả dụng");
+        }
+
+        return tenant;
+    }
+
+    /**
      * K2: Row-Level Security Probe
      * Verifies PostgreSQL Fail-Closed behavior with dynamic tenant selection and 3 SQL scenarios:
      * 1. Without SET LOCAL context: query returns 0 rows.
@@ -87,28 +143,7 @@ public class InspectorProbeController {
      */
     @GetMapping("/api/inspector/rls-probe")
     public ResponseEntity<Map<String, Object>> probeRls(@RequestParam(value = "targetSlug", required = false) String targetSlug) {
-        Tenant targetTenant = null;
-        if (targetSlug != null && !targetSlug.isBlank()) {
-            targetTenant = tenantRepository.findBySlug(targetSlug.trim().toLowerCase()).orElse(null);
-        }
-        if (targetTenant == null) {
-            TenantInfo info = TenantContext.get();
-            if (info != null && info.tenantId() != null) {
-                targetTenant = tenantRepository.findById(info.tenantId()).orElse(null);
-            }
-        }
-        if (targetTenant == null) {
-            targetTenant = tenantRepository.findBySlug("t-acme")
-                    .orElseGet(() -> tenantRepository.findAll().stream()
-                            .filter(t -> "ACTIVE".equals(t.getStatus()))
-                            .findFirst()
-                            .orElse(null));
-        }
-
-        if (targetTenant == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_AVAILABLE", "No active tenant available for RLS probe");
-        }
-
+        Tenant targetTenant = resolveTargetTenant(targetSlug);
         UUID targetTenantId = targetTenant.getId();
 
         // Pick another active tenant for cross-tenant breach test
@@ -222,28 +257,7 @@ public class InspectorProbeController {
      */
     @PostMapping("/api/inspector/cache-probe")
     public ResponseEntity<Map<String, Object>> probeCache(@RequestParam(value = "targetSlug", required = false) String targetSlug) {
-        Tenant targetTenant = null;
-        if (targetSlug != null && !targetSlug.isBlank()) {
-            targetTenant = tenantRepository.findBySlug(targetSlug.trim().toLowerCase()).orElse(null);
-        }
-        if (targetTenant == null) {
-            TenantInfo info = TenantContext.get();
-            if (info != null && info.tenantId() != null) {
-                targetTenant = tenantRepository.findById(info.tenantId()).orElse(null);
-            }
-        }
-        if (targetTenant == null) {
-            targetTenant = tenantRepository.findBySlug("t-acme")
-                    .orElseGet(() -> tenantRepository.findAll().stream()
-                            .filter(t -> "ACTIVE".equals(t.getStatus()))
-                            .findFirst()
-                            .orElse(null));
-        }
-
-        if (targetTenant == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_AVAILABLE", "No active tenant available for cache probe");
-        }
-
+        Tenant targetTenant = resolveTargetTenant(targetSlug);
         UUID tenantId = targetTenant.getId();
         List<Map<String, Object>> steps = new ArrayList<>();
 
