@@ -18,6 +18,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { api, ApiError } from '../api';
+import { buildRootUrl } from '../utils/domain';
 import type { AuthUser, PublicBranding, TenantSettings } from '../types';
 
 interface Props {
@@ -497,7 +498,7 @@ export const LoginView: React.FC<Props> = ({ subdomain, onLoginSuccess }) => {
               <div>
                 <span>Doanh nghiệp chưa có hệ thống riêng? </span>
                 <a
-                  href={`${window.location.protocol}//localhost${window.location.port ? `:${window.location.port}` : ''}`}
+                  href={buildRootUrl()}
                   className="font-semibold text-primary hover:underline inline-flex items-center gap-1"
                 >
                   <span>Khởi tạo ngay</span>

@@ -57,7 +57,7 @@ public class JwtTenantFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization Bearer token");
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization Bearer token", request);
             return;
         }
 
@@ -66,7 +66,7 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         try {
             claims = jwtService.parseToken(token);
         } catch (Exception ex) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token", request);
             return;
         }
 
@@ -86,7 +86,7 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         // Control Plane: Platform Admin endpoints
         if (path.startsWith("/api/admin/") || path.startsWith("/api/platform/")) {
             if (!info.systemAdmin()) {
-                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Platform Admin privileges required");
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Platform Admin privileges required", request);
                 return;
             }
             try {
@@ -103,14 +103,14 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         // Inspector Probes (Data Plane & Control Plane verification)
         if (path.startsWith("/api/inspector/")) {
             if (!info.systemAdmin() && (info.tenantId() == null || info.slug() == null)) {
-                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant or Admin context missing in JWT");
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant or Admin context missing in JWT", request);
                 return;
             }
             if (!info.systemAdmin()) {
                 String hostSubdomain = extractSubdomain(request.getHeader("Host"));
                 if (hostSubdomain != null && !hostSubdomain.equalsIgnoreCase(info.slug())) {
                     sendError(response, HttpServletResponse.SC_FORBIDDEN,
-                            "Subdomain mismatch: Host subdomain '" + hostSubdomain + "' does not match JWT slug '" + info.slug() + "'");
+                            "Subdomain mismatch: Host subdomain '" + hostSubdomain + "' does not match JWT slug '" + info.slug() + "'", request);
                     return;
                 }
             }
@@ -126,7 +126,7 @@ public class JwtTenantFilter extends OncePerRequestFilter {
 
         // Tenant-scoped endpoints: require tenantId + slug
         if (info.tenantId() == null || info.slug() == null) {
-            sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant context missing in JWT");
+            sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant context missing in JWT", request);
             return;
         }
 
@@ -134,13 +134,13 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         String hostSubdomain = extractSubdomain(request.getHeader("Host"));
         if (hostSubdomain != null && !hostSubdomain.equalsIgnoreCase(info.slug())) {
             sendError(response, HttpServletResponse.SC_FORBIDDEN,
-                    "Subdomain mismatch: Host subdomain '" + hostSubdomain + "' does not match JWT slug '" + info.slug() + "'");
+                    "Subdomain mismatch: Host subdomain '" + hostSubdomain + "' does not match JWT slug '" + info.slug() + "'", request);
             return;
         }
 
         Tenant tenant = tenantRepository.findById(info.tenantId()).orElse(null);
         if (tenant == null || !"ACTIVE".equals(tenant.getStatus())) {
-            sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant organization is suspended or unavailable");
+            sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant organization is suspended or unavailable", request);
             return;
         }
 
@@ -187,6 +187,18 @@ public class JwtTenantFilter extends OncePerRequestFilter {
     }
 
     private void sendError(HttpServletResponse response, int status, String message) throws IOException {
+        sendError(response, status, message, null);
+    }
+
+    private void sendError(HttpServletResponse response, int status, String message, HttpServletRequest request) throws IOException {
+        if (request != null) {
+            String origin = request.getHeader("Origin");
+            if (origin != null && !origin.isBlank() && response.getHeader("Access-Control-Allow-Origin") == null) {
+                response.setHeader("Access-Control-Allow-Origin", origin);
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+                response.setHeader("Vary", "Origin");
+            }
+        }
         response.setStatus(status);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

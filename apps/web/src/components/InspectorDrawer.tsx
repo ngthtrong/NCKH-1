@@ -17,7 +17,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { api, getStoredToken, subscribeTelemetry } from '../api';
-import { getTenantUrl } from '../utils/domain';
+import { buildTenantUrl } from '../utils/domain';
 import type {
   CacheProbeResult,
   InspectorTelemetry,
@@ -133,7 +133,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
 
     // Pick a mismatched tenant target
     const targetSlug = tenantSlug === 't-lotus' ? 't-acme' : 't-lotus';
-    const targetUrl = getTenantUrl(targetSlug, '/api/boards');
+    const targetUrl = buildTenantUrl(targetSlug, '/api/boards');
     const token = getStoredToken();
     const start = performance.now();
 
@@ -401,7 +401,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                     <tbody className="divide-y divide-slate-200">
                       <tr>
                         <td className="px-3 py-2 text-slate-500 font-sans w-44">Domain / Host thực tế</td>
-                        <td className="px-3 py-2 font-bold text-slate-900">{currentHost || 'localhost:8080'}</td>
+                        <td className="px-3 py-2 font-bold text-slate-900">{currentHost || (typeof window !== 'undefined' ? window.location.host : '')}</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-2 text-slate-500 font-sans">Tenant ID (UUID)</td>

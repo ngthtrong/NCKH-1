@@ -16,7 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { api, ApiError } from '../api';
-import { getTenantHost } from '../utils/domain';
+import { buildTenantUrl } from '../utils/domain';
 import type { TenantMember, TenantSettings } from '../types';
 
 interface Props {
@@ -134,14 +134,9 @@ export const MembersView: React.FC<Props> = ({
     settings?.inviteCode ||
     (tenantSlug ? `${tenantSlug.replace(/^t-/i, '')}-2026`.toUpperCase() : 'INVITE-2026');
 
-  const port = window.location.port ? `:${window.location.port}` : '';
-  const proto = window.location.protocol;
-  const currentHost = window.location.host;
-  const tenantHost =
-    tenantSlug && !currentHost.toLowerCase().startsWith(tenantSlug.toLowerCase())
-      ? getTenantHost(tenantSlug)
-      : currentHost;
-  const inviteLink = `${proto}//${tenantHost}?action=join&code=${encodeURIComponent(effectiveInviteCode)}`;
+  const inviteLink = tenantSlug
+    ? buildTenantUrl(tenantSlug, `?action=join&code=${encodeURIComponent(effectiveInviteCode)}`)
+    : `${window.location.protocol}//${window.location.host}?action=join&code=${encodeURIComponent(effectiveInviteCode)}`;
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(effectiveInviteCode);

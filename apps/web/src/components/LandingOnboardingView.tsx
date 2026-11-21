@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { api, ApiError } from '../api';
 import { AutoProductShowcase } from './AutoProductShowcase';
-import { getTenantHost } from '../utils/domain';
+import { buildTenantUrl, getTenantHost } from '../utils/domain';
 import type { DiscoveredTenant } from '../types';
 
 interface RecentTenant {
@@ -143,10 +143,9 @@ export const LandingOnboardingView: React.FC = () => {
 
   const handleNavigateToTenant = (t: { slug: string; name: string; tier: string; primaryColor?: string }) => {
     saveRecentTenant(t);
-    const targetHost = getTenantHost(t.slug);
     const emailParam = searchEmail.trim() ? `email=${encodeURIComponent(searchEmail.trim())}&` : '';
     // Security: forceLogin=1 ensures any existing stale session is purged and password entry is required
-    window.location.href = `${proto}//${targetHost}/?${emailParam}forceLogin=1`;
+    window.location.href = buildTenantUrl(t.slug, `/?${emailParam}forceLogin=1`);
   };
 
   // Submit onboarding
@@ -919,7 +918,7 @@ export const LandingOnboardingView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(`${proto}//${getTenantHost(createdTenantData.slug)}`);
+                        navigator.clipboard.writeText(buildTenantUrl(createdTenantData.slug));
                         setCopiedSlug(true);
                         setTimeout(() => setCopiedSlug(false), 2000);
                       }}
@@ -930,7 +929,7 @@ export const LandingOnboardingView: React.FC = () => {
                     </button>
                   </div>
                   <div className="p-2.5 bg-white rounded-lg border border-slate-200 font-mono text-xs text-blue-600 font-semibold truncate">
-                    {proto}//{getTenantHost(createdTenantData.slug)}
+                    {buildTenantUrl(createdTenantData.slug)}
                   </div>
                 </div>
 
@@ -972,7 +971,7 @@ export const LandingOnboardingView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          const fullLink = `${proto}//${getTenantHost(createdTenantData.slug)}?action=join&code=${createdTenantData.inviteCode}`;
+                          const fullLink = buildTenantUrl(createdTenantData.slug, `?action=join&code=${createdTenantData.inviteCode}`);
                           navigator.clipboard.writeText(fullLink);
                           setCopiedLink(true);
                           setTimeout(() => setCopiedLink(false), 2000);
@@ -991,7 +990,7 @@ export const LandingOnboardingView: React.FC = () => {
                 {/* Primary Action Button to Enter App */}
                 <div className="pt-2">
                   <a
-                    href={`${proto}//${getTenantHost(createdTenantData.slug)}/?forceLogin=1`}
+                    href={buildTenantUrl(createdTenantData.slug, '/?forceLogin=1')}
                     className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2"
                   >
                     <span>Vào hệ thống ngay</span>

@@ -39,7 +39,7 @@ import {
   Legend,
 } from 'recharts';
 import { api, ApiError } from '../api';
-import { getTenantHost } from '../utils/domain';
+import { buildTenantUrl, getTenantHost } from '../utils/domain';
 import type { AdminTenant, MetricsOverview } from '../types';
 
 export const AdminView: React.FC = () => {
@@ -873,7 +873,7 @@ export const AdminView: React.FC = () => {
 
                       <td className="px-4 py-3.5">
                         <a
-                          href={`${proto}//${getTenantHost(t.slug)}`}
+                          href={buildTenantUrl(t.slug)}
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}

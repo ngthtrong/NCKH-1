@@ -1,61 +1,82 @@
 /**
- * Domain and URL Resolution Utilities for TenantFlow SaaS
+ * Dynamic Domain & URL Resolution Utilities for TenantFlow SaaS
  * Seamlessly supports both local development (*.localhost:8080)
  * and production cloud deployments (*.tenantflow.tech)
  */
 
-export function getBaseDomain(): string {
-  const host = window.location.hostname.toLowerCase();
-  if (host === 'localhost' || host === '127.0.0.1') {
-    return 'localhost';
+export function getBaseHost(): string {
+  if (typeof window === 'undefined') {
+    return 'localhost:8080';
   }
-  if (host.endsWith('.localhost')) {
-    return 'localhost';
+  const hostname = window.location.hostname.toLowerCase();
+  const port = window.location.port ? `:${window.location.port}` : '';
+
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost')) {
+    return `localhost${port}`;
   }
-  const parts = host.split('.');
+
+  const parts = hostname.split('.');
   const isIp = parts.every((p) => !isNaN(Number(p)));
   if (isIp) {
-    return host;
+    return `${hostname}${port}`;
   }
+
   if (parts.length >= 3) {
-    return parts.slice(1).join('.');
+    return `${parts.slice(1).join('.')}${port}`;
   }
-  return host;
+
+  return `${hostname}${port}`;
+}
+
+export function buildRootUrl(path: string = ''): string {
+  if (typeof window === 'undefined') {
+    return `http://localhost:8080${path}`;
+  }
+  const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
+  return `${window.location.protocol}//${getBaseHost()}${cleanPath}`;
+}
+
+export function buildTenantUrl(slug: string, path: string = ''): string {
+  if (typeof window === 'undefined') {
+    return `http://${slug}.localhost:8080${path}`;
+  }
+  const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
+  const cleanSlug = slug.trim().toLowerCase();
+  return `${window.location.protocol}//${cleanSlug}.${getBaseHost()}${cleanPath}`;
+}
+
+export function buildAdminUrl(path: string = ''): string {
+  if (typeof window === 'undefined') {
+    return `http://admin.localhost:8080${path}`;
+  }
+  const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
+  return `${window.location.protocol}//admin.${getBaseHost()}${cleanPath}`;
+}
+
+// Backward-compatible aliases
+export function getBaseDomain(): string {
+  const base = getBaseHost();
+  return base.split(':')[0];
 }
 
 export function getEffectivePort(): string {
+  if (typeof window === 'undefined') return '';
   const p = window.location.port;
-  if (!p || p === '80' || p === '443') {
-    return '';
-  }
-  return `:${p}`;
+  return !p || p === '80' || p === '443' ? '' : `:${p}`;
 }
 
 export function getTenantHost(slug: string): string {
-  const base = getBaseDomain();
-  const port = getEffectivePort();
-  if (base === 'localhost') {
-    return `${slug}.localhost${port}`;
-  }
-  return `${slug}.${base}${port}`;
+  return `${slug.trim().toLowerCase()}.${getBaseHost()}`;
 }
 
 export function getRootHost(): string {
-  const base = getBaseDomain();
-  const port = getEffectivePort();
-  return `${base}${port}`;
+  return getBaseHost();
 }
 
 export function getTenantUrl(slug: string, path: string = ''): string {
-  const proto = window.location.protocol;
-  const host = getTenantHost(slug);
-  const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
-  return `${proto}//${host}${cleanPath}`;
+  return buildTenantUrl(slug, path);
 }
 
 export function getRootUrl(path: string = ''): string {
-  const proto = window.location.protocol;
-  const host = getRootHost();
-  const cleanPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
-  return `${proto}//${host}${cleanPath}`;
+  return buildRootUrl(path);
 }

@@ -21,7 +21,7 @@ import { LoginView } from './components/LoginView';
 import { MembersView } from './components/MembersView';
 import { OverviewView } from './components/OverviewView';
 import { SettingsView } from './components/SettingsView';
-import { getRootUrl } from './utils/domain';
+import { buildRootUrl } from './utils/domain';
 import type { TenantInfo, TenantSettings } from './types';
 
 type Tab = 'overview' | 'kanban' | 'members' | 'settings' | 'admin';
@@ -406,7 +406,7 @@ export default function App() {
               </button>
 
               <a
-                href={getRootUrl()}
+                href={buildRootUrl()}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition"
                 title="Mở Trang chủ & Đăng ký Dịch vụ"
               >
