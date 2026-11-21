@@ -43,7 +43,7 @@ const DEMO_BY_SUBDOMAIN: Record<string, DemoAccount[]> = {
     {
       label: 'Platform Admin',
       role: 'PLATFORM_ADMIN',
-      email: 'admin@platform.local',
+      email: 'admin@tenantflow.vn',
       desc: 'Quản trị viên toàn hệ thống SaaS (Control Plane)',
     },
   ],

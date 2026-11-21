@@ -73,7 +73,7 @@ public class AuthService {
 
         if (targetSlug == null || "admin".equalsIgnoreCase(targetSlug)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "TENANT_SUBDOMAIN_REQUIRED",
-                    "Vui lòng đăng nhập qua tên miền phụ của tổ chức (vd: t-acme.localhost)");
+                    "Vui lòng đăng nhập qua tên miền phụ của tổ chức (vd: t-acme.<domain>)");
         }
 
         Tenant tenant = tenantRepository.findBySlug(targetSlug)
@@ -135,7 +135,7 @@ public class AuthService {
 
         if (targetSlug == null || "admin".equalsIgnoreCase(targetSlug)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "TENANT_SUBDOMAIN_REQUIRED",
-                    "Vui lòng đăng ký tham gia qua tên miền phụ của tổ chức (vd: t-acme.localhost)");
+                    "Vui lòng đăng ký tham gia qua tên miền phụ của tổ chức (vd: t-acme.<domain>)");
         }
 
         Tenant tenant = tenantRepository.findBySlug(targetSlug)
