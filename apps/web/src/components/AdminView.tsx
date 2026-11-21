@@ -14,21 +14,15 @@ import {
   Unlock,
   AlertCircle,
   Activity,
-  Layers,
   Database,
-  Server,
-  Play,
-  Pause,
-  ArrowRight,
   TrendingUp,
   X,
   Sliders,
   RefreshCw,
-  Globe,
   Sparkles,
   User,
-  Mail,
-  Key,
+  Play,
+  Pause,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -58,8 +52,7 @@ export const AdminView: React.FC = () => {
   const [isLive, setIsLive] = useState(true);
   const [rightChartTab, setRightChartTab] = useState<'CACHE' | 'LATENCY'>('CACHE');
 
-  // Modal / Drawer states
-  const [isPipelineModalOpen, setIsPipelineModalOpen] = useState(false);
+  // Slide-over Drawer states
   const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
   const [selectedTenantForEdit, setSelectedTenantForEdit] = useState<AdminTenant | null>(null);
 
@@ -194,7 +187,7 @@ export const AdminView: React.FC = () => {
     const newStatus = t.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
     try {
       await api.updateTenant(t.id, { status: newStatus });
-      setSuccessMsg(`Đã ${newStatus === 'ACTIVE' ? 'mở khóa' : 'tạm khóa'} tổ chức "${t.name}"!`);
+      setSuccessMsg(`Đã ${newStatus === 'ACTIVE' ? 'kích hoạt lại' : 'tạm ngưng'} tổ chức "${t.name}"!`);
       setTimeout(() => setSuccessMsg(null), 3000);
       await fetchMetricsAndTenants(true);
     } catch (err) {
@@ -248,7 +241,7 @@ export const AdminView: React.FC = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 pb-16 max-w-[1440px] mx-auto space-y-5 text-slate-900 font-sans">
       {/* ============================================================== */}
-      {/* TẦNG 1: Header Toolbar (1 Hàng gọn gàng, sắc nét)              */}
+      {/* TẦNG 1: Header Toolbar (1 Hàng ngang chuẩn Stripe/Linear)       */}
       {/* ============================================================== */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div className="flex items-center gap-3.5">
@@ -304,16 +297,6 @@ export const AdminView: React.FC = () => {
             title="Làm mới dữ liệu ngay"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Architecture Pipeline Button */}
-          <button
-            onClick={() => setIsPipelineModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition"
-            title="Xem 5 tầng luồng kiến trúc SaaS Multi-Tenant"
-          >
-            <Layers className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Luồng kiến trúc K1–K4</span>
           </button>
 
           {/* Provision Tenant Button */}
@@ -430,7 +413,7 @@ export const AdminView: React.FC = () => {
       </div>
 
       {/* ============================================================== */}
-      {/* TẦNG 3: Lưới Đồ thị Viễn trắc (Tỷ lệ 7/12 & 5/12, Cao h-64)   */}
+      {/* TẦNG 3: Lưới Đồ thị Viễn trắc (Tỷ lệ 7/12 & 5/12, Cao h-64 ~260px) */}
       {/* ============================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Chart (7 cols): Timeseries Throughput & 429 Blocks */}
@@ -618,7 +601,7 @@ export const AdminView: React.FC = () => {
       </div>
 
       {/* ============================================================== */}
-      {/* TẦNG 4: Bảng Quản lý Khách thuê (Tích hợp Thanh Tiến độ Hạn ngạch) */}
+      {/* TẦNG 4: Bảng Quản trị Khách thuê (Tích hợp Thanh Tiến độ Hạn ngạch) */}
       {/* ============================================================== */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
         {/* Table Toolbar */}
@@ -628,7 +611,7 @@ export const AdminView: React.FC = () => {
               Danh sách Khách thuê Đăng ký ({tenants.length})
             </h2>
             <p className="text-[11px] text-slate-500">
-              Quản lý gói dịch vụ, tiêu thụ hạn mức thời gian thực và trạng thái vận hành tức thời
+              Quản lý gói dịch vụ, hạn mức thời gian thực và trạng thái vận hành tức thời
             </p>
           </div>
 
@@ -662,7 +645,7 @@ export const AdminView: React.FC = () => {
                   <th className="px-4 py-3.5 min-w-[160px]">Lưu lượng (RPM)</th>
                   <th className="px-4 py-3.5 min-w-[150px]">Nhân sự</th>
                   <th className="px-4 py-3.5 w-24 text-center">Chặn 429</th>
-                  <th className="px-4 py-3.5 w-32">Trạng thái</th>
+                  <th className="px-4 py-3.5 w-36">Trạng thái</th>
                   <th className="px-4 py-3.5 w-40 text-right whitespace-nowrap">Thao tác</th>
                 </tr>
               </thead>
@@ -672,7 +655,7 @@ export const AdminView: React.FC = () => {
                   const metric = metrics?.byTenant?.find((m) => m.slug === t.slug);
                   const color = tenantColors[t.slug] || '#6366f1';
 
-                  // Calculate RPM usage & percentage
+                  // Calculate RPM usage & percentage (updates dynamically with live polling)
                   const currentRpm = metric?.currentRpm || 0;
                   const rpmLimit = t.rateLimitRpm || 120;
                   const rpmPercent = Math.min(100, Math.round((currentRpm / rpmLimit) * 100));
@@ -789,17 +772,17 @@ export const AdminView: React.FC = () => {
                         )}
                       </td>
 
-                      {/* 7. Trạng thái */}
+                      {/* 7. Trạng thái (ĐANG HOẠT ĐỘNG / TẠM NGƯNG) */}
                       <td className="px-4 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                             isActive
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : 'bg-rose-50 text-rose-700 border border-rose-200'
                           }`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                          {isActive ? 'HOẠT ĐỘNG' : 'TẠM KHÓA'}
+                          {isActive ? 'ĐANG HOẠT ĐỘNG' : 'TẠM NGƯNG'}
                         </span>
                       </td>
 
@@ -826,7 +809,7 @@ export const AdminView: React.FC = () => {
                                 ? 'text-rose-600 hover:bg-rose-50 border-rose-200'
                                 : 'text-emerald-600 hover:bg-emerald-50 border-emerald-200'
                             }`}
-                            title={isActive ? 'Khóa tạm thời tổ chức' : 'Kích hoạt lại tổ chức'}
+                            title={isActive ? 'Tạm ngưng hoạt động tổ chức' : 'Kích hoạt lại tổ chức'}
                           >
                             {isActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
                           </button>
@@ -840,181 +823,6 @@ export const AdminView: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* ============================================================== */}
-      {/* MODAL: Luồng Kiến trúc K1–K4 (Hiển thị Trực quan 5 Tầng)      */}
-      {/* ============================================================== */}
-      {isPipelineModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="relative w-full max-w-3xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="p-5 bg-slate-950 text-white flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-indigo-400">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold">Lưu đồ Kiến trúc Vận hành Cụm SaaS Multi-Tenant</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Hành trình xử lý request từ Caddy Gateway qua các chốt kiểm định K1, K3, Cache đến PostgreSQL RLS (K2)
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsPipelineModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body: 5 Architecture Stages */}
-            <div className="p-6 space-y-3 font-sans text-xs bg-slate-50/50">
-              {/* Stage 1: Edge Reverse Proxy */}
-              <div className="p-3.5 rounded-xl bg-slate-900 text-white flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-cyan-400 font-mono font-bold text-xs">
-                    01
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-100 flex items-center gap-2">
-                      <span>Caddy Edge Reverse Proxy</span>
-                      <span className="px-1.5 py-0.2 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-mono text-[10px]">
-                        Port 80 / 443
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      Tiếp nhận Wildcard Subdomain (*.tenantflow.tech), quản lý TLS tự động và chuyển tiếp nguyên vẹn Host header
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right font-mono text-xs font-bold text-cyan-400 shrink-0 ml-2">
-                  PASS
-                </div>
-              </div>
-
-              <div className="flex justify-center -my-1 text-slate-300">
-                <ArrowRight className="w-4 h-4 rotate-90" />
-              </div>
-
-              {/* Stage 2: K1 Identity Filter */}
-              <div className="p-3.5 rounded-xl bg-white border border-slate-200/90 flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-[11px] border border-blue-200">
-                    K1
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <span>JWT &amp; Subdomain Matching Filter</span>
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px]">
-                        EXACT_MATCH
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Đối chiếu định danh Host Subdomain với Claim slug trong JWT token. Ngăn chặn tuyệt đối giả mạo phiên chéo (HTTP 403 Forbidden)
-                    </div>
-                  </div>
-                </div>
-                <span className="font-mono text-xs font-bold text-emerald-600 shrink-0 ml-2">
-                  100% SECURE
-                </span>
-              </div>
-
-              <div className="flex justify-center -my-1 text-slate-300">
-                <ArrowRight className="w-4 h-4 rotate-90" />
-              </div>
-
-              {/* Stage 3: Rate Limiting K3 */}
-              <div className="p-3.5 rounded-xl bg-white border border-slate-200/90 flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-[11px] border border-purple-200">
-                    K3
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <span>Token Bucket Rate Limit Filter (Redis 7.2)</span>
-                      <span className="px-1.5 py-0.2 rounded bg-purple-50 text-purple-700 border border-purple-200 font-mono text-[10px]">
-                        SLIDING_BUCKET
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Giới hạn thông lượng động theo gói cước (FREE 30 / PRO 120 / ENT 600 RPM). Cắt tải bảo vệ hệ thống bằng HTTP 429 Too Many Requests
-                    </div>
-                  </div>
-                </div>
-                <div className="font-mono text-xs font-bold text-rose-600 shrink-0 ml-2">
-                  {summary.totalBlocked429} <span className="text-[10px] font-normal text-slate-400">chặn</span>
-                </div>
-              </div>
-
-              <div className="flex justify-center -my-1 text-slate-300">
-                <ArrowRight className="w-4 h-4 rotate-90" />
-              </div>
-
-              {/* Stage 4: Multi-Tier Cache */}
-              <div className="p-3.5 rounded-xl bg-white border border-slate-200/90 flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-cyan-50 text-cyan-700 flex items-center justify-center font-bold text-[11px] border border-cyan-200">
-                    Đệm
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <span>Multi-Tier Configuration Cache</span>
-                      <span className="px-1.5 py-0.2 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 font-mono text-[10px]">
-                        L1 + L2
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      L1 Caffeine bộ nhớ trong (&lt;0.5ms) kết hợp L2 Redis Pub/Sub đồng bộ tức thời khi quản trị viên cập nhật cấu hình
-                    </div>
-                  </div>
-                </div>
-                <div className="font-mono text-xs font-bold text-emerald-600 shrink-0 ml-2">
-                  {summary.cacheHitRatio}% <span className="text-[10px] font-normal text-slate-400">hit</span>
-                </div>
-              </div>
-
-              <div className="flex justify-center -my-1 text-slate-300">
-                <ArrowRight className="w-4 h-4 rotate-90" />
-              </div>
-
-              {/* Stage 5: Database RLS (K2) */}
-              <div className="p-3.5 rounded-xl bg-white border border-slate-200/90 flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-800 flex items-center justify-center font-bold text-[11px] border border-amber-200">
-                    K2
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                      <span>Bảo mật Cấp dòng (PostgreSQL FORCE RLS)</span>
-                      <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200 font-mono text-[10px]">
-                        ROW_LEVEL_SECURITY
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Thiết lập biến session <code className="text-amber-800 bg-amber-50 px-1 py-0.2 rounded">app.current_tenant_id</code> trước mỗi truy vấn. Cách ly dữ liệu tuyệt đối ở tầng nhân CSDL
-                    </div>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold shrink-0 ml-2">
-                  FAIL-CLOSED
-                </span>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-white border-t border-slate-200 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsPipelineModalOpen(false)}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl text-xs transition"
-              >
-                Đóng lưu đồ
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ============================================================== */}
       {/* SLIDE-OVER DRAWER: Cấp phát hoặc Cấu hình Khách thuê           */}
@@ -1129,7 +937,7 @@ export const AdminView: React.FC = () => {
                           }`}
                         >
                           <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                          <span>HOẠT ĐỘNG</span>
+                          <span>ĐANG HOẠT ĐỘNG</span>
                         </button>
 
                         <button
@@ -1142,7 +950,7 @@ export const AdminView: React.FC = () => {
                           }`}
                         >
                           <span className="w-2 h-2 rounded-full bg-rose-500" />
-                          <span>TẠM KHÓA</span>
+                          <span>TẠM NGƯNG</span>
                         </button>
                       </div>
                     </div>
@@ -1371,7 +1179,18 @@ export const AdminView: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 flex gap-2">
+                    {/* Hộp ghi chú Đặc tả UC01 */}
+                    <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl text-[11px] text-indigo-900 space-y-1">
+                      <div className="font-semibold flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Tự động Cấp phát Toàn diện (Đặc tả UC01)</span>
+                      </div>
+                      <p className="text-indigo-700 leading-relaxed">
+                        Hệ thống sẽ tự động sinh UUID duy nhất, áp dụng hạn mức Token Bucket, tạo tài khoản Tenant Admin và khởi tạo sẵn Bảng Kanban cùng các cột mặc định.
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex gap-2">
                       <button
                         type="button"
                         onClick={() => setIsSlideOverOpen(false)}
