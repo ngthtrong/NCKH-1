@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.tenantflow.domain.entity.Tenant;
 import vn.tenantflow.domain.repository.TenantRepository;
+import vn.tenantflow.service.TenantTelemetryService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,10 +21,14 @@ public class JwtTenantFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final TenantRepository tenantRepository;
+    private final TenantTelemetryService telemetryService;
 
-    public JwtTenantFilter(JwtService jwtService, TenantRepository tenantRepository) {
+    public JwtTenantFilter(JwtService jwtService,
+                           TenantRepository tenantRepository,
+                           TenantTelemetryService telemetryService) {
         this.jwtService = jwtService;
         this.tenantRepository = tenantRepository;
+        this.telemetryService = telemetryService;
     }
 
     @Override
@@ -33,8 +38,9 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Public endpoints (Edge branding, self-service onboarding, login, health)
+        // Public endpoints (Edge branding, self-service onboarding, login, member registration, health)
         if (path.equals("/api/auth/login")
+                || path.equals("/api/auth/register-member")
                 || path.equals("/api/health")
                 || path.startsWith("/api/public/")
                 || (path.equals("/api/platform/tenants") && "POST".equalsIgnoreCase(method))
@@ -123,6 +129,8 @@ public class JwtTenantFilter extends OncePerRequestFilter {
             }
             long elapsedMs = Math.max(1, (System.nanoTime() - startNs) / 1_000_000);
             response.setHeader("X-Response-Time-Ms", String.valueOf(elapsedMs));
+
+            telemetryService.recordRequest(info.tenantId(), info.slug(), response.getStatus(), elapsedMs, cacheStatus);
         } finally {
             TenantContext.clear();
             MDC.remove("tenant_id");

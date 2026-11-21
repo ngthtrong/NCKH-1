@@ -24,6 +24,14 @@ public class AuthController {
 
     public record LoginRequest(@NotBlank String email, @NotBlank String password, String tenantSlug) {}
 
+    public record RegisterMemberRequest(
+            @NotBlank String email,
+            @NotBlank String fullName,
+            @NotBlank String password,
+            @NotBlank String inviteCode,
+            String tenantSlug
+    ) {}
+
     @GetMapping("/health")
     public Map<String, String> health() {
         return Map.of("status", "UP", "service", "tenantflow-kanban-api");
@@ -33,6 +41,14 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest req, HttpServletRequest request) {
         String hostSubdomain = JwtTenantFilter.extractSubdomain(request.getHeader("Host"));
         return ResponseEntity.ok(authService.login(req.email(), req.password(), hostSubdomain, req.tenantSlug()));
+    }
+
+    @PostMapping("/auth/register-member")
+    public ResponseEntity<Map<String, Object>> registerMember(@Valid @RequestBody RegisterMemberRequest req, HttpServletRequest request) {
+        String hostSubdomain = JwtTenantFilter.extractSubdomain(request.getHeader("Host"));
+        return ResponseEntity.ok(authService.registerMember(
+                req.email(), req.fullName(), req.password(), req.inviteCode(), hostSubdomain, req.tenantSlug()
+        ));
     }
 
     @GetMapping("/auth/me")

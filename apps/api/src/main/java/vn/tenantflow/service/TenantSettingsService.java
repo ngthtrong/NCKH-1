@@ -24,7 +24,15 @@ public class TenantSettingsService {
 
     public TenantSettings getSettings() {
         TenantInfo info = TenantContext.get();
-        return cacheService.getTenantSettings(info.tenantId());
+        TenantSettings s = cacheService.getTenantSettings(info.tenantId());
+        String code = s.effectiveInviteCode(info.slug());
+        if (s.inviteCode() == null || s.inviteCode().isBlank()) {
+            return new TenantSettings(
+                    s.theme(), s.wipMode(), s.defaultWipLimit(), s.cardDisplayMode(),
+                    s.defaultColumns(), s.customFields(), code
+            );
+        }
+        return s;
     }
 
     @Transactional
@@ -53,11 +61,19 @@ public class TenantSettingsService {
 
         Tenant tenant = tenantRepository.findById(info.tenantId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "TENANT_NOT_FOUND", "Không tìm thấy tổ chức"));
-        tenant.setSettings(updated);
+
+        String code = (updated.inviteCode() != null && !updated.inviteCode().isBlank())
+                ? updated.inviteCode().trim().toUpperCase()
+                : updated.effectiveInviteCode(info.slug());
+        TenantSettings toSave = new TenantSettings(
+                updated.theme(), updated.wipMode(), updated.defaultWipLimit(),
+                updated.cardDisplayMode(), updated.defaultColumns(), updated.customFields(), code
+        );
+        tenant.setSettings(toSave);
         tenantRepository.save(tenant);
 
         // Invalidate Redis L2 and publish Pub/Sub to evict L1 Caffeine across all API nodes
         cacheService.invalidateTenantConfig(info.tenantId());
-        return updated;
+        return toSave;
     }
 }

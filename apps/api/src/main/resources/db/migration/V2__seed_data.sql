@@ -61,13 +61,13 @@ VALUES (
     }'::jsonb
 );
 
--- Tenant 3: Noisy Corp (STANDARD, 30 rpm for KB-3 HTTP 429 demonstration, OFF WIP)
+-- Tenant 3: Noisy Corp (FREE, 30 rpm for KB-3 HTTP 429 demonstration, OFF WIP)
 INSERT INTO tenants (id, slug, name, tier, rate_limit_rpm, max_members, status, settings)
 VALUES (
     '33333333-3333-3333-3333-333333333333',
     't-noisy',
     'Noisy Corp',
-    'STANDARD',
+    'FREE',
     30,
     10,
     'ACTIVE',

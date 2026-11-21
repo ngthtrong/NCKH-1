@@ -4,7 +4,9 @@ import type {
   Board,
   BoardColumn,
   Card,
+  DiscoveredTenant,
   InspectorTelemetry,
+  MetricsOverview,
   PublicBranding,
   TenantInfo,
   TenantMember,
@@ -25,14 +27,44 @@ export class ApiError extends Error {
 const TOKEN_KEY = 'tenantflow_token';
 
 export function getStoredToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  // Purge any legacy localStorage token to prevent session leakage
+  try {
+    if (localStorage.getItem(TOKEN_KEY)) {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+  try {
+    return sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export function setStoredToken(token: string | null) {
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token);
-  } else {
+  try {
     localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+  try {
+    if (token) {
+      sessionStorage.setItem(TOKEN_KEY, token);
+    } else {
+      sessionStorage.removeItem(TOKEN_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export function clearStoredToken() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Ignore storage errors
   }
 }
 
@@ -101,6 +133,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const api = {
   getPublicBranding: () => request<PublicBranding>('/api/public/tenant-branding'),
 
+  discoverTenant: (email: string) =>
+    request<DiscoveredTenant[]>('/api/public/discover-tenant', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
   login: (email: string, password: string, tenantSlug?: string) =>
     request<{
       accessToken: string;
@@ -109,6 +147,22 @@ export const api = {
     }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password, tenantSlug }),
+    }),
+
+  registerMember: (payload: {
+    email: string;
+    fullName: string;
+    password: string;
+    inviteCode: string;
+    tenantSlug?: string;
+  }) =>
+    request<{
+      accessToken: string;
+      user: AuthUser;
+      tenant?: { id: string; slug: string; name: string; tier: string; settings: TenantSettings };
+    }>('/api/auth/register-member', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 
   me: () => request<TenantInfo>('/api/auth/me'),
@@ -130,6 +184,7 @@ export const api = {
     id: string,
     payload: { status?: 'ACTIVE' | 'SUSPENDED'; tier?: string; rateLimitRpm?: number; maxMembers?: number }
   ) => request<AdminTenant>(`/api/platform/tenants/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  getMetricsOverview: () => request<MetricsOverview>('/api/admin/metrics/overview'),
 
   // Settings (K4)
   getSettings: () => request<TenantSettings>('/api/tenant-settings/kanban'),

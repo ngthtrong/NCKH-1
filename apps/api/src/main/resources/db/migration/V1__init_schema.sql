@@ -9,7 +9,7 @@ CREATE TABLE tenants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug VARCHAR(64) UNIQUE NOT NULL,
     name VARCHAR(120) NOT NULL,
-    tier VARCHAR(20) NOT NULL CHECK (tier IN ('FREE', 'STANDARD', 'PRO', 'ENTERPRISE')),
+    tier VARCHAR(20) NOT NULL CHECK (tier IN ('FREE', 'PRO', 'ENTERPRISE')),
     rate_limit_rpm INT NOT NULL DEFAULT 120 CHECK (rate_limit_rpm > 0),
     max_members INT NOT NULL DEFAULT 50 CHECK (max_members > 0),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'SUSPENDED')),

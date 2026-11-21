@@ -18,6 +18,7 @@ export interface TenantSettings {
   cardDisplayMode: 'FULL' | 'COMPACT';
   defaultColumns: string[];
   customFields: CustomFieldDef[];
+  inviteCode?: string;
 }
 
 export interface PublicBranding {
@@ -32,6 +33,15 @@ export interface PublicBranding {
     logoText?: string;
     tagline?: string;
   };
+}
+
+export interface DiscoveredTenant {
+  type: 'TENANT' | 'PLATFORM_ADMIN';
+  slug: string;
+  name: string;
+  tier: string;
+  primaryColor: string;
+  logoText: string;
 }
 
 export interface AuthUser {
@@ -93,7 +103,7 @@ export interface AdminTenant {
   id: string;
   slug: string;
   name: string;
-  tier: 'FREE' | 'STANDARD' | 'PRO' | 'ENTERPRISE';
+  tier: 'FREE' | 'PRO' | 'ENTERPRISE';
   rateLimitRpm: number;
   maxMembers: number;
   status: 'ACTIVE' | 'SUSPENDED';
@@ -114,4 +124,50 @@ export interface InspectorTelemetry {
   rateLimit: string;
   rlsContext: string;
   responseTimeMs: string;
+}
+
+export interface MetricsSummary {
+  totalTenants: number;
+  activeTenants: number;
+  totalRpm: number;
+  p50LatencyMs: number;
+  p95LatencyMs: number;
+  totalBlocked429: number;
+  cacheHitRatio: number;
+}
+
+export interface MetricsTimeseriesPoint {
+  time: string;
+  blocked429: number;
+  total: number;
+  [tenantSlug: string]: string | number;
+}
+
+export interface TenantMetricsStat {
+  id?: string;
+  tenantId: string;
+  slug: string;
+  name: string;
+  tier: string;
+  status: string;
+  rateLimitRpm: number;
+  currentRpm: number;
+  blocked429: number;
+  p50Ms: number;
+  p95Ms: number;
+  l1Hits?: number;
+  l2Hits?: number;
+  dbMisses?: number;
+  memberCount: number;
+  maxMembers: number;
+  boardCount: number;
+  cardCount: number;
+  primaryColor: string;
+}
+
+export interface MetricsOverview {
+  summary: MetricsSummary;
+  timeseries: MetricsTimeseriesPoint[];
+  tenants?: TenantMetricsStat[];
+  byTenant: TenantMetricsStat[];
 }

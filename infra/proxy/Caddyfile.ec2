@@ -1,0 +1,49 @@
+{
+	admin off
+	email {$TLS_EMAIL:huynhhonganhgr@gmail.com}
+	on_demand_tls {
+		ask http://kanban-api:8080/api/health
+	}
+}
+
+https:// {
+	tls {
+		on_demand
+	}
+
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	handle /actuator/health {
+		reverse_proxy kanban-api:8080 {
+			header_up Host {http.request.host}
+		}
+	}
+
+	handle {
+		reverse_proxy kanban-web:80 {
+			header_up Host {http.request.host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

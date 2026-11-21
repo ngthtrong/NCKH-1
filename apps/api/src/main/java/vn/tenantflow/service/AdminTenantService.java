@@ -81,15 +81,16 @@ public class AdminTenantService {
             throw new ApiException(HttpStatus.CONFLICT, "SLUG_EXISTS", "Subdomain '" + normalizedSlug + "' đã tồn tại");
         }
 
-        String normalizedTier = (tier != null && !tier.isBlank()) ? tier.trim().toUpperCase() : "STANDARD";
+        String normalizedTier = (tier != null && !tier.isBlank()) ? tier.trim().toUpperCase() : "PRO";
         int rpm = rateLimitRpm != null ? rateLimitRpm : defaultRpmForTier(normalizedTier);
         int membersLimit = maxMembers != null ? maxMembers : defaultMaxMembersForTier(normalizedTier);
         String logoText = normalizedSlug.replaceFirst("^t-", "").toUpperCase();
         if (logoText.length() > 8) logoText = logoText.substring(0, 8);
+        String inviteCode = (normalizedSlug.replaceFirst("^t-", "") + "-2026").toUpperCase();
 
         TenantSettings settings = "MEDIA".equalsIgnoreCase(industryTemplate)
-                ? TenantSettings.mediaTemplate(logoText, null)
-                : TenantSettings.softwareTemplate(logoText, null);
+                ? TenantSettings.mediaTemplate(logoText, null, inviteCode)
+                : TenantSettings.softwareTemplate(logoText, null, inviteCode);
 
         Tenant tenant = new Tenant();
         tenant.setSlug(normalizedSlug);
@@ -173,7 +174,8 @@ public class AdminTenantService {
         return switch (tier) {
             case "ENTERPRISE" -> 600;
             case "PRO" -> 120;
-            default -> 30; // STANDARD / FREE
+            case "FREE" -> 30;
+            default -> 30;
         };
     }
 
@@ -181,6 +183,7 @@ public class AdminTenantService {
         return switch (tier) {
             case "ENTERPRISE" -> 500;
             case "PRO" -> 50;
+            case "FREE" -> 10;
             default -> 10;
         };
     }

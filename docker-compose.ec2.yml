@@ -1,0 +1,29 @@
+# =============================================================================
+# Docker Compose Overlay for AWS EC2 Deployment (tenantflow.tech)
+# Optimized for AWS EC2 (2 vCPU, 8 GiB RAM)
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.ec2.yml up -d --build
+# =============================================================================
+
+services:
+  caddy-proxy:
+    ports: !override
+      - "80:80"
+      - "443:443"
+    environment:
+      BASE_DOMAIN: ${BASE_DOMAIN:-tenantflow.tech}
+      TLS_EMAIL: ${TLS_EMAIL:-huynhhonganhgr@gmail.com}
+    volumes:
+      - ./infra/proxy/Caddyfile.ec2:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+volumes:
+  caddy_data:
+  caddy_config:
