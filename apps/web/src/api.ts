@@ -79,25 +79,54 @@ export function subscribeTelemetry(fn: TelemetryListener): () => void {
   return () => telemetryListeners.delete(fn);
 }
 
-function emitTelemetry(method: string, path: string, res: Response) {
+export function recordCustomTelemetry(entry: InspectorTelemetry) {
+  telemetryListeners.forEach((fn) => fn(entry));
+}
+
+function resolveTenantSlug(res: Response, path: string): string {
+  const fromHeader = res.headers.get('X-Tenant-Slug');
+  if (fromHeader) return fromHeader;
+  try {
+    const host = window.location.hostname.toLowerCase();
+    if (host.endsWith('.localhost')) {
+      return host.replace('.localhost', '') || 'admin';
+    }
+    const parts = host.split('.');
+    if (parts.length >= 3) {
+      return parts[0];
+    }
+  } catch {}
+  return 'admin';
+}
+
+function emitTelemetry(method: string, path: string, res: Response, clientElapsedMs: number) {
   const limit = res.headers.get('X-RateLimit-Limit');
   const rem = res.headers.get('X-RateLimit-Remaining');
+  const serverLatency = res.headers.get('X-Response-Time-Ms') || res.headers.get('X-Latency-Ms');
+  const latency = serverLatency ? parseInt(serverLatency, 10) : clientElapsedMs;
+  const rawCache = res.headers.get('X-Cache-Status') || res.headers.get('X-Cache-Source');
+  const cacheStatus = rawCache && rawCache !== 'N/A' ? rawCache : 'DIRECT';
+
   const entry: InspectorTelemetry = {
     timestamp: new Date().toLocaleTimeString('vi-VN'),
+    tenantSlug: resolveTenantSlug(res, path),
     method,
     path,
     status: res.status,
     tenantId: res.headers.get('X-Tenant-ID') || '—',
     subdomainMatch: res.headers.get('X-Subdomain-Match') || '—',
-    cacheStatus: res.headers.get('X-Cache-Status') || 'N/A',
+    cacheStatus,
     rateLimit: limit && rem ? `${rem}/${limit}` : '—',
     rlsContext: res.headers.get('X-RLS-Context') || '—',
-    responseTimeMs: res.headers.get('X-Response-Time-Ms') ? `${res.headers.get('X-Response-Time-Ms')} ms` : '—',
+    responseTimeMs: `${latency} ms`,
+    latencyMs: latency,
   };
   telemetryListeners.forEach((fn) => fn(entry));
 }
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+type RequestOptions = RequestInit & { skipTelemetryLog?: boolean };
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const token = getStoredToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -108,8 +137,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   const method = options.method || 'GET';
+  const start = performance.now();
   const res = await fetch(path, { ...options, headers });
-  emitTelemetry(method, path, res);
+  const clientElapsed = Math.max(1, Math.round(performance.now() - start));
+
+  if (!options.skipTelemetryLog) {
+    emitTelemetry(method, path, res, clientElapsed);
+  }
 
   if (res.status === 204) {
     return undefined as T;
@@ -171,7 +205,7 @@ export const api = {
   me: () => request<TenantInfo>('/api/auth/me'),
 
   // Platform Admin & Self-Service Onboarding
-  listTenants: () => request<AdminTenant[]>('/api/platform/tenants'),
+  listTenants: (opts?: { skipTelemetryLog?: boolean }) => request<AdminTenant[]>('/api/platform/tenants', opts),
   createTenant: (payload: {
     slug: string;
     name: string;
@@ -187,7 +221,8 @@ export const api = {
     id: string,
     payload: { status?: 'ACTIVE' | 'SUSPENDED'; tier?: string; rateLimitRpm?: number; maxMembers?: number }
   ) => request<AdminTenant>(`/api/platform/tenants/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }),
-  getMetricsOverview: () => request<MetricsOverview>('/api/admin/metrics/overview'),
+  getMetricsOverview: (opts?: { skipTelemetryLog?: boolean }) =>
+    request<MetricsOverview>('/api/admin/metrics/overview', opts),
 
   // Settings (K4)
   getSettings: () => request<TenantSettings>('/api/tenant-settings/kanban'),
@@ -262,8 +297,23 @@ export const api = {
     ),
 
   // Architecture Dev Inspector Probes
-  probeRls: () => request<RlsProbeResult>('/api/inspector/rls-probe'),
-  probeCache: () => request<CacheProbeResult>('/api/inspector/cache-probe', { method: 'POST' }),
-  runNoisyNeighborTest: () =>
-    request<NoisyNeighborTestResult>('/api/admin/inspector/noisy-neighbor-test', { method: 'POST' }),
+  probeRls: (targetSlug?: string) =>
+    request<RlsProbeResult>(
+      targetSlug ? `/api/inspector/rls-probe?targetSlug=${encodeURIComponent(targetSlug)}` : '/api/inspector/rls-probe'
+    ),
+  probeCache: (targetSlug?: string) =>
+    request<CacheProbeResult>(
+      targetSlug ? `/api/inspector/cache-probe?targetSlug=${encodeURIComponent(targetSlug)}` : '/api/inspector/cache-probe',
+      { method: 'POST' }
+    ),
+  runNoisyNeighborTest: (payload?: {
+    noisySlug?: string;
+    noisyRequests?: number;
+    normalSlug?: string;
+    normalRequests?: number;
+  }) =>
+    request<NoisyNeighborTestResult>('/api/admin/inspector/noisy-neighbor-test', {
+      method: 'POST',
+      body: JSON.stringify(payload || {}),
+    }),
 };

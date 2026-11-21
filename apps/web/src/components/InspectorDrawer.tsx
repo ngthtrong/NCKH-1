@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   Activity,
+  Check,
   CheckCircle2,
   ChevronUp,
+  Copy,
   Database,
-  ExternalLink,
   Layers,
   Play,
   RotateCw,
@@ -16,9 +17,10 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import { api, getStoredToken, subscribeTelemetry } from '../api';
+import { api, getStoredToken, recordCustomTelemetry, subscribeTelemetry } from '../api';
 import { buildTenantUrl } from '../utils/domain';
 import type {
+  AdminTenant,
   CacheProbeResult,
   InspectorTelemetry,
   NoisyNeighborTestResult,
@@ -37,6 +39,7 @@ interface ForgeryTestResult {
   statusText: string;
   latencyMs: number;
   errorMessage: string;
+  curlCommand: string;
 }
 
 interface BurstTestResult {
@@ -49,37 +52,78 @@ interface BurstTestResult {
   warningMessage?: string;
 }
 
+const DEFAULT_TENANTS: { slug: string; name: string }[] = [
+  { slug: 't-acme', name: 'Acme Corporation' },
+  { slug: 't-lotus', name: 'Lotus Retail' },
+  { slug: 't-noisy', name: 'Noisy Neighbor Inc' },
+];
+
 export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant }) => {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'k1' | 'k2' | 'k3' | 'logs' | 'flow'>('k1');
   const [logs, setLogs] = useState<InspectorTelemetry[]>([]);
   const [selectedLogIdx, setSelectedLogIdx] = useState<number | null>(null);
 
+  // Available tenants list for dropdowns
+  const [availableTenants, setAvailableTenants] = useState<{ slug: string; name: string }[]>(DEFAULT_TENANTS);
+
   // K1: Identity & Subdomain Forgery State
+  const [k1TargetSlug, setK1TargetSlug] = useState<string>('t-lotus');
+  const [k1CustomSlug, setK1CustomSlug] = useState<string>('');
+  const [k1Token, setK1Token] = useState<string>('');
+  const [k1Copied, setK1Copied] = useState(false);
   const [forgeryLoading, setForgeryLoading] = useState(false);
   const [forgeryResult, setForgeryResult] = useState<ForgeryTestResult | null>(null);
 
   // K2: RLS Fail-Closed Probe State
+  const [k2TargetSlug, setK2TargetSlug] = useState<string>('');
   const [rlsLoading, setRlsLoading] = useState(false);
   const [rlsResult, setRlsResult] = useState<RlsProbeResult | null>(null);
 
   // K3: Rate Limit & Cache State
+  const [k3NoisySlug, setK3NoisySlug] = useState<string>('t-noisy');
+  const [k3NoisyRequests, setK3NoisyRequests] = useState<number>(45);
+  const [k3NormalSlug, setK3NormalSlug] = useState<string>('t-acme');
+  const [k3NormalRequests, setK3NormalRequests] = useState<number>(15);
+  const [noisyTestLoading, setNoisyTestLoading] = useState(false);
+  const [noisyTestResult, setNoisyTestResult] = useState<NoisyNeighborTestResult | null>(null);
+
   const [burstCount, setBurstCount] = useState<number>(40);
   const [burstLoading, setBurstLoading] = useState(false);
   const [burstResult, setBurstResult] = useState<BurstTestResult | null>(null);
 
-  const [noisyTestLoading, setNoisyTestLoading] = useState(false);
-  const [noisyTestResult, setNoisyTestResult] = useState<NoisyNeighborTestResult | null>(null);
-
+  const [k3CacheTargetSlug, setK3CacheTargetSlug] = useState<string>('');
   const [cacheLoading, setCacheLoading] = useState(false);
   const [cacheResult, setCacheResult] = useState<CacheProbeResult | null>(null);
 
   // Subscribe to live telemetry from api.ts
   useEffect(() => {
     return subscribeTelemetry((entry) => {
-      setLogs((prev) => [entry, ...prev].slice(0, 30));
+      setLogs((prev) => [entry, ...prev].slice(0, 50));
     });
   }, []);
+
+  // Fetch available tenants for dropdowns when opened
+  useEffect(() => {
+    if (!open) return;
+    const originalToken = getStoredToken() || '';
+    if (!k1Token) {
+      setK1Token(originalToken);
+    }
+    api
+      .listTenants({ skipTelemetryLog: true })
+      .then((tenants: AdminTenant[]) => {
+        if (tenants && tenants.length > 0) {
+          const list = tenants.map((t) => ({ slug: t.slug, name: t.name }));
+          setAvailableTenants(list);
+          if (!k2TargetSlug) setK2TargetSlug(list[0].slug);
+          if (!k3CacheTargetSlug) setK3CacheTargetSlug(list[0].slug);
+        }
+      })
+      .catch(() => {
+        // Fallback already set to DEFAULT_TENANTS
+      });
+  }, [open]);
 
   // Parse JWT token payload if currentTenant is not provided
   const jwtClaims = useMemo(() => {
@@ -103,10 +147,19 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
   // Derived Identity Info
   const currentHost = typeof window !== 'undefined' ? window.location.host : '';
   const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
-  const tenantSlug = currentTenant?.slug || jwtClaims?.slug || 'unknown';
+  const tenantSlug = currentTenant?.slug || jwtClaims?.slug || 't-acme';
   const tenantId = currentTenant?.tenantId || jwtClaims?.tenantId || '—';
   const userRole = currentTenant?.role || jwtClaims?.role || (jwtClaims?.systemAdmin ? 'PLATFORM_ADMIN' : 'MEMBER');
   const isSystemAdmin = currentTenant?.systemAdmin || jwtClaims?.systemAdmin || false;
+
+  // Set initial target slugs if empty
+  useEffect(() => {
+    if (!k2TargetSlug) setK2TargetSlug(tenantSlug !== 'unknown' ? tenantSlug : 't-acme');
+    if (!k3CacheTargetSlug) setK3CacheTargetSlug(tenantSlug !== 'unknown' ? tenantSlug : 't-acme');
+    if (k1TargetSlug === tenantSlug) {
+      setK1TargetSlug(tenantSlug === 't-lotus' ? 't-acme' : 't-lotus');
+    }
+  }, [tenantSlug]);
 
   // Subdomain match check
   const extractedSubdomain = useMemo(() => {
@@ -126,22 +179,26 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
     return extractedSubdomain.toLowerCase() === tenantSlug.toLowerCase();
   }, [extractedSubdomain, tenantSlug]);
 
+  // Effective K1 Target Slug
+  const effectiveK1Slug = k1TargetSlug === '__custom__' ? (k1CustomSlug.trim() || 't-unknown') : k1TargetSlug;
+
   // Handler: K1 Cross-Subdomain Forgery Test
   const handleRunForgeryTest = async () => {
     setForgeryLoading(true);
     setForgeryResult(null);
 
-    // Pick a mismatched tenant target
-    const targetSlug = tenantSlug === 't-lotus' ? 't-acme' : 't-lotus';
+    const targetSlug = effectiveK1Slug;
     const targetUrl = buildTenantUrl(targetSlug, '/api/boards');
-    const token = getStoredToken();
+    const tokenToSend = k1Token.trim() || getStoredToken() || '';
     const start = performance.now();
+
+    const curlCmd = `curl -i -X GET "${targetUrl}" \\\n  -H "Authorization: Bearer ${tokenToSend.slice(0, 20)}..." \\\n  -H "Accept: application/json"`;
 
     try {
       const res = await fetch(targetUrl, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${tokenToSend}`,
           'Content-Type': 'application/json',
         },
       });
@@ -151,6 +208,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
       try {
         const json = JSON.parse(text);
         if (json.error) errorMsg = json.error;
+        else if (json.message) errorMsg = json.message;
       } catch {
         if (text) errorMsg = text;
       }
@@ -159,9 +217,22 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
         targetUrl,
         targetSlug,
         status: res.status,
-        statusText: res.statusText || 'Forbidden',
+        statusText: res.statusText || (res.status === 403 ? 'Forbidden' : 'OK'),
         latencyMs,
         errorMessage: errorMsg,
+        curlCommand: curlCmd,
+      });
+
+      // Record in Dev Inspector logs
+      recordCustomTelemetry({
+        timestamp: new Date().toLocaleTimeString('vi-VN', { hour12: false }),
+        method: 'GET',
+        path: `/api/boards [${targetSlug}]`,
+        status: res.status,
+        cacheStatus: 'DIRECT',
+        responseTimeMs: `${latencyMs} ms`,
+        latencyMs,
+        tenantSlug: targetSlug,
       });
     } catch (err: any) {
       const latencyMs = Math.round(performance.now() - start);
@@ -171,23 +242,59 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
         status: 403,
         statusText: 'Forbidden (CORS/Network Filtered)',
         latencyMs,
-        errorMessage: err.message || 'Yêu cầu bị chặn đứng bởi chính sách bảo mật đa miền.',
+        errorMessage: err.message || 'Yêu cầu bị chặn bởi chính sách Gateway / CORS đa miền.',
+        curlCommand: curlCmd,
+      });
+
+      recordCustomTelemetry({
+        timestamp: new Date().toLocaleTimeString('vi-VN', { hour12: false }),
+        method: 'GET',
+        path: `/api/boards [${targetSlug}]`,
+        status: 403,
+        cacheStatus: 'DIRECT',
+        responseTimeMs: `${latencyMs} ms`,
+        latencyMs,
+        tenantSlug: targetSlug,
       });
     } finally {
       setForgeryLoading(false);
     }
   };
 
+  const handleCopyCurl = (cmd: string) => {
+    navigator.clipboard.writeText(cmd);
+    setK1Copied(true);
+    setTimeout(() => setK1Copied(false), 2000);
+  };
+
   // Handler: K2 RLS Fail-Closed Probe
   const handleRunRlsProbe = async () => {
     setRlsLoading(true);
     try {
-      const res = await api.probeRls();
+      const res = await api.probeRls(k2TargetSlug || tenantSlug);
       setRlsResult(res);
     } catch (err: any) {
       alert(`Lỗi kiểm định RLS: ${err.message}`);
     } finally {
       setRlsLoading(false);
+    }
+  };
+
+  // Handler: K3 Admin Noisy Neighbor Test
+  const handleRunNoisyTest = async () => {
+    setNoisyTestLoading(true);
+    try {
+      const res = await api.runNoisyNeighborTest({
+        noisySlug: k3NoisySlug,
+        noisyRequests: k3NoisyRequests,
+        normalSlug: k3NormalSlug,
+        normalRequests: k3NormalRequests,
+      });
+      setNoisyTestResult(res);
+    } catch (err: any) {
+      alert(`Lỗi chạy đối chứng láng giềng: ${err.message}`);
+    } finally {
+      setNoisyTestLoading(false);
     }
   };
 
@@ -243,24 +350,11 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
     setBurstLoading(false);
   };
 
-  // Handler: K3 Admin Noisy Neighbor Test
-  const handleRunNoisyTest = async () => {
-    setNoisyTestLoading(true);
-    try {
-      const res = await api.runNoisyNeighborTest();
-      setNoisyTestResult(res);
-    } catch (err: any) {
-      alert(`Lỗi chạy mô phỏng láng giềng ồn ào: ${err.message}`);
-    } finally {
-      setNoisyTestLoading(false);
-    }
-  };
-
   // Handler: K3 Two-Tier Cache Probe
   const handleRunCacheProbe = async () => {
     setCacheLoading(true);
     try {
-      const res = await api.probeCache();
+      const res = await api.probeCache(k3CacheTargetSlug || tenantSlug);
       setCacheResult(res);
     } catch (err: any) {
       alert(`Lỗi kiểm định Cache: ${err.message}`);
@@ -308,30 +402,23 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
         </button>
       ) : (
         /* DevTools White & Slate Console Panel */
-        <div className="w-[660px] max-w-[95vw] bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] font-sans animate-in fade-in slide-in-from-bottom-2 duration-150">
-          {/* Header Bar */}
-          <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
+        <div className="w-[740px] max-w-[96vw] bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[88vh] font-sans animate-in fade-in slide-in-from-bottom-2 duration-150">
+          {/* Header Bar - Single line layout */}
+          <div className="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-white">
                 <Activity className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5 font-mono">
-                  <span>Dev Inspector</span>
-                  <span className="text-[10px] font-normal text-slate-500 bg-slate-200/70 px-1.5 py-0.2 rounded">
-                    v2.5 Council Console
-                  </span>
-                </div>
-              </div>
+              <span className="text-xs font-bold text-slate-900 font-mono tracking-tight">Dev Inspector</span>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex items-center bg-slate-200/80 p-0.5 rounded-lg text-xs font-medium">
+            {/* Navigation Tabs - nowrap to prevent breaking into 2 rows */}
+            <div className="flex items-center bg-slate-200/80 p-0.5 rounded-lg text-xs font-medium overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveTab('k1')}
-                className={`px-2.5 py-1 rounded-md transition ${
+                className={`px-2 py-1 rounded-md transition whitespace-nowrap shrink-0 ${
                   activeTab === 'k1'
-                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -339,19 +426,19 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
               </button>
               <button
                 onClick={() => setActiveTab('k2')}
-                className={`px-2.5 py-1 rounded-md transition ${
+                className={`px-2 py-1 rounded-md transition whitespace-nowrap shrink-0 ${
                   activeTab === 'k2'
-                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                K2 • Cô lập RLS
+                K2 • RLS
               </button>
               <button
                 onClick={() => setActiveTab('k3')}
-                className={`px-2.5 py-1 rounded-md transition ${
+                className={`px-2 py-1 rounded-md transition whitespace-nowrap shrink-0 ${
                   activeTab === 'k3'
-                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -359,9 +446,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
               </button>
               <button
                 onClick={() => setActiveTab('flow')}
-                className={`px-2.5 py-1 rounded-md transition ${
+                className={`px-2 py-1 rounded-md transition whitespace-nowrap shrink-0 ${
                   activeTab === 'flow'
-                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -369,9 +456,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
               </button>
               <button
                 onClick={() => setActiveTab('logs')}
-                className={`px-2.5 py-1 rounded-md transition flex items-center gap-1 ${
+                className={`px-2 py-1 rounded-md transition flex items-center gap-1 whitespace-nowrap shrink-0 ${
                   activeTab === 'logs'
-                    ? 'bg-white text-slate-900 font-semibold shadow-sm'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -387,7 +474,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
             {/* Close Button */}
             <button
               onClick={() => setOpen(false)}
-              className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-200 transition ml-2"
+              className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-200 transition shrink-0"
               title="Đóng khay kiểm định"
             >
               <X className="w-4 h-4" />
@@ -449,24 +536,23 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                   </table>
                 </div>
 
-                {/* Cross-Subdomain Forgery Test Block */}
+                {/* Interactive Cross-Subdomain Forgery & JWT Simulation Panel */}
                 <div className="border border-slate-200 rounded-lg p-3.5 bg-white space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div>
                       <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                         <ShieldAlert className="w-4 h-4 text-rose-600" />
-                        <span>Thử nghiệm Giả mạo Chéo Subdomain (Cross-Subdomain Forgery)</span>
+                        <span>Kiểm thử Giả mạo Chéo Subdomain (Cross-Subdomain Forgery)</span>
                       </div>
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        Dùng JWT của tenant hiện tại (<code className="font-mono text-slate-700">{tenantSlug}</code>) nhưng
-                        gửi request thật sang subdomain của tenant khác.
+                        Gửi request mang JWT chứa tenant này sang subdomain của tenant khác để kiểm tra chốt chặn Gateway.
                       </div>
                     </div>
 
                     <button
                       onClick={handleRunForgeryTest}
                       disabled={forgeryLoading}
-                      className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition shrink-0 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer"
                     >
                       {forgeryLoading ? (
                         <>
@@ -476,42 +562,100 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                       ) : (
                         <>
                           <Play className="w-3.5 h-3.5" />
-                          <span>Chạy thử giả mạo</span>
+                          <span>Chạy thử nghiệm K1</span>
                         </>
                       )}
                     </button>
                   </div>
 
-                  {/* Forgery Result Console */}
+                  {/* Form Controls for Target Tenant & Editable JWT */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700">Subdomain Mục tiêu (Target Tenant):</label>
+                      <select
+                        value={k1TargetSlug}
+                        onChange={(e) => setK1TargetSlug(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                      >
+                        {availableTenants.map((t) => (
+                          <option key={t.slug} value={t.slug}>
+                            {t.slug} ({t.name})
+                          </option>
+                        ))}
+                        <option value="__custom__">+ Tự nhập subdomain tùy ý...</option>
+                      </select>
+                      {k1TargetSlug === '__custom__' && (
+                        <input
+                          type="text"
+                          placeholder="vd: t-victim"
+                          value={k1CustomSlug}
+                          onChange={(e) => setK1CustomSlug(e.target.value)}
+                          className="w-full mt-1.5 px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                        />
+                      )}
+                      <div className="text-[10px] text-slate-500 font-mono truncate">
+                        URL: {buildTenantUrl(effectiveK1Slug, '/api/boards')}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-semibold text-slate-700">Mã Token JWT (Authorization Bearer):</label>
+                        <button
+                          type="button"
+                          onClick={() => setK1Token(getStoredToken() || '')}
+                          className="text-[10px] text-indigo-600 hover:text-indigo-800 underline"
+                        >
+                          Khôi phục token gốc
+                        </button>
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={k1Token}
+                        onChange={(e) => setK1Token(e.target.value)}
+                        className="w-full px-2 py-1 text-[10px] font-mono border border-slate-300 rounded-lg bg-slate-50 text-slate-700 focus:bg-white resize-none"
+                        placeholder="Bearer JWT token..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Forgery Result Console with Raw HTTP & Copy cURL */}
                   {forgeryResult && (
-                    <div className="border border-slate-200 rounded-lg p-3 bg-slate-900 text-slate-100 font-mono text-[11px] space-y-2">
-                      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <div className="border border-slate-200 rounded-lg p-3 bg-slate-900 text-slate-100 font-mono text-[11px] space-y-2.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
                         <div className="flex items-center gap-2 truncate">
                           <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px]">
                             TARGET
                           </span>
                           <span className="text-slate-300 truncate">{forgeryResult.targetUrl}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="px-2 py-0.5 rounded border border-rose-500/50 bg-rose-500/20 text-rose-300 font-bold text-[10px]">
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span
+                            className={`px-2 py-0.5 rounded border text-[10px] font-bold ${
+                              forgeryResult.status === 403 || forgeryResult.status === 401
+                                ? 'border-rose-500/50 bg-rose-500/20 text-rose-300'
+                                : 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
+                            }`}
+                          >
                             HTTP {forgeryResult.status} {forgeryResult.statusText}
                           </span>
                           <span className="text-slate-400 text-[10px]">{forgeryResult.latencyMs} ms</span>
+                          <button
+                            onClick={() => handleCopyCurl(forgeryResult.curlCommand)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] rounded border border-slate-700 transition"
+                            title="Sao chép lệnh cURL"
+                          >
+                            {k1Copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                            <span>{k1Copied ? 'Đã sao chép' : 'Sao chép cURL'}</span>
+                          </button>
                         </div>
                       </div>
 
                       <div className="space-y-1 text-slate-300 text-[11px]">
-                        <div className="text-slate-400"># Phản hồi từ Gateway / JwtTenantFilter:</div>
-                        <div className="text-rose-400 bg-slate-950 p-2 rounded border border-slate-800 break-words">
-                          &quot;{forgeryResult.errorMessage}&quot;
+                        <div className="text-slate-400"># Phản hồi từ JwtTenantFilter / Caddy:</div>
+                        <div className="text-rose-400 bg-slate-950 p-2.5 rounded border border-slate-800 break-words font-mono">
+                          {forgeryResult.errorMessage}
                         </div>
-                      </div>
-
-                      <div className="pt-1 text-[11px] text-emerald-400 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                        <span>
-                          Kết luận: Gateway và Filter đã chặn đứng 100% token giả mạo giữa các tenant theo đúng chuẩn K1.
-                        </span>
                       </div>
                     </div>
                   )}
@@ -525,54 +669,66 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
             {activeTab === 'k2' && (
               <div className="space-y-4">
                 <div className="border border-slate-200 rounded-lg p-3.5 bg-white space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                         <Database className="w-4 h-4 text-indigo-600" />
-                        <span>Kiểm định Fail-Closed trên PostgreSQL</span>
+                        <span>Kiểm định Fail-Closed trên PostgreSQL (FORCE ROW LEVEL SECURITY)</span>
                       </div>
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        Mở kết nối JDBC thật với user <code className="font-mono text-slate-700">kanban_app_user</code>, so
-                        sánh số bản ghi khi chưa chạy và đã chạy lệnh SET LOCAL.
+                        Thực thi 3 giao dịch SQL cô lập với DB user <code className="font-mono text-slate-700">kanban_app_user</code>: Không context ⟷ Context chéo ⟷ Context hợp lệ.
                       </div>
                     </div>
 
-                    <button
-                      onClick={handleRunRlsProbe}
-                      disabled={rlsLoading}
-                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition shrink-0 cursor-pointer"
-                    >
-                      {rlsLoading ? (
-                        <>
-                          <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                          <span>Đang truy vấn DB...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5" />
-                          <span>Chạy kiểm định RLS</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={k2TargetSlug}
+                        onChange={(e) => setK2TargetSlug(e.target.value)}
+                        className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                      >
+                        {availableTenants.map((t) => (
+                          <option key={t.slug} value={t.slug}>
+                            {t.slug} ({t.name})
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        onClick={handleRunRlsProbe}
+                        disabled={rlsLoading}
+                        className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer"
+                      >
+                        {rlsLoading ? (
+                          <>
+                            <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Đang truy vấn DB...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5" />
+                            <span>Chạy kiểm định RLS</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* RLS Comparison Table */}
+                  {/* RLS 3-Scenario Comparison Table */}
                   {rlsResult ? (
                     <div className="border border-slate-200 rounded-lg overflow-hidden space-y-0">
                       <table className="w-full text-left text-[11px]">
                         <thead className="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider border-b border-slate-200 font-semibold">
                           <tr>
-                            <th className="px-3 py-2">Trường hợp kiểm thử</th>
+                            <th className="px-3 py-2">Kịch bản kiểm thử</th>
                             <th className="px-3 py-2">Lệnh SQL thực thi trên PostgreSQL</th>
                             <th className="px-3 py-2 text-right">Số bản ghi</th>
-                            <th className="px-3 py-2 text-center">Đánh giá Cô lập</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 font-mono">
-                          {/* Case 1: Fail-Closed */}
+                          {/* Case 1: Fail-Closed without SET LOCAL */}
                           <tr className="bg-slate-50/70 hover:bg-slate-50">
                             <td className="px-3 py-2.5 font-sans font-semibold text-slate-700">
-                              1. Chưa thiết lập ngữ cảnh (Fail-Closed)
+                              1. Không thiết lập SET LOCAL (Fail-Closed)
                             </td>
                             <td className="px-3 py-2.5 text-slate-600 text-[10px]">
                               <code>{rlsResult.sqlWithoutContext}</code>
@@ -580,18 +736,28 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                             <td className="px-3 py-2.5 text-right font-bold text-slate-900">
                               {rlsResult.withoutContextCount} cards
                             </td>
-                            <td className="px-3 py-2.5 text-center">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-sans">
-                                <CheckCircle2 className="w-3 h-3" />
-                                FAIL-CLOSED AN TOÀN
-                              </span>
+                          </tr>
+
+                          {/* Case 2: Cross-Tenant Breach attempt with mismatched context */}
+                          <tr className="bg-rose-50/40 hover:bg-rose-50/70">
+                            <td className="px-3 py-2.5 font-sans font-semibold text-rose-900">
+                              2. Cố tình truy vấn chéo (Context khác + WHERE target_id)
+                            </td>
+                            <td className="px-3 py-2.5 text-rose-700 text-[10px] break-all">
+                              <code>
+                                {rlsResult.sqlCrossTenant ||
+                                  `SET LOCAL app.current_tenant_id = '${rlsResult.otherSlug || 't-other'}'; SELECT count(*) FROM cards WHERE tenant_id = '${rlsResult.targetSlug}'`}
+                              </code>
+                            </td>
+                            <td className="px-3 py-2.5 text-right font-bold text-rose-700">
+                              {rlsResult.crossTenantCount !== undefined ? rlsResult.crossTenantCount : 0} cards
                             </td>
                           </tr>
 
-                          {/* Case 2: Tenant Active */}
+                          {/* Case 3: Legitimate Tenant Context */}
                           <tr className="bg-white hover:bg-slate-50">
                             <td className="px-3 py-2.5 font-sans font-semibold text-slate-700">
-                              2. Đã gắn ngữ cảnh Tenant
+                              3. Đã gắn đúng ngữ cảnh Tenant ({rlsResult.targetSlug})
                             </td>
                             <td className="px-3 py-2.5 text-indigo-700 text-[10px] break-all">
                               <code>{rlsResult.sqlWithContext}</code>
@@ -599,14 +765,23 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                             <td className="px-3 py-2.5 text-right font-bold text-indigo-700">
                               {rlsResult.withContextCount} cards
                             </td>
-                            <td className="px-3 py-2.5 text-center">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 font-sans">
-                                TRUY XUẤT ĐÚNG DỮ LIỆU
-                              </span>
-                            </td>
                           </tr>
                         </tbody>
                       </table>
+
+                      {/* Sample Card Titles retrieved */}
+                      {rlsResult.sampleTitles && rlsResult.sampleTitles.length > 0 && (
+                        <div className="bg-slate-50 px-3 py-2 border-t border-slate-200 flex items-center gap-2 text-[11px] font-sans">
+                          <span className="text-slate-500 font-semibold">Dữ liệu thẻ mẫu ({rlsResult.targetSlug}):</span>
+                          <div className="flex flex-wrap gap-1.5 font-mono text-[10px]">
+                            {rlsResult.sampleTitles.map((t, i) => (
+                              <span key={i} className="px-2 py-0.5 bg-white border border-slate-200 text-slate-800 rounded">
+                                &quot;{t}&quot;
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* System Metadata Bar */}
                       <div className="bg-slate-100/80 px-3 py-2 border-t border-slate-200 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-600">
@@ -623,14 +798,13 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                           </span>
                         </div>
                         <div>
-                          Thời gian truy vấn: <strong className="text-slate-900">{rlsResult.queryTimeMs} ms</strong>
+                          Thời gian truy vấn DB: <strong className="text-slate-900">{rlsResult.queryTimeMs} ms</strong>
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div className="p-6 text-center border border-dashed border-slate-300 rounded-lg text-slate-500 text-xs">
-                      Bấm nút <strong>&quot;Chạy kiểm định RLS&quot;</strong> để mở kết nối trực tiếp vào PostgreSQL và
-                      chứng minh chính sách Fail-Closed.
+                      Bấm nút <strong>&quot;Chạy kiểm định RLS&quot;</strong> để mở kết nối trực tiếp vào PostgreSQL và kiểm tra 3 kịch bản cô lập.
                     </div>
                   )}
                 </div>
@@ -644,16 +818,14 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
               <div className="space-y-4">
                 {/* Block 1: Rate Limiting & Noisy Neighbor Defense */}
                 <div className="border border-slate-200 rounded-lg p-3.5 bg-white space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div>
                       <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                         <Timer className="w-4 h-4 text-purple-600" />
                         <span>Hạn ngạch Lưu lượng &amp; Phòng vệ Láng giềng Ồn ào (Token Bucket)</span>
                       </div>
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        {isSystemAdmin
-                          ? 'Mô phỏng đối chứng 2 tổ chức song song: t-noisy (bị dội tải 429) vs t-acme (hoạt động bình thường).'
-                          : 'Bắn đồng thời các request song song lên API để kiểm tra phản ứng của Redis Token Bucket.'}
+                        Bắn tải đồng thời vào 2 tổ chức với quota độc lập trên Redis 7.2.
                       </div>
                     </div>
 
@@ -661,12 +833,12 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                       <button
                         onClick={handleRunNoisyTest}
                         disabled={noisyTestLoading}
-                        className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition shrink-0 cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer"
                       >
                         {noisyTestLoading ? (
                           <>
                             <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                            <span>Đang bắn dồn dập...</span>
+                            <span>Đang bắn tải...</span>
                           </>
                         ) : (
                           <>
@@ -689,7 +861,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                         <button
                           onClick={handleRunBurstTest}
                           disabled={burstLoading}
-                          className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition shrink-0 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer"
                         >
                           {burstLoading ? (
                             <>
@@ -706,6 +878,61 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                       </div>
                     )}
                   </div>
+
+                  {/* Input parameters for Admin Noisy Neighbor Test */}
+                  {isSystemAdmin && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-rose-800 whitespace-nowrap">Bên gây quá tải:</span>
+                        <select
+                          value={k3NoisySlug}
+                          onChange={(e) => setK3NoisySlug(e.target.value)}
+                          className="px-2 py-1 text-xs border border-slate-300 rounded bg-white font-mono flex-1"
+                        >
+                          {availableTenants.map((t) => (
+                            <option key={t.slug} value={t.slug}>
+                              {t.slug}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          min={5}
+                          max={150}
+                          value={k3NoisyRequests}
+                          onChange={(e) => setK3NoisyRequests(Number(e.target.value))}
+                          className="w-16 px-1.5 py-1 text-xs border border-slate-300 rounded bg-white font-mono text-center"
+                          title="Số request gửi đồng thời"
+                        />
+                        <span className="text-[10px] text-slate-500">reqs</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-emerald-800 whitespace-nowrap">Bên bình thường:</span>
+                        <select
+                          value={k3NormalSlug}
+                          onChange={(e) => setK3NormalSlug(e.target.value)}
+                          className="px-2 py-1 text-xs border border-slate-300 rounded bg-white font-mono flex-1"
+                        >
+                          {availableTenants.map((t) => (
+                            <option key={t.slug} value={t.slug}>
+                              {t.slug}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          min={5}
+                          max={100}
+                          value={k3NormalRequests}
+                          onChange={(e) => setK3NormalRequests(Number(e.target.value))}
+                          className="w-16 px-1.5 py-1 text-xs border border-slate-300 rounded bg-white font-mono text-center"
+                          title="Số request gửi đồng thời"
+                        />
+                        <span className="text-[10px] text-slate-500">reqs</span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Tenant Portal: Burst Test Result Grid */}
                   {!isSystemAdmin && burstResult && (
@@ -727,7 +954,6 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                         </div>
                       </div>
 
-                      {/* Visual Badge Grid */}
                       <div className="flex flex-wrap gap-1">
                         {burstResult.statuses.map((st, i) => (
                           <span
@@ -745,7 +971,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
 
                       {burstResult.warningMessage && (
                         <div className="p-2 bg-rose-50 border border-rose-200 text-rose-800 rounded text-[11px] font-mono">
-                          # Token Bucket Cảnh báo: &quot;{burstResult.warningMessage}&quot;
+                          # Token Bucket: &quot;{burstResult.warningMessage}&quot;
                         </div>
                       )}
                     </div>
@@ -754,22 +980,21 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                   {/* Admin Portal: Side-by-Side Noisy Neighbor Comparison */}
                   {isSystemAdmin && noisyTestResult && (
                     <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* t-noisy Card */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {/* Noisy Tenant Card */}
                         <div className="border border-rose-200 bg-rose-50/50 rounded-lg p-3 space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="font-bold text-rose-900 text-xs">
                               {noisyTestResult.noisy.name} ({noisyTestResult.noisy.slug})
                             </div>
-                            <span className="px-1.5 py-0.2 rounded bg-rose-200 text-rose-800 text-[10px] font-bold">
-                              Limit: {noisyTestResult.noisy.limitRpm} rpm
+                            <span className="px-1.5 py-0.5 rounded bg-rose-200 text-rose-800 text-[10px] font-bold">
+                              Hạn mức: {noisyTestResult.noisy.limitRpm} rpm
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-600 font-mono">
-                            Gửi 45 reqs • <strong>{noisyTestResult.noisy.successCount} OK</strong> •{' '}
+                            Gửi {noisyTestResult.noisy.statuses.length} reqs • <strong>{noisyTestResult.noisy.successCount} OK</strong> •{' '}
                             <strong className="text-rose-700">{noisyTestResult.noisy.blockedCount} BỊ CHẶN (429)</strong>
                           </div>
-                          {/* Mini Grid */}
                           <div className="flex flex-wrap gap-0.5">
                             {noisyTestResult.noisy.statuses.map((st, idx) => (
                               <span
@@ -789,43 +1014,44 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                           </div>
                         </div>
 
-                        {/* t-acme Card */}
-                        <div className="border border-emerald-200 bg-emerald-50/50 rounded-lg p-3 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="font-bold text-emerald-900 text-xs">
-                              {noisyTestResult.acme.name} ({noisyTestResult.acme.slug})
+                        {/* Normal / Acme Tenant Card */}
+                        {(() => {
+                          const normal = noisyTestResult.normal || noisyTestResult.acme;
+                          return (
+                            <div className="border border-emerald-200 bg-emerald-50/50 rounded-lg p-3 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="font-bold text-emerald-900 text-xs">
+                                  {normal.name} ({normal.slug})
+                                </div>
+                                <span className="px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold">
+                                  Hạn mức: {normal.limitRpm} rpm
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-600 font-mono">
+                                Gửi {normal.statuses.length} reqs •{' '}
+                                <strong className="text-emerald-700">{normal.successCount} OK</strong> •{' '}
+                                <strong>{normal.blockedCount} Bị chặn</strong>
+                              </div>
+                              <div className="flex flex-wrap gap-0.5">
+                                {normal.statuses.map((st, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={`text-[9px] px-1 py-0.2 rounded font-mono font-bold ${
+                                      st === 200
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-rose-600 text-white'
+                                    }`}
+                                  >
+                                    {st}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="text-[10px] text-slate-500 font-mono">
+                                p50: {normal.p50Ms} ms • p95: {normal.p95Ms} ms
+                              </div>
                             </div>
-                            <span className="px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold">
-                              Limit: {noisyTestResult.acme.limitRpm} rpm
-                            </span>
-                          </div>
-                          <div className="text-[11px] text-slate-600 font-mono">
-                            Gửi 15 reqs • <strong className="text-emerald-700">{noisyTestResult.acme.successCount} OK</strong>{' '}
-                            • <strong>0 Bị chặn</strong>
-                          </div>
-                          {/* Mini Grid */}
-                          <div className="flex flex-wrap gap-0.5">
-                            {noisyTestResult.acme.statuses.map((st, idx) => (
-                              <span
-                                key={idx}
-                                className="text-[9px] px-1 py-0.2 rounded font-mono font-bold bg-emerald-600 text-white"
-                              >
-                                {st}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="text-[10px] text-slate-500 font-mono">
-                            p50: {noisyTestResult.acme.p50Ms} ms • p95: {noisyTestResult.acme.p95Ms} ms
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded border border-emerald-200 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                        <span>
-                          Số liệu thực tế đã cập nhật vào Redis và Telemetry. Đồ thị trên Trung tâm Điều hành đã phản ánh
-                          ngay lập tức.
-                        </span>
+                          );
+                        })()}
                       </div>
                     </div>
                   )}
@@ -833,47 +1059,66 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
 
                 {/* Block 2: Two-Tier Cache Benchmark */}
                 <div className="border border-slate-200 rounded-lg p-3.5 bg-white space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div>
                       <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
                         <Layers className="w-4 h-4 text-cyan-600" />
                         <span>Đo lường Độ trễ Bộ đệm 2 tầng (Two-Tier Cache Benchmark)</span>
                       </div>
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        Thực hiện quy trình 3 bước: Xóa L1+L2 (DB Miss) → Nạp L2 (Redis Hit) → Đọc L1 (Caffeine In-Memory).
+                        Quy trình đo: Xóa L1+L2 (DB Miss) → Nạp L2 (Redis Hit) → Đọc L1 (Caffeine In-Memory).
                       </div>
                     </div>
 
-                    <button
-                      onClick={handleRunCacheProbe}
-                      disabled={cacheLoading}
-                      className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition shrink-0 cursor-pointer"
-                    >
-                      {cacheLoading ? (
-                        <>
-                          <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                          <span>Đang đo...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5" />
-                          <span>Đo độ trễ DB → L2 → L1</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={k3CacheTargetSlug}
+                        onChange={(e) => setK3CacheTargetSlug(e.target.value)}
+                        className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                      >
+                        {availableTenants.map((t) => (
+                          <option key={t.slug} value={t.slug}>
+                            {t.slug}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        onClick={handleRunCacheProbe}
+                        disabled={cacheLoading}
+                        className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer"
+                      >
+                        {cacheLoading ? (
+                          <>
+                            <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Đang đo...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5" />
+                            <span>Đo độ trễ DB → L2 → L1</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Cache Benchmark Visual Bars */}
+                  {/* Cache Benchmark Visual Bars with Real Double Latency */}
                   {cacheResult && (
                     <div className="border border-slate-200 rounded-lg p-3 bg-slate-50 space-y-3">
                       <div className="text-[11px] text-slate-600 font-mono">
                         Cache Key: <strong className="text-slate-900">{cacheResult.cacheKey}</strong>
+                        {cacheResult.targetSlug && (
+                          <span className="ml-2 text-slate-500">
+                            • Thuê bao: <strong className="text-indigo-700">{cacheResult.targetSlug}</strong>
+                          </span>
+                        )}
                       </div>
 
-                      <div className="space-y-2 font-mono text-[11px]">
+                      <div className="space-y-2.5 font-mono text-[11px]">
                         {cacheResult.steps.map((st) => {
                           const maxLat = Math.max(...cacheResult.steps.map((s) => s.latencyMs), 1);
-                          const pct = Math.max(8, Math.min(100, Math.round((st.latencyMs / maxLat) * 100)));
+                          const pct = Math.max(6, Math.min(100, Math.round((st.latencyMs / maxLat) * 100)));
                           const isDb = st.source === 'DB_MISS';
                           const isL2 = st.source === 'L2_HIT';
 
@@ -884,7 +1129,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                                   Bước {st.step}: {st.source} ({st.description})
                                 </span>
                                 <span
-                                  className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
+                                  className={`font-bold px-1.5 py-0.5 rounded text-[10px] tabular-nums ${
                                     isDb
                                       ? 'bg-amber-100 text-amber-900 border border-amber-300'
                                       : isL2
@@ -892,7 +1137,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                                       : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                                   }`}
                                 >
-                                  {st.latencyMs > 0 ? `${st.latencyMs} ms` : '< 1 ms (Nano)'}
+                                  {typeof st.latencyMs === 'number' ? `${st.latencyMs.toFixed(2)} ms` : `${st.latencyMs} ms`}
                                 </span>
                               </div>
 
@@ -908,11 +1153,6 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                             </div>
                           );
                         })}
-                      </div>
-
-                      <div className="text-[10px] text-slate-500 font-sans border-t border-slate-200 pt-2">
-                        💡 L1 Caffeine loại bỏ hoàn toàn độ trễ I/O mạng. L2 Redis đảm bảo tính nhất quán trên toàn bộ cụm
-                        server.
                       </div>
                     </div>
                   )}
@@ -945,6 +1185,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                     <table className="w-full text-left text-[11px] font-mono">
                       <thead className="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider border-b border-slate-200 font-semibold">
                         <tr>
+                          <th className="px-2.5 py-1.5">Thuê bao</th>
                           <th className="px-2.5 py-1.5">Giờ</th>
                           <th className="px-2.5 py-1.5">Method &amp; Path</th>
                           <th className="px-2.5 py-1.5 text-center">Mã HTTP</th>
@@ -959,6 +1200,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                             onClick={() => setSelectedLogIdx(selectedLogIdx === idx ? null : idx)}
                             className="hover:bg-slate-50 cursor-pointer transition"
                           >
+                            <td className="px-2.5 py-1.5 text-indigo-700 font-semibold text-[10px] truncate max-w-[90px]">
+                              {l.tenantSlug || 'system'}
+                            </td>
                             <td className="px-2.5 py-1.5 text-slate-400 text-[10px]">{l.timestamp}</td>
                             <td className="px-2.5 py-1.5">
                               <span
@@ -982,15 +1226,13 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({ currentTenant 
                               </span>
                             </td>
                             <td className="px-2.5 py-1.5 text-center">
-                              {l.cacheStatus !== 'N/A' ? (
-                                <span className="px-1 py-0.2 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                  {l.cacheStatus}
-                                </span>
-                              ) : (
-                                <span className="text-slate-400">—</span>
-                              )}
+                              <span className="px-1 py-0.2 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                {l.cacheStatus}
+                              </span>
                             </td>
-                            <td className="px-2.5 py-1.5 text-right text-slate-600">{l.responseTimeMs}</td>
+                            <td className="px-2.5 py-1.5 text-right text-slate-600 tabular-nums">
+                              {l.responseTimeMs}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

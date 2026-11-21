@@ -81,8 +81,8 @@ export const AdminView: React.FC = () => {
     if (!silent) setLoading(true);
     try {
       const [tenantsData, metricsData] = await Promise.all([
-        api.listTenants(),
-        api.getMetricsOverview().catch(() => null),
+        api.listTenants({ skipTelemetryLog: silent }),
+        api.getMetricsOverview({ skipTelemetryLog: silent }).catch(() => null),
       ]);
       setTenants(tenantsData);
       if (metricsData) {
@@ -308,7 +308,7 @@ export const AdminView: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs transition whitespace-nowrap shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Khởi tạo Tổ chức mới</span>
+            <span>Khởi tạo Tổ chức mới</span>
           </button>
         </div>
       </div>

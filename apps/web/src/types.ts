@@ -115,15 +115,17 @@ export interface AdminTenant {
 
 export interface InspectorTelemetry {
   timestamp: string;
+  tenantSlug: string;
   method: string;
   path: string;
   status: number;
-  tenantId: string;
-  subdomainMatch: string;
+  tenantId?: string;
+  subdomainMatch?: string;
   cacheStatus: string;
-  rateLimit: string;
-  rlsContext: string;
+  rateLimit?: string;
+  rlsContext?: string;
   responseTimeMs: string;
+  latencyMs: number;
 }
 
 export interface MetricsSummary {
@@ -175,11 +177,16 @@ export interface MetricsOverview {
 export interface RlsProbeResult {
   dbRole: string;
   rlsForced: boolean;
-  withoutContextCount: number;
-  withContextCount: number;
-  queryTimeMs: number;
   tenantId: string;
+  targetSlug: string;
+  otherSlug?: string;
+  withoutContextCount: number;
+  crossTenantCount: number;
+  withContextCount: number;
+  sampleTitles: string[];
+  queryTimeMs: number;
   sqlWithoutContext: string;
+  sqlCrossTenant: string;
   sqlWithContext: string;
 }
 
@@ -192,6 +199,7 @@ export interface CacheProbeStep {
 
 export interface CacheProbeResult {
   tenantId: string;
+  targetSlug: string;
   cacheKey: string;
   steps: CacheProbeStep[];
 }
@@ -210,5 +218,6 @@ export interface NoisyNeighborTenantResult {
 
 export interface NoisyNeighborTestResult {
   noisy: NoisyNeighborTenantResult;
+  normal?: NoisyNeighborTenantResult;
   acme: NoisyNeighborTenantResult;
 }

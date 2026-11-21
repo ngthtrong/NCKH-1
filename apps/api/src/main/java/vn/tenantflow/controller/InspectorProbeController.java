@@ -80,34 +80,50 @@ public class InspectorProbeController {
 
     /**
      * K2: Row-Level Security Probe
-     * Verifies PostgreSQL Fail-Closed behavior:
-     * - Without SET LOCAL context: query returns 0 rows.
-     * - With SET LOCAL context: query returns exact tenant cards.
+     * Verifies PostgreSQL Fail-Closed behavior with dynamic tenant selection and 3 SQL scenarios:
+     * 1. Without SET LOCAL context: query returns 0 rows.
+     * 2. With SET LOCAL of another tenant: explicitly querying target tenant cards still returns 0 rows.
+     * 3. With SET LOCAL of target tenant: returns exact card count + real sample titles.
      */
     @GetMapping("/api/inspector/rls-probe")
-    public ResponseEntity<Map<String, Object>> probeRls() {
-        TenantInfo info = TenantContext.get();
-        UUID tenantId = (info != null && info.tenantId() != null) ? info.tenantId() : null;
-
-        if (tenantId == null) {
-            // If called by Platform Admin, pick first active tenant (e.g. t-acme)
-            tenantId = tenantRepository.findBySlug("t-acme")
-                    .map(Tenant::getId)
+    public ResponseEntity<Map<String, Object>> probeRls(@RequestParam(value = "targetSlug", required = false) String targetSlug) {
+        Tenant targetTenant = null;
+        if (targetSlug != null && !targetSlug.isBlank()) {
+            targetTenant = tenantRepository.findBySlug(targetSlug.trim().toLowerCase()).orElse(null);
+        }
+        if (targetTenant == null) {
+            TenantInfo info = TenantContext.get();
+            if (info != null && info.tenantId() != null) {
+                targetTenant = tenantRepository.findById(info.tenantId()).orElse(null);
+            }
+        }
+        if (targetTenant == null) {
+            targetTenant = tenantRepository.findBySlug("t-acme")
                     .orElseGet(() -> tenantRepository.findAll().stream()
                             .filter(t -> "ACTIVE".equals(t.getStatus()))
                             .findFirst()
-                            .map(Tenant::getId)
                             .orElse(null));
         }
 
-        if (tenantId == null) {
+        if (targetTenant == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_AVAILABLE", "No active tenant available for RLS probe");
         }
+
+        UUID targetTenantId = targetTenant.getId();
+
+        // Pick another active tenant for cross-tenant breach test
+        final UUID currentId = targetTenantId;
+        Tenant otherTenant = tenantRepository.findAll().stream()
+                .filter(t -> !t.getId().equals(currentId) && "ACTIVE".equals(t.getStatus()))
+                .findFirst()
+                .orElse(null);
 
         String dbRole = "unknown";
         boolean rlsForced = false;
         int withoutContextCount = 0;
+        int crossTenantCount = 0;
         int withContextCount = 0;
+        List<String> sampleTitles = new ArrayList<>();
         long totalDurationMs;
 
         long startNs = System.nanoTime();
@@ -130,7 +146,7 @@ public class InspectorProbeController {
                 }
             }
 
-            // 3. Branch 1: Fail-Closed query WITHOUT SET LOCAL
+            // 3. Scenario 1: Fail-Closed query WITHOUT SET LOCAL
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery("SELECT count(*) FROM cards")) {
                 if (rs.next()) {
@@ -139,15 +155,38 @@ public class InspectorProbeController {
             }
             conn.rollback();
 
-            // 4. Branch 2: Query WITH SET LOCAL app.current_tenant_id
+            // 4. Scenario 2: Cross-Tenant Breach Attempt (SET LOCAL otherTenant, but explicit WHERE tenant_id = targetId)
+            if (otherTenant != null) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT set_config('app.current_tenant_id', ?, true)")) {
+                    ps.setString(1, otherTenant.getId().toString());
+                    ps.execute();
+                }
+                try (PreparedStatement ps = conn.prepareStatement("SELECT count(*) FROM cards WHERE tenant_id = ?")) {
+                    ps.setObject(1, targetTenantId);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            crossTenantCount = rs.getInt(1);
+                        }
+                    }
+                }
+                conn.rollback();
+            }
+
+            // 5. Scenario 3: Query WITH SET LOCAL app.current_tenant_id = targetTenantId
             try (PreparedStatement ps = conn.prepareStatement("SELECT set_config('app.current_tenant_id', ?, true)")) {
-                ps.setString(1, tenantId.toString());
+                ps.setString(1, targetTenantId.toString());
                 ps.execute();
             }
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery("SELECT count(*) FROM cards")) {
                 if (rs.next()) {
                     withContextCount = rs.getInt(1);
+                }
+            }
+            try (Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT title FROM cards ORDER BY position ASC LIMIT 3")) {
+                while (rs.next()) {
+                    sampleTitles.add(rs.getString(1));
                 }
             }
             conn.rollback();
@@ -159,48 +198,60 @@ public class InspectorProbeController {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("dbRole", dbRole);
         response.put("rlsForced", rlsForced);
+        response.put("tenantId", targetTenantId.toString());
+        response.put("targetSlug", targetTenant.getSlug());
+        response.put("otherSlug", otherTenant != null ? otherTenant.getSlug() : "none");
         response.put("withoutContextCount", withoutContextCount);
+        response.put("crossTenantCount", crossTenantCount);
         response.put("withContextCount", withContextCount);
+        response.put("sampleTitles", sampleTitles);
         response.put("queryTimeMs", totalDurationMs);
-        response.put("tenantId", tenantId.toString());
         response.put("sqlWithoutContext", "SELECT count(*) FROM cards; -- Không có SET LOCAL (Fail-Closed)");
-        response.put("sqlWithContext", "SET LOCAL app.current_tenant_id = '" + tenantId + "'; SELECT count(*) FROM cards;");
+        response.put("sqlCrossTenant", otherTenant != null
+                ? "SET LOCAL app.current_tenant_id = '" + otherTenant.getId() + "'; SELECT count(*) FROM cards WHERE tenant_id = '" + targetTenantId + "';"
+                : "N/A");
+        response.put("sqlWithContext", "SET LOCAL app.current_tenant_id = '" + targetTenantId + "'; SELECT count(*) FROM cards;");
 
         return ResponseEntity.ok(response);
     }
 
     /**
      * K3: Two-Tier Cache Probe (L1 Caffeine + L2 Redis)
-     * Step 1: Evict L1 & L2 -> Read triggers DB query (DB_MISS).
-     * Step 2: Evict L1 only -> Read triggers Redis query (L2_HIT).
-     * Step 3: Keep cache -> Read triggers Caffeine JVM memory (L1_HIT).
+     * Supports dynamic targetSlug.
+     * Accurately measures latency with System.nanoTime() and returns precise Double milliseconds.
      */
     @PostMapping("/api/inspector/cache-probe")
-    public ResponseEntity<Map<String, Object>> probeCache() {
-        TenantInfo info = TenantContext.get();
-        UUID tenantId = (info != null && info.tenantId() != null) ? info.tenantId() : null;
-
-        if (tenantId == null) {
-            tenantId = tenantRepository.findBySlug("t-acme")
-                    .map(Tenant::getId)
+    public ResponseEntity<Map<String, Object>> probeCache(@RequestParam(value = "targetSlug", required = false) String targetSlug) {
+        Tenant targetTenant = null;
+        if (targetSlug != null && !targetSlug.isBlank()) {
+            targetTenant = tenantRepository.findBySlug(targetSlug.trim().toLowerCase()).orElse(null);
+        }
+        if (targetTenant == null) {
+            TenantInfo info = TenantContext.get();
+            if (info != null && info.tenantId() != null) {
+                targetTenant = tenantRepository.findById(info.tenantId()).orElse(null);
+            }
+        }
+        if (targetTenant == null) {
+            targetTenant = tenantRepository.findBySlug("t-acme")
                     .orElseGet(() -> tenantRepository.findAll().stream()
                             .filter(t -> "ACTIVE".equals(t.getStatus()))
                             .findFirst()
-                            .map(Tenant::getId)
                             .orElse(null));
         }
 
-        if (tenantId == null) {
+        if (targetTenant == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "NO_TENANT_AVAILABLE", "No active tenant available for cache probe");
         }
 
+        UUID tenantId = targetTenant.getId();
         List<Map<String, Object>> steps = new ArrayList<>();
 
         // Step 1: Invalidate L1 + L2 -> DB_MISS
         cacheService.invalidateTenantConfig(tenantId);
         long t1 = System.nanoTime();
         TenantSettings s1 = cacheService.getTenantSettings(tenantId);
-        long lat1 = Math.max(1, (System.nanoTime() - t1) / 1_000_000);
+        double lat1 = Math.round(((System.nanoTime() - t1) / 1_000_000.0) * 100.0) / 100.0;
         Map<String, Object> step1 = new LinkedHashMap<>();
         step1.put("step", 1);
         step1.put("source", "DB_MISS");
@@ -212,7 +263,7 @@ public class InspectorProbeController {
         cacheService.invalidateL1Only(tenantId);
         long t2 = System.nanoTime();
         TenantSettings s2 = cacheService.getTenantSettings(tenantId);
-        long lat2 = Math.max(1, (System.nanoTime() - t2) / 1_000_000);
+        double lat2 = Math.round(((System.nanoTime() - t2) / 1_000_000.0) * 100.0) / 100.0;
         Map<String, Object> step2 = new LinkedHashMap<>();
         step2.put("step", 2);
         step2.put("source", "L2_HIT");
@@ -223,7 +274,7 @@ public class InspectorProbeController {
         // Step 3: Direct JVM memory read -> L1_HIT
         long t3 = System.nanoTime();
         TenantSettings s3 = cacheService.getTenantSettings(tenantId);
-        long lat3 = (System.nanoTime() - t3) / 1_000_000;
+        double lat3 = Math.round(((System.nanoTime() - t3) / 1_000_000.0) * 100.0) / 100.0;
         Map<String, Object> step3 = new LinkedHashMap<>();
         step3.put("step", 3);
         step3.put("source", "L1_HIT");
@@ -233,50 +284,71 @@ public class InspectorProbeController {
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("tenantId", tenantId.toString());
+        result.put("targetSlug", targetTenant.getSlug());
         result.put("cacheKey", cacheService.getConfigCacheKey(tenantId));
         result.put("steps", steps);
 
         return ResponseEntity.ok(result);
     }
 
+    public record NoisyNeighborTestRequest(
+            String noisySlug,
+            Integer noisyRequests,
+            String normalSlug,
+            Integer normalRequests
+    ) {}
+
     /**
      * K3: Noisy Neighbor Simulation Test (Admin Only)
-     * Fires 45 bursts against t-noisy (limit 30 rpm) -> 30 OK, 15 Blocked (429).
-     * Fires 15 bursts against t-acme (limit 120 rpm) -> 15 OK, 0 Blocked.
-     * Updates Redis and TenantTelemetryService in real-time.
+     * Fires requests against noisyTenant and normalTenant concurrently.
+     * Updates Redis Token Bucket and TenantTelemetryService in real-time.
      */
     @PostMapping("/api/admin/inspector/noisy-neighbor-test")
-    public ResponseEntity<Map<String, Object>> runNoisyNeighborTest() {
+    public ResponseEntity<Map<String, Object>> runNoisyNeighborTest(@RequestBody(required = false) NoisyNeighborTestRequest req) {
         TenantInfo info = TenantContext.get();
         if (info == null || !info.systemAdmin()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Platform Admin privileges required");
         }
 
-        Tenant noisyTenant = tenantRepository.findBySlug("t-noisy")
+        String noisySlug = (req != null && req.noisySlug() != null && !req.noisySlug().isBlank())
+                ? req.noisySlug().trim().toLowerCase()
+                : "t-noisy";
+        int noisyCount = (req != null && req.noisyRequests() != null)
+                ? Math.max(5, Math.min(200, req.noisyRequests()))
+                : 45;
+
+        String normalSlug = (req != null && req.normalSlug() != null && !req.normalSlug().isBlank())
+                ? req.normalSlug().trim().toLowerCase()
+                : "t-acme";
+        int normalCount = (req != null && req.normalRequests() != null)
+                ? Math.max(5, Math.min(200, req.normalRequests()))
+                : 15;
+
+        Tenant noisyTenant = tenantRepository.findBySlug(noisySlug)
                 .orElseGet(() -> tenantRepository.findAll().stream()
                         .filter(t -> t.getRateLimitRpm() <= 30)
                         .findFirst()
                         .orElse(null));
 
-        Tenant acmeTenant = tenantRepository.findBySlug("t-acme")
+        Tenant normalTenant = tenantRepository.findBySlug(normalSlug)
                 .orElseGet(() -> tenantRepository.findAll().stream()
                         .filter(t -> t.getRateLimitRpm() > 30)
                         .findFirst()
                         .orElse(null));
 
-        if (noisyTenant == null || acmeTenant == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "TENANTS_NOT_FOUND", "Need both t-noisy and t-acme to run noisy neighbor test");
+        if (noisyTenant == null || normalTenant == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "TENANTS_NOT_FOUND", "Cần 2 tổ chức hợp lệ để chạy kiểm định dội tải");
         }
 
         // 1. Reset Redis rate limit token bucket for reproducible benchmark
         String noisyKey = "ratelimit:tenant:" + noisyTenant.getId();
-        String acmeKey = "ratelimit:tenant:" + acmeTenant.getId();
+        String normalKey = "ratelimit:tenant:" + normalTenant.getId();
         try {
             redisTemplate.delete(noisyKey);
-            redisTemplate.delete(acmeKey);
+            redisTemplate.delete(normalKey);
         } catch (Exception ignored) {}
 
-        // 2. Simulate 45 bursts against t-noisy (capacity = 30 rpm)
+        // 2. Simulate bursts against noisyTenant
         int noisyCapacity = noisyTenant.getRateLimitRpm();
         double noisyRefill = noisyCapacity / 60.0;
         List<Integer> noisyStatuses = new ArrayList<>();
@@ -284,7 +356,7 @@ public class InspectorProbeController {
         int noisySuccess = 0;
         int noisyBlocked = 0;
 
-        for (int i = 0; i < 45; i++) {
+        for (int i = 0; i < noisyCount; i++) {
             long reqStart = System.nanoTime();
             long nowMs = System.currentTimeMillis();
             int status = 200;
@@ -302,7 +374,6 @@ public class InspectorProbeController {
                     status = 429;
                 }
             } catch (Exception ex) {
-                // fallback
                 if (i >= noisyCapacity) status = 429;
             }
 
@@ -320,15 +391,15 @@ public class InspectorProbeController {
             }
         }
 
-        // 3. Simulate 15 requests against t-acme (capacity = 120 rpm)
-        int acmeCapacity = acmeTenant.getRateLimitRpm();
-        double acmeRefill = acmeCapacity / 60.0;
-        List<Integer> acmeStatuses = new ArrayList<>();
-        List<Long> acmeLatencies = new ArrayList<>();
-        int acmeSuccess = 0;
-        int acmeBlocked = 0;
+        // 3. Simulate requests against normalTenant
+        int normalCapacity = normalTenant.getRateLimitRpm();
+        double normalRefill = normalCapacity / 60.0;
+        List<Integer> normalStatuses = new ArrayList<>();
+        List<Long> normalLatencies = new ArrayList<>();
+        int normalSuccess = 0;
+        int normalBlocked = 0;
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < normalCount; i++) {
             long reqStart = System.nanoTime();
             long nowMs = System.currentTimeMillis();
             int status = 200;
@@ -336,9 +407,9 @@ public class InspectorProbeController {
                 @SuppressWarnings("unchecked")
                 List<Long> res = redisTemplate.execute(
                         rateLimitScript,
-                        Collections.singletonList(acmeKey),
-                        String.valueOf(acmeCapacity),
-                        String.valueOf(acmeRefill),
+                        Collections.singletonList(normalKey),
+                        String.valueOf(normalCapacity),
+                        String.valueOf(normalRefill),
                         String.valueOf(nowMs),
                         "1"
                 );
@@ -348,53 +419,55 @@ public class InspectorProbeController {
             } catch (Exception ignored) {}
 
             long elapsed = Math.max(1, (System.nanoTime() - reqStart) / 1_000_000);
-            acmeLatencies.add(elapsed);
-            acmeStatuses.add(status);
+            normalLatencies.add(elapsed);
+            normalStatuses.add(status);
 
             if (status == 429) {
-                acmeBlocked++;
-                telemetryService.recordBlocked429(acmeTenant.getId(), acmeTenant.getSlug());
+                normalBlocked++;
+                cacheService.incrementBlocked429Count(normalTenant.getId());
+                telemetryService.recordBlocked429(normalTenant.getId(), normalTenant.getSlug());
             } else {
-                acmeSuccess++;
-                telemetryService.recordRequest(acmeTenant.getId(), acmeTenant.getSlug(), 200, elapsed, "L1_HIT");
+                normalSuccess++;
+                telemetryService.recordRequest(normalTenant.getId(), normalTenant.getSlug(), 200, elapsed, "L1_HIT");
             }
         }
 
         // Calculate percentiles
         Collections.sort(noisyLatencies);
-        Collections.sort(acmeLatencies);
+        Collections.sort(normalLatencies);
 
         long noisyP50 = !noisyLatencies.isEmpty() ? noisyLatencies.get(noisyLatencies.size() / 2) : 2;
         long noisyP95 = !noisyLatencies.isEmpty() ? noisyLatencies.get((int) (noisyLatencies.size() * 0.95)) : 5;
 
-        long acmeP50 = !acmeLatencies.isEmpty() ? acmeLatencies.get(acmeLatencies.size() / 2) : 1;
-        long acmeP95 = !acmeLatencies.isEmpty() ? acmeLatencies.get((int) (acmeLatencies.size() * 0.95)) : 3;
+        long normalP50 = !normalLatencies.isEmpty() ? normalLatencies.get(normalLatencies.size() / 2) : 1;
+        long normalP95 = !normalLatencies.isEmpty() ? normalLatencies.get((int) (normalLatencies.size() * 0.95)) : 3;
 
         Map<String, Object> noisyMap = new LinkedHashMap<>();
         noisyMap.put("slug", noisyTenant.getSlug());
         noisyMap.put("name", noisyTenant.getName());
         noisyMap.put("limitRpm", noisyCapacity);
-        noisyMap.put("totalSent", 45);
+        noisyMap.put("totalSent", noisyCount);
         noisyMap.put("successCount", noisySuccess);
         noisyMap.put("blockedCount", noisyBlocked);
         noisyMap.put("p50Ms", noisyP50);
         noisyMap.put("p95Ms", noisyP95);
         noisyMap.put("statuses", noisyStatuses);
 
-        Map<String, Object> acmeMap = new LinkedHashMap<>();
-        acmeMap.put("slug", acmeTenant.getSlug());
-        acmeMap.put("name", acmeTenant.getName());
-        acmeMap.put("limitRpm", acmeCapacity);
-        acmeMap.put("totalSent", 15);
-        acmeMap.put("successCount", acmeSuccess);
-        acmeMap.put("blockedCount", acmeBlocked);
-        acmeMap.put("p50Ms", acmeP50);
-        acmeMap.put("p95Ms", acmeP95);
-        acmeMap.put("statuses", acmeStatuses);
+        Map<String, Object> normalMap = new LinkedHashMap<>();
+        normalMap.put("slug", normalTenant.getSlug());
+        normalMap.put("name", normalTenant.getName());
+        normalMap.put("limitRpm", normalCapacity);
+        normalMap.put("totalSent", normalCount);
+        normalMap.put("successCount", normalSuccess);
+        normalMap.put("blockedCount", normalBlocked);
+        normalMap.put("p50Ms", normalP50);
+        normalMap.put("p95Ms", normalP95);
+        normalMap.put("statuses", normalStatuses);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("noisy", noisyMap);
-        result.put("acme", acmeMap);
+        result.put("normal", normalMap);
+        result.put("acme", normalMap); // backward compatibility
 
         return ResponseEntity.ok(result);
     }
