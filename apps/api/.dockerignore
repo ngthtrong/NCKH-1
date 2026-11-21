@@ -1,4 +1,5 @@
 target
+src/test
 .git
 .idea
 *.log
