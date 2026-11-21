@@ -579,7 +579,7 @@ export default function App() {
       </div>
 
       {/* Modern Architecture Telemetry Bar / Drawer */}
-      <InspectorDrawer />
+      <InspectorDrawer currentTenant={me} />
     </div>
   );
 }

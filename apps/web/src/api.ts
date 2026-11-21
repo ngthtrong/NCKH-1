@@ -3,11 +3,14 @@ import type {
   AuthUser,
   Board,
   BoardColumn,
+  CacheProbeResult,
   Card,
   DiscoveredTenant,
   InspectorTelemetry,
   MetricsOverview,
+  NoisyNeighborTestResult,
   PublicBranding,
+  RlsProbeResult,
   TenantInfo,
   TenantMember,
   TenantSettings,
@@ -257,4 +260,10 @@ export const api = {
       `/api/cards/${cardId}/move`,
       { method: 'PATCH', body: JSON.stringify(payload) }
     ),
+
+  // Architecture Dev Inspector Probes
+  probeRls: () => request<RlsProbeResult>('/api/inspector/rls-probe'),
+  probeCache: () => request<CacheProbeResult>('/api/inspector/cache-probe', { method: 'POST' }),
+  runNoisyNeighborTest: () =>
+    request<NoisyNeighborTestResult>('/api/admin/inspector/noisy-neighbor-test', { method: 'POST' }),
 };

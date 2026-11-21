@@ -171,3 +171,44 @@ export interface MetricsOverview {
   tenants?: TenantMetricsStat[];
   byTenant: TenantMetricsStat[];
 }
+
+export interface RlsProbeResult {
+  dbRole: string;
+  rlsForced: boolean;
+  withoutContextCount: number;
+  withContextCount: number;
+  queryTimeMs: number;
+  tenantId: string;
+  sqlWithoutContext: string;
+  sqlWithContext: string;
+}
+
+export interface CacheProbeStep {
+  step: number;
+  source: 'DB_MISS' | 'L2_HIT' | 'L1_HIT';
+  latencyMs: number;
+  description: string;
+}
+
+export interface CacheProbeResult {
+  tenantId: string;
+  cacheKey: string;
+  steps: CacheProbeStep[];
+}
+
+export interface NoisyNeighborTenantResult {
+  slug: string;
+  name: string;
+  limitRpm: number;
+  totalSent: number;
+  successCount: number;
+  blockedCount: number;
+  p50Ms: number;
+  p95Ms: number;
+  statuses: number[];
+}
+
+export interface NoisyNeighborTestResult {
+  noisy: NoisyNeighborTenantResult;
+  acme: NoisyNeighborTenantResult;
+}

@@ -38,6 +38,12 @@ public class JwtTenantFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
+        // Handle CORS Preflight immediately
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         // Public endpoints (Edge branding, self-service onboarding, login, member registration, health)
         if (path.equals("/api/auth/login")
                 || path.equals("/api/auth/register-member")
@@ -86,6 +92,30 @@ public class JwtTenantFilter extends OncePerRequestFilter {
             try {
                 TenantContext.set(info);
                 MDC.put("tenant_id", "PLATFORM_ADMIN");
+                filterChain.doFilter(request, response);
+            } finally {
+                TenantContext.clear();
+                MDC.remove("tenant_id");
+            }
+            return;
+        }
+
+        // Inspector Probes (Data Plane & Control Plane verification)
+        if (path.startsWith("/api/inspector/")) {
+            if (!info.systemAdmin() && (info.tenantId() == null || info.slug() == null)) {
+                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Tenant or Admin context missing in JWT");
+                return;
+            }
+            if (!info.systemAdmin()) {
+                String hostSubdomain = extractSubdomain(request.getHeader("Host"));
+                if (hostSubdomain != null && !hostSubdomain.equalsIgnoreCase(info.slug())) {
+                    sendError(response, HttpServletResponse.SC_FORBIDDEN,
+                            "Subdomain mismatch: Host subdomain '" + hostSubdomain + "' does not match JWT slug '" + info.slug() + "'");
+                    return;
+                }
+            }
+            try {
+                TenantContext.set(info);
                 filterChain.doFilter(request, response);
             } finally {
                 TenantContext.clear();

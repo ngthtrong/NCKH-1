@@ -107,6 +107,15 @@ public class TenantConfigCacheService {
         }
     }
 
+    public void invalidateL1Only(UUID tenantId) {
+        l1ConfigCache.invalidate(tenantId);
+        l1RpmCache.invalidate(tenantId);
+    }
+
+    public String getConfigCacheKey(UUID tenantId) {
+        return configKey(tenantId);
+    }
+
     public void onConfigInvalidateMessage(String tenantIdStr) {
         try {
             UUID tenantId = UUID.fromString(tenantIdStr.replace("\"", "").trim());
