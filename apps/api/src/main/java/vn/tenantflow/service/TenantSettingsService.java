@@ -29,7 +29,7 @@ public class TenantSettingsService {
         if (s.inviteCode() == null || s.inviteCode().isBlank()) {
             return new TenantSettings(
                     s.theme(), s.wipMode(), s.defaultWipLimit(), s.cardDisplayMode(),
-                    s.defaultColumns(), s.customFields(), code
+                    s.cardDensity(), s.defaultColumns(), s.customFields(), code
             );
         }
         return s;
@@ -65,9 +65,10 @@ public class TenantSettingsService {
         String code = (updated.inviteCode() != null && !updated.inviteCode().isBlank())
                 ? updated.inviteCode().trim().toUpperCase()
                 : updated.effectiveInviteCode(info.slug());
+        String density = updated.cardDensity() != null ? updated.cardDensity() : updated.cardDisplayMode();
         TenantSettings toSave = new TenantSettings(
                 updated.theme(), updated.wipMode(), updated.defaultWipLimit(),
-                updated.cardDisplayMode(), updated.defaultColumns(), updated.customFields(), code
+                updated.cardDisplayMode(), density, updated.defaultColumns(), updated.customFields(), code
         );
         tenant.setSettings(toSave);
         tenantRepository.save(tenant);

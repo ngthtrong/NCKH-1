@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: tenantflow-kanban-api
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kanban_saas_db}
     username: ${SPRING_DATASOURCE_USERNAME:kanban_app_user}

@@ -1,18 +1,44 @@
 package vn.tenantflow.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record TenantSettings(
         Theme theme,
         String wipMode,
         Integer defaultWipLimit,
         String cardDisplayMode,
+        String cardDensity,
         List<String> defaultColumns,
         List<CustomFieldDef> customFields,
         String inviteCode
 ) {
+    public TenantSettings {
+        if (cardDensity == null && cardDisplayMode != null) {
+            cardDensity = cardDisplayMode;
+        }
+        if (cardDisplayMode == null && cardDensity != null) {
+            cardDisplayMode = cardDensity;
+        }
+    }
+
+    public TenantSettings(
+            Theme theme,
+            String wipMode,
+            Integer defaultWipLimit,
+            String cardDisplayMode,
+            List<String> defaultColumns,
+            List<CustomFieldDef> customFields,
+            String inviteCode
+    ) {
+        this(theme, wipMode, defaultWipLimit, cardDisplayMode, cardDisplayMode, defaultColumns, customFields, inviteCode);
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record Theme(String primary, String accent, String logoText, String tagline) {}
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record CustomFieldDef(
             String key,
             String label,
