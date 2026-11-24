@@ -283,7 +283,7 @@ export default function App() {
         <div className="h-13 px-3.5 border-b border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs text-white shrink-0 shadow-sm"
+              className="h-8 px-2.5 min-w-[32px] rounded-lg flex items-center justify-center font-black text-xs text-white shrink-0 shadow-sm"
               style={{ backgroundColor: 'var(--color-primary, #0d6efd)' }}
             >
               {me.systemAdmin ? <Layers className="w-4 h-4" /> : logoText}
@@ -476,7 +476,7 @@ export default function App() {
           {/* Left: Organization context & Tier */}
           <div className="flex items-center gap-2.5 min-w-0">
             <div
-              className="w-7 h-7 rounded-lg text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs"
+              className="h-7 px-2.5 min-w-[32px] rounded-lg text-white font-black text-xs tracking-wider flex items-center justify-center shrink-0 shadow-xs"
               style={{ backgroundColor: 'var(--color-primary, #0d6efd)' }}
             >
               {me.systemAdmin ? <Layers className="w-4 h-4" /> : logoText}

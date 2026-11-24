@@ -732,7 +732,7 @@ export const KanbanView: React.FC<Props> = ({
                         setDragOverColId(null);
                       }}
                       className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-150 cursor-grab active:cursor-grabbing select-none ${
-                        isCompact ? 'p-2.5 space-y-1.5' : 'p-3.5 space-y-2'
+                        isCompact ? 'p-2.5 space-y-1.5' : 'p-4 space-y-2.5'
                       } ${
                         isOverLimitCard && settings.wipMode === 'WARN'
                           ? 'border-l-4 !border-l-amber-500 bg-amber-50/20'
@@ -749,7 +749,11 @@ export const KanbanView: React.FC<Props> = ({
                               VƯỢT WIP
                             </span>
                           )}
-                          <h4 className="font-bold text-slate-900 text-xs leading-snug break-words">
+                          <h4
+                            className={`font-bold text-slate-900 leading-snug break-words ${
+                              isCompact ? 'text-xs' : 'text-sm'
+                            }`}
+                          >
                             {card.title}
                           </h4>
                         </div>
@@ -773,20 +777,14 @@ export const KanbanView: React.FC<Props> = ({
 
                       {/* Display Mode: Description (hidden when isCompact) */}
                       {!isCompact && card.description && (
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
                           {card.description}
                         </p>
                       )}
 
-                      {/* Extended JSONB Field Badges (Formatted & Styled) */}
+                      {/* Extended JSONB Field Badges (Formatted & Styled, No Horizontal Scroll) */}
                       {card.customFields && Object.keys(card.customFields).length > 0 && (
-                        <div
-                          className={
-                            isCompact
-                              ? 'flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap pt-0.5'
-                              : 'flex flex-wrap gap-1 pt-0.5'
-                          }
-                        >
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
                           {Object.entries(card.customFields).map(([k, v]) => {
                             const def = settings.customFields.find((f) => f.key === k);
                             const parsed = formatCustomFieldValue(k, v, def?.type);
@@ -800,7 +798,9 @@ export const KanbanView: React.FC<Props> = ({
                             return (
                               <span
                                 key={k}
-                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border shrink-0 ${badgeStyle}`}
+                                className={`inline-flex items-center gap-1 rounded font-medium border ${
+                                  isCompact ? 'text-[11px] px-1.5 py-0.5' : 'text-xs px-2.5 py-1'
+                                } ${badgeStyle}`}
                               >
                                 <span className="opacity-70">{def ? def.label : k}:</span>
                                 {parsed.isUrl ? (
@@ -824,12 +824,28 @@ export const KanbanView: React.FC<Props> = ({
                       )}
 
                       {/* Card Footer: Assignee */}
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px] text-slate-500">
-                        <div className="flex items-center gap-1.5 truncate max-w-[180px]">
-                          <div className="w-4 h-4 rounded-full bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center text-[9px] font-bold shrink-0">
+                      <div
+                        className={`flex items-center justify-between text-slate-500 ${
+                          isCompact
+                            ? 'pt-1 text-[10px]'
+                            : 'pt-2 border-t border-slate-200 text-xs'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 truncate max-w-[200px]">
+                          <div
+                            className={`rounded-full bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center font-bold shrink-0 ${
+                              isCompact ? 'w-3.5 h-3.5 text-[8px]' : 'w-4.5 h-4.5 text-[9px]'
+                            }`}
+                          >
                             {assignee ? assignee.charAt(0).toUpperCase() : 'U'}
                           </div>
-                          <span className="truncate text-slate-600 font-medium">{assignee || 'Chưa phân công'}</span>
+                          <span
+                            className={`truncate font-medium ${
+                              isCompact ? 'text-slate-600 text-[10px]' : 'text-slate-700 text-xs'
+                            }`}
+                          >
+                            {assignee || 'Chưa phân công'}
+                          </span>
                         </div>
                       </div>
                     </div>
