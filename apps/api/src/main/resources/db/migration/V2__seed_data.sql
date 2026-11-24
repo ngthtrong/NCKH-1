@@ -3,15 +3,15 @@
 -- Strict 1-to-1 User-Tenant binding (Password: Password123!)
 -- =============================================================================
 
--- Tenant 1: Acme Software (PRO, 120 rpm, STRICT WIP)
+-- Tenant 1: Acme Software (ENTERPRISE, 300 rpm, STRICT WIP)
 INSERT INTO tenants (id, slug, name, tier, rate_limit_rpm, max_members, status, settings)
 VALUES (
     '11111111-1111-1111-1111-111111111111',
     't-acme',
     'Acme Software',
-    'PRO',
-    120,
-    50,
+    'ENTERPRISE',
+    300,
+    100,
     'ACTIVE',
     '{
       "theme": {
@@ -23,6 +23,7 @@ VALUES (
       "wipMode": "STRICT",
       "defaultWipLimit": 2,
       "cardDisplayMode": "FULL",
+      "cardDensity": "FULL",
       "defaultColumns": ["Backlog", "In Progress", "Code Review", "Done"],
       "customFields": [
         { "key": "story_points", "label": "Story Points", "type": "NUMBER", "required": true, "options": [] },
@@ -52,6 +53,7 @@ VALUES (
       "wipMode": "WARN",
       "defaultWipLimit": 2,
       "cardDisplayMode": "COMPACT",
+      "cardDensity": "COMPACT",
       "defaultColumns": ["Ý tưởng", "Sản xuất", "Duyệt nội dung", "Xuất bản"],
       "customFields": [
         { "key": "channel", "label": "Kênh phát hành", "type": "SELECT", "required": false, "options": ["Facebook", "TikTok", "YouTube"] },
@@ -81,6 +83,7 @@ VALUES (
       "wipMode": "OFF",
       "defaultWipLimit": null,
       "cardDisplayMode": "COMPACT",
+      "cardDensity": "COMPACT",
       "defaultColumns": ["To Do", "Doing", "Done"],
       "customFields": []
     }'::jsonb
@@ -140,6 +143,7 @@ VALUES
     ('cb000001-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'bc000001-0000-0000-0000-000000000001', 'bbbbbbbb-3333-3333-3333-333333333333', 'Video giới thiệu Bộ sưu tập Thu Đông', 'Quay dựng TVC 45s cho chiến dịch mới', 0, 1, '{"channel": "TikTok", "budget_vnd": 35000000, "publish_date": "2026-11-25"}'::jsonb),
     ('cb000002-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222', 'bc000002-0000-0000-0000-000000000002', 'bbbbbbbb-1111-1111-1111-111111111111', 'Thiết kế Banner Landing Page', 'Bộ nhận diện màu cam chủ đạo Lotus', 0, 1, '{"channel": "Facebook", "budget_vnd": 12000000, "publish_date": "2026-11-22"}'::jsonb),
     ('cb000003-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'bc000002-0000-0000-0000-000000000002', 'bbbbbbbb-3333-3333-3333-333333333333', 'Video Review Sản phẩm mới', 'Hợp tác KOL quay YouTube Shorts', 1, 1, '{"channel": "YouTube", "budget_vnd": 25000000, "publish_date": "2026-11-28"}'::jsonb),
+    ('cb000005-0000-0000-0000-000000000005', '22222222-2222-2222-2222-222222222222', 'bc000002-0000-0000-0000-000000000002', 'bbbbbbbb-3333-3333-3333-333333333333', 'Thu âm Podcast Phỏng vấn Chuyên gia', 'Tập 12 chuyên đề Content Creator 2026', 2, 1, '{"channel": "YouTube", "budget_vnd": 18000000, "publish_date": "2026-11-29"}'::jsonb),
     ('cb000004-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', 'bc000004-0000-0000-0000-000000000004', 'bbbbbbbb-1111-1111-1111-111111111111', 'Bản tin Email Khách hàng Thân thiết', 'Đã gửi đợt 1 tới 15.000 người đăng ký', 0, 1, '{"channel": "Facebook", "budget_vnd": 5000000, "publish_date": "2026-11-15"}'::jsonb);
 
 -- =============================================================================

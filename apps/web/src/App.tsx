@@ -75,6 +75,8 @@ function applyThemeCss(settings: TenantSettings | null) {
   document.documentElement.style.setProperty('--color-primary', primary);
   document.documentElement.style.setProperty('--color-accent', accent);
   document.documentElement.style.setProperty('--color-primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+  document.documentElement.style.setProperty('--brand-primary', primary);
+  document.documentElement.style.setProperty('--brand-accent', accent);
   document.documentElement.style.setProperty('--brand-sidebar-bg', `rgb(${bgR}, ${bgG}, ${bgB})`);
   document.documentElement.style.setProperty('--brand-sidebar-border', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.22)`);
   document.documentElement.style.setProperty('--brand-active-bg', `linear-gradient(135deg, ${primary} 0%, ${accent} 100%)`);
@@ -554,6 +556,8 @@ export default function App() {
               settings={settings}
               selectedBoardId={selectedBoardId}
               onSelectBoardId={setSelectedBoardId}
+              tenantSlug={me.slug}
+              tier={me.tier}
             />
           )}
           {activeTab === 'members' && (

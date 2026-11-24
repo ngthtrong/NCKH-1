@@ -16,6 +16,7 @@ export interface TenantSettings {
   wipMode: 'STRICT' | 'WARN' | 'OFF';
   defaultWipLimit: number | null;
   cardDisplayMode: 'FULL' | 'COMPACT';
+  cardDensity?: 'FULL' | 'COMPACT';
   defaultColumns: string[];
   customFields: CustomFieldDef[];
   inviteCode?: string;

@@ -22,6 +22,63 @@ interface Props {
   settings: TenantSettings;
   selectedBoardId?: string;
   onSelectBoardId?: (id: string) => void;
+  tenantSlug?: string;
+  tier?: string;
+}
+
+function formatCustomFieldValue(key: string, value: any, type?: string): {
+  formatted: string;
+  isUrl: boolean;
+  href?: string;
+  isCurrency?: boolean;
+  isDate?: boolean;
+} {
+  if (value === null || value === undefined || value === '') {
+    return { formatted: '—', isUrl: false };
+  }
+  const valStr = String(value).trim();
+  if (valStr.startsWith('http://') || valStr.startsWith('https://')) {
+    let display = valStr.replace(/^https?:\/\//i, '');
+    if (display.length > 24) display = display.slice(0, 22) + '…';
+    return { formatted: display, isUrl: true, href: valStr };
+  }
+  const lowerKey = key.toLowerCase();
+  const isCurrency =
+    lowerKey.includes('ngan_sach') ||
+    lowerKey.includes('budget') ||
+    lowerKey.includes('chi_phi') ||
+    lowerKey.includes('price') ||
+    lowerKey.includes('cost');
+
+  if (type === 'NUMBER' || isCurrency) {
+    const num = Number(valStr);
+    if (!isNaN(num)) {
+      const formatted = num.toLocaleString('vi-VN');
+      return {
+        formatted: isCurrency ? `${formatted} đ` : formatted,
+        isUrl: false,
+        isCurrency: true,
+      };
+    }
+  }
+
+  if (type === 'DATE' || /^\d{4}-\d{2}-\d{2}$/.test(valStr)) {
+    const parts = valStr.split('-');
+    if (parts.length === 3) {
+      return { formatted: `${parts[2]}/${parts[1]}/${parts[0]}`, isUrl: false, isDate: true };
+    }
+  }
+
+  return { formatted: valStr, isUrl: false };
+}
+
+function getCustomFieldBadgeStyle(type?: string, isCurrency?: boolean, isUrl?: boolean, isDate?: boolean): string {
+  if (isUrl) return 'bg-sky-50 text-sky-700 border-sky-200 hover:text-sky-900 hover:bg-sky-100 hover:underline cursor-pointer';
+  if (isCurrency) return 'bg-emerald-50 text-emerald-800 border-emerald-200 font-mono';
+  if (type === 'NUMBER') return 'bg-blue-50 text-blue-700 border-blue-200 font-mono';
+  if (type === 'SELECT') return 'bg-purple-50 text-purple-700 border-purple-200';
+  if (type === 'DATE' || isDate) return 'bg-amber-50 text-amber-800 border-amber-200 font-mono';
+  return 'bg-slate-100 text-slate-700 border-slate-200';
 }
 
 export const KanbanView: React.FC<Props> = ({
@@ -29,7 +86,11 @@ export const KanbanView: React.FC<Props> = ({
   settings,
   selectedBoardId: propBoardId,
   onSelectBoardId,
+  tenantSlug,
+  tier,
 }) => {
+  const isCompact = settings.cardDensity === 'COMPACT' || settings.cardDisplayMode === 'COMPACT';
+  const brandPrimary = settings.theme?.primary || 'var(--brand-primary, #0d6efd)';
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoardId, setSelectedBoardId] = useState<string>(propBoardId || '');
   const [columns, setColumns] = useState<BoardColumn[]>([]);
@@ -439,6 +500,72 @@ export const KanbanView: React.FC<Props> = ({
         </form>
       </div>
 
+      {/* Policy Status Bar (Trụ cột K4: Nhận diện & Chính sách vận hành Tenant) */}
+      <div
+        className="px-3.5 py-2 rounded-xl border flex flex-wrap items-center justify-between gap-2.5 text-xs shadow-2xs shrink-0 transition-all"
+        style={{
+          backgroundColor: `${brandPrimary}0D`,
+          borderColor: `${brandPrimary}33`,
+        }}
+      >
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Tenant Identity & Tier Badge */}
+          <div className="flex items-center gap-2">
+            <span
+              className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+              style={{ backgroundColor: brandPrimary }}
+            />
+            <span className="font-bold text-slate-900 font-mono">
+              {tenantSlug ? `@${tenantSlug}` : 'Tenant Workspace'}
+            </span>
+            {tier && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-slate-900 text-white shadow-2xs">
+                {tier}
+              </span>
+            )}
+          </div>
+
+          <span className="text-slate-300 hidden sm:inline">|</span>
+
+          {/* WIP Policy Pill */}
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="text-slate-500 font-medium">Chính sách WIP:</span>
+            <span
+              className={`px-2 py-0.5 rounded-md font-mono font-bold border ${
+                settings.wipMode === 'STRICT'
+                  ? 'bg-rose-50 text-rose-700 border-rose-300'
+                  : settings.wipMode === 'WARN'
+                  ? 'bg-amber-50 text-amber-800 border-amber-300'
+                  : 'bg-slate-100 text-slate-600 border-slate-200'
+              }`}
+            >
+              {settings.wipMode}
+            </span>
+            <span className="text-slate-400 text-[10px] hidden md:inline">
+              ({settings.wipMode === 'STRICT' ? 'Chặn cưỡng chế HTTP 422 khi vượt' : settings.wipMode === 'WARN' ? 'Cảnh báo mềm & ghi nhận' : 'Không kiểm soát'})
+            </span>
+          </div>
+
+          <span className="text-slate-300 hidden sm:inline">|</span>
+
+          {/* Density Pill */}
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="text-slate-500 font-medium">Mật độ hiển thị:</span>
+            <span className="px-2 py-0.5 rounded-md font-mono font-bold bg-white border border-slate-200 text-slate-800 shadow-2xs">
+              {isCompact ? 'COMPACT (Thu gọn)' : 'FULL (Chi tiết)'}
+            </span>
+          </div>
+        </div>
+
+        {/* Default WIP limit indicator */}
+        <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium ml-auto">
+          <span>Ngưỡng WIP mặc định:</span>
+          <span className="font-mono font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
+            {settings.defaultWipLimit ? `${settings.defaultWipLimit} thẻ/cột` : 'Không giới hạn'}
+          </span>
+        </div>
+      </div>
+
       {/* Floating Professional Toast (Top Right) */}
       {toast && (
         <div className="fixed top-16 right-6 z-50 max-w-sm w-full animate-in slide-in-from-top-4 duration-300">
@@ -501,7 +628,10 @@ export const KanbanView: React.FC<Props> = ({
                 if (dragOverColId === col.id) setDragOverColId(null);
               }}
               onDrop={() => handleDropOnColumn(col.id)}
-              className={`w-72 sm:w-80 shrink-0 rounded-2xl border p-3 flex flex-col gap-2.5 transition-all duration-200 ${
+              style={{
+                borderTopColor: brandPrimary,
+              }}
+              className={`w-72 sm:w-80 shrink-0 rounded-2xl border border-t-4 p-3 flex flex-col gap-2.5 transition-all duration-200 ${
                 isDragTarget
                   ? 'bg-indigo-50/70 border-indigo-400 ring-2 ring-indigo-400/30'
                   : isWarning
@@ -511,7 +641,7 @@ export const KanbanView: React.FC<Props> = ({
             >
               {/* Column Header */}
               <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-200/70">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 flex-wrap">
                   <h3 className="font-bold text-slate-800 text-xs truncate">{col.name}</h3>
 
                   {/* WIP Count Badge */}
@@ -527,6 +657,18 @@ export const KanbanView: React.FC<Props> = ({
                     {colCards.length}
                     {hasLimit ? `/${col.wipLimit}` : ''}
                   </span>
+
+                  {/* Explicit Policy Mode Indicator Badges */}
+                  {settings.wipMode === 'STRICT' && col.wipLimit !== null && colCards.length >= col.wipLimit && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse whitespace-nowrap">
+                      ĐÃ ĐẦY • STRICT
+                    </span>
+                  )}
+                  {settings.wipMode === 'WARN' && col.wipLimit !== null && colCards.length > col.wipLimit && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">
+                      VƯỢT NGƯỠNG • WARN
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -572,9 +714,13 @@ export const KanbanView: React.FC<Props> = ({
 
               {/* Card List with Dnd Elevation */}
               <div className="space-y-2 min-h-[90px]">
-                {colCards.map((card) => {
+                {colCards.map((card, cardIdx) => {
                   const assignee = memberName(card.assigneeId);
                   const isBeingDragged = draggingCard?.id === card.id;
+                  const isOverLimitCard =
+                    hasLimit &&
+                    cardIdx >= col.wipLimit! &&
+                    (settings.wipMode === 'WARN' || settings.wipMode === 'STRICT');
 
                   return (
                     <div
@@ -585,15 +731,28 @@ export const KanbanView: React.FC<Props> = ({
                         setDraggingCard(null);
                         setDragOverColId(null);
                       }}
-                      className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-150 cursor-grab active:cursor-grabbing p-3 space-y-2 select-none ${
+                      className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-150 cursor-grab active:cursor-grabbing select-none ${
+                        isCompact ? 'p-2.5 space-y-1.5' : 'p-3.5 space-y-2'
+                      } ${
+                        isOverLimitCard && settings.wipMode === 'WARN'
+                          ? 'border-l-4 !border-l-amber-500 bg-amber-50/20'
+                          : ''
+                      } ${
                         isBeingDragged ? 'opacity-40 scale-95 border-dashed border-indigo-400' : ''
                       }`}
                     >
                       {/* Card Header: Title & Actions */}
                       <div className="flex items-start justify-between gap-1.5">
-                        <h4 className="font-bold text-slate-900 text-xs leading-snug break-words">
-                          {card.title}
-                        </h4>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {isOverLimitCard && settings.wipMode === 'WARN' && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shrink-0">
+                              VƯỢT WIP
+                            </span>
+                          )}
+                          <h4 className="font-bold text-slate-900 text-xs leading-snug break-words">
+                            {card.title}
+                          </h4>
+                        </div>
                         <div className="flex items-center gap-0.5 shrink-0 opacity-70 hover:opacity-100">
                           <button
                             onClick={() => openEditCard(card)}
@@ -612,41 +771,57 @@ export const KanbanView: React.FC<Props> = ({
                         </div>
                       </div>
 
-                      {/* Display Mode FULL: Description */}
-                      {settings.cardDisplayMode === 'FULL' && card.description && (
+                      {/* Display Mode: Description (hidden when isCompact) */}
+                      {!isCompact && card.description && (
                         <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                           {card.description}
                         </p>
                       )}
 
-                      {/* Display Mode FULL: Extended JSONB Field Badges */}
-                      {settings.cardDisplayMode === 'FULL' &&
-                        card.customFields &&
-                        Object.keys(card.customFields).length > 0 && (
-                          <div className="flex flex-wrap gap-1 pt-0.5">
-                            {Object.entries(card.customFields).map(([k, v]) => {
-                              const def = settings.customFields.find((f) => f.key === k);
-                              const isNumber = def?.type === 'NUMBER';
-                              const isSelect = def?.type === 'SELECT';
+                      {/* Extended JSONB Field Badges (Formatted & Styled) */}
+                      {card.customFields && Object.keys(card.customFields).length > 0 && (
+                        <div
+                          className={
+                            isCompact
+                              ? 'flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap pt-0.5'
+                              : 'flex flex-wrap gap-1 pt-0.5'
+                          }
+                        >
+                          {Object.entries(card.customFields).map(([k, v]) => {
+                            const def = settings.customFields.find((f) => f.key === k);
+                            const parsed = formatCustomFieldValue(k, v, def?.type);
+                            const badgeStyle = getCustomFieldBadgeStyle(
+                              def?.type,
+                              parsed.isCurrency,
+                              parsed.isUrl,
+                              parsed.isDate
+                            );
 
-                              return (
-                                <span
-                                  key={k}
-                                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border ${
-                                    isNumber
-                                      ? 'bg-blue-50 text-blue-700 border-blue-200 font-mono'
-                                      : isSelect
-                                      ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                                  }`}
-                                >
-                                  <span className="opacity-70">{def ? def.label : k}:</span>
-                                  <strong className="font-semibold">{String(v)}</strong>
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
+                            return (
+                              <span
+                                key={k}
+                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border shrink-0 ${badgeStyle}`}
+                              >
+                                <span className="opacity-70">{def ? def.label : k}:</span>
+                                {parsed.isUrl ? (
+                                  <a
+                                    href={parsed.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center gap-0.5 font-semibold"
+                                  >
+                                    {parsed.formatted}
+                                    <ExternalLink className="w-2.5 h-2.5 ml-0.5 opacity-80" />
+                                  </a>
+                                ) : (
+                                  <strong className="font-semibold">{parsed.formatted}</strong>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
 
                       {/* Card Footer: Assignee */}
                       <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px] text-slate-500">
