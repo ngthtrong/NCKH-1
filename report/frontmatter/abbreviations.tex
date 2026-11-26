@@ -1,30 +1,73 @@
 \addchap{Danh mục từ viết tắt}
-\begin{longtable}{P{.18\textwidth}P{.74\textwidth}}
-\toprule Từ viết tắt & Diễn giải \\
+\begingroup\VfourTableSetup
+\begin{longtable}{P{.14\textwidth}P{.30\textwidth}P{.47\textwidth}}
+\toprule Từ viết tắt & Thuật ngữ đầy đủ & Diễn giải \\
+\midrule\endfirsthead
+\toprule Từ viết tắt & Thuật ngữ đầy đủ & Diễn giải \\
 \midrule\endhead
-API & Application Programming Interface --- giao diện lập trình ứng dụng \\
-ASP & Application Service Provider --- nhà cung cấp dịch vụ ứng dụng \\
-AWS & Amazon Web Services \\
-CPU & Central Processing Unit --- bộ xử lý trung tâm \\
-CSDL & Cơ sở dữ liệu \\
-DBMS & Database Management System --- hệ quản trị cơ sở dữ liệu \\
-HTTP & Hypertext Transfer Protocol --- giao thức truyền siêu văn bản \\
-IDOR & Insecure Direct Object References --- tham chiếu trực tiếp đối tượng không an toàn \\
-I/O & Input/Output --- vào/ra \\
-JSON & JavaScript Object Notation --- định dạng trao đổi dữ liệu \\
-JVM & Java Virtual Machine --- máy ảo Java \\
-JWT & JSON Web Token --- token mang tập khai báo \\
-NIST & National Institute of Standards and Technology --- Viện Tiêu chuẩn và Công nghệ Quốc gia Hoa Kỳ \\
-OS & Operating System --- hệ điều hành \\
-PITR & Point-in-Time Recovery --- phục hồi về một thời điểm \\
-RAM & Random Access Memory --- bộ nhớ truy cập ngẫu nhiên \\
-RLS & Row-Level Security --- chính sách bảo vệ cấp hàng \\
-RTO & Recovery Time Objective --- mục tiêu thời gian phục hồi \\
-SaaS & Software as a Service --- phần mềm dưới dạng dịch vụ \\
-SQL & Structured Query Language --- ngôn ngữ truy vấn có cấu trúc \\
-TTL & Time to Live --- thời gian sống của mục dữ liệu \\
-UI & User Interface --- giao diện người dùng \\
-VM & Virtual Machine --- máy ảo \\
-WAL & Write-Ahead Log --- nhật ký ghi trước \\
+\textbf{AOP} & Aspect-Oriented Programming & Lập trình hướng khía cạnh (chặn thực thi tại ranh giới phương thức/giao dịch) \\
+\textbf{API} & Application Programming Interface & Giao diện lập trình ứng dụng \\
+\textbf{ASP} & Application Service Provider & Nhà cung cấp dịch vụ ứng dụng (mô hình tiền thân của SaaS) \\
+\textbf{AWS} & Amazon Web Services & Nền tảng dịch vụ điện toán đám mây của Amazon \\
+\textbf{CPU} & Central Processing Unit & Bộ xử lý trung tâm \\
+\textbf{CSDL} & Cơ sở dữ liệu & Hệ thống lưu trữ và quản lý dữ liệu có cấu trúc \\
+\textbf{CSS} & Cascading Style Sheets & Ngôn ngữ định kiểu giao diện web (hỗ trợ biến CSS Variables cho chủ đề động) \\
+\textbf{DB} & Database & Cơ sở dữ liệu (viết tắt ngữ cảnh tiếng Anh trên sơ đồ/bảng biểu) \\
+\textbf{DDL} & Data Definition Language & Ngôn ngữ định nghĩa dữ liệu trong SQL (như CREATE, ALTER TABLE) \\
+\textbf{DNS} & Domain Name System & Hệ thống phân giải tên miền \\
+\textbf{EAV} & Entity-Attribute-Value & Mô hình lưu trữ Thực thể - Thuộc tính - Giá trị \\
+\textbf{EC2} & Elastic Compute Cloud & Dịch vụ máy chủ ảo đám mây trên AWS \\
+\textbf{ERD} & Entity-Relationship Diagram & Sơ đồ thực thể - liên kết \\
+\textbf{FK} & Foreign Key & Khóa ngoại tham chiếu toàn vẹn giữa các bảng \\
+\textbf{GC} & Garbage Collection & Cơ chế thu gom rác bộ nhớ tự động (JVM) \\
+\textbf{GIN} & Generalized Inverted Index & Chỉ mục đảo ngược tổng quát tăng tốc truy vấn JSONB trong PostgreSQL \\
+\textbf{HMAC} & Hash-based Message Authentication Code & Mã xác thực thông điệp dựa trên hàm băm mật mã (ví dụ HMAC-SHA256) \\
+\textbf{HTTP} & Hypertext Transfer Protocol & Giao thức truyền tải siêu văn bản \\
+\textbf{HTTPS} & Hypertext Transfer Protocol Secure & Giao thức HTTP được mã hóa an toàn qua lớp bảo mật TLS \\
+\textbf{IDOR} & Insecure Direct Object Reference & Lỗ hổng tham chiếu đối tượng trực tiếp không an toàn (truy cập chéo bản ghi) \\
+\textbf{IP} & Internet Protocol & Giao thức liên mạng / Địa chỉ định danh mạng \\
+\textbf{JDBC} & Java Database Connectivity & Giao diện lập trình kết nối cơ sở dữ liệu chuẩn trong Java \\
+\textbf{JSON} & JavaScript Object Notation & Định dạng trao đổi dữ liệu văn bản có cấu trúc gọn nhẹ \\
+\textbf{JSONB} & Binary JSON & Kiểu dữ liệu JSON lưu dạng nhị phân tối ưu truy vấn và chỉ mục trong PostgreSQL \\
+\textbf{JWT} & JSON Web Token & Thẻ bài định danh dạng JSON có chữ ký số xác thực phiên làm việc \\
+\textbf{KB} & Kịch bản thực nghiệm & Ký hiệu nhóm kịch bản đo kiểm hệ thống (KB-1 đến KB-4) \\
+\textbf{LFU} & Least Frequently Used & Thuật toán loại bỏ phần tử ít được truy cập nhất trong bộ nhớ đệm \\
+\textbf{LRU} & Least Recently Used & Thuật toán loại bỏ phần tử ít được truy cập gần đây nhất trong bộ nhớ đệm \\
+\textbf{LTS} & Long-Term Support & Phiên bản hỗ trợ dài hạn (như Java 21 LTS) \\
+\textbf{MDC} & Mapped Diagnostic Context & Ngữ cảnh chẩn đoán ánh xạ hỗ trợ gắn định danh thuê bao vào nhật ký (SLF4J) \\
+\textbf{MI} & Multi-Instance & Mô hình kiến trúc Đa thể hiện (tách riêng thể hiện ứng dụng và CSDL theo thuê bao) \\
+\textbf{MT} & Multi-Tenant / Multi-Tenancy & Kiến trúc Đa thuê bao (nhiều tổ chức dùng chung hạ tầng và phần mềm) \\
+\textbf{MU} & Multi-User & Mô hình Đa người dùng trên một không gian ứng dụng chung \\
+\textbf{NFR} & Non-Functional Requirement & Yêu cầu phi chức năng (hiệu năng, cô lập, bảo mật, đồng bộ cấu hình) \\
+\textbf{ORM} & Object-Relational Mapping & Kỹ thuật ánh xạ đối tượng - quan hệ \\
+\textbf{PK} & Primary Key & Khóa chính định danh duy nhất bản ghi trong bảng \\
+\textbf{QoS} & Quality of Service & Chất lượng dịch vụ và điều phối tài nguyên \\
+\textbf{RAM} & Random Access Memory & Bộ nhớ truy cập ngẫu nhiên \\
+\textbf{RBAC} & Role-Based Access Control & Kiểm soát truy cập dựa trên vai trò (PLATFORM\_ADMIN, TENANT\_ADMIN, MEMBER) \\
+\textbf{RL} & Rate Limiter / Rate Limiting & Cơ chế giới hạn tốc độ lưu lượng yêu cầu theo thuê bao \\
+\textbf{RLS} & Row-Level Security & Cơ chế bảo mật dữ liệu ở cấp độ từng dòng trong PostgreSQL \\
+\textbf{RPM} & Requests Per Minute & Số lượng yêu cầu tối đa cho phép trong mỗi phút \\
+\textbf{RPS} & Requests Per Second & Số yêu cầu HTTP trên mỗi giây \\
+\textbf{SaaS} & Software as a Service & Mô hình cung cấp phần mềm dưới dạng dịch vụ qua Internet \\
+\textbf{SLA} & Service Level Agreement & Thỏa thuận về chất lượng dịch vụ giữa nhà cung cấp và khách hàng \\
+\textbf{SLF4J} & Simple Logging Facade for Java & Thư viện giao diện chuẩn ghi nhật ký trong Java \\
+\textbf{SPA} & Single-Page Application & Ứng dụng web trang đơn tải một lần và cập nhật động phía trình duyệt \\
+\textbf{SQL} & Structured Query Language & Ngôn ngữ truy vấn dữ liệu có cấu trúc \\
+\textbf{ST} & Single-Tenant & Mô hình kiến trúc Đơn thuê bao (triển khai độc lập cho từng khách hàng) \\
+\textbf{TCO} & Total Cost of Ownership & Tổng chi phí sở hữu và vận hành hệ thống \\
+\textbf{TCP} & Transmission Control Protocol & Giao thức điều khiển truyền vận ở tầng giao vận \\
+\textbf{TLS} & Transport Layer Security & Giao thức mã hóa bảo mật tầng truyền tải (cấp phát cho HTTPS) \\
+\textbf{UC} & Use Case & Ca sử dụng mô tả tương tác giữa tác nhân và hệ thống (UC01 đến UC10) \\
+\textbf{UI} & User Interface & Giao diện người dùng \\
+\textbf{UML} & Unified Modeling Language & Ngôn ngữ mô hình hóa hướng đối tượng thống nhất \\
+\textbf{URL} & Uniform Resource Locator & Địa chỉ định vị tài nguyên trên mạng \\
+\textbf{UUID} & Universally Unique Identifier & Định danh duy nhất toàn cầu kích thước 128-bit \\
+\textbf{vCPU} & Virtual Central Processing Unit & Đơn vị bộ xử lý trung tâm ảo cấp phát cho máy chủ đám mây hoặc vùng chứa \\
+\textbf{VPC} & Virtual Private Cloud & Mạng đám mây riêng ảo cô lập tài nguyên \\
+\textbf{VU} & Virtual User(s) & Người dùng ảo mô phỏng truy cập đồng thời trong kiểm thử chịu tải (k6) \\
+\textbf{WAN} & Wide Area Network & Mạng diện rộng kết nối qua Internet công cộng \\
+\textbf{WIP} & Work-In-Progress & Công việc đang thực hiện / dở dang trên bảng Kanban (gắn với ngưỡng WIP Limit) \\
+\textbf{W-TinyLFU} & Window Tiny Least Frequently Used & Thuật toán quản lý bộ nhớ đệm kết hợp cửa sổ đón và bộ lọc tần suất ít dùng nhất (Caffeine L1) \\
 \bottomrule
 \end{longtable}
+\endgroup

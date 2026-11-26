@@ -87,13 +87,16 @@
   \FormTextAt{103.10}{192.01}{12}{\bfseries Xác nhận của \UniversitySignatureName}%
   \FormTextAt{424.60}{192.01}{12}{\makebox[0pt][c]{\bfseries Người hướng dẫn}}%
   \FormTextAt{424.60}{302.41}{12}{\makebox[0pt][c]{\bfseries\SupervisorName}}}
-% Blank photo field; never embed a person's link from the source report.
-\newcommand{\StudentPhoto}{%
+% Insert the supplied portrait within the existing CTU frame.
+\newcommand{\StudentPhoto}[1][]{%
   \AddToShipoutPictureFG*{\AtPageUpperLeft{%
     \put(\LenToUnit{417bp},\LenToUnit{-156.15bp}){%
       \setlength{\fboxsep}{0pt}\setlength{\fboxrule}{.5bp}%
-      \raisebox{-\height}{\fbox{\parbox[c][95.25bp][c]{78.25bp}{\centering
-        \fontsize{12bp}{13.8bp}\selectfont Ảnh 4 $\times$ 6}}}}}}}
+      \raisebox{-\height}{\fbox{%
+        \ifstrempty{#1}{\parbox[c][95.25bp][c]{78.25bp}{\centering
+          \fontsize{12bp}{13.8bp}\selectfont Ảnh 4 $\times$ 6}}{%
+          \makebox[78.25bp][c]{%
+            \includegraphics[width=78.25bp,height=95.25bp,keepaspectratio]{#1}}}}}}}}}
 \newcommand{\StudentSignature}{\FormJointSignature{Chủ nhiệm đề tài}{\PrincipalName}}
 \renewenvironment{reportcover}[1][Main]{%
   \clearpage\begingroup\def\CoverKind{#1}%

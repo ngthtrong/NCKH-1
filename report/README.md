@@ -2,7 +2,7 @@
 
 `report/` là nơi lưu nguồn LaTeX và PDF của báo cáo **Xây dựng ứng dụng
 quản lý công việc theo kiến trúc đa thuê bao**. Thông tin chung được
-điền theo V4 và các xác nhận của nhóm. Nguồn thông tin hành chính dùng
+điền theo Report_newest và các xác nhận của nhóm. Nguồn thông tin hành chính dùng
 chung nằm ở `config/metadata.tex` và `config/members.tex`. Biểu mẫu chủ
 nhiệm có điểm hệ 4 của ba năm đầu theo ảnh được cung cấp.
 
@@ -20,18 +20,23 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
-Bố cục thân bài: 35 hình được đặt trên trang dọc trong nội
-dung, sau đoạn văn hoàn chỉnh; chỉ năm sơ đồ nhiều chi tiết dùng trang
-ngang (2.7, 3.10, 4.4, 4.8, 4.9). Tiêu đề Phần II nằm cùng trang
+Bố cục thân bài: hình đặt sau đoạn văn hoàn chỉnh. Các cụm hình và bảng
+ngang liền nhau dùng chung luồng trang, gồm Hình 2.6 với Bảng 2.1
+và các bảng ở Phụ lục D. Tiêu đề Phần II nằm cùng trang
 đầu Chương 1. Hình/chú thích không nổi giữa đoạn; cột bảng và vị trí các
 đoạn giới thiệu được điều chỉnh để giảm trang gần trống, giữ đủ nội dung.
+Đoạn thân bài cách nhau 2 bp. Danh sách không đánh số dùng gạch ngang
+`–` ở cấp 1, dấu cộng `+` ở cấp 2 và dấu chấm tròn `•` ở cấp 3.
+Danh sách có thứ tự dùng số kèm dấu chấm ở cấp 1.
 
-Nội dung ngày 26/11/2026 được chuyển từ `Report_V4.md`, `Report_V4.pdf`
-và `Report_V4.docx`: Mở đầu, năm chương, kết luận, 25 tài liệu tham khảo
+Nội dung ngày 26/11/2026 được chuyển từ `Report_newest.docx.md`,
+`Report_newest.docx.pdf` và `Report_newest.docx`: Mở đầu, năm chương,
+kết luận, 24 tài liệu tham khảo
 và phụ lục A–D. Có 40 số hình với 42 ảnh nội dung. Ba ảnh của Hình 4.6
 dùng chung một chú thích. Biểu mẫu kết quả và bản tin/tóm tắt Việt–Anh
-lấy nội dung tương ứng trong V4. Bốn bản tin/tóm tắt được ghép sau phụ
-lục và đồng thời có đầu ra PDF riêng.
+lấy nội dung tương ứng trong Report_newest. Bản scan thuyết minh đã
+phê duyệt được ghép sau Phụ lục D. Bốn bản tin/tóm tắt nằm cuối quyển
+và đồng thời có đầu ra PDF riêng.
 Các mục đã duyệt, tạm hoãn và dữ liệu biểu mẫu còn thiếu được ghi ở
 [V4-REVIEW.md](V4-REVIEW.md).
 
@@ -69,7 +74,8 @@ powershell -ExecutionPolicy Bypass -File report/scripts/build.ps1
 
 Wrapper làm mới PATH của tài khoản, dùng `python`, bật UTF-8 và chạy
 `all`, `smoke`, `check`. Make có thể dùng `PYTHON=python`.
-Nội dung V4 dùng thêm `fvextra` và `caption` (`ltcaption`). Khối mã dùng
+Nội dung nhập từ Report_newest dùng thêm `enumitem`, `fvextra` và
+`caption` (`ltcaption`). Khối mã dùng
 Consolas 9 bp nếu có để giữ vừa dòng mã gốc PDF; thân bài và bảng vẫn
 dùng Times New Roman 13 bp.
 
@@ -126,15 +132,15 @@ không phát hiện được mọi vấn đề như chữ đè lên logo.
 
 `assets/v4-import-manifest.json` ghi hash ba nguồn, đề mục, thứ tự/chú
 thích hình, vị trí ảnh gốc trong PDF/DOCX, số hàng/cột bảng và mục phụ lục.
-`bibliography/v4-reference-map.json` ánh xạ số nguồn V4 sang khóa trích
+`bibliography/v4-reference-map.json` ánh xạ số nguồn mới sang khóa trích
 dẫn; số hiển thị do template sắp xếp theo nhóm/tác giả. Giữ các số hình
-1.6a/b và 5.3a/b. Hai bảng hành trình không có caption trong V4 vẫn không
+1.6a/b và 5.3a/b. Hai bảng luồng tương tác không có caption trong nguồn vẫn không
 đánh số. Ngắt dòng bên trong ô được giữ theo nguồn.
 
 Nhập lại thân bài và phụ lục bằng `python report/scripts/import_v4.py` (ghi lại
 các tệp nội dung đã sinh); bước này cần `pypandoc_binary`, `PyMuPDF`,
-`Pillow` và ba tệp V4 ở thư mục gốc. Các chỉnh sửa đã duyệt cho thân bài
-nằm ở `assets/v4-approved-edits.json`. Kiểm tra nội dung PDF bằng
+`Pillow` và ba tệp Report_newest ở thư mục gốc. Các chỉnh sửa đã duyệt
+cho thân bài nằm ở `assets/newest-approved-edits.json`. Kiểm tra nội dung PDF bằng
 `python report/scripts/verify_v4.py`.
 Các thư viện này không cần cho build LaTeX thông thường. Kết quả và những
 điểm thiếu thông tin trong nguồn được ghi tại [VALIDATION.md](VALIDATION.md).
@@ -154,17 +160,21 @@ Git; file phụ, log và tệp tạm bị bỏ qua.
   và `\ProjectMembers` trong cùng tệp.
 - `frontmatter/`: danh sách thành viên, chữ viết tắt, thông tin kết quả
   Việt–Anh và thông tin chủ nhiệm. Thay `\PendingField{...}` bằng nội
-  dung cần kê khai; thêm/bớt khối năm học và chèn ảnh vào đúng ô.
-- `chapters/introduction.tex`: bảy mục Mở đầu của V4.
-- `chapters/01-foundations/chapter.tex`: cơ sở lý thuyết và mô hình hóa.
+  dung cần kê khai. Phiếu chủ nhiệm dùng ảnh `assets/student-photo.png`.
+- `assets/approved-proposal.pdf`: bản scan thuyết minh do nhóm cung cấp.
+  `main.tex` ghép đủ 16 trang, canh vừa khổ A4 và thêm mục dẫn tới
+  trang đầu của bản scan.
+- `chapters/introduction.tex`: bảy mục Mở đầu.
+- `chapters/01-foundations/chapter.tex`: cơ sở lý thuyết về kiến trúc đa thuê bao.
 - `chapters/02-architecture/chapter.tex`: kiến trúc hệ thống đa thuê bao.
 - `chapters/03-system/chapter.tex`: kỹ thuật/nguyên lý Pool 9 tầng, K1–K4.
 - `chapters/04-implementation/chapter.tex`: nghiệp vụ, thiết kế và hiện thực Kanban.
-- `chapters/04-evaluation/chapter.tex`: thực nghiệm và kết quả kiểm định.
+- `chapters/04-evaluation/chapter.tex`: thực nghiệm và đánh giá kết quả.
   Nội dung hiện hành nằm trong các `chapter.tex`; section và khung cũ
   không được nhập vào `main.tex`. Số trong tên thư mục không quyết định số chương.
 - `chapters/conclusion.tex`: kết luận và kiến nghị.
-- `appendices/v4-a.tex` đến `v4-d.tex`: bốn phụ lục V4, dùng mã trong `assets/code/v4/`.
+- `appendices/v4-a.tex` đến `v4-d.tex`: bốn phụ lục, gồm các trích đoạn trong
+  `assets/code/v4/` và bảng số liệu tại Phụ lục D.
 - `deliverables/content/`: nội dung bản tin Việt–Anh; hai bản tóm tắt
   dùng lại `frontmatter/research-body-vi.tex` và `research-body-en.tex`
   để thông tin thống nhất với biểu mẫu trong báo cáo.

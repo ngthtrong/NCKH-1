@@ -23,13 +23,13 @@ hồ sơ và phạm vi cập nhật của đề tài này.
 | 3.3 | Thành viên và đơn vị phối hợp chính | `frontmatter/participants.tex`, thông tin để điền |
 | 3.4–3.5 | Mục lục, danh mục bảng/hình | Sinh tự động theo thứ tự trong `main.tex` |
 | 3.6 | Từ viết tắt theo bảng chữ cái | Có danh mục; phải sắp xếp các hàng sau khi điền |
-| 3.7–3.9 | Kết quả Việt, kết quả Anh, thông tin chủ nhiệm | Đúng thứ tự, có chỗ nhận xét, ảnh và ký tên; giữ placeholder |
+| 3.7–3.9 | Kết quả Việt, kết quả Anh, thông tin chủ nhiệm | Đúng thứ tự, đã chèn ảnh chủ nhiệm, giữ vùng nhận xét và ký tên |
 | 3.10 | Mở đầu đủ tổng quan trong/ngoài nước, lý do, mục tiêu, phương pháp, đối tượng, phạm vi | Sáu mục trong `chapters/introduction.tex` |
 | 3.11 | Chương đánh số, trình bày kết quả và bàn luận | Có khung chương; phải điền kết quả và đánh giá có căn cứ |
 | 3.12 | Kết luận và kiến nghị | Hai mục riêng; hướng dẫn điền đóng góp, khả năng ứng dụng và đề xuất |
 | 3.13 | Tài liệu tham khảo chia loại, trong từng loại theo bảng chữ cái | Cả Biber/BibTeX chia nhóm và sắp xếp; chỉ có nguồn thật khi người dùng bổ sung |
 | 3.14 | Phụ lục nếu có | Sau tài liệu tham khảo |
-| 3.15 | Thuyết minh đã phê duyệt, có ký tên/đóng dấu | Vị trí chèn sau phụ lục đã đánh dấu; chờ tài liệu thật |
+| 3.15 | Thuyết minh đã phê duyệt, có ký tên/đóng dấu | Đã ghép bản scan 16 trang sau phụ lục |
 | 3.16 | Minh chứng sản phẩm nhóm I–III theo mục 16 của thuyết minh | Vị trí tiếp sau thuyết minh; chờ hồ sơ đăng ký/thực tế, không tạo minh chứng giả |
 | 3.17 | Bản tin Việt/Anh rồi tóm tắt Việt/Anh; video không ghép quyển | Đã ghép đúng thứ tự, dùng chung nguồn với bốn PDF riêng; không ghép video |
 
@@ -46,22 +46,22 @@ bắt buộc trích dẫn theo IEEE; đó là các lựa chọn của template.
 | Thân bài | A4; Times New Roman 13 bp; giãn dòng 1,3; trái 30 mm, các lề khác 20 mm | `template/ctu-report.cls`, `template/typography.tex` |
 | Hai mặt | Giữ lề vật lý trái/phải; không ép chương mở ở trang lẻ | `template/ctu-report.cls` |
 | Mục lục | Chừa rộng hơn cho số trang La Mã dài; phần đầu La Mã, Mở đầu bắt đầu từ 1 | Class và `main.tex` |
-| Bảng thân bài | Cỡ 13 bp trong `tabular`, `tabularx`, `longtable`; bảng trong biểu mẫu có cỡ riêng | `template/packages.tex`, `template/forms.tex` |
-| Vị trí hình/bảng | V4 ưu tiên hình dọc đặt thành khối sau đoạn hoàn chỉnh; năm sơ đồ dày thông tin dùng ngang, giữ đoạn giới thiệu cùng đối tượng | `template/v4-content.tex`; `flafter`/`placeins` cho float thông thường |
+| Đoạn văn và danh sách | Giãn dòng 1,3 cho đoạn thân bài, cách đoạn 2 bp. Danh sách không đánh số dùng `–`, `+`, `•` lần lượt ở cấp 1, 2, 3. Danh sách có thứ tự dùng `1.` ở cấp 1 | `main.tex`, `template/v4-content.tex` |
+| Bảng thân bài | Cỡ 13 bp trong `tabular`, `tabularx`, `longtable`; bảng nhập từ nguồn dùng giãn dòng 1,10 và lặp đầu cột khi sang trang; bảng trong biểu mẫu có cỡ riêng | `template/packages.tex`, `template/v4-content.tex`, `template/forms.tex` |
+| Vị trí hình/bảng | Hình đặt thành khối sau đoạn hoàn chỉnh. Các hình và bảng ngang liền nhau dùng chung luồng dàn trang, với đoạn dẫn ngay trước đối tượng | `scripts/import_v4.py`, `template/v4-content.tex` |
 | Bảng/hình rộng | Tách nội dung hoặc dùng trang ngang A4; giữ cỡ chữ đọc được | `pdflscape`, ví dụ trong `examples/formatting.tex` |
 | Chú thích | Hình ở dưới, bảng ở trên; `label` sau `caption`; tham chiếu bằng nhãn | Hướng dẫn trong README và ví dụ |
 | Tài liệu tham khảo | Văn bản pháp quy → sách/báo/tạp chí → bài viết/tài liệu khác; xếp tác giả trong từng nhóm; số liên tục toàn danh mục | `template/bibliography.tex` |
 | Bìa và biểu mẫu | Đầu trang/khung bìa vector từ mẫu CTU; lề, cỡ chữ và giãn dòng theo từng loại mẫu | `template/forms.tex`, `assets/*.pdf` |
 | Công bố | Bảng sáu cột: STT, tên bài báo, tác giả/nhóm tác giả, tên tạp chí, số tạp chí, năm xuất bản | `frontmatter/research-body-vi.tex` |
-| Sản phẩm Việt–Anh | Ghép bản tin Việt, bản tin Anh, tóm tắt Việt, tóm tắt Anh sau phụ lục; dùng cùng nguồn để xuất riêng | `main.tex`, `deliverables/content/` |
+| Sản phẩm Việt–Anh | Ghép bản tin Việt, bản tin Anh, tóm tắt Việt, tóm tắt Anh sau thuyết minh và minh chứng sản phẩm nếu có; dùng cùng nguồn để xuất riêng | `main.tex`, `deliverables/content/` |
 | Build | Build quyển một/hai mặt tự dựng lại cả bốn PDF riêng; không xuất số liệu hoặc chạy mô hình | `scripts/build.py` |
 
 Số chương và tên chương là mặc định có thể chỉnh theo đề tài, không phải
-yêu cầu bắt buộc của hướng dẫn hình thức. Bản V4 cập nhật ngày 26/11/2026
-dùng năm chương: cơ sở lý thuyết/mô hình hóa → kiến trúc đa thuê bao → kỹ
-thuật/nguyên lý Pool 9 tầng → nghiệp vụ/thiết kế/hiện thực Kanban → thực
-nghiệm/kết quả kiểm định. Nội dung lấy từ ba bản V4 Markdown, PDF và
-DOCX. Biểu mẫu dùng khung CTU, nội dung V4 và thông tin xác nhận của nhóm.
+yêu cầu bắt buộc của hướng dẫn hình thức. Bản hiện hành dùng tiêu đề và
+nội dung năm chương từ bộ Report_newest sau khi áp dụng các sửa đổi đã
+duyệt. Biểu mẫu dùng khung CTU, nội dung nguồn mới và thông tin xác nhận
+của nhóm.
 
 Quy ước vị trí hình/bảng, cỡ tiêu đề, đánh số và cách dùng nhãn là lựa
 chọn trình bày được kế thừa từ báo cáo. Không diễn giải mọi lựa chọn kỹ
@@ -73,6 +73,8 @@ thuật này thành quy định của trường.
   ép bảng thân bài vừa trang. Sửa độ rộng cột, chia bảng hoặc dùng trang
   ngang; bảng dài dùng `longtable` có tiêu đề lặp lại. Hook giữ cỡ chữ khi
   bắt đầu bảng; người soạn vẫn cần tránh lệnh giảm cỡ bên trong từng ô.
+- Dùng `itemize` và `enumerate` cho danh sách. Nhánh con nằm trong mục
+  cha. Bộ nhập nhận diện các dấu gõ tay của Word để dựng đúng cấp.
 - Hình và sơ đồ phải giữ đủ nội dung, trạng thái, quan hệ và chú giải.
   Phóng to đồng đều một hình đang đặt `width=\textwidth` không làm chữ
   trong PDF lớn hơn; cần điều chỉnh cỡ chữ tương đối hoặc bố cục nguồn.
@@ -96,14 +98,15 @@ thuật này thành quy định của trường.
 
 ## Phạm vi thông tin được điền
 
-Các trường hành chính lấy theo V4 và xác nhận được ghi ở
+Các trường hành chính lấy theo Report_newest và xác nhận được ghi ở
 [V4-REVIEW.md](V4-REVIEW.md). Biểu mẫu chủ nhiệm ghi điểm hệ 4 của năm
-1–3. Thành tích, ảnh, nhận xét và ngày ký/chữ ký chưa có dữ liệu được giữ
-chỗ trong mẫu. Tài liệu định dạng minh họa nằm trong `examples/`.
+1–3 và ảnh chân dung đã cung cấp. Thành tích, nhận xét và ngày ký/chữ ký
+chưa có dữ liệu được giữ chỗ trong mẫu. Tài liệu định dạng minh họa nằm
+trong `examples/`.
 
 Không áp số trang tối thiểu hay kiểm tra hồ sơ nghiệm thu vào template
-trống. Nếu cần báo cáo hoàn chỉnh, bổ sung thuyết minh và minh chứng thật
-ở vị trí đã chú thích trước bốn bản tin/tóm tắt; video là đầu ra riêng.
+trống. Bổ sung minh chứng sản phẩm sau thuyết minh và trước bốn bản
+tin/tóm tắt khi có hồ sơ. Video là đầu ra riêng.
 Build/check thành công chỉ xác nhận kỹ thuật của template, chưa xác nhận
 nội dung, chữ ký hoặc hồ sơ đủ điều kiện nộp.
 
@@ -115,7 +118,7 @@ make all smoke
 make check
 ```
 
-Chạy từ template hoặc thêm `-C reportTemplate` khi ở gốc repository.
+Chạy từ thư mục `report/` hoặc thêm `-C report` khi ở gốc repository.
 Kiểm tra thêm `content smoke BIBLIOGRAPHY=bibtex` trên bản sao độc lập
 khi sửa danh mục. Xem PDF thực tế để kiểm tra logo, bảng sáu cột, hình,
 bảng, cỡ chữ, trang ngang và bốn biểu mẫu cuối quyển; log không phát

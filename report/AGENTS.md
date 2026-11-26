@@ -1,7 +1,7 @@
 # Hướng dẫn cho agent trong báo cáo
 
 `report/` là nơi soạn và lưu bản báo cáo tổng kết của đề tài THS2026-67.
-Thông tin hành chính lấy từ bộ Report V4 và xác nhận của nhóm được ghi
+Thông tin hành chính lấy từ bộ Report_newest và xác nhận của nhóm được ghi
 ở [V4-REVIEW.md](V4-REVIEW.md). Nội dung nghiên cứu được cập nhật theo
 phạm vi người dùng yêu cầu.
 Không dùng `archive/` làm nguồn báo cáo hiện hành. Giữ dữ liệu còn thiếu,

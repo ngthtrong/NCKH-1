@@ -1,0 +1,744 @@
+[
+  {
+    "id": "R01",
+    "location": "Markdown, dòng 521",
+    "before": "Các công trình nghiên cứu ngoài nước về kiến trúc đa thuê bao được tiếp cận từ cả góc độ học thuật lẫn thực tiễn công nghiệp với nhiều tầng bậc khác nhau. Trước tình trạng thiếu nhất quán trong cách định nghĩa và mô hình hóa hệ thống, nghiên cứu lập bản đồ hệ thống (Systematic Mapping Study \\- SMS) của Kabbedijk và cộng sự (2015) \\[5\\] trên tạp chí Journal of Systems and Software đã khảo sát sâu rộng 781 công trình học thuật và 371 tài liệu công nghiệp nhằm chuẩn hóa định nghĩa đa thuê bao và đề xuất mô hình phân tầng 9 tầng thành phần. Khảo cứu này chỉ ra hai phát hiện quan trọng: thứ nhất, tồn tại sự khác biệt rõ nét về góc nhìn khi giới công nghiệp thường tập trung vào chia sẻ tài nguyên ở tầng hạ tầng và ảo hóa để tối ưu chi phí, trong khi giới học thuật lại tập trung vào khả năng tùy biến động lúc chạy ở tầng ứng dụng và tầng dữ liệu; thứ hai, phần lớn các công bố học thuật mới dừng lại ở mức đề xuất lý thuyết, trong khi các báo cáo thực nghiệm triển khai và đo kiểm thực nghiệm đầy đủ chỉ chiếm khoảng 2,1% trong tổng số công trình được khảo sát. Tiếp nối hướng tiếp cận tổng quan này, nghiên cứu lập bản đồ hệ thống của Olabanji, Fitch và Matthew (2023) \\[6\\] đã khảo sát 64 công bố khoa học giai đoạn 2015-2022 liên quan đến kiến trúc SaaS đa thuê bao trên nền tảng đám mây gốc (Cloud-Native), cho thấy các giải pháp phần lớn vẫn dừng ở mức khái niệm hoặc chỉ giải quyết bài toán tối ưu trên từng thành phần riêng lẻ. Bên cạnh đó, công trình của Shinu Pushpan \\[7\\] đã hệ thống hóa tri thức, tổng hợp các mẫu thiết kế và công nghệ phổ biến trong kiến trúc đa thuê bao, nhưng các thành phần kỹ thuật vẫn được trình bày dưới dạng rời rạc và chưa được kết nối thành một khung kiến trúc hoàn chỉnh gắn với một bài toán nghiệp vụ cụ thể.",
+    "after": "Kabbedijk và cộng sự (2015) \\[5\\] thực hiện một nghiên cứu lập bản đồ hệ thống (Systematic Mapping Study — SMS) nhằm làm rõ định nghĩa và phạm vi của kiến trúc đa thuê bao. Nhóm tác giả thu được 761 bài học thuật sau khi loại trùng, trong đó 48 bài qua bước đọc toàn văn, và phân tích 371 mục web công nghiệp. Bảng phân loại 48 bài ghi nhận 26 đề xuất giải pháp, 10 nghiên cứu xác nhận, 6 nghiên cứu đánh giá trong thực tế, 5 bài quan điểm triết lý và 1 báo cáo kinh nghiệm (2,1%). Nguồn công nghiệp chú trọng chia sẻ hạ tầng và chi phí, còn nghiên cứu học thuật chú trọng tùy biến lúc chạy và các cơ chế phần mềm. Olabanji, Fitch và Matthew (2023) \\[6\\] tiếp tục lập bản đồ 64 công bố giai đoạn 2015–2022 về đa thuê bao trong kiến trúc cloud-native. Pushpan \\[7\\] tổng hợp các mẫu thiết kế và kỹ thuật phổ biến, cung cấp cơ sở để lựa chọn các cơ chế dùng trong nguyên mẫu của đề tài.",
+    "count": 1
+  },
+  {
+    "id": "R02",
+    "location": "Markdown, dòng 527",
+    "before": "Tổng quan tình hình nghiên cứu cho thấy, mặc dù kiến trúc đa thuê bao đã được khảo sát ở nhiều khía cạnh kỹ thuật đơn lẻ, vẫn còn thiếu vắng các nghiên cứu xây dựng một khung kiến trúc phần mềm đa thuê bao nhất quán từ lý thuyết đến thực nghiệm, được thiết kế và kiểm chứng đầy đủ trong bối cảnh một ứng dụng cộng tác cụ thể nhằm đánh giá khách quan các yếu tố đánh đổi giữa chi phí vận hành, hiệu năng phản hồi và mức độ an toàn dữ liệu.",
+    "after": "Các nguồn trên cung cấp khung phân tầng, mẫu tổ chức tài nguyên và các phương pháp đánh giá từng cơ chế. Từ đó, đề tài chọn một bài toán Kanban cụ thể để nối các quyết định kiến trúc với kết quả triển khai và kiểm thử. Phân tích chi phí dựa trên mô hình khái niệm. Thực nghiệm tập trung vào định danh, cô lập dữ liệu, hiệu năng và tùy biến.",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Markdown, dòng 552",
+    "before": "Ở bước đầu, nghiên cứu tổng hợp tài liệu có chọn lọc để tránh cách làm chắp vá theo từng mẹo kỹ thuật rời rạc. Nguồn tham khảo được lọc từ các công trình nền tảng về đa thuê bao và kiến trúc đám mây, ưu tiên những mô hình đã được kiểm chứng. Quá trình này giúp làm rõ động lực kinh tế và kỹ thuật của mô hình dùng chung, nhận diện các thách thức chính và thống nhất mô hình phân tầng làm khung tham chiếu chung.",
+    "after": "Ở bước đầu, nghiên cứu tổng hợp tài liệu có chọn lọc để xây dựng cơ sở nhất quán cho các quyết định kỹ thuật. Nguồn tham khảo được lọc từ các công trình nền tảng về đa thuê bao và kiến trúc đám mây, ưu tiên những mô hình đã được kiểm chứng. Quá trình này giúp làm rõ động lực kinh tế và kỹ thuật của mô hình dùng chung, nhận diện các thách thức chính và thống nhất mô hình phân tầng làm khung tham chiếu chung.",
+    "count": 1
+  },
+  {
+    "id": "R05",
+    "location": "Markdown, dòng 578",
+    "before": "\\- Nghiên cứu các quy tắc nghiệp vụ như: người dùng được mời bởi thuê bao chỉ có thể truy cập board thuộc phạm vi của mình, thuê bao có thể xóa board nhưng người dùng không thể và cơ chế phân quyền cho người dùng cụ thể.",
+    "after": "\\- Thành viên chỉ truy cập bảng công việc trong phạm vi được cấp quyền. Quản trị viên thuê bao (TENANT\\_ADMIN) được xóa bảng thuộc thuê bao của mình.",
+    "count": 1
+  },
+  {
+    "id": "R02",
+    "location": "Markdown, dòng 580",
+    "before": "\\- Các thành phần chính của hệ thống: quản lý người dùng và phân quyền, quản lý dự án và công việc theo thứ bậc, quản lý và chia sẻ tài nguyên phục vụ cho công việc.",
+    "after": "\\- Phạm vi đã hiện thực gồm quản lý người dùng và phân quyền, cùng cấu trúc Thuê bao – Bảng – Cột – Thẻ để theo dõi tiến độ. Đề cương ban đầu còn nêu công việc phân cấp nhiều tầng và chia sẻ tệp phục vụ công việc.",
+    "count": 1
+  },
+  {
+    "id": "R02",
+    "location": "Markdown, dòng 582",
+    "before": "\\- Cơ chế theo dõi tiến độ và nhắc nhở thời hạn thực hiện công việc đa kênh.",
+    "after": "\\- Nhắc nhở thời hạn đa kênh, chia sẻ tệp và công việc phân cấp nhiều tầng nằm ngoài phạm vi hiện thực và kiểm thử của nguyên mẫu. Chương 4 mô tả phạm vi đã thực hiện.",
+    "count": 1
+  },
+  {
+    "id": "R02",
+    "location": "Markdown, dòng 1226",
+    "before": "Chương 4 đưa khung kiến trúc Pool Cấp độ 3 và bốn nguyên lý kiểm soát K1–K4 từ Chương 2–3 vào xây dựng một sản phẩm hoàn chỉnh: ứng dụng quản lý công việc trực quan theo phương pháp Kanban. Bám sát hướng tiếp cận thị trường từ ngoài vào trong đã  nêu ở Phần I, nội dung chương đi từ giới hạn phạm vi nghiệp vụ (Bảng 4.1), khảo sát nhu cầu người dùng để chia dịch vụ và chức năng phần mềm (Mục 4.1), đặc tả ca sử dụng, thiết kế kiến trúc và cơ sở dữ liệu (Mục 4.2–4.3), đến đóng gói và triển khai Ứng dụng ra Internet (Mục 4.4).",
+    "after": "Chương 4 đưa khung kiến trúc Pool Cấp độ 3 và bốn nguyên lý kiểm soát K1–K4 từ Chương 2–3 vào xây dựng nguyên mẫu TenantFlow: ứng dụng quản lý công việc trực quan theo phương pháp Kanban. Bám sát hướng tiếp cận thị trường từ ngoài vào trong đã  nêu ở Phần I, nội dung chương đi từ giới hạn phạm vi nghiệp vụ (Bảng 4.1), khảo sát nhu cầu người dùng để chia dịch vụ và chức năng phần mềm (Mục 4.1), đặc tả ca sử dụng, thiết kế kiến trúc và cơ sở dữ liệu (Mục 4.2–4.3), đến đóng gói và triển khai Ứng dụng ra Internet (Mục 4.4).",
+    "count": 1
+  },
+  {
+    "id": "R02",
+    "location": "Markdown, dòng 1247",
+    "before": "Qua khảo sát nhu cầu thực tế của các phòng ban và nhóm dự án, quy trình quản lý công việc Kanban cho thấy hai xu hướng vận hành đối lập khá rõ. Hai hồ sơ thuê bao dưới đây đại diện cho hai thái cực quy trình phổ quát: nhóm kỹ thuật phần mềm đòi hỏi kỷ luật chặt chẽ và nhóm truyền thông ưu tiên điều phối linh hoạt. Thực tế, hai kiểu quy trình này không chỉ phổ biến tại doanh nghiệp vừa và nhỏ mà còn áp dụng trực tiếp cho các phòng thí nghiệm nghiên cứu, nhóm đồ án và câu lạc bộ học thuật trong môi trường đại học như định hướng tại Phần I. Để làm cơ sở xuyên suốt cho thiết kế giao diện, chức năng và chạy thực nghiệm đối chứng, đề tài chọn hai hồ sơ thuê bao đại diện cho hai nhóm này:",
+    "after": "Để chuyển nhu cầu nghiệp vụ thành yêu cầu thiết kế, nhóm xây dựng hai chân dung thuê bao giả lập. Chân dung nhóm kỹ thuật ưu tiên giới hạn chặt công việc đang thực hiện, còn chân dung nhóm truyền thông ưu tiên xử lý linh hoạt khi tải công việc tăng. Hai chân dung dùng để minh họa thiết kế và thực nghiệm, với cấu hình và dữ liệu mẫu do nhóm thiết lập.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 654",
+    "before": "**\\- Tổng chi phí sở hữu tăng tuyến tính:** Khi phục vụ N khách hàng trên N môi trường riêng biệt, chi phí hạ tầng và công sức bảo trì, sao lưu, nâng cấp sẽ tăng tuyến tính theo công thức: C(N) \\= N × C\\_single, trong đó C\\_single là chi phí cố định để duy trì một môi trường khách hàng đơn lẻ.",
+    "after": "**\\- Mô hình chi phí của triển khai tách riêng:** Giả sử mỗi môi trường có cùng chi phí duy trì C\\_single và chi phí chung có thể bỏ qua trong khoảng quy mô đang xét. Khi phục vụ N khách hàng trên N môi trường, chi phí minh họa là C(N) \\= N × C\\_single.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 658",
+    "before": "Ngược lại, khi nhiều khách hàng dùng chung một tập tài nguyên và thời điểm tải cao điểm của họ không trùng nhau, hệ thống có thể linh hoạt điều phối phần năng lực dư giữa các nhóm. Cách hoạt động này dựa trên nguyên lý ghép kênh thống kê (Statistical Multiplexing): tải tổng hợp được san phẳng, giúp phục vụ cùng một lượng khách hàng với ít phần cứng dự phòng hơn nhiều. Nhờ vậy, hàm chi phí có dạng C(N) \\= C\\_fixed \\+ δ × N, trong đó C\\_fixed là chi phí đầu tư ban đầu cho kiến trúc đa thuê bao, còn δ là chi phí phát sinh rất nhỏ khi thêm một thuê bao mới.",
+    "after": "Ngược lại, khi nhiều khách hàng dùng chung một tập tài nguyên và thời điểm tải cao điểm của họ không trùng nhau, hệ thống có thể linh hoạt điều phối phần năng lực dư giữa các nhóm. Cách hoạt động này dựa trên nguyên lý ghép kênh thống kê (Statistical Multiplexing): tải tổng hợp được san phẳng, giúp phục vụ cùng một lượng khách hàng với ít phần cứng dự phòng hơn nhiều. Nhờ vậy, hàm chi phí có dạng C(N) \\= C\\_fixed \\+ δ × N, trong đó C\\_fixed là chi phí đầu tư ban đầu cho kiến trúc đa thuê bao, còn δ là chi phí biên giả định trên đoạn hệ thống còn đủ năng lực phục vụ. Giá trị này có thể thay đổi khi phải bổ sung máy chủ hoặc nhân lực vận hành.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 664",
+    "before": "Có thể thấy trên Hình 1.2, nền tảng đa thuê bao đòi hỏi chi phí đầu tư ban đầu cao hơn để giải quyết các bài toán cô lập và tùy biến. Khi số lượng khách hàng còn ít, triển khai tách riêng từng hệ thống có thể rẻ hơn; nhưng khi vượt qua Điểm hòa vốn, mô hình đa thuê bao phát huy rõ lợi thế kinh tế theo quy mô. Lưu ý rằng Hình 1.2 là đồ thị định tính minh họa xu hướng: tổng chi phí đa thuê bao vẫn tăng chậm theo N, nhưng chi phí bình quân trên mỗi thuê bao (C\\_MT(N)/N) tiến dần về mức biên δ rất nhỏ.",
+    "after": "Có thể thấy trên Hình 1.2, nền tảng đa thuê bao đòi hỏi chi phí đầu tư ban đầu cao hơn để giải quyết các bài toán cô lập và tùy biến. Khi số lượng khách hàng còn ít, triển khai tách riêng từng hệ thống có thể rẻ hơn; nhưng khi vượt qua Điểm hòa vốn, mô hình đa thuê bao phát huy rõ lợi thế kinh tế theo quy mô. Lưu ý rằng Hình 1.2 là đồ thị định tính minh họa xu hướng: tổng chi phí đa thuê bao vẫn tăng chậm theo N, nhưng chi phí bình quân trên mỗi thuê bao (C\\_MT(N)/N) tiến dần về δ trong mô hình minh họa với δ cố định. Hòa vốn và mức tiết kiệm phụ thuộc vào cấu hình, tải và chi phí thực tế.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 730",
+    "before": "Tổng hợp đối chiếu theo Hình 1.4 qua ba tiêu chí trên: Đơn thuê bao (ST) và Đa thể hiện (MI) đều có định danh tổ chức ở tiêu chí 1 nhưng phải cấp một Thể hiện Hệ thống riêng cho mỗi khách hàng ở tiêu chí 2, nên cô lập phần cứng tốt nhưng chi phí vận hành tăng tuyến tính O(N). Ngược lại, Đa người dùng (MU) gom mọi tài khoản vào một Thể hiện Hệ thống dùng chung nhưng thiếu ranh giới thuê bao hai lớp và khả năng tùy biến cho tổ chức. Chỉ kiến trúc Đa thuê bao (MT) dung hòa được cả ba tiêu chí: dùng chung một Thể hiện Hệ thống để giảm chi phí, giữ định danh hai lớp qua tenant\\_id và tùy biến động theo siêu dữ liệu trên một bộ mã nguồn chung.",
+    "after": "Tổng hợp đối chiếu theo Hình 1.4 qua ba tiêu chí trên: Đơn thuê bao (ST) và Đa thể hiện (MI) đều có định danh tổ chức ở tiêu chí 1 nhưng phải cấp một Thể hiện Hệ thống riêng cho mỗi khách hàng ở tiêu chí 2, nên có thể cô lập tài nguyên tốt hơn, với chi phí xấp xỉ tỷ lệ số môi trường dưới giả định ở Mục 1.1.2. Ngược lại, Đa người dùng (MU) gom mọi tài khoản vào một Thể hiện Hệ thống dùng chung nhưng thiếu ranh giới thuê bao hai lớp và khả năng tùy biến cho tổ chức. Chỉ kiến trúc Đa thuê bao (MT) dung hòa được cả ba tiêu chí: dùng chung một Thể hiện Hệ thống để giảm chi phí, giữ định danh hai lớp qua tenant\\_id và tùy biến động theo siêu dữ liệu trên một bộ mã nguồn chung.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 740",
+    "before": "Quan sát Hình 1.5 và Bảng 1.1 có thể thấy sự chuyển dịch rõ nét qua bốn cấp độ. Ở Cấp độ 1 và Cấp độ 2, hệ thống vẫn cấp cho mỗi tổ chức một Thể hiện Hệ thống riêng (chỉ khác ở chỗ Cấp độ 2 gom về một bộ mã nguồn chuẩn với cấu hình tĩnh), nên chi phí máy chủ và công sức vận hành vẫn tăng tuyến tính O(N) theo số khách hàng. Bước chuyển lớn diễn ra tại Cấp độ 3 khi rào chắn phần cứng giữa các khách hàng được gỡ bỏ để gộp nhiều Thuê bao vào chung một Thể hiện Hệ thống, kết hợp tùy biến động bằng siêu dữ liệu lúc chạy. Cấp độ 4 kế thừa nguyên vẹn Cấp độ 3 để nhân bản thành nhiều thể hiện đặt sau bộ cân bằng tải. Như vậy, đa thuê bao đúng nghĩa bắt đầu từ Cấp độ 3\\. Cùng mạch nghiên cứu này \\[15\\], Chong, Carraro và Wolter (2006) \\[16\\] cũng phân loại ba chiến lược tổ chức dữ liệu (cơ sở dữ liệu riêng, lược đồ riêng và bảng dùng chung), làm tiền đề cho phần phân tích ở Chương 2\\.",
+    "after": "Quan sát Hình 1.5 và Bảng 1.1 có thể thấy sự chuyển dịch rõ nét qua bốn cấp độ. Ở Cấp độ 1 và Cấp độ 2, hệ thống vẫn cấp cho mỗi tổ chức một Thể hiện Hệ thống riêng (chỉ khác ở chỗ Cấp độ 2 gom về một bộ mã nguồn chuẩn với cấu hình tĩnh), nên chi phí vận hành phụ thuộc vào số môi trường phải duy trì. Bước chuyển lớn diễn ra tại Cấp độ 3 khi rào chắn phần cứng giữa các khách hàng được gỡ bỏ để gộp nhiều Thuê bao vào chung một Thể hiện Hệ thống, kết hợp tùy biến động bằng siêu dữ liệu lúc chạy. Cấp độ 4 kế thừa nguyên vẹn Cấp độ 3 để nhân bản thành nhiều thể hiện đặt sau bộ cân bằng tải. Như vậy, đa thuê bao đúng nghĩa bắt đầu từ Cấp độ 3\\. Cùng mạch nghiên cứu này \\[15\\], Chong, Carraro và Wolter (2006) \\[16\\] cũng phân loại ba chiến lược tổ chức dữ liệu (cơ sở dữ liệu riêng, lược đồ riêng và bảng dùng chung), làm tiền đề cho phần phân tích ở Chương 2\\.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 912",
+    "before": "Điểm cần nhấn mạnh là Silo, Pool và Bridge áp dụng được cho từng Thể hiện Thành phần ở mỗi tầng, chứ không chỉ riêng ở cơ sở dữ liệu. Chẳng hạn ở Cụm Ứng dụng (Tầng 8–9), hệ thống cũng có thể chọn Silo (mỗi thuê bao một tiến trình và nhánh mã riêng), Pool (dùng chung cả mã nguồn và tiến trình thực thi) hoặc Bridge (dùng chung mã nguồn Tầng 9 nhưng tách tiến trình chạy ở Tầng 8). Xét ở mức toàn bộ Thể hiện Hệ thống, có bốn mô hình triển khai chính sau:",
+    "after": "Điểm cần nhấn mạnh là Silo, Pool và Bridge áp dụng được cho từng Thể hiện Thành phần ở mỗi tầng, chứ không chỉ riêng ở cơ sở dữ liệu. Chẳng hạn ở Cụm Ứng dụng (Tầng 8–9), hệ thống cũng có thể chọn Silo (mỗi thuê bao có tiến trình riêng, có thể triển khai từ cùng bộ mã nguồn chuẩn), Pool (dùng chung cả mã nguồn và tiến trình thực thi) hoặc Bridge (dùng chung mã nguồn Tầng 9 nhưng tách tiến trình chạy ở Tầng 8). Xét ở mức toàn bộ Thể hiện Hệ thống, có bốn mô hình triển khai chính sau:",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 959",
+    "before": "| **2\\. Hiệu quả Chi phí và Kinh tế quy mô** | **Thấp nhất:** Chi phí tăng tuyến tính O(N), không tận dụng được ghép kênh thống kê. | **Cao nhất:** Chi phí biên δ → 0, tối đa hóa ghép kênh thống kê (chuẩn Cấp độ 3-4). | **Trung bình \\- Khá:** Tiết kiệm chi phí tính toán ứng dụng, phát sinh thêm chi phí quản lý dữ liệu riêng. | **Tối ưu theo doanh thu:** Cân bằng chi phí biên thấp cho số đông với biên lợi nhuận từ gói khách hàng đặc biệt. |",
+    "after": "| **2\\. Hiệu quả chi phí và kinh tế quy mô** | Chi phí phụ thuộc số môi trường dành riêng và mức tự động hóa. | Chia sẻ công suất nhàn rỗi khi tải và sức chứa cho phép. | Chia sẻ tài nguyên tính toán, duy trì thêm các không gian dữ liệu riêng. | Phối hợp tài nguyên dùng chung và dành riêng theo nhu cầu từng nhóm thuê bao. |",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 960",
+    "before": "| **3\\. Mức độ Cô lập và Rủi ro *hàng xóm ồn ào*** | **Cô lập vật lý/ảo hóa cứng:** Bán kính sự cố đóng khung trong 1 thuê bao; miễn nhiễm *hàng xóm ồn ào*. | **Cô lập logic phần mềm:** Bán kính sự cố rộng; bắt buộc kiểm soát chặt chẽ trên cả K1-K4. | **Cô lập trung gian:** Dữ liệu tách cấu trúc, nhưng vẫn có thể tranh chấp CPU và RAM ở tầng ứng dụng/hệ quản trị cơ sở dữ liệu. | **Thích ứng theo cam kết chất lượng dịch vụ:** Thuê bao *doanh nghiệp* miễn nhiễm *hàng xóm ồn ào*; thuê bao thường chịu kiểm soát *hạn ngạch*. |",
+    "after": "| **3\\. Mức độ cô lập và rủi ro hàng xóm ồn ào** | Giảm tranh chấp ở các tài nguyên được cấp riêng. Tài nguyên còn dùng chung vẫn có thể chịu nhiễu. | Cô lập logic bằng K1–K4. Sự cố ở thành phần dùng chung có thể ảnh hưởng nhiều thuê bao. | Dữ liệu tách cấu trúc. Tầng ứng dụng hoặc hệ quản trị cơ sở dữ liệu dùng chung vẫn có thể tranh chấp tài nguyên. | Mức ảnh hưởng tùy theo ranh giới giữa cụm dùng chung và cụm dành riêng. |",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 962",
+    "before": "| **5\\. Khả năng Mở rộng theo Số lượng Thuê bao** | Kém (thường giới hạn ở N từ vài chục đến vài trăm thuê bao lớn). | Xuất sắc (hỗ trợ từ hàng nghìn đến hàng triệu thuê bao nhỏ và vừa). | Trung bình (phù hợp vài trăm đến vài nghìn thuê bao; bị giới hạn bởi *danh mục hệ thống/bể kết nối*). | Rất linh hoạt (mở rộng số lượng lớn ở nhánh *chia sẻ toàn phần* và phục vụ khách hàng lớn ở nhánh *cô lập to*àn phần). |",
+    "after": "| **5\\. Khả năng mở rộng theo số lượng thuê bao** | Phụ thuộc khả năng cấp phát và quản trị các môi trường dành riêng. | Phụ thuộc sức chứa cụm dùng chung, đặc điểm tải và cơ chế điều tiết. | Phụ thuộc số cơ sở dữ liệu hoặc lược đồ, kết nối và quy trình di trú. | Có thể mở rộng từng nhánh theo đặc điểm tải và yêu cầu cô lập. |",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 969",
+    "before": "**(1) Thị trường mục tiêu, quy mô khách hàng và bài toán chi phí:** Nếu sản phẩm chỉ phục vụ một số ít doanh nghiệp lớn với doanh thu mỗi khách hàng cao, mô hình Silo tăng chi phí theo O(N) vẫn chấp nhận được. Ngược lại, khi phục vụ số lượng lớn khách hàng vừa và nhỏ với chi phí hợp lý, hệ thống cần đưa chi phí biên tiến gần về 0 bằng Pool, còn nếu khách hàng trải nhiều mức ngân sách thì nên cân nhắc Hybrid.",
+    "after": "**(1) Thị trường mục tiêu, quy mô khách hàng và chi phí:** Silo phù hợp khi khách hàng cần tài nguyên riêng và có thể chịu chi phí tương ứng. Pool có thể giảm chi phí biên trong phạm vi tài nguyên dùng chung còn đủ. Hybrid có thể phục vụ các nhóm khách hàng có nhu cầu và ngân sách khác nhau.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 985",
+    "before": "(1) Về kinh tế và quy mô: Nhóm người dùng mục tiêu của ứng dụng là số đông doanh nghiệp vừa và nhỏ, phòng ban và nhóm dự án cần đăng ký dùng ngay với chi phí thấp và thời gian làm việc tập trung theo giờ hành chính, nên chi phí hạ tầng tăng tuyến tính của Silo không phù hợp.",
+    "after": "(1) Về kinh tế và quy mô: Nhóm người dùng mục tiêu của ứng dụng là số đông doanh nghiệp vừa và nhỏ, phòng ban và nhóm dự án cần đăng ký dùng ngay với chi phí thấp và thời gian làm việc tập trung theo giờ hành chính, nên đề tài ưu tiên chia sẻ hạ tầng theo giả định chi phí ở Mục 1.1.2.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 987",
+    "before": "(2) Về pháp lý và cô lập: Quản lý công việc nhóm thuộc phân khúc phổ thông, không bắt buộc phải tách riêng máy chủ vật lý, nên cách cô lập logic bằng kiểm soát truy cập ở tầng ứng dụng và cơ sở dữ liệu hoàn toàn đáp ứng được.",
+    "after": "(2) Về pháp lý và cô lập: Phạm vi nguyên mẫu giả định có thể dùng cơ chế cô lập logic ở tầng ứng dụng và cơ sở dữ liệu. Yêu cầu tách hạ tầng vật lý hoặc tuân thủ trong một triển khai cụ thể cần được đánh giá theo tổ chức tiếp nhận.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 997",
+    "before": "Từ các phân tích trên, đề tài chọn Mô hình Pool ở Cấp độ trưởng thành 3 làm kiến trúc mục tiêu cho ứng dụng SaaS Kanban. Toàn bộ các thành phần từ Tầng 1 đến Tầng 9 đều tổ chức theo hướng gộp dùng chung. Tuy nhiên, chốt mô hình Pool ở Chương 2 mới giải quyết được bài toán chi phí; khi gỡ bỏ vách ngăn phần cứng, hệ thống phải đối mặt trực tiếp với nguy cơ lẫn ngữ cảnh, rò rỉ dữ liệu và tranh chấp tải. Chương 3 sẽ đi vào từng cụm tầng để xử lý cụ thể bốn khía cạnh kiểm soát K1–K4.",
+    "after": "Từ các phân tích trên, đề tài chọn Mô hình Pool ở Cấp độ trưởng thành 3 làm kiến trúc mục tiêu cho ứng dụng SaaS Kanban. Toàn bộ các thành phần từ Tầng 1 đến Tầng 9 đều tổ chức theo hướng gộp dùng chung. Tuy nhiên, lựa chọn Pool xác định cách chia sẻ tài nguyên trong phạm vi giả định; khi gỡ bỏ vách ngăn phần cứng, hệ thống phải đối mặt trực tiếp với nguy cơ lẫn ngữ cảnh, rò rỉ dữ liệu và tranh chấp tải. Chương 3 sẽ đi vào từng cụm tầng để xử lý cụ thể bốn khía cạnh kiểm soát K1–K4.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 999",
+    "before": "Việc chọn Pool Cấp độ 3 dựa trên nhận thức rõ ràng về sự đánh đổi: Silo và Bridge có sẵn vách ngăn phần cứng hoặc lược đồ tự nhiên mạnh hơn, nhưng kéo theo chi phí hạ tầng hoặc bảo trì lược đồ tăng tuyến tính O(N). Trong khi đó, Pool Cấp độ 3 vừa hợp với bài toán kinh tế của ứng dụng Kanban vừa là môi trường tốt nhất để kiểm nghiệm trọn vẹn các kỹ thuật phần mềm K1–K4. Ngoài ra, so với Mục 6 Phần I, việc so sánh Silo, Bridge, Pool và Hybrid được thực hiện ở mức phân tích kiến trúc tại Chương 2–3, còn phần cài đặt Ứng dụng và đo kiểm định lượng ở Chương 4–5 đi sâu vào Pool Cấp độ 3 qua đối chứng hai cấu hình cơ sở (Baseline) và đề xuất (Proposed).",
+    "after": "Việc chọn Pool Cấp độ 3 dựa trên nhận thức rõ ràng về sự đánh đổi: Silo và Bridge có sẵn vách ngăn phần cứng hoặc lược đồ tự nhiên mạnh hơn, nhưng kéo theo công việc cấp phát hoặc di trú trên nhiều tài nguyên riêng. Trong khi đó, Pool Cấp độ 3 vừa hợp với bài toán kinh tế của ứng dụng Kanban vừa là môi trường tốt nhất để kiểm nghiệm trọn vẹn các kỹ thuật phần mềm K1–K4. Ngoài ra, so với Mục 6 Phần I, việc so sánh Silo, Bridge, Pool và Hybrid được thực hiện ở mức phân tích kiến trúc tại Chương 2–3, còn phần cài đặt Ứng dụng và đo kiểm định lượng ở Chương 4–5 đi sâu vào Pool Cấp độ 3 qua đối chứng hai cấu hình cơ sở (Baseline) và đề xuất (Proposed).",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 1009",
+    "before": "Trong mô hình Pool Cấp độ 3, toàn bộ Cụm Hạ tầng nền (Tầng 1–3) được tổ chức theo hướng gộp dùng chung. Mọi thuê bao chia sẻ chung máy chủ, mạng nội bộ và nền tảng vùng chứa. So với mô hình Silo hay Bridge (phải cấp máy chủ hoặc mạng VPC riêng cho từng khách hàng với chi phí tăng theo O(N)), cách dùng chung này giảm đáng kể chi phí phần cứng nhàn rỗi nhưng tạo ra cạnh tranh tài nguyên vật lý giữa các dịch vụ trên cùng máy chủ.",
+    "after": "Trong mô hình Pool Cấp độ 3, toàn bộ Cụm Hạ tầng nền (Tầng 1–3) được tổ chức theo hướng gộp dùng chung. Mọi thuê bao chia sẻ chung máy chủ, mạng nội bộ và nền tảng vùng chứa. Chia sẻ máy chủ có thể tận dụng năng lực nhàn rỗi tốt hơn cấp phát riêng cho từng thuê bao nhưng tạo ra cạnh tranh tài nguyên vật lý giữa các dịch vụ trên cùng máy chủ.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 1067",
+    "before": "Ở phần trên cùng của mô hình 9 tầng là Cụm Ứng dụng và Môi trường thực thi, gồm Tầng 8 (máy chủ ứng dụng) và Tầng 9 (mã nguồn nghiệp vụ). Theo mô hình Pool Cấp độ 3, mọi thuê bao đều dùng chung một bộ mã nguồn ở Tầng 9 và chạy xen kẽ trong cùng tiến trình máy chủ ứng dụng phi trạng thái tại Tầng 8 như trên Hình 3.3:",
+    "after": "Cụm Ứng dụng và Môi trường thực thi gồm Tầng 8 (máy chủ ứng dụng) và Tầng 9 (thể hiện ứng dụng đang xử lý nghiệp vụ). Trong nguyên mẫu Pool cấp độ 3, các thuê bao dùng chung bộ mã nguồn triển khai và thể hiện ứng dụng tại Tầng 9. Các yêu cầu chạy xen kẽ trên môi trường thực thi và bể luồng dùng chung tại Tầng 8, như minh họa ở Hình 3.3:",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 1081",
+    "before": "Nếu tách tiến trình chạy riêng cho mỗi thuê bao theo mô hình Silo hay Bridge (chạy Worker hoặc Pod độc lập cho từng khách hàng), vùng nhớ Heap và bể luồng được cô lập ở cấp hệ điều hành. Nhưng mỗi tiến trình riêng đều tốn một lượng RAM nền đáng kể, làm chi phí bộ nhớ tăng tuyến tính O(N) và khó mở rộng khi phục vụ nhiều khách hàng vừa và nhỏ.",
+    "after": "Nếu tách tiến trình chạy riêng cho mỗi thuê bao theo mô hình Silo hay Bridge (chạy Worker hoặc Pod độc lập cho từng khách hàng), vùng nhớ Heap và bể luồng được cô lập ở cấp hệ điều hành. Nhưng mỗi tiến trình riêng đều tốn một lượng RAM nền đáng kể, làm tăng nhu cầu bộ nhớ nền theo số tiến trình chạy đồng thời.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1121",
+    "before": "Vì mọi yêu cầu trong mô hình Pool dùng chung vùng nhớ Heap và Bể luồng tại Tầng 8–9, hệ thống không thể cô lập tài nguyên bằng tiến trình hệ điều hành riêng. Do đó, cơ chế bảo vệ ở cụm tầng này (K3) đặt giới hạn bộ nhớ và thời gian chạy cho từng yêu cầu theo thuê bao, tránh để một khách hàng chiếm hết luồng xử lý hoặc làm hệ thống khựng lại vì thu gom rác toàn cục (Stop-the-World GC).",
+    "after": "Việc chia sẻ vùng nhớ heap và bể luồng tại Tầng 8–9 đặt ra nhu cầu khống chế kích thước yêu cầu, thời gian chiếm luồng và tác động của bộ thu gom rác. Ba biện pháp sau là nguyên tắc thiết kế. Chương 4 mô tả cơ chế đã hiện thực và Chương 5 báo cáo kết quả đo; thực nghiệm hiện có chưa đánh giá riêng giới hạn luồng và bộ nhớ theo từng thuê bao.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1139",
+    "before": "Việc gom dữ liệu về một tập bảng chung như trên Hình 3.6 giúp tái sử dụng một bể kết nối duy nhất và nâng cấp cấu trúc bảng với độ phức tạp O(1) thay vì lặp qua từng khách hàng. Tuy vậy, gộp chung lưu trữ cũng làm bộc lộ bốn rủi ro kỹ thuật lớn xuyên suốt K1–K4:",
+    "after": "Việc gom dữ liệu về một tập bảng chung như trên Hình 3.6 giúp tái sử dụng một bể kết nối duy nhất và quản lý di trú tập trung trên một lược đồ. Thời gian chạy di trú còn phụ thuộc dữ liệu và thao tác thực hiện. Tuy vậy, gộp chung lưu trữ cũng làm bộc lộ bốn rủi ro kỹ thuật lớn xuyên suốt K1–K4:",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1163",
+    "before": "Để rào chắn RLS vận hành an toàn tuyệt đối trên bảng dùng chung, chính sách bảo mật dòng tuân theo bốn nguyên tắc sau:",
+    "after": "Để xác định phạm vi bảo vệ của RLS trên các bảng nghiệp vụ dùng chung, chính sách bảo mật dòng tuân theo bốn nguyên tắc sau:",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1165",
+    "before": "1) **Bắt buộc áp dụng với cả chủ sở hữu bảng:** Mặc định một số hệ quản trị CSDL cho phép tài khoản chủ bảng bỏ qua RLS. Do đó, phải kích hoạt chế độ cưỡng chế bắt buộc (như FORCE ROW LEVEL SECURITY trong PostgreSQL) \\[22\\] và tách riêng tài khoản chạy ứng dụng khỏi tài khoản quản trị di trú bảng.",
+    "after": "1) **Áp dụng cho chủ sở hữu bảng trong phạm vi PostgreSQL:** Thiết lập FORCE ROW LEVEL SECURITY trên ba bảng nghiệp vụ để chủ bảng cũng chịu chính sách khi truy cập thông thường \\[22\\]. Tách vai trò di trú khỏi vai trò ứng dụng có NOBYPASSRLS. Siêu người dùng và vai trò có BYPASSRLS vẫn có thể bỏ qua RLS.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1167",
+    "before": "2) **Kiểm soát đồng thời cả chiều đọc và chiều ghi:** Chính sách RLS phải kiểm tra cả lúc đọc/sửa/xóa lẫn lúc ghi mới (mệnh đề WITH CHECK), bảo đảm mọi bản ghi chèn hoặc cập nhật đều mang đúng tenant\\_id của phiên hiện tại.",
+    "after": "2) **Kiểm tra dòng hiện có và giá trị mới:** Mệnh đề USING xác định các dòng hiện có mà thao tác được phép truy cập. WITH CHECK xác định giá trị mới được phép ghi khi chèn hoặc cập nhật \\[22\\].",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1173",
+    "before": "Theo logic ba giá trị trong SQL, khi biến ngữ cảnh là NULL, phép so sánh record.tenant\\_id \\= NULL luôn cho kết quả UNKNOWN (tương đương sai). Nhờ đó CSDL tự động chặn ghi hoặc chỉ trả về 0 dòng dữ liệu ngay cả khi ứng dụng quên truyền ngữ cảnh.",
+    "after": "Khi ngữ cảnh thuê bao là NULL, phép so sánh với record.tenant\\_id cho kết quả UNKNOWN theo logic ba giá trị. Chính sách chỉ chấp nhận dòng khi biểu thức trả TRUE. Giá trị UNKNOWN do đó loại dòng khỏi tầm nhìn của thao tác hoặc làm kiểm tra giá trị mới thất bại, tùy mệnh đề và thao tác.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1175",
+    "before": "4) **Đưa cột tenant\\_id xuống tất cả các bảng con:** Thay vì chỉ lưu tenant\\_id ở bảng cha rồi nối bảng JOIN khi kiểm tra RLS ở các bảng con, mọi bảng nghiệp vụ dùng chung đều lưu trực tiếp cột tenant\\_id NOT NULL để rào chắn RLS kiểm tra trực tiếp trên từng dòng với chi phí O(1).",
+    "after": "4) **Đưa cột tenant\\_id xuống tất cả các bảng con:** Thay vì chỉ lưu tenant\\_id ở bảng cha rồi nối bảng JOIN khi kiểm tra RLS ở các bảng con, mọi bảng nghiệp vụ dùng chung đều lưu trực tiếp cột tenant\\_id NOT NULL để rào chắn RLS kiểm tra trực tiếp trên dòng, giảm nhu cầu nối bảng. Hiệu năng truy vấn phụ thuộc vào kế hoạch thực thi và phân bố dữ liệu.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1185",
+    "before": "Phương án FORCE RLS kết hợp biến phiên phạm vi giao dịch được chọn thay cho cách lọc WHERE ở tầng ứng dụng hay ORM, vì đây là tuyến bảo vệ độc lập nằm ngay trong CSDL và luôn tự làm sạch kết nối kể cả khi giao dịch gặp lỗi phải hoàn tác.",
+    "after": "Kết hợp FORCE RLS với biến cấu hình phạm vi giao dịch tạo thêm một lớp kiểm soát bên cạnh điều kiện lọc của ứng dụng. Việc tái sử dụng kết nối an toàn phụ thuộc vào thiết lập biến trong đúng giao dịch và việc kết thúc giao dịch trước khi trả kết nối về bể.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1405",
+    "before": "**Thứ nhất, bổ sung cột định danh tenant\\_id xuống cả ba bảng con (Mục 3.4.1):** Cột tenant\\_id UUID NOT NULL được đặt trực tiếp vào ba bảng Mặt phẳng Dữ liệu (boards, board\\_columns, cards). Nhờ vậy, chính sách RLS kiểm tra ngay trên từng dòng bảng với chi phí O(1) qua chỉ mục B-Tree đặt tenant\\_id ở đầu mà không cần nối bảng JOIN.",
+    "after": "**Thứ nhất, bổ sung cột định danh tenant\\_id xuống cả ba bảng con (Mục 3.4.1):** Cột tenant\\_id UUID NOT NULL được đặt trực tiếp vào ba bảng Mặt phẳng Dữ liệu (boards, board\\_columns, cards). Nhờ vậy, chính sách RLS kiểm tra tenant\\_id trực tiếp trên dòng. Các chỉ mục B-Tree có tenant\\_id ở đầu hỗ trợ mẫu truy vấn tương ứng khi bộ lập kế hoạch chọn sử dụng.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1409",
+    "before": "**Thứ ba, phân rõ phạm vi FORCE RLS, chống tranh chấp ghi và đánh chỉ mục:** Thay vì bật RLS mù lên mọi bảng, thiết kế chỉ bật ENABLE và FORCE ROW LEVEL SECURITY cho tài khoản chạy ứng dụng kanban\\_app\\_user (quyền NOBYPASSRLS) trên ba bảng nghiệp vụ (boards, board\\_columns, cards) với điều kiện Fail-Closed đọc biến app.current\\_tenant\\_id. Hai bảng tenants và tenant\\_users phục vụ tra cứu giao diện công khai theo tên miền phụ và kiểm tra tài khoản lúc chưa đăng nhập nên không áp chính sách đó cho chiều đọc tiền đăng nhập, còn thao tác ghi sửa cấu hình vẫn kiểm soát theo tenant\\_id đã xác thực.",
+    "after": "**Thứ ba, xác định phạm vi FORCE RLS và kiểm soát quyền:** Ba bảng boards, board\\_columns và cards bật ENABLE và FORCE ROW LEVEL SECURITY. Vai trò ứng dụng kanban\\_app\\_user có NOBYPASSRLS, chịu chính sách dựa trên app.current\\_tenant\\_id. Hai bảng tenants và tenant\\_users phục vụ phân giải tên miền phụ và đăng nhập nên nằm ngoài phạm vi FORCE RLS mô tả ở đây. Các thao tác quản trị trên hai bảng này dựa vào kiểm tra định danh và quyền ở tầng dịch vụ.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1692",
+    "before": "Lược đồ cơ sở dữ liệu kanban\\_saas\\_db trên PostgreSQL 16 gồm năm bảng quan hệ đặt chung trong lược đồ public, phân tách rõ giữa Mặt phẳng Điều khiển (tenants, tenant\\_users) và Mặt phẳng Dữ liệu (boards, board\\_columns, cards). Toàn bộ các bảng dữ liệu đều phi chuẩn hóa cột tenant\\_id kèm chỉ mục tổ hợp B-Tree dẫn đầu bởi tenant\\_id để tối ưu đường dẫn truy xuất dưới chính sách RLS.",
+    "after": "Lược đồ cơ sở dữ liệu kanban\\_saas\\_db trên PostgreSQL 16 gồm năm bảng quan hệ đặt chung trong lược đồ public, phân tách rõ giữa Mặt phẳng Điều khiển (tenants, tenant\\_users) và Mặt phẳng Dữ liệu (boards, board\\_columns, cards). Ba bảng nghiệp vụ lưu trực tiếp tenant\\_id và có các chỉ mục hỗ trợ mẫu truy vấn theo thuê bao, như trình bày trong Bảng A.1.",
+    "count": 1
+  },
+  {
+    "id": "R06",
+    "location": "Markdown, dòng 1281",
+    "before": "(3) NFR-03 – Chi phí phụ trội của bảo mật dòng thấp (K2 & K3): Thời gian trễ tăng thêm do RLS và biến phiên SET LOCAL giữ ở mức dưới 5% nhờ hệ thống chỉ mục đặt tenant\\_id ở đầu.",
+    "after": "(3) NFR-03 – Chi phí phụ trội của bảo mật cấp dòng (K2 và K3): Độ trễ truy vấn tăng thêm do RLS và SET LOCAL phải dưới 5% so với thời gian truy vấn lọc thủ công trong phép đo vi mô.",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1283",
+    "before": "(4) NFR-04 – Chống hiện tượng hàng xóm ồn ào (K3): Khi một thuê bao tạo bão tải trong bài đo 80 VUs, độ trễ p95 của các thuê bao bình thường giữ dưới mức SLA 500 ms (thực đo 242–277 ms), còn độ trễ p50 đọc cấu hình qua đệm hai tầng giảm hơn 80% và dưới 0,5 ms nếu trúng bộ đệm L1.",
+    "after": "(4) NFR-04 – Hạn chế ảnh hưởng của thuê bao gây nhiễu (K3): Trong kịch bản 80 VU nghiệp vụ (tối đa 82 VU gồm các lượt kiểm thử), p95 của các nhóm thuê bao thông thường phải dưới 500 ms. Mục tiêu đọc cấu hình là giảm p50 đầu-cuối hơn 80%; mức dưới 0,5 ms áp dụng riêng cho lượt đọc trúng bộ đệm L1.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1287",
+    "before": "(6) NFR-06 – Đồng bộ cấu hình nhanh giữa các nút chạy (K4): Khoảng thời gian từ lúc quản trị viên lưu cấu hình đến khi các tiến trình xóa bản đệm L1 cũ qua kênh Pub/Sub chỉ ở mức vài chục mili-giây.",
+    "after": "(6) NFR-06 – Đồng bộ cấu hình nhanh giữa các nút chạy (K4): Mục tiêu là các tiến trình nhận và vô hiệu hóa bản đệm L1 cũ qua Pub/Sub trong vài chục mili giây. Đánh giá cần đo tại nhiều tiến trình ứng dụng.",
+    "count": 1
+  },
+  {
+    "id": "R05",
+    "location": "Markdown, dòng 1316",
+    "before": "| UC06 | Dữ liệu | Quản trị Bảng Kanban (Admin / Member) | Tạo, xem, đổi tên bảng công việc thuộc phạm vi tenant\\_id; mọi truy vấn đi qua FORCE RLS (K2). |",
+    "after": "| UC06 | Dữ liệu | Quản trị Bảng Kanban (Admin / Member) | Tạo, xem, đổi tên bảng công việc trong phạm vi tenant\\_id theo quyền được cấp. Quyền xóa bảng thuộc quản trị viên thuê bao; mọi truy vấn đi qua FORCE RLS (K2). |",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1339",
+    "before": "| **Bước 1: Khởi tạo & Cập nhật Thẻ** | Thành viên tổ chức mở bảng công việc; tạo thẻ mới và nhập các thuộc tính tùy biến theo biểu mẫu động (như Story Points, Mức độ lỗi hoặc Kênh phát hành, Ngân sách VNĐ). | Hệ thống tự động kiểm định dữ liệu theo lược đồ JSONB và lưu bản ghi vào bảng cards; chính sách RLS tự động gắn kết tenant\\_id từ ngữ cảnh luồng ThreadLocal, bảo đảm phân vùng dữ liệu an toàn. |",
+    "after": "| **Bước 1: Khởi tạo & Cập nhật Thẻ** | Thành viên tổ chức mở bảng công việc; tạo thẻ mới và nhập các thuộc tính tùy biến theo biểu mẫu động (như Story Points, Mức độ lỗi hoặc Kênh phát hành, Ngân sách VNĐ). | Hệ thống tự động kiểm định dữ liệu theo lược đồ JSONB và lưu bản ghi vào bảng cards; tầng ứng dụng gán tenant\\_id từ ngữ cảnh đã xác thực, sau đó RLS kiểm tra dòng theo biến cấu hình giao dịch. |",
+    "count": 1
+  },
+  {
+    "id": "R05",
+    "location": "Markdown, dòng 1390",
+    "before": "| GET /api/public/tenant-branding & POST /api/auth/login  | Tất cả người dùng (Tiền đăng nhập theo Tên miền phụ) | Login: {email, password} JWT Claims cấp phát: {sub, tenant\\_id, slug, role, tier, exp} |  200 OK \\+ {accessToken, tenant, user} (403 nếu lệch tổ chức)  |",
+    "after": "| GET /api/public/tenant-branding (Mặt phẳng Điều khiển) | Người dùng trước đăng nhập | Mã tên miền phụ; hỗ trợ tham số slug khi thiếu tên miền phụ | 200 OK và thông tin nhận diện thuê bao. |\n| POST /api/auth/login (Mặt phẳng Điều khiển) | Quản trị viên hoặc thành viên | {email, password, tenantSlug?}; JWT chứa định danh và vai trò thuê bao | 200 OK và {accessToken, tenant, user}; từ chối nếu tài khoản lệch thuê bao. |",
+    "count": 1
+  },
+  {
+    "id": "R05",
+    "location": "Markdown, dòng 1391",
+    "before": "| GET /api/tenant-settings/kanbanPUT /api/tenant-settings/kanban(Mặt phẳng Điều khiển) | GET: Member+; PUT: Tenant Admin \\+ Kiểm tra Host \\== JWT.slug | Settings JSONB: {theme: {primary, accent, logoText, tagline}, wipMode: \"STRICT\"\\|\"WARN\"\\|\"OFF\", defaultWipLimit: 2, cardDensity: \"FULL\"\\|\"COMPACT\", defaultColumns: \\[...\\], customFields: \\[{key, label, type, required, options}\\]}  | 200 OK (đọc L1 Caffeine 0,12 ms / L2 Redis). PUT cập nhật tenants.settings, xóa L2 và phát Pub/Sub tenant:config:invalidate. |",
+    "after": "| GET /api/tenant-settings/kanban (Mặt phẳng Điều khiển) | Thành viên trở lên | Thuê bao theo Host và JWT | 200 OK và cấu hình Kanban. Có thể đọc từ Caffeine L1 hoặc Redis L2. |\n| PUT /api/tenant-settings/kanban (Mặt phẳng Điều khiển) | Quản trị viên thuê bao; đối chiếu Host và JWT | Settings JSONB: {theme: {primary, accent, logoText, tagline}, wipMode: \"STRICT\"\\|\"WARN\"\\|\"OFF\", defaultWipLimit: 2, cardDensity: \"FULL\"\\|\"COMPACT\" (tương thích cardDisplayMode), defaultColumns: \\[...\\], customFields: \\[{key, label, type, required, options}\\]}  | 200 OK; lưu tenants.settings, vô hiệu hóa L2 và phát sự kiện Pub/Sub. |",
+    "count": 1
+  },
+  {
+    "id": "R05",
+    "location": "Markdown, dòng 1392",
+    "before": "| POST /api/boards/{id}/cards(Mặt phẳng Dữ liệu) | Member+; JwtTenantFilter (K1) \\+ RateLimitFilter (K3) | Body:{columnId, title, description, assigneeId?, customFields: {\"story\\_points\": 5, \"bug\\_severity\": \"Medium\"}}  | 201 Created. Kiểm định customFields theo schema trong settings (sai kiểu/thiếu trường bắt buộc \\-\\> 400 Bad Request); INSERT qua FORCE RLS. |",
+    "after": "| POST /api/boards/{id}/tasks(Mặt phẳng Dữ liệu) | Member+; JwtTenantFilter (K1) \\+ RateLimitFilter (K3) | Body:{columnId, title, description, assigneeId?, customFields: {\"story\\_points\": 5, \"bug\\_severity\": \"Medium\"}}  | 201 Created. Kiểm định customFields theo schema trong settings (sai kiểu/thiếu trường bắt buộc \\-\\> 400 Bad Request); INSERT qua FORCE RLS. |",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1431",
+    "before": "Từ cấu hình lấy được, bộ đánh giá kiểm tra ngay chế độ wip\\_mode (trả lỗi HTTP 422 ở chế độ STRICT của Acme Software nếu cột đích đã đầy, hoặc gắn cờ cảnh báo ở chế độ WARN của Lotus Media) và kiểm tra kiểu dữ liệu của custom\\_fields. Lưu ý rằng trong Ứng dụng 5 thuê bao, chỉ siêu dữ liệu cấu hình (tenants.settings qua khóa tenant:{tenant\\_id}:config) mới áp dụng đầy đủ cơ chế phân cấp hai tầng từ L1 Caffeine sang L2 Redis (kèm đồng bộ xóa L1 qua Pub/Sub), nơi thuật toán W-TinyLFU ở L1 giúp chống quét tràn bộ đệm khi số lượng thuê bao tăng lên. Ngược lại, tải trọng bảng công việc (tenant:{tenant\\_id}:board:{board\\_id}) có kích thước lớn và thay đổi liên tục nên chỉ lưu đệm ở tầng phân tán L2 Redis nhằm tránh gây áp lực thu gom rác lên bộ nhớ heap của JVM và hạn chế bão thông điệp xóa đệm.",
+    "after": "Dịch vụ đọc chế độ wip\\_mode và định nghĩa custom\\_fields từ cấu hình. Khi chuyển thẻ, kiểm tra số thẻ ở cột đích và quyết định chặn ở chế độ STRICT hoặc cảnh báo ở chế độ WARN diễn ra trong giao dịch ở chặng tiếp theo. Lưu ý rằng trong Ứng dụng 5 thuê bao, chỉ siêu dữ liệu cấu hình (tenants.settings qua khóa tenant:{tenant\\_id}:config) mới áp dụng đầy đủ cơ chế phân cấp hai tầng từ L1 Caffeine sang L2 Redis (kèm đồng bộ xóa L1 qua Pub/Sub), nơi thuật toán W-TinyLFU ở L1 giúp chống quét tràn bộ đệm khi số lượng thuê bao tăng lên. Ngược lại, tải trọng bảng công việc (tenant:{tenant\\_id}:board:{board\\_id}) có kích thước lớn và thay đổi liên tục nên chỉ lưu đệm ở tầng phân tán L2 Redis nhằm tránh gây áp lực thu gom rác lên bộ nhớ heap của JVM và hạn chế bão thông điệp xóa đệm.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1433",
+    "before": "**\\- Chặng 4 – Gắn biến phiên giao dịch, thực thi RLS và dọn sạch ngữ cảnh (Bước 6–9, K2):** Khi mở giao dịch ghi xuống PostgreSQL trên kết nối mượn từ bể HikariCP, bộ đánh chặn RlsConnectionInterceptor đọc tenant\\_id từ TenantContext và chạy lệnh SET LOCAL app.current\\_tenant\\_id \\= '\\<tenant\\_uuid\\>' ở đầu giao dịch (Bước 6). Các câu SQL trên bảng board\\_columns và cards chạy dưới kiểm soát của FORCE RLS và bộ chỉ mục dẫn đầu bởi tenant\\_id (Bước 7).",
+    "after": "**\\- Chặng 4 – Gắn biến phiên giao dịch, thực thi RLS và dọn sạch ngữ cảnh (Bước 6–9, K2):** Khi mở giao dịch ghi xuống PostgreSQL trên kết nối mượn từ bể HikariCP, bộ đánh chặn RlsConnectionInterceptor đọc tenant\\_id từ TenantContext và chạy lệnh SET LOCAL app.current\\_tenant\\_id \\= '\\<tenant\\_uuid\\>' ở đầu giao dịch (Bước 6). Ứng dụng sử dụng tenant\\_id từ ngữ cảnh đã xác thực khi ghi dữ liệu. Trong giao dịch, dịch vụ khóa dòng cột đích trước khi đánh giá WIP và kiểm tra phiên bản thẻ. FORCE RLS kiểm tra các thao tác trên board\\_columns và cards (Bước 7).",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1509",
+    "before": "Sau khi chuyển cấu hình, hệ thống ổn định khoảng 25 giây trước cửa sổ đo chính thức kéo dài 60 giây. Các số liệu tải trong KB-3 được ghi nhận từ một lượt đo ở pha ổn định cao điểm (n \\= 1\\) nhằm đối chứng trực tiếp tác động gộp của cơ chế cắt tải kết hợp bộ đệm hai tầng, chưa thực hiện thêm hai cấu hình trung gian tách riêng từng cơ chế. k6 ghi nhận thông lượng, độ trễ p50, p95, p99 và kết quả theo mã HTTP; phía máy chủ ghi nhận CPU, RAM theo chu kỳ khoảng 5 giây. Tệp telemetry sử dụng trong phân tích có 17 mẫu cho các dịch vụ chính và 14 mẫu cho tiến trình sinh tải.",
+    "after": "Sau khi chuyển cấu hình, hệ thống ổn định khoảng 25 giây trước cửa sổ đo chính thức kéo dài 60 giây. Các số liệu tải trong KB-3 được ghi nhận từ một lượt đo ở pha ổn định cao điểm (n \\= 1\\) nhằm đối chứng trực tiếp tác động gộp của cơ chế cắt tải kết hợp bộ đệm hai tầng, chưa thực hiện thêm hai cấu hình trung gian tách riêng từng cơ chế. k6 ghi nhận thông lượng, độ trễ p50, p95, p99 và kết quả theo mã HTTP; phía máy chủ ghi nhận CPU, RAM với khoảng cách 4–5 giây giữa các mẫu liên tiếp. Tệp telemetry sử dụng trong phân tích có 17 mẫu cho các dịch vụ chính và 14 mẫu cho tiến trình sinh tải.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1528",
+    "before": "Kết quả cho thấy cơ chế TenantContext kết hợp giải phóng ThreadLocal trong khối try ... finally giúp duy trì ngữ cảnh riêng cho từng yêu cầu, không phát hiện hiện tượng nhiễm bẩn ngữ cảnh trong tập mẫu thử nghiệm. Đây là bằng chứng hỗ trợ NFR-01.",
+    "after": "Theo số liệu tổng hợp của nguồn báo cáo, tập mẫu này không ghi nhận lẫn ngữ cảnh. Kết quả phù hợp với thiết kế TenantContext và việc giải phóng ThreadLocal trong khối try ... finally. Cần nhật ký gốc liên kết với phiên bản chạy để xác nhận các cỡ mẫu KB-1 nêu trên.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1532",
+    "before": "Khi ngữ cảnh thuê bao không được thiết lập, chính sách FORCE RLS không cho phép truy vấn mở rộng phạm vi dữ liệu sang thuê bao khác. Hai vế USING và WITH CHECK lần lượt kiểm soát dữ liệu được đọc và ghi. Kết quả này chứng minh vai trò của RLS như một lớp phòng vệ độc lập, giảm sự phụ thuộc hoàn toàn vào điều kiện lọc tại tầng ứng dụng, qua đó hỗ trợ NFR-02.",
+    "after": "Trên ba bảng nghiệp vụ, mệnh đề USING giới hạn các dòng có thể truy cập, còn WITH CHECK kiểm tra giá trị dòng mới khi chèn hoặc cập nhật. Khi thiếu ngữ cảnh, điều kiện chính sách dành cho vai trò ứng dụng không chấp nhận dòng. Kết quả 0/600 là số tổng hợp của nguồn báo cáo và cần đối chiếu nhật ký KB-2 gốc.",
+    "count": 1
+  },
+  {
+    "id": "R06",
+    "location": "Markdown, dòng 1534",
+    "before": "Chi phí độ trễ vi mô của RLS (Hình 5.2c): Trên 500 truy vấn, thời gian thực thi trung bình tăng từ 1,25 ± 0,32 ms khi chỉ lọc thủ công lên 1,70 ± 0,41 ms khi kết hợp thiết lập ngữ cảnh giao dịch và FORCE RLS. Mức phụ trội là 0,45 ms, tương đương 36,0% trong phép đo vi mô. Tuy nhiên, khi đặt trong tổng thời gian phản hồi API khoảng 23-27 ms, chi phí này chỉ chiếm xấp xỉ 1,8%. Như vậy, RLS tăng cường khả năng cô lập dữ liệu với mức ảnh hưởng nhỏ đến độ trễ đầu-cuối trong điều kiện thực nghiệm, đáp ứng mục tiêu NFR-03.",
+    "after": "Chi phí độ trễ vi mô của RLS (Hình 5.2c): Nguồn báo cáo nêu 500 truy vấn, với thời gian trung bình tăng từ 1,25 ± 0,32 ms khi lọc thủ công lên 1,70 ± 0,41 ms khi thiết lập ngữ cảnh giao dịch và dùng FORCE RLS. Phụ trội 0,45 ms tương đương 36,0% so với truy vấn lọc thủ công, vượt ngưỡng 5% theo NFR-03. Tỷ lệ khoảng 1,8% dùng độ trễ API đầu-cuối khoảng 23–27 ms làm mẫu số. Cần số liệu gốc để xác nhận cỡ mẫu, cách đo và ý nghĩa của dấu ±.",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1552",
+    "before": "**Kiểm soát lưu lượng và thông lượng:** Thông lượng HTTP tổng hợp tăng từ 101,45 RPS ở Baseline lên 327,56 RPS ở Proposed, tương ứng mức tăng 222,9%. Baseline ghi nhận 63 yêu cầu quá thời gian chờ (timeout); trong Proposed, 2.613/2.613 yêu cầu hợp lệ của bốn nhóm thuê bao thông thường thành công. Cần làm rõ rằng mức 327,56 RPS là tổng thông lượng xử lý HTTP (bao gồm khoảng 80,3% phản hồi cắt tải nhanh HTTP 429 tại biên đối với t-aggressor); năng lực phục vụ nghiệp vụ thực chất của hệ thống được bảo chứng bởi tỷ lệ 100% (2.613/2.613) yêu cầu hợp lệ của bốn nhóm thuê bao thông thường thành công mà không phát sinh lỗi quá thời gian chờ và độ trễ p95 giảm 78,2-83,4%.",
+    "after": "**Lưu lượng và kết quả theo nhóm:** k6 ghi 6.385 yêu cầu ở Baseline (101,45 RPS) và 20.423 yêu cầu ở Proposed (327,56 RPS). Tốc độ HTTP tổng gồm cả phản hồi 429, chiếm khoảng 80,4% tổng số yêu cầu Proposed. Cửa sổ tải thiết lập là 60 giây; mẫu số suy ra từ tổng số yêu cầu và tốc độ k6 lần lượt khoảng 62,93 và 62,35 giây. Baseline có 63 yêu cầu được k6 xếp thất bại theo http\\_req\\_failed. Chưa có phân loại để xác định số timeout. Các kiểm tra nghiệp vụ thông thường ở Proposed đạt 2.613/2.613.",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1556",
+    "before": "Ngoài 16.423 phản hồi 429, các bộ đếm kiểm thử âm tính ghi nhận 75 trường hợp bị từ chối, gồm 29 trường hợp xác thực HTTP 401, 29 trường hợp truy cập chéo thuê bao HTTP 403/404 và 17 trường hợp vi phạm WIP HTTP 422\\. Toàn bộ 75 mẫu âm tính này do 2 người dùng ảo kiểm định chạy song song phát sinh ngay trong pha chịu tải 60 giây, tách biệt hoàn toàn với bộ phép thử chuyên biệt gồm 500, 200 và 600 mẫu của KB-1 và KB-2. Đây là các kết quả từ chối có chủ đích trong phép thử bảo mật và nghiệp vụ, không phải lỗi xử lý của các yêu cầu nghiệp vụ hợp lệ. Do đó, cần phân biệt chỉ số http\\_req\\_failed tổng hợp của k6 với tỷ lệ thành công của từng nhóm giao dịch.",
+    "after": "Trong pha chịu tải, hai VU kiểm thử ghi nhận 75 trường hợp từ chối có chủ đích: 29 mã 401, 29 mã 403/404 và 17 mã 422. Nhóm này tách khỏi các tập KB-1/KB-2 chuyên biệt. Tổng ba nhóm được nêu (17.723 yêu cầu của thuê bao gây nhiễu, 2.613 lượt nghiệp vụ thường và 75 lượt từ chối chủ đích) là 20.411, thấp hơn tổng HTTP 20.423 của k6 12 yêu cầu. Cần nhật ký cấp yêu cầu để quy nhóm phần chênh lệch.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1576",
+    "before": "**Phân tích tài nguyên (Hình 5.4a-b):** Trong 17 mẫu telemetry thu thập theo chu kỳ 5 giây, kanban-api chịu áp lực xử lý lớn nhất với CPU trung bình **95,02%** (cực đại 127,93%, tiệm cận ngưỡng trần khai báo 1,25 vCPU tại Hình 5.4a); bộ nhớ sử dụng đạt khoảng 1.010 MB trên giới hạn 2.560 MB. Trong nhóm dịch vụ còn lại và bộ sinh tải (Hình 5.4b), CPU trung bình của caddy-proxy đạt 11,94%, postgres-db đạt 8,11%, redis-cache đạt 2,76%, tiến trình phụ trợ nền (worker) đạt 1,26% và kanban-web chỉ ở mức 0,16%; riêng vùng chứa sinh tải k6 (N \\= 14 mẫu) tiêu thụ trung bình 14,01% CPU. Kết quả cho thấy tầng dữ liệu và bộ nhớ đệm vẫn còn dư địa tài nguyên lớn. Nguyên nhân kiến trúc chính khiến kanban-api chạm trần CPU nằm ở vị trí đặt bộ lọc điều tiết lưu lượng: RateLimitFilter chạy ngay bên trong tiến trình Spring Boot (sau JwtTenantFilter). Khi t-aggressor chạy vòng lặp kín, việc trả mã HTTP 429 nhanh lại cho phép luồng gây nhiễu dội tới 17.723 yêu cầu trong 60 giây (\\~295 yêu cầu/giây), buộc JVM của kanban-api vẫn phải phân tích HTTP, xác thực chữ ký JWT HMAC-SHA256 và gọi Redis Lua cho toàn bộ 16.423 yêu cầu vượt ngưỡng. Cộng hưởng với tình trạng tranh chấp khi k6 chạy chung trên máy chủ đơn nút 2 vCPU (CPU overcommit), áp lực CPU kéo dài này giải thích trực tiếp hiện tượng độ trễ đuôi p99 vẫn ở mức \\~2 giây dù p50 và p95 đã giảm sâu.",
+    "after": "**Phân tích tài nguyên (Hình 5.4a–b):** Nhật ký có 17 mẫu cho mỗi vùng chứa dịch vụ và 14 mẫu cho k6, với khoảng cách giữa mẫu 4–5 giây. kanban-api có CPU trung bình **95,02%**, cực đại 127,93% và dùng khoảng 1.010 MB bộ nhớ trên giới hạn khai báo 2.560 MB. CPU trung bình của caddy-proxy là 11,94%, PostgreSQL 8,11%, Redis 2,76%, worker 1,26%, giao diện 0,16% và k6 14,01%. Bộ lọc giới hạn lưu lượng chạy trong kanban-api sau xác thực, nên yêu cầu bị trả 429 vẫn sử dụng một phần tài nguyên API. Đây và việc k6 chạy chung máy chủ là các giả thuyết giải thích p99. Cần ghép dấu thời gian CPU với độ trễ hoặc đo với bộ sinh tải tách riêng để kiểm chứng.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1578",
+    "before": "**Kiểm chứng tùy biến cấu hình và dữ liệu JSONB (Hình 5.4d):** Trong kịch bản KB-4, 19/19 lượt truy xuất cấu hình thuê bao qua GET /api/tenant-settings/kanban thành công HTTP 200\\. Nhờ cơ chế đệm hai tầng, độ trễ trung vị p50 giảm từ **137,67 ms** ở *Baseline* xuống **21,36 ms** ở *Proposed* (giảm 84,5%), và p95 giảm từ **737,24 ms** xuống **213,21 ms** (giảm 71,1%). Đồng thời, 19/19 lượt tạo thẻ công việc mang thuộc tính mở rộng (story\\_points, bug\\_severity) trong cột cards.custom\\_fields đều được chấp nhận bằng HTTP 201, khẳng định khả năng mở rộng trường nghiệp vụ theo từng tổ chức mà không cần thay đổi cấu trúc bảng vật lý.",
+    "after": "**Kiểm chứng tùy biến cấu hình và dữ liệu JSONB (Hình 5.4d):** Trong kịch bản KB-4, 19/19 lượt truy xuất cấu hình thuê bao qua GET /api/tenant-settings/kanban thành công HTTP 200\\. Trong đối chiếu hai cấu hình, độ trễ trung vị p50 giảm từ **137,67 ms** ở *Baseline* xuống **21,36 ms** ở *Proposed* (giảm 84,5%), và p95 giảm từ **737,24 ms** xuống **213,21 ms** (giảm 71,1%). Đồng thời, 19/19 lượt tạo thẻ công việc mang thuộc tính mở rộng (story\\_points, bug\\_severity) trong cột cards.custom\\_fields đều được chấp nhận bằng HTTP 201, khẳng định khả năng mở rộng trường nghiệp vụ theo từng tổ chức mà không cần thay đổi cấu trúc bảng vật lý.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1580",
+    "before": "**Kiểm chứng WIP Strict và đồng bộ bộ đệm (Hình 5.4c):** Với thuê bao t-acme, phép thử thực hiện 19 lượt chuyển thẻ liên tiếp vào cột áp dụng chế độ WIP Strict (giới hạn 2 thẻ). Hai lượt hợp lệ đầu tiên khi cột còn chỗ trống được chấp nhận bằng HTTP 200, trong khi toàn bộ **17/17 lượt tiếp theo** vượt ngưỡng đều bị từ chối chính xác bằng **HTTP 422** (ở cấu hình *Baseline*, thao tác tạo thẻ trước bước di chuyển không thành công do quá tải dẫn đến hết thời gian chờ, nên chưa phát sinh mẫu kiểm định PATCH tương ứng). Bên cạnh đó, độ trễ lan truyền sự kiện vô hiệu hóa bộ đệm cục bộ Caffeine L1 qua kênh Redis Pub/Sub đạt **2,45 ± 0,65 ms** (số liệu tổng hợp chưa tách riêng cỡ mẫu N cho từng sự kiện thông điệp), bảo đảm thay đổi cấu hình được đồng bộ nhanh giữa các tiến trình ứng dụng, cung cấp bằng chứng thực nghiệm cho NFR-05 và NFR-06.",
+    "after": "**Kiểm tra WIP Strict và đồng bộ bộ đệm (Hình 5.4c):** Bản tổng hợp Proposed ghi 19 lượt kiểm tra di chuyển thẻ, gồm hai lượt được chấp nhận và 17 lượt nhận HTTP 422. Baseline không có tập PATCH đối ứng đầy đủ. Nguồn báo cáo ghi độ trễ Pub/Sub là 2,45 ± 0,65 ms. Chưa có cỡ mẫu, định nghĩa của ± và dấu thời gian phát/nhận giữa các tiến trình để xác nhận NFR-06. Các lượt WIP và JSONB hỗ trợ đánh giá một phần NFR-05.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1584",
+    "before": "Khép lại chuỗi phân tích từ đề cương Phần I đến kiểm chứng thực nghiệm tại Chương 5, phạm vi tính năng sản phẩm đã được tinh gọn có chủ đích để giữ vững trọng tâm kiến trúc, toàn bộ các mục tiêu cốt lõi ban đầu về định danh thuê bao, cô lập dữ liệu và nhất quán trạng thái công việc \\- cùng hai trụ cột mở rộng về kiểm soát hiệu năng K3 và tùy biến động K4 \\- đều đã được triển khai hoàn chỉnh trên Internet và chứng minh định lượng nhất quán dưới điều kiện tải có kiểm soát.",
+    "after": "Chương này đối chiếu kết quả theo bốn khía cạnh K1–K4. Các tập KB-1 và KB-2 được trình bày theo số tổng hợp của nguồn báo cáo. KB-3 và một phần KB-4 có số liệu đối chiếu từ các bản tổng hợp k6 và telemetry đã lưu. Kết luận dưới đây giới hạn theo cấu hình, kịch bản và phạm vi bằng chứng của từng phép thử.",
+    "count": 1
+  },
+  {
+    "id": "R06",
+    "location": "Markdown, dòng 1588",
+    "before": "**Cô lập dữ liệu (Thách thức 2, NFR-02, NFR-03):** KB-2 không ghi nhận bản ghi rò rỉ trên 600 mẫu tiêm lỗi. Chi phí phụ trội của RLS là 0,45 ms, tương đương khoảng 1,8% thời gian phản hồi API đầu-cuối. Kết quả cho thấy có thể tăng cường an toàn dữ liệu mà không gây suy giảm hiệu năng đáng kể trong điều kiện thử nghiệm.",
+    "after": "**Cô lập dữ liệu (Thách thức 2, NFR-02 và NFR-03):** Nguồn báo cáo ghi nhận 0/600 mẫu rò rỉ. Phụ trội 0,45 ms tương đương 36,0% so với truy vấn lọc thủ công, vượt ngưỡng 5% của NFR-03 trong phép đo vi mô. Ước tính khoảng 1,8% mô tả phụ trội theo độ trễ API đầu-cuối.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1590",
+    "before": "**Kháng Hàng xóm ồn ào (Thách thức 3, NFR-04):** Token Bucket từ chối 92,66% lưu lượng của t-aggressor; bốn nhóm thuê bao thông thường đạt 100% yêu cầu hợp lệ thành công. p50 giảm 87,2-88,5%, p95 duy trì dưới 500 ms. Tuy nhiên, p99 vẫn còn cao vì luồng xử lý cắt tải và xác thực JWT vẫn tiêu tốn CPU bên trong kanban-api trước khi loại yêu cầu vượt ngưỡng; khi mở rộng thực tế cần đẩy bộ giới hạn lưu lượng ra tầng cổng biên (Edge Proxy/API Gateway).",
+    "after": "**Hạn chế ảnh hưởng của thuê bao gây nhiễu (Thách thức 3, NFR-04):** Proposed từ chối 16.423/17.723 yêu cầu của nhóm gây nhiễu và ghi nhận 2.613/2.613 lượt kiểm tra nghiệp vụ thường đạt. Cả bốn nhóm thuê bao thông thường có p95 dưới 500 ms. Mức giảm p50 và p95 mô tả hiệu quả kết hợp của hai cơ chế trong lượt đo, trong khi p99 vẫn khoảng 1,99–2,45 giây.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1592",
+    "before": "**Tùy biến động (Thách thức 4, NFR-05, NFR-06):** JSONB hỗ trợ lưu thuộc tính nghiệp vụ mở rộng; WIP Strict chấp nhận 2 lượt hợp lệ và chặn 17 lượt vượt ngưỡng; Redis Pub/Sub truyền sự kiện vô hiệu hóa bộ đệm với độ trễ trung bình 2,45 ± 0,65 ms.",
+    "after": "**Tùy biến động (Thách thức 4, NFR-05 và NFR-06):** Bản tổng hợp ghi nhận các lượt tạo thẻ có trường mở rộng và kiểm tra WIP của Proposed. Số Pub/Sub 2,45 ± 0,65 ms cần nhật ký giữa các tiến trình để đánh giá NFR-06.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1596",
+    "before": "**Quản lý phiên bản lược đồ (Thách thức 6):** Một lược đồ dùng chung được quản lý bằng Flyway giúp tập trung quy trình di trú, tránh phải duy trì cấu trúc dữ liệu riêng cho từng thuê bao.",
+    "after": "**Quản lý phiên bản lược đồ (Thách thức 6):** Một lược đồ dùng chung được quản lý bằng Flyway giúp tập trung quy trình di trú, tránh phải duy trì cấu trúc dữ liệu riêng cho từng thuê bao. Bốn kịch bản chưa đo nâng cấp không gián đoạn hoặc khôi phục dữ liệu theo thuê bao.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1598",
+    "before": "**Giám sát theo thuê bao (Thách thức 7):** Việc gắn ngữ cảnh thuê bao vào nhật ký và dữ liệu giám sát giúp hỗ trợ truy vết hoạt động, đối chiếu tải với mức tiêu thụ tài nguyên. Telemetry cũng cho thấy kanban-api là thành phần cần ưu tiên tối ưu khi mở rộng hệ thống.",
+    "after": "**Giám sát theo thuê bao (Thách thức 7):** Nhật ký ứng dụng có thể dùng ngữ cảnh thuê bao để hỗ trợ truy vết. Telemetry hiện có đo tài nguyên theo dịch vụ trên một nút và xác định kanban-api là ứng viên cần ưu tiên phân tích khi tối ưu.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1604",
+    "before": "Đề tài \"Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao\" đã hoàn thành các mục tiêu nghiên cứu và thực nghiệm đặt ra từ phần Mở đầu. Trước thực trạng các tài liệu về đa thuê bao thường rời rạc theo từng kỹ thuật riêng lẻ hoặc phụ thuộc nhiều vào dịch vụ có sẵn của một nhà cung cấp đám mây, nghiên cứu đã tổng hợp thành một mạch phân tích thống nhất: từ các khái niệm nền tảng như Thuê bao, Dịch vụ và Thể hiện, cách cân nhắc giữa tách riêng và dùng chung tài nguyên trên mô hình chín tầng, cho đến bốn vấn đề kỹ thuật trọng tâm từ K1 đến K4 cần kiểm soát khi xây dựng phần mềm.",
+    "after": "Đề tài \"Xây dựng ứng dụng quản lý công việc theo kiến trúc đa thuê bao\" đã xây dựng nguyên mẫu TenantFlow để đánh giá các cơ chế kiến trúc trong phạm vi đã xác định. Trước thực trạng các tài liệu về đa thuê bao thường rời rạc theo từng kỹ thuật riêng lẻ hoặc phụ thuộc nhiều vào dịch vụ có sẵn của một nhà cung cấp đám mây, nghiên cứu đã tổng hợp thành một mạch phân tích thống nhất: từ các khái niệm nền tảng như Thuê bao, Dịch vụ và Thể hiện, cách cân nhắc giữa tách riêng và dùng chung tài nguyên trên mô hình chín tầng, cho đến bốn vấn đề kỹ thuật trọng tâm từ K1 đến K4 cần kiểm soát khi xây dựng phần mềm.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1606",
+    "before": "Điều quan trọng nhất mà đề tài làm được là đã đưa lý thuyết kiến trúc đa thuê bao vào giải quyết một bài toán quản lý công việc thực tế theo mô hình Kanban, xuất phát từ nhu cầu sử dụng của các nhóm người dùng khác nhau thay vì làm một ứng dụng đơn giản chỉ để minh họa tính năng. Toàn bộ chuỗi giải pháp cho mô hình dùng chung hoàn toàn ở Cấp độ 3 đã được hiện thực hóa trên ứng dụng TenantFlow vận hành trực tiếp qua Internet, bao gồm nhận diện thuê bao qua tên miền phụ và thẻ xác thực, giữ sạch ngữ cảnh xử lý theo từng yêu cầu, bảo vệ dữ liệu ngay tại tầng cơ sở dữ liệu, kiểm soát lưu lượng tránh quá tải chéo và cho phép từng tổ chức tự điều chỉnh giao diện, quy trình lẫn các trường thông tin mở rộng mà không cần sửa mã nguồn. Thông qua việc chạy thử nghiệm có đối chứng, đề tài đã chứng minh rằng mô hình dùng chung hạ tầng có thể tiết kiệm chi phí vận hành mà vẫn giữ được ranh giới an toàn dữ liệu và sự ổn định cho phần lớn nhóm khách hàng.",
+    "after": "Nguyên mẫu TenantFlow hiện thực các cơ chế nhận diện thuê bao qua tên miền phụ và thẻ xác thực, kiểm soát ngữ cảnh xử lý, bảo mật cấp dòng trên ba bảng nghiệp vụ, giới hạn lưu lượng và tùy biến cấu hình theo thuê bao. Thực nghiệm ghi nhận các kết quả trong môi trường một nút. Ở Proposed, p95 dưới 500 ms ở cả bốn nhóm thuê bao thông thường, còn p99 duy trì khoảng 1,99–2,45 giây. Phụ trội RLS theo mẫu số vi mô vượt ngưỡng NFR-03. Các nhận định về chi phí là phân tích kiến trúc và chưa có phép đo TCO của nguyên mẫu.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1608",
+    "before": "Bên cạnh kết quả đã đo kiểm ở Chương 5, nghiên cứu rút ra hai bài học thực tế quan trọng khi thiết kế các hệ thống phần mềm dịch vụ. Với mô hình dùng chung hoàn toàn ứng dụng và cơ sở dữ liệu, tính an toàn dữ liệu và sự công bằng tài nguyên không thể chỉ trông chờ vào câu lệnh kiểm tra trong mã nguồn ứng dụng, mà cần được bảo vệ đồng bộ qua nhiều lớp và lấy cơ sở dữ liệu làm chốt chặn cuối cùng. Đồng thời, việc đặt bộ giới hạn lưu lượng ngay bên trong tiến trình ứng dụng tuy giúp ngăn quá tải cơ sở dữ liệu nhưng vẫn khiến máy chủ ứng dụng tiêu tốn nhiều tài nguyên xử lý để kiểm tra thẻ xác thực và từ chối các luồng yêu cầu rác; kết hợp với việc gom toàn bộ khách hàng lên một cụm máy chủ, hệ thống sẽ sớm chạm ngưỡng chịu tải khi có đột biến truy cập nếu không đưa lớp cắt tải ra cổng vào bên ngoài và tính trước phương án mở rộng.",
+    "after": "Hai điểm thiết kế cần chú ý khi dùng chung ứng dụng và cơ sở dữ liệu là phối hợp kiểm soát quyền ở ứng dụng với chính sách bảo vệ dòng trong cơ sở dữ liệu, và đánh giá chi phí thực thi của bộ giới hạn lưu lượng ở vị trí được triển khai. Kết quả trên máy chủ đơn là căn cứ để ưu tiên phân tích độ trễ đuôi và lập phép đo tiếp theo.",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1612",
+    "before": "Thứ nhất, về quy mô hạ tầng triển khai, hệ thống hiện mới được cài đặt và đánh giá trên một máy chủ đơn lẻ trong cùng một vùng mạng, đồng thời máy chủ này chạy chung với công cụ tạo tải thử nghiệm. Cách bố trí này giúp thấy rõ sự cạnh tranh tài nguyên giữa các thuê bao nhưng cũng khiến máy chủ ứng dụng nhanh chóng chạm ngưỡng tải khi có lượng truy cập dồn dập, làm tốc độ phản hồi ở một số ít yêu cầu chậm nhất chưa thật sự ổn định và chưa phản ánh được điều kiện vận hành trên nhiều máy chủ hoặc nhiều vùng mạng khác nhau.",
+    "after": "Thứ nhất, về quy mô hạ tầng triển khai, hệ thống hiện mới được cài đặt và đánh giá trên một máy chủ đơn lẻ trong cùng một vùng mạng, đồng thời máy chủ này chạy chung với công cụ tạo tải thử nghiệm. Cách bố trí này giúp thấy rõ sự cạnh tranh tài nguyên giữa các thuê bao và ghi nhận độ trễ đuôi cao hơn ngưỡng p95. Kết quả có thể chịu ảnh hưởng của tài nguyên dùng chung giữa k6 và dịch vụ, nên chỉ đại diện cho điều kiện trên một nút.",
+    "count": 1
+  },
+  {
+    "id": "R03",
+    "location": "Markdown, dòng 1624",
+    "before": "Đối với việc ứng dụng trong môi trường đại học, các khoa, bộ môn hoặc nhóm nghiên cứu có thể tham khảo kiến trúc và ứng dụng của đề tài để xây dựng nền tảng quản lý đồ án, bài tập nhóm và tiến độ nghiên cứu khoa học cho giảng viên cùng sinh viên trên một máy chủ dùng chung. Cách làm này giúp tiết kiệm chi phí vận hành máy chủ nhưng mỗi lớp học, môn học hoặc nhóm nghiên cứu vẫn có không gian làm việc riêng, tự điều chỉnh các bước xử lý công việc và thông tin cần quản lý theo đặc thù riêng.",
+    "after": "Đối với việc ứng dụng trong môi trường đại học, các khoa, bộ môn hoặc nhóm nghiên cứu có thể tham khảo kiến trúc và ứng dụng của đề tài để xây dựng nền tảng quản lý đồ án, bài tập nhóm và tiến độ nghiên cứu khoa học cho giảng viên cùng sinh viên trên một máy chủ dùng chung. Cách làm này có thể tận dụng tài nguyên máy chủ dùng chung nhưng mỗi lớp học, môn học hoặc nhóm nghiên cứu vẫn có không gian làm việc riêng, tự điều chỉnh các bước xử lý công việc và thông tin cần quản lý theo đặc thù riêng.",
+    "count": 1
+  },
+  {
+    "id": "R06",
+    "location": "Markdown, dòng 1792",
+    "before": "| **KB-2** (K2) | NFR-02 NFR-03 | 100 thiếu SET LOCAL; 200 thiếu WHERE; 300 IDOR; 500 truy vấn đo vi mô RLS | Thực thi trực tiếp trong mạng nội bộ EC2 nckh-ec2-net bằng vai trò kanban\\_app\\_user | 0 dòng rò rỉ trên 600 mẫu; phụ trội RLS \\< 5% độ trễ API | 0/600 rò rỉ; phụ trội \\+0,45 ms (1,25 \\-\\> 1,70 ms; \\~1,8% API) (Đạt) |",
+    "after": "| **KB-2** (K2) | NFR-02, NFR-03 | 100 thiếu ngữ cảnh; 200 thiếu điều kiện lọc; 300 kiểm tra IDOR; 500 truy vấn vi mô (số nguồn báo cáo) | Kiểm tra cô lập với vai trò ứng dụng và đối chiếu truy vấn lọc thủ công | 0 rò rỉ trong tập mẫu; phụ trội dưới 5% so với truy vấn lọc thủ công | Nguồn báo cáo ghi 0/600 rò rỉ; phụ trội +0,45 ms (36,0% phép đo vi mô, khoảng 1,8% so với API). NFR-03 vượt ngưỡng. |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1791",
+    "before": "| **KB-1** (K1) | NFR-01 | 500 JWT lỗi/thiếu; 200 lệch Host-JWT; 1.500 yêu cầu đan xen 5 thuê bao | Kịch bản HTTP gửi qua caddy-proxy (http\\://127.0.0.1:8080/api) | 100% chặn 401/403; 0% nhiễm bẩn ThreadLocal/MDC | 500/500 mã 401; 200/200 mã 403; 1.500/1.500 khớp ngữ cảnh (Đạt) |",
+    "after": "| **KB-1** (K1) | NFR-01 | 500 JWT lỗi/thiếu; 200 lệch Host-JWT; 1.500 yêu cầu đan xen 5 thuê bao | Kịch bản HTTP gửi qua caddy-proxy (http\\://127.0.0.1:8080/api) | 100% chặn 401/403; 0% nhiễm bẩn ThreadLocal/MDC | 500/500 mã 401; 200/200 mã 403; 1.500/1.500 khớp ngữ cảnh theo tổng hợp nguồn báo cáo, chờ đối chiếu nhật ký gốc |",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1793",
+    "before": "| **KB-3** (K3) | NFR-04 | 80 VUs nghiệp vụ (60 thường \\+ 20 t-aggressor) trong 60s (ổn định trước 25s) | k6 v0.57.0 đối chứng Baseline (tắt Cache/RL) vs. Proposed (bật cả hai) | 4 nhóm thường p95 \\< 500 ms, thành công \\> 99%, chặn bão tải biên | p95 \\= 242,17-276,84 ms; 2.613/2.613 (100%) OK; chặn 92,66% mã 429 (Đạt; p99 \\~2s) |",
+    "after": "| **KB-3** (K3) | NFR-04 | 80 VU nghiệp vụ (60 thường, 20 gây nhiễu); tối đa 82 VU trong 60s (ổn định trước 25s) | k6 v0.57.0 đối chứng Baseline (tắt Cache/RL) vs. Proposed (bật cả hai) | 4 nhóm thường p95 \\< 500 ms, thành công \\> 99%, chặn bão tải biên | p95 \\= 242,17-276,84 ms; 2.613/2.613 (100%) OK; chặn 92,66% mã 429 (Đạt; p99 \\~2s) |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1794",
+    "before": "| **KB-4** (K4) | NFR-05 NFR-06 | 19 lượt đọc cấu hình; 19 lượt tạo thẻ JSONB; 19 lượt PATCH WIP Strict; đo Pub/Sub | 2 VUs kiểm định song song (kb1\\_kb2, kb4\\_dyn) và đo độ trễ Redis Pub/Sub | 100% lưu JSONB; chặn 422 vượt WIP; trễ Pub/Sub vài chục ms | 19/19 mã 200; 19/19 mã 201; 2/2 hợp lệ \\+ 17/17 mã 422; Pub/Sub 2,45 ± 0,65 ms (Đạt) |",
+    "after": "| **KB-4** (K4) | NFR-05, NFR-06 | 19 lượt đọc cấu hình, 19 lượt tạo thẻ có trường mở rộng, 19 lượt kiểm tra WIP | Hai VU kiểm thử chạy song song. Nguồn báo cáo có số tổng hợp Pub/Sub | Kiểm tra tùy biến theo thuê bao và thời gian vô hiệu hóa bộ đệm giữa các tiến trình | 19/19 mã 200; 19/19 mã 201; 2 lượt được chấp nhận, 17 mã 422. NFR-06 cần dữ liệu đo giữa các tiến trình. |",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1824",
+    "before": "| **Phân vị đuôi p99 (4 nhóm thường)** | Ghi nhận 63 lỗi quá hạn timeout | 1,99 \\- 2,45 giây (0 timeout) | Chịu ảnh hưởng bão hòa CPU nút đơn |",
+    "after": "| **Phân vị đuôi p99 (4 nhóm thường)** | — | 1,99–2,45 giây | Cần phép đo bổ sung để xác định nguyên nhân độ trễ đuôi. |",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Markdown, dòng 1825",
+    "before": "| **Tổng thông lượng HTTP & Độ tin cậy** | 101,45 RPS (63 lỗi timeout) | 327,56 RPS (gồm \\~80,3% mã 429); 2.613/2.613 yêu cầu thường OK | \\+222,9% tổng HTTP; 100% nghiệp vụ thường thành công |",
+    "after": "| **Tốc độ HTTP tổng và kết quả nghiệp vụ** | 101,45 RPS; 63 yêu cầu bị k6 xếp thất bại | 327,56 RPS (khoảng 80,4% mã 429); 2.613/2.613 lượt kiểm tra nghiệp vụ thường đạt | Tốc độ HTTP tổng tăng 222,9%. Tỷ lệ thành công nghiệp vụ tính riêng trên nhóm thường. |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1826",
+    "before": "| **GET /api/tenant-settings/kanban** | p50: 137,67 ms \\| p95: 737,24 ms | p50: 21,36 ms \\| p95: 213,21 ms (Trúng L1 Caffeine \\~0,12 ms) | p50 giảm 84,5%; p95 giảm 71,1%; Pub/Sub 2,45 ± 0,65 ms |",
+    "after": "| **GET /api/tenant-settings/kanban** | p50: 137,67 ms \\| p95: 737,24 ms | p50: 21,36 ms \\| p95: 213,21 ms (Trúng L1 Caffeine \\~0,12 ms) | p50 giảm 84,5%; p95 giảm 71,1%; số Pub/Sub cần xác nhận riêng |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1832",
+    "before": "| **kanban-api** | 1,25 vCPU / 2.560 MB | 95,02% (đỉnh 127,93%; RAM \\~1.010 MB) | Điểm nghẽn CPU chính, tiệm cận trần cgroups |",
+    "after": "| **kanban-api** | 1,25 vCPU / 2.560 MB | 95,02% (đỉnh 127,93%; RAM \\~1.010 MB) | Dịch vụ có CPU trung bình cao nhất trong telemetry |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1833",
+    "before": "| **k6 (bộ sinh tải đồng trú)** | Chạy cùng nút EC2 2 vCPU | 14,01% | Góp phần tranh chấp CPU vật lý ở phân vị p99 |",
+    "after": "| **k6 (bộ sinh tải đồng trú)** | Chạy cùng nút EC2 2 vCPU | 14,01% | Chạy đồng trú và sử dụng CPU của máy chủ |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1835",
+    "before": "| **postgres-db** | 0,50 vCPU / 1.536 MB | 8,11% | Dư địa lớn nhờ chỉ mục tổ hợp, bộ đệm và cắt biên |",
+    "after": "| **postgres-db** | 0,50 vCPU / 1.536 MB | 8,11% | Mức sử dụng CPU trong cửa sổ lấy mẫu |",
+    "count": 1
+  },
+  {
+    "id": "R08",
+    "location": "Markdown, dòng 1837",
+    "before": "| **worker (phụ trợ nền)** | Phụ trợ trong cụm thực nghiệm | 1,26% | Tải nền rất thấp, không gây nghẽn |",
+    "after": "| **worker (phụ trợ nền)** | Phụ trợ trong cụm thực nghiệm | 1,26% | CPU trung bình thấp trong cửa sổ lấy mẫu |",
+    "count": 1
+  },
+  {
+    "id": "R10",
+    "location": "Markdown, dòng 1652",
+    "before": "**\\[8\\]** V. R. Narasayya và S. Chaudhuri, \"Multi-Tenant Cloud Data Services: State-of-the-Art, Challenges and Opportunities,\" trong Proceedings of the ACM SIGMOD International Conference on Management of Data, 2022, pp. 1-26, DOI: 10.1145/3514221.3522566.",
+    "after": "**\\[8\\]** V. R. Narasayya và S. Chaudhuri, \"Multi-Tenant Cloud Data Services: State-of-the-Art, Challenges and Opportunities,\" trong Proceedings of the ACM SIGMOD International Conference on Management of Data, 2022, pp. 2465-2473, DOI: 10.1145/3514221.3522566.",
+    "count": 1
+  },
+  {
+    "id": "R10",
+    "location": "Markdown, dòng 1680",
+    "before": "**\\[22\\]** PostgreSQL Global Development Group, \"PostgreSQL 16 Documentation \\- Section 5.8: Row Security Policies & Section 20.1: Setting Parameters (SET LOCAL),\" 2024\\. \\[Trực tuyến\\]. Available: https\\://www\\.postgresql.org/docs/current/ddl-rowsecurity.html",
+    "after": "**\\[22\\]** PostgreSQL Global Development Group, \"PostgreSQL 16 Documentation: Row Security Policies and SET.\" \\[Trực tuyến\\]. https://www.postgresql.org/docs/16/ddl-rowsecurity.html và https://www.postgresql.org/docs/16/sql-set.html.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1195",
+    "before": "Cùng với đó, mọi chỉ mục B-Tree ở Tầng 6 đều phải đặt cột tenant\\_id đứng đầu tiên (Leftmost Prefix): INDEX (tenant\\_id, \\<các\\_cột\\_sắp\\_xếp\\>) để tối ưu hiệu năng truy vấn (K3). Cách đánh chỉ mục này gom toàn bộ khóa của một thuê bao nằm liền kề nhau thay vì rải rác xen kẽ với dữ liệu của các khách hàng khác.",
+    "after": "Với các truy vấn lọc theo thuê bao và sắp xếp theo một hoặc nhiều cột, chỉ mục tổ hợp có thể đặt tenant\\_id ở đầu, ví dụ INDEX (tenant\\_id, \\<các\\_cột\\_sắp\\_xếp\\>). Cách đặt cột đầu hỗ trợ các mẫu truy vấn theo thuê bao. Các chỉ mục khác, như chỉ mục dùng để tìm theo tên miền phụ, phục vụ điều kiện khác.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1197",
+    "before": "Khi đó, mỗi truy vấn của một thuê bao chỉ quét trên một dải hẹp của cây chỉ mục (Index Range Scan) thay vì quét lan sang dữ liệu tổ chức khác. Kết hợp với giới hạn thời gian chạy câu lệnh tại Tầng 4, hệ thống ngăn được tình trạng truy vấn chậm làm nghẽn đĩa I/O chung.",
+    "after": "Bộ lập kế hoạch có thể chọn quét dải chỉ mục cho truy vấn có điều kiện phù hợp. Lựa chọn còn phụ thuộc vào độ chọn lọc, kích thước bảng và ước lượng chi phí. Cần kế hoạch truy vấn và phép đo để đánh giá ảnh hưởng của chỉ mục và giới hạn thời gian chạy trong từng cấu hình.",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1203",
+    "before": "1\\. Tại Tầng 7 (Middleware): Kiểm tra chữ ký số của thẻ bài định danh để ngăn giả mạo IDOR (K1) và đặt hạn mức lưu lượng riêng cho từng thuê bao (K3).",
+    "after": "1\\. Tại Tầng 7 (phần mềm trung gian): Xác thực JWT và đối chiếu ngữ cảnh thuê bao (K1), sau đó áp dụng hạn mức lưu lượng riêng ở lớp lọc ứng dụng (K3).",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1205",
+    "before": "2\\. Tại Tầng 8–9 (Ứng dụng và Thực thi): Giữ ngữ cảnh thuê bao theo phạm vi luồng kèm khối finally thu hồi và giới hạn tài nguyên chạy (K1, K3), dùng bộ nhớ đệm hai tầng chống quét tràn đệm (K2, K3) và áp dụng siêu dữ liệu tùy biến ba lớp lúc chạy (K4).",
+    "after": "2\\. Tại Tầng 8–9 (ứng dụng và thực thi): Gắn ngữ cảnh theo phạm vi xử lý và thu hồi trong khối finally (K1). Bộ nhớ đệm dùng khóa phân vùng theo thuê bao (K2, K3), còn siêu dữ liệu cấu hình cho phép tùy biến ba lớp khi chạy (K4).",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1207",
+    "before": "3\\. Tại Tầng 4–6 (Cơ sở dữ liệu): Tiêm biến phiên giao dịch qua bể kết nối dùng chung (K1) để bật bảo mật cấp dòng FORCE RLS (K2), thu gọn phạm vi tìm kiếm bằng chỉ mục đặt tenant\\_id ở đầu (K3) và lưu trường mở rộng trong cột bán cấu trúc kèm chỉ mục đảo ngược (K4).",
+    "after": "3\\. Tại Tầng 4–6 (cơ sở dữ liệu): Thiết lập ngữ cảnh theo giao dịch (K1). Chính sách RLS kiểm tra dòng trên các bảng nghiệp vụ (K2). Chỉ mục hỗ trợ một số mẫu truy vấn theo thuê bao (K3) và JSONB lưu các trường mở rộng (K4).",
+    "count": 1
+  },
+  {
+    "id": "R04",
+    "location": "Markdown, dòng 1411",
+    "before": "Khi nhiều thành viên cùng kéo thẻ vào một cột đang chạm ngưỡng WIP, giao dịch di chuyển thẻ thực hiện khóa dòng cột đích (SELECT ... FOR UPDATE) trước khi đếm thẻ dưới chế độ STRICT và kiểm tra cột cards.version (Optimistic Locking) để tránh ghi đè vị trí \\[23\\]. Hệ thống chỉ mục B-Tree đặt tenant\\_id ở đầu (idx\\_boards\\_tenant\\_created,idx\\_columns\\_tenant\\_board\\_pos,idx\\_cards\\_tenant\\_col\\_pos) kết hợp chỉ mục GIN trên cards.custom\\_fields giúp mọi câu truy vấn thu gọn vào phạm vi dữ liệu của từng tổ chức.",
+    "after": "Khi nhiều thành viên cùng kéo thẻ vào một cột đang chạm ngưỡng WIP, giao dịch di chuyển thẻ thực hiện khóa dòng cột đích (SELECT ... FOR UPDATE) trước khi đếm thẻ dưới chế độ STRICT và kiểm tra cột cards.version (Optimistic Locking) để tránh ghi đè vị trí \\[23\\]. Hệ thống chỉ mục B-Tree đặt tenant\\_id ở đầu (idx\\_boards\\_tenant\\_created,idx\\_columns\\_tenant\\_board\\_pos,idx\\_cards\\_tenant\\_col\\_pos) kết hợp chỉ mục GIN trên cards.custom\\_fields có thể hỗ trợ các điều kiện lọc và sắp xếp tương ứng. RLS và kiểm soát quyền xác định phạm vi dữ liệu được phép truy cập.",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Thông lượng hệ thống, tỷ lệ chặn tải biên và độ trễ truy xuất cấu hình (KB-3).",
+    "after": "Tốc độ HTTP tổng, tỷ lệ phản hồi 429 và độ trễ truy xuất cấu hình (KB-3).",
+    "count": 2
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "**5.3.1. Kiểm định hiệu năng và kháng hàng xóm ồn ào (KB-3)**",
+    "after": "**5.3.1. Kiểm định hiệu năng khi một thuê bao gây nhiễu (KB-3)**",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "hậu đài",
+    "after": "dịch vụ phía máy chủ",
+    "count": 3
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "mượt mà người dùng",
+    "after": "ổn định cho người dùng",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "bão tải",
+    "after": "đột biến tải",
+    "count": 2
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Tiêm biến phiên",
+    "after": "Thiết lập biến ngữ cảnh",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "tiêm biến phiên",
+    "after": "thiết lập biến ngữ cảnh",
+    "count": 2
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "tiêm ngữ cảnh",
+    "after": "thiết lập ngữ cảnh",
+    "count": 2
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Hàng xóm ồn ào",
+    "after": "hàng xóm ồn ào",
+    "count": 4
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "các tenant.",
+    "after": "các thuê bao.",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "module Quản trị Tenant",
+    "after": "mô-đun quản trị thuê bao",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "module Quản trị hệ thống",
+    "after": "mô-đun quản trị hệ thống",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "module Thành viên",
+    "after": "mô-đun thành viên",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "VUs",
+    "after": "VU",
+    "count": 28
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Trong Ứng dụng",
+    "after": "Trong ứng dụng",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "xây dựng Ứng dụng",
+    "after": "xây dựng ứng dụng",
+    "count": 3
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Điều tiết lưu lượng tại biên (Bước",
+    "after": "Điều tiết lưu lượng ở lớp lọc ứng dụng (Bước",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "ngay tại biên.",
+    "after": "ở lớp lọc ứng dụng.",
+    "count": 1
+  },
+  {
+    "id": "R09",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "chặn biên HTTP 429",
+    "after": "trả HTTP 429 ở lớp lọc ứng dụng",
+    "count": 1
+  },
+  {
+    "id": "R07",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": " (0 timeout)",
+    "after": "",
+    "count": 4
+  },
+  {
+    "id": "R07",
+    "location": "Các vị trí có cụm từ tương ứng",
+    "before": "Đạt SLA",
+    "after": "Đạt ngưỡng",
+    "count": 4
+  }
+]

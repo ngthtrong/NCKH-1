@@ -1,14 +1,34 @@
-% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
-\chapter{CẤU HÌNH ĐÓNG GÓI VÀ GIỚI HẠN TÀI NGUYÊN THỰC NGHIỆM (DOCKER COMPOSE) (Đối ứng Mục~\ref{v4-sec-3-1}, Mục~\ref{v4-sec-4-4-1}--4.4.2 \& Mục~\ref{v4-sec-5-1})}\label{v4-appendix-C}
+% Content imported from Report_newest.docx.md with approved edits.
+\begin{landscape}
+\chapter{CẤU HÌNH ĐÓNG GÓI VÀ ĐỊNH TUYẾN BIÊN}\label{v4-appendix-C}
+\section{Thông số vùng chứa và giới hạn tài nguyên cgroups}\label{v4-sec-C-1}
 
-\Needspace{90bp}
-\section{Tệp cấu hình triển khai 5 vùng chứa (caddy-proxy cùng 4 dịch vụ lõi), cgroups và Caddyfile}\label{v4-sec-C-1}
+Toàn bộ Ứng dụng triển khai trên máy chủ AWS EC2 m7i-flex.large (2 vCPU, 8 GiB RAM, Amazon Linux 2023) thông qua Docker Compose trên mạng cầu nối nội bộ nckh-ec2-net. Toàn bộ thông tin bí mật (mật khẩu cơ sở dữ liệu, khóa ký JWT) được truyền qua biến môi trường \$\{ENV\_\allowbreak{}VAR\} thay vì ghi trực tiếp vào tệp cấu hình.
+\begingroup\VfourTableSetup
+\renewcommand{\thetable}{C.1}
+\begin{longtable}{@{}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}P{\dimexpr 0.20000\linewidth-8.000bp\relax}@{}}
+\caption{Đặc tả cấu hình năm vùng chứa dịch vụ lõi và giới hạn tài nguyên cgroups.}\label{tab:v4-C-1}\\
+\toprule
+Vùng chứa & Ảnh / Môi trường & Cổng mạng & Hạn mức cgroups & Tham số cấu hình trọng yếu \\
+\midrule\endfirsthead
+\toprule
+Vùng chứa & Ảnh / Môi trường & Cổng mạng & Hạn mức cgroups & Tham số cấu hình trọng yếu \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{caddy-proxy} (tenantflow-caddy) & caddy:2.8-alpine & Công khai: 80, 443 Nội bộ: 8080 (k6) & 0,25 vCPU 256 MB RAM & Wildcard *.tenantflow.tech, on\_\allowbreak{}demand\_\allowbreak{}tls, bảo lưu tiêu đề Host, nén zstd/gzip. \\
+\textbf{kanban-web} (tenantflow-web) & React 18 + Nginx & Nội bộ: 80 & 0,25 vCPU 256 MB RAM & Phục vụ bản dựng tĩnh SPA, áp chủ đề giao diện động bằng CSS Variables. \\
+\textbf{kanban-api} (tenantflow-api) & Spring Boot 3.3 Java 21 LTS & Nội bộ: 8080 & 1,25 vCPU 2.560 MB RAM & HikariCP max=25, tài khoản \$\{DB\_\allowbreak{}APP\_\allowbreak{}USER\} (NOBYPASSRLS), khóa \$\{APP\_\allowbreak{}JWT\_\allowbreak{}SECRET\}, Caffeine L1. \\
+\textbf{redis-cache} (tenantflow-redis) & redis:7.2-alpine & Nội bộ: 6379 & 0,25 vCPU 512 MB RAM & Bật -\/-appendonly yes; lưu Token Bucket Lua, đệm L2 và kênh Pub/Sub. \\
+\textbf{postgres-db} (tenantflow-postgres) & postgres:16-alpine & Nội bộ: 5432 & 0,50 vCPU 1.536 MB RAM & Volume bền vững pgdata, nạp 01-init-roles.sql tạo vai trò NOBYPASSRLS, bật FORCE RLS. \\
+\textbf{Tổng 5 dịch vụ lõi} & \textbf{AWS EC2 2 vCPU, 8 GiB RAM} & \textbf{Security Group chỉ mở 80/443} & \textbf{2,50 vCPU} \textbf{5.120 MB RAM} & \textbf{Thiết lập CPU overcommit có chủ ý để kiểm chứng K3; telemetry còn ghi nhận worker (1,26\%) và k6 (14,01\%).} \\
+\end{longtable}
+\endgroup
+\end{landscape}
 
-\par\noindent\textbf{C.1. Docker Compose (5 Vùng chứa + cgroups) \& Cấu hình Caddyfile}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/C-1.txt}
+\section{Cấu hình định tuyến tên miền phụ và On-Demand TLS}\label{v4-sec-C-2}
 
-\Needspace{90bp}
-\section{Tệp cấu hình định tuyến Wildcard Subdomain biên (Caddyfile)}\label{v4-sec-C-2}
+Trích đoạn Caddyfile dưới đây trình bày ba quy tắc cốt lõi tại tầng biên: kiểm duyệt tên miền hợp lệ trước khi cấp chứng chỉ TLS tự động (chống lạm dụng hạn mức Let\textquotesingle s Encrypt), định tuyến tên miền phụ *.tenantflow.tech kèm bảo lưu nguyên vẹn tiêu đề Host để JwtTenantFilter đối soát, và khối lắng nghe nội bộ :8080 dành riêng cho công cụ k6 đo tải trong mạng máy chủ mà không phát sinh chuyển hướng HTTP 308 sang HTTPS.
 
-\par\noindent\textbf{C.2. ĐỊNH TUYẾN WILDCARD SUBDOMAIN VÀ BẢO LƯU TIÊU ĐỀ BIÊN}\par
+\par\Needspace{65bp}\noindent\textbf{Trích đoạn C.2 - Quy tắc On-Demand TLS, Wildcard Subdomain và cổng đo tải nội bộ (Caddyfile)}\par
 \VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/C-2.txt}

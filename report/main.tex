@@ -20,14 +20,24 @@
 \hypersetup{pageanchor=true}
 \renewcommand{\theHtable}{front.\thepage.\arabic{table}}
 \input{frontmatter/participants}
+\begingroup\setstretch{1.15}
 \tableofcontents
 \listoftables
 \listoffigures
+\endgroup
 \input{frontmatter/abbreviations}
 \input{frontmatter/research-info-vi}
 \input{frontmatter/research-info-en}
 \input{frontmatter/principal-investigator}
 \clearpage\pagenumbering{arabic}
+\raggedbottom
+\setlength{\parskip}{2bp}
+\setlength{\abovecaptionskip}{8bp}
+\setlength{\belowcaptionskip}{3bp}
+\RedeclareSectionCommand[afterskip=14bp]{chapter}
+\RedeclareSectionCommand[beforeskip=-12bp,afterskip=6bp]{section}
+\RedeclareSectionCommand[beforeskip=-10bp,afterskip=5bp]{subsection}
+\RedeclareSectionCommand[beforeskip=-8bp,afterskip=4bp]{subsubsection}
 \renewcommand{\theHtable}{\theHchapter.\arabic{table}}
 \include{chapters/introduction}
 \VfourDivisionBeforeChapter{PHẦN II. KẾT QUẢ NGHIÊN CỨU VÀ PHÂN TÍCH}
@@ -47,8 +57,12 @@
 \include{appendices/v4-b}
 \include{appendices/v4-c}
 \include{appendices/v4-d}
-% HinhThucBC 3.15: approved proposal, only when the signed/stamped PDF is supplied.
-% \includepdf[pages=-,pagecommand={}]{assets/approved-proposal.pdf}
+% HinhThucBC 3.15: complete scan, fitted to the A4 report pages.
+\clearpage\bookmarksetup{startatroot}
+\includepdf[pages=1,fitpaper=false,
+  pagecommand={\thispagestyle{empty}\phantomsection
+    \addcontentsline{toc}{chapter}{Thuyết minh đề tài đã phê duyệt}}]{assets/approved-proposal.pdf}
+\includepdf[pages=2-,pagetemplate=1,fitpaper=false,pagecommand={\thispagestyle{empty}}]{assets/approved-proposal.pdf}
 % HinhThucBC 3.16: registered group I-III products, using real evidence PDFs.
 % \includepdf[pages=-,pagecommand={}]{assets/product-evidence.pdf}
 \clearpage\bookmarksetup{startatroot}\pdfbookmark[0]{Bản tin và báo cáo tóm tắt}{product-bulletins}

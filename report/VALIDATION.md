@@ -1,10 +1,117 @@
-# Kiểm tra báo cáo V4
+# Kiểm tra báo cáo THS2026-67
 
-## Bản ngày 26/11/2026
+## Ký hiệu danh sách ngày 27/11/2026
 
-Nguồn gồm `Report_V4.md`, `Report_V4.pdf` và `Report_V4.docx`. Hash nguồn,
-ánh xạ từng ảnh và phiên bản các mục phụ lục nằm trong
-[manifest](assets/v4-import-manifest.json). Nội dung đã duyệt, các mục
+Danh sách không đánh số dùng `–` ở cấp 1, `+` ở cấp 2 và `•`
+ở cấp 3. Hai mục con trong bảng luồng sử dụng ở Mục 4.2.2 dùng dấu
+`+` theo cùng cấu hình. Danh sách có thứ tự dùng số kèm dấu chấm.
+Đối chiếu danh sách ở trang PDF 26 và các mục con trong bảng ở trang
+PDF 86. Mẫu biên dịch riêng xác nhận đủ ba cấp ký hiệu.
+Cả hai bản có 153 trang A4 và qua `make -C report check` cùng
+`python report/scripts/verify_v4.py`.
+
+## Dàn trang và danh sách ngày 27/11/2026
+
+[Bản một mặt](build/content/content.pdf) và
+[bản hai mặt](build/content-twoside/content.pdf) được dựng từ cùng nguồn.
+
+| Chỉ số | Trước | Sau |
+| --- | ---: | ---: |
+| Tổng số trang A4 mỗi bản | 160 | 153 |
+| Từ Mở đầu đến hết Kết luận và kiến nghị | 96 | 92 |
+| Trang ngang trong thân bài, tài liệu tham khảo và phụ lục A–D | 34 | 29 |
+| Trang có nội dung chiếm dưới 60% chiều cao vùng in trong cùng phạm vi | 20 | 18 |
+
+Các điều chỉnh gồm khoảng cách đoạn 2 bp và chuẩn hóa cấu trúc danh sách.
+Bộ nhập bỏ dấu xuống dòng thừa cuối mục. Thân bài dùng Times New Roman
+13 bp, giãn dòng 1,3. Bảng dùng 13 bp, giãn dòng 1,10 và lặp đầu cột
+khi qua trang.
+
+Bảng 1.1 dùng một trang ngang. Hình 2.5 đi cùng mục giới thiệu.
+Phần cuối đoạn dẫn vào Hình 4.6 nằm cùng trang với ba ảnh và chú thích.
+Hai trang chỉ có vài dòng ở Chương 5 đã được nhập vào luồng nội dung.
+Một số trang chuyển từ dọc sang ngang, trang kết chương và trang nối
+bảng vẫn có khoảng trắng, chẳng hạn trang PDF 60 và 123.
+
+Đã đối chiếu ảnh chủ nhiệm tại trang PDF 20, đủ 16 trang bản scan
+thuyết minh tại trang 132–147 và các biểu mẫu Việt–Anh tại trang 148–153.
+Mục lục dẫn đến trang đầu của bản scan.
+
+Cả hai bản vượt qua `make -C report check` và
+`python report/scripts/verify_v4.py`. Bộ kiểm tra đối chiếu đủ 25.193
+cụm năm từ từ 353 đoạn sau khi chuẩn hóa cấu trúc danh sách, cùng
+40 chú thích hình, thứ tự 42 ảnh gốc và 17 bảng.
+
+## Bản bổ sung hồ sơ trước khi tối ưu dàn trang
+
+Ở lần ghép hồ sơ trước khi tối ưu, bản một mặt và hai mặt đều có
+**160 trang A4**.
+Số trang dưới đây tính từ trang đầu của tệp PDF.
+
+| Nội dung | Trang PDF | Đối chiếu |
+| --- | --- | --- |
+| Phiếu sinh viên chủ nhiệm | 20 | Ảnh người dùng cung cấp nằm trong khung mẫu, giữ tỷ lệ và không đè lên văn bản. |
+| Thuyết minh đề tài đã phê duyệt | 139–154 | Đủ 16 trang đúng thứ tự, gồm trang chữ ký và dấu. Mục lục và dấu trang đều dẫn tới trang 139. |
+| Bản tin và tóm tắt Việt–Anh | 155–160 | Đúng thứ tự và khớp nội dung các PDF xuất riêng. |
+
+Hai tài nguyên [ảnh chân dung](assets/student-photo.png) và
+[bản scan thuyết minh](assets/approved-proposal.pdf) khớp từng byte với
+tệp nhóm cung cấp. Đã đối chiếu ảnh nhúng theo từng trang scan, vị trí
+ảnh chân dung và văn bản các phần còn lại với bản trước khi ghép.
+`make -C report all smoke` và `make -C report check` thành công.
+Các mục hồ sơ cần hoàn thiện nằm tại [V4-REVIEW.md](V4-REVIEW.md).
+
+## Phiên bản Report_newest ngày 26/11/2026 trước khi bổ sung hồ sơ
+
+Đã áp dụng các mục R01–R10 vào nội dung LaTeX. Hash ba tệp nguồn,
+thứ tự đề mục, hình, bảng và các trích đoạn Word được ghi tại
+[manifest](assets/v4-import-manifest.json). Các quyết định và hồ sơ
+còn thiếu nằm ở [V4-REVIEW.md](V4-REVIEW.md).
+
+| Đầu ra | Số trang |
+| --- | ---: |
+| Bản một mặt | 144 |
+| Bản hai mặt | 144 |
+| [Bản tin Việt](build/bulletin-vi/bulletin-vi.pdf) | 1 |
+| [Bản tin Anh](build/bulletin-en/bulletin-en.pdf) | 1 |
+| [Tóm tắt Việt](build/summary-vi/summary-vi.pdf) | 2 |
+| [Tóm tắt Anh](build/summary-en/summary-en.pdf) | 2 |
+| [Minh họa template](build/smoke/smoke.pdf) | 6 |
+
+- Từ Mở đầu đến hết Kết luận và kiến nghị, bản một mặt có
+  96 trang (trang PDF 21–116), bản hai mặt
+  có 96 trang (trang PDF 21–116).
+- Hai quyển có 40 số hình, 42 ảnh đúng thứ tự, 17 bảng gồm 15 bảng
+  có chú thích, 4 trích đoạn mã và 24 tài liệu tham khảo. Ba sơ đồ
+  2.2, 3.6 và 3.9 dùng ảnh DOCX gốc. Các ảnh còn lại khớp pixel giữa
+  DOCX và PDF nguồn. Hình 5.2 và 5.3b có nhãn hiệu chỉnh trong LaTeX.
+- Bộ kiểm tra đối chiếu đủ 25.223 cụm năm từ
+  từ 352 đoạn thân bài và phụ lục sau khi áp dụng
+  các sửa đổi đã duyệt. Chú thích của cả 40 hình ở cùng trang với hình.
+  Khoảng cách lớn nhất đo được là 23,32 bp.
+- Đã kiểm tra khổ A4, phông nhúng, số trích dẫn, danh mục hình và bảng,
+  bìa, biểu mẫu, các trang ngang và vùng ký trong bản PDF. Bốn PDF
+  riêng khớp văn bản với các biểu mẫu ghép ở cuối mỗi quyển.
+
+```bash
+make -C report all smoke
+make -C report check
+python report/scripts/verify_v4.py
+git diff --check -- report
+```
+
+Nhánh BibTeX cũng dựng thành công `content` và `smoke` trên bản sao
+độc lập. Kết quả kiểm tra áp dụng cho việc chuyển đổi và trình bày
+báo cáo. Hồ sơ nghiệm thu và các phép đo cần dữ liệu gốc được theo
+dõi trong [V4-REVIEW.md](V4-REVIEW.md).
+
+## Lịch sử kiểm tra Report V4
+
+### Bản V4 ngày 26/11/2026
+
+Nguồn gồm `Report_V4.md`, `Report_V4.pdf` và `Report_V4.docx`. Hash,
+ánh xạ ảnh và các mục phụ lục của phiên bản này nằm trong manifest
+`assets/v4-import-manifest.json` ở lịch sử Git. Nội dung đã duyệt, các mục
 tạm hoãn và dữ liệu biểu mẫu được ghi ở [V4-REVIEW.md](V4-REVIEW.md).
 
 | Đầu ra | Số trang |

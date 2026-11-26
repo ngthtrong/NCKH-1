@@ -1,20 +1,33 @@
-% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
-\chapter{LƯỢC ĐỒ CƠ SỞ DỮ LIỆU VÀ CHÍNH SÁCH BẢO MẬT DÒNG (POSTGRESQL DDL \& RLS) (Đối ứng Mục~\ref{v4-sec-3-4} \& Mục~\ref{v4-sec-4-3-2})}\label{v4-appendix-A}
+% Content imported from Report_newest.docx.md with approved edits.
+\begin{landscape}
+\chapter{ĐẶC TẢ CƠ SỞ DỮ LIỆU VÀ CHÍNH SÁCH BẢO MẬT CẤP DÒNG}\label{v4-appendix-A}
+\section{Từ điển dữ liệu và chỉ mục}\label{v4-sec-A-1}
 
-\Needspace{90bp}
-\section{Thiết lập vai trò bảo mật (NOBYPASSRLS) và Lược đồ Mặt phẳng Điều khiển (Control Plane)}\label{v4-sec-A-1}
+Lược đồ cơ sở dữ liệu kanban\_\allowbreak{}saas\_\allowbreak{}db trên PostgreSQL 16 gồm năm bảng quan hệ đặt chung trong lược đồ public, phân tách rõ giữa Mặt phẳng Điều khiển (tenants, tenant\_\allowbreak{}users) và Mặt phẳng Dữ liệu (boards, board\_\allowbreak{}columns, cards). Ba bảng nghiệp vụ lưu trực tiếp tenant\_\allowbreak{}id và có các chỉ mục hỗ trợ mẫu truy vấn theo thuê bao, như trình bày trong Bảng~\ref{tab:v4-A-1}.
+\begingroup\VfourTableSetup
+\renewcommand{\thetable}{A.1}
+\begin{longtable}{@{}P{\dimexpr 0.14000\linewidth-5.600bp\relax}P{\dimexpr 0.17000\linewidth-6.800bp\relax}P{\dimexpr 0.28000\linewidth-11.200bp\relax}P{\dimexpr 0.15000\linewidth-6.000bp\relax}P{\dimexpr 0.26000\linewidth-10.400bp\relax}@{}}
+\caption{Từ điển dữ liệu, ràng buộc toàn vẹn, phạm vi FORCE RLS và chỉ mục của năm bảng cốt lõi.}\label{tab:v4-A-1}\\
+\toprule
+Bảng \& Mặt phẳng & Khóa chính \& Khóa ngoại & Cột trọng yếu \& Ràng buộc & FORCE RLS & Chỉ mục \& Vai trò \\
+\midrule\endfirsthead
+\toprule
+Bảng \& Mặt phẳng & Khóa chính \& Khóa ngoại & Cột trọng yếu \& Ràng buộc & FORCE RLS & Chỉ mục \& Vai trò \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{tenants} (Điều khiển) & PK: id (UUID) & slug (UNIQUE), name, tier (FREE/PRO/ENTERPRISE), rate\_\allowbreak{}limit\_\allowbreak{}rpm (\textgreater0), max\_\allowbreak{}members (\textgreater0), status (ACTIVE/SUSPENDED), settings (JSONB), created\_\allowbreak{}at & Không (phân giải nhận diện biên theo slug) & UNIQUE(slug) - tra cứu nhanh tên miền phụ tại cổng biên \\
+\textbf{tenant\_\allowbreak{}users} (Điều khiển) & PK: id (UUID) FK: tenant\_\allowbreak{}id -\textgreater{} tenants(id) & email, password\_\allowbreak{}hash, full\_\allowbreak{}name, role (TENANT\_\allowbreak{}ADMIN/MEMBER), UNIQUE(tenant\_\allowbreak{}id, email), created\_\allowbreak{}at & Không (đối khớp đăng nhập 1-1 theo Host) & idx\_\allowbreak{}tenant\_\allowbreak{}users\_\allowbreak{}email (email) - xác thực tài khoản đăng nhập \\
+\textbf{boards} (Dữ liệu) & PK: id (UUID) FK: tenant\_\allowbreak{}id -\textgreater{} tenants(id) & name (VARCHAR 150), created\_\allowbreak{}at (TIMESTAMPTZ) & ENABLE + FORCE RLS (USING \& WITH CHECK) & idx\_\allowbreak{}boards\_\allowbreak{}tenant\_\allowbreak{}created (tenant\_\allowbreak{}id, created\_\allowbreak{}at DESC) \\
+\textbf{board\_\allowbreak{}columns} (Dữ liệu) & PK: id (UUID) FK: tenant\_\allowbreak{}id -\textgreater{} tenants(id) FK: board\_\allowbreak{}id -\textgreater{} boards(id) & name (VARCHAR 80), position (INT), wip\_\allowbreak{}limit (NULL hoặc \textgreater0) & ENABLE + FORCE RLS (USING \& WITH CHECK) & idx\_\allowbreak{}columns\_\allowbreak{}tenant\_\allowbreak{}board\_\allowbreak{}pos (tenant\_\allowbreak{}id, board\_\allowbreak{}id, position) \\
+\textbf{cards} (Dữ liệu) & PK: id (UUID) FK: tenant\_\allowbreak{}id, column\_\allowbreak{}id, assignee\_\allowbreak{}id & title, description, position, version (Optimistic Lock), custom\_\allowbreak{}fields (JSONB), created\_\allowbreak{}at & ENABLE + FORCE RLS (USING \& WITH CHECK) & idx\_\allowbreak{}cards\_\allowbreak{}tenant\_\allowbreak{}col\_\allowbreak{}pos (tenant\_\allowbreak{}id, column\_\allowbreak{}id, position); idx\_\allowbreak{}cards\_\allowbreak{}custom\_\allowbreak{}fields\_\allowbreak{}gin (GIN jsonb\_\allowbreak{}path\_\allowbreak{}ops) \\
+\end{longtable}
+\endgroup
+\end{landscape}
 
-\par\noindent\textbf{A.1. SQL -- Vai trò NOBYPASSRLS \& Bảng Mặt phẳng Điều khiển}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-1.txt}
+\section{Chính sách bảo mật cấp dòng (FORCE RLS)}\label{v4-sec-A-2}
 
-\Needspace{90bp}
-\section{Lược đồ Mặt phẳng Dữ liệu và Hệ thống Chỉ mục Tổ hợp dẫn đầu bởi tenant\_\allowbreak{}id}\label{v4-sec-A-2}
+Hệ thống tách biệt tài khoản di trú lược đồ (kanban\_\allowbreak{}migrator) khỏi tài khoản thực thi ứng dụng có quyền tối thiểu và mang cờ NOBYPASSRLS (kanban\_\allowbreak{}app\_\allowbreak{}user). Đoạn lệnh SQL cốt lõi dưới đây minh họa cơ chế kích hoạt FORCE RLS và chính sách đóng an toàn mặc định (Fail-Closed) đại diện cho bảng cards; hai bảng boards và board\_\allowbreak{}columns áp dụng cùng cấu trúc mệnh đề USING và WITH CHECK tương đương.
 
-\par\noindent\textbf{A.2. SQL -- Bảng Mặt phẳng Dữ liệu \& Chỉ mục Dẫn đầu tenant\_\allowbreak{}id + GIN}\par
+\par\Needspace{65bp}\noindent\textbf{Trích đoạn A.2 - Vai trò NOBYPASSRLS và Chính sách Fail-Closed FORCE RLS (PostgreSQL 16)}\par
 \VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-2.txt}
-
-\Needspace{90bp}
-\section{Kịch bản kích hoạt và cưỡng chế chính sách Row-Level Security (ENABLE / FORCE RLS)}\label{v4-sec-A-3}
-
-\par\noindent\textbf{A.3. SQL -- Chính sách ENABLE / FORCE ROW LEVEL SECURITY (Fail-Closed)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/A-3.txt}

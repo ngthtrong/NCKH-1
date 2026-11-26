@@ -1,23 +1,33 @@
-% Bài viết và tài liệu kỹ thuật khác, chép metadata từ Report_V4.md.
-% Không bổ sung ngày truy cập, DOI, tác giả hoặc năm mà V4 chưa cung cấp.
+% Report_newest.docx.md. Khóa giữ số trong nguồn; số in do template sinh.
 
-% V4 [9]: nguồn chỉ ghi "overview paper"; không tự gán nơi xuất bản.
-@misc{v4-09,
-  author = {Kumar, R.},
-  title = {{Multi-Tenant SaaS Architectures: Design Principles and Security Considerations}},
-  howpublished = {overview paper},
-  year = {2025}
+@misc{v4-19,
+  author = {{Amazon Web Services (AWS)}},
+  title = {{AWS Well-Architected Framework: SaaS Lens – General Design Principles, Tenant Isolation Models \& Data Partitioning Patterns}},
+  howpublished = {AWS Whitepapers \& Guides},
+  year = {2024}
 }
 
-% V4 [10]
-@misc{v4-10,
-  author = {{Microsoft Azure Architecture Center}},
-  title = {{Architecting multitenant solutions on Azure: Tenancy models, data isolation approaches, and noisy neighbor mitigation}},
-  year = {2024},
-  url = {https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview}
+@misc{v4-13,
+  author = {{Amazon Web Services (aws-samples)}},
+  title = {{SaaS Reference Architecture on Amazon ECS}},
+  howpublished = {GitHub repository},
+  url = {https://github.com/aws-samples/saas-reference-architecture-ecs}
 }
 
-% V4 [11]
+@misc{v4-15,
+  author = {Chong, F. and Carraro, G.},
+  title = {{Architecture strategies for catching the long tail}},
+  howpublished = {Microsoft Corporation, MSDN Library, pp. 1--14},
+  year = {2006}
+}
+
+@misc{v4-16,
+  author = {Chong, F. and Carraro, G. and Wolter, R.},
+  title = {{Multi-tenant data architecture}},
+  howpublished = {Microsoft Corporation, MSDN Library},
+  year = {2006}
+}
+
 @misc{v4-11,
   author = {Golding, T.},
   title = {{SaaS Architecture Fundamentals}},
@@ -26,22 +36,12 @@
   url = {https://docs.aws.amazon.com/whitepapers/latest/saas-architecture-fundamentals}
 }
 
-% V4 [12]: nguồn không cung cấp năm.
 @misc{v4-12,
   author = {{Google Cloud Architecture Center}},
   title = {{Best practices for enterprise multi-tenancy}},
   url = {https://cloud.google.com/kubernetes-engine/docs/concepts/multitenancy-overview}
 }
 
-% V4 [13]: nguồn không cung cấp năm.
-@misc{v4-13,
-  author = {{Amazon Web Services (aws-samples)}},
-  title = {{SaaS Reference Architecture on Amazon ECS}},
-  howpublished = {GitHub repository},
-  url = {https://github.com/aws-samples/saas-reference-architecture-ecs}
-}
-
-% V4 [14]: không giữ DOI/URL từ bản cũ vì V4 không cung cấp.
 @techreport{v4-14,
   author = {Mell, P. and Grance, T.},
   title = {{The NIST Definition of Cloud Computing}},
@@ -51,42 +51,16 @@
   year = {2011}
 }
 
-% V4 [15]
-@misc{v4-15,
-  author = {Chong, F. and Carraro, G.},
-  title = {{Architecture strategies for catching the long tail}},
-  howpublished = {Microsoft Corporation, MSDN Library, pp. 1--14},
-  year = {2006}
+@misc{v4-10,
+  author = {{Microsoft Azure Architecture Center}},
+  title = {{Architecting multitenant solutions on Azure: Tenancy models, data isolation approaches, and noisy neighbor mitigation}},
+  year = {2024},
+  url = {https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview}
 }
 
-% V4 [16]
-@misc{v4-16,
-  author = {Chong, F. and Carraro, G. and Wolter, R.},
-  title = {{Multi-tenant data architecture}},
-  howpublished = {Microsoft Corporation, MSDN Library},
-  year = {2006}
-}
-
-% V4 [19]
-@misc{v4-19,
-  author = {{Amazon Web Services (AWS)}},
-  title = {{AWS Well-Architected Framework: SaaS Lens – General Design Principles, Tenant Isolation Models \& Data Partitioning Patterns}},
-  howpublished = {AWS Whitepapers \& Guides},
-  year = {2024}
-}
-
-% V4 [22]
 @misc{v4-22,
-  author = {{Cloud Native Computing Foundation (CNCF)}},
-  title = {{OpenFeature Specification (v0.8.0): Vendor-agnostic, community-driven API for feature flagging}},
-  year = {2024},
-  url = {https://openfeature.dev/specification/}
-}
-
-% V4 [25]: giữ nhan đề PostgreSQL 16 và URL /current/ như nguồn.
-@misc{v4-25,
   author = {{PostgreSQL Global Development Group}},
-  title = {{PostgreSQL 16 Documentation – Section 5.8: Row Security Policies \& Section 20.1: Setting Parameters (SET LOCAL)}},
-  year = {2024},
-  url = {https://www.postgresql.org/docs/current/ddl-rowsecurity.html}
+  title = {{PostgreSQL 16 Documentation: Row Security Policies and SET}},
+  url = {https://www.postgresql.org/docs/16/ddl-rowsecurity.html},
+  note = {SET: \url{https://www.postgresql.org/docs/16/sql-set.html}}
 }

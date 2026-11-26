@@ -1,0 +1,15 @@
+@Aspect @Component @Order(Ordered.LOWEST_PRECEDENCE) // Chạy SAU khi @Transactional mở giao dịch
+public class RlsConnectionInterceptor {
+    @PersistenceContext private EntityManager entityManager;
+
+    @Before("@annotation(org.springframework.transaction.annotation.Transactional) || " +
+            "@within(org.springframework.transaction.annotation.Transactional)")
+    public void applyTenantRlsContext() {
+        TenantInfo info = TenantContext.get();
+        // Fail-Closed: Nếu info == null -> Không đặt biến -> FORCE RLS tự động chặn 100%
+        if (info != null && info.tenantId() != null) {
+            entityManager.createNativeQuery("SELECT set_config('app.current_tenant_id', :tid, true)")
+                    .setParameter("tid", info.tenantId().toString()).getSingleResult();
+        }
+    }
+}

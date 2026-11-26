@@ -1,48 +1,21 @@
-# Khối tùy chọn toàn cục: Kiểm duyệt tên miền hợp lệ trước khi cấp phát chứng chỉ tự động
-{
+{   # Kiểm duyệt tên miền hợp lệ trước khi cấp phát chứng chỉ HTTPS tự động
     admin off
-    on_demand_tls {
-        ask http://kanban-api:8080/api/public/tls-check
-    }
+    on_demand_tls { ask http://kanban-api:8080/api/public/tls-check }
 }
 
-# 1. Cổng quản trị và tên miền gốc (admin.tenantflow.tech, tenantflow.tech)
-admin.{$BASE_DOMAIN:tenantflow.tech}, {$BASE_DOMAIN:tenantflow.tech} {
-    encode zstd gzip
-    # Chuyển tiếp API sang kanban-api (Bảo lưu Header Host để phân giải tenant)
-    handle /api/* {
-        reverse_proxy kanban-api:8080 {
-            header_up Host {http.request.host}
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-Proto https
-        }
-    }
-    # Chuyển tiếp giao diện người dùng Single Page Application (SPA)
-    handle {
-        reverse_proxy kanban-web:80 {
-            header_up Host {http.request.host}
-            header_up X-Real-IP {remote_host}
-        }
-    }
-}
-
-# 2. Không gian làm việc đa thuê bao (*.tenantflow.tech, VD: t-acme, t-lotus)
+# 1. Không gian thuê bao công cộng (áp dụng tương tự cho admin.tenantflow.tech)
 *.{$BASE_DOMAIN:tenantflow.tech} {
-    tls {
-        on_demand # Chỉ cấp SSL/TLS khi endpoint tls-check trả về HTTP 200
-    }
+    tls { on_demand }
     encode zstd gzip
     handle /api/* {
-        reverse_proxy kanban-api:8080 {
-            header_up Host {http.request.host}
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-Proto https
-        }
+        reverse_proxy kanban-api:8080 { header_up Host {http.request.host} }
     }
-    handle {
-        reverse_proxy kanban-web:80 {
-            header_up Host {http.request.host}
-            header_up X-Real-IP {remote_host}
-        }
+    handle { reverse_proxy kanban-web:80 }
+}
+
+# 2. Cổng HTTP nội bộ riêng cho công cụ đo tải k6 (tránh chuyển hướng 308 sang HTTPS)
+:8080 {
+    handle /api/* {
+        reverse_proxy kanban-api:8080 { header_up Host {http.request.host} }
     }
 }

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Import Report V4 and apply the approved copy edits.
+"""Import Report_newest and apply the approved copy edits.
 
 Requires pypandoc_binary, PyMuPDF and Pillow only when re-importing; ordinary
-report builds need none of these. The two source files are never modified.
+report builds need none of these. The three source files are never modified.
 """
 from __future__ import annotations
 
 import base64
-from copy import deepcopy
 import hashlib
 import io
 import json
@@ -21,13 +20,24 @@ from PIL import Image
 import pypandoc
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT.parent / 'Report_V4.md'
-PDF = ROOT.parent / 'Report_V4.pdf'
-DOCX = ROOT.parent / 'Report_V4.docx'
+DOCX = ROOT.parent / 'Report_newest.docx'
+SOURCE = DOCX.with_suffix('.docx.md')
+PDF = DOCX.with_suffix('.docx.pdf')
+APPROVED_EDITS = ROOT / 'assets/newest-approved-edits.json'
+REFERENCE_COUNT = 24
+MARKDOWN_FORMAT = 'markdown-smart-citations-implicit_figures'
 API = []
 MANIFEST = {'sources': {}, 'headings': [], 'figures': [], 'tables': [], 'code': []}
-LANDSCAPE_FIGURES = {'2.7', '3.10', '4.4', '4.8', '4.9'}
-LISTING_ID = re.compile(r'^([A-D](?:\.\d+)+)\. ')
+LANDSCAPE_FIGURES = {'2.6', '2.7', '3.10', '4.4', '4.7', '4.8', '4.9', '5.2', '5.3b'}
+FIGURE_HEIGHT_LIMIT = {'2.6': '.52', '3.10': '.55', '4.9': '.62', '5.4': '.355'}
+LANDSCAPE_LEAD_COUNT = {'5.3b': 2}
+FIGURE_NOTES = {
+    '5.2': 'R06/R08: label KB-1/KB-2 evidence and report NFR-03 above threshold',
+    '5.3b': 'R07/R08: classify HTTP failures, total RPS, and Pub/Sub evidence',
+}
+FIGURE_ID = r'\d+\.\d+[a-z]?'
+TABLE_ID = r'[\dA-D]+\.\d+[a-z]?'
+LISTING_ID = re.compile(r'^Trích đoạn ([A-D](?:\.\d+)+)\s*[-–]')
 
 
 def plain(value):
@@ -77,19 +87,17 @@ def write(path, content):
         output.write('\n'.join(line.rstrip() for line in content.rstrip().split('\n')) + '\n')
 
 
-def extract_images(source):
+def image_definitions(source):
     def replace(match):
         name, mime, encoded = match.groups()
         data = base64.b64decode(encoded)
         suffix = {'image/png': '.png', 'image/jpeg': '.jpg'}[mime]
-        path = ROOT / 'assets/figures/v4' / (name + suffix)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
+        path = Path('assets/figures/v4') / (name + suffix)
         with Image.open(io.BytesIO(data)) as img:
             width, height = img.size
-        IMAGE_DATA[name] = {'image_id': name, 'path': str(path.relative_to(ROOT)).replace('\\', '/'),
-                            'sha256': hashlib.sha256(data).hexdigest(),
-                            'width_px': width, 'height_px': height}
+        IMAGE_DATA[name] = {'image_id': name, 'path': path.as_posix(),
+                            'markdown_sha256': hashlib.sha256(data).hexdigest(),
+                            'markdown_dimensions': [width, height]}
         return f'[{name}]: {IMAGE_DATA[name]["path"]}'
     return re.sub(r'^\[(image\d+)\]:\s*<data:([^;]+);base64,([^>]+)>\s*$', replace, source, flags=re.M)
 
@@ -130,37 +138,76 @@ def clean_markdown(source):
     return re.sub(r'(\S)(!\[\]\[image31\])', r'\1\n\n\2', source)
 
 
-def apply_approved_edits(source):
-    path = ROOT / 'assets/v4-approved-edits.json'
-    edits = json.loads(path.read_text(encoding='utf-8'))
-    for edit in edits:
-        before, after, count = edit['before'], edit['after'], edit['count']
-        if source.count(before) != count:
-            raise ValueError(f"Recheck {edit['id']} at {edit['location']}")
-        source = source.replace(before, after)
+def normalize_list_markers(source):
+    """Turn Word export's typed markers into real Markdown list structure."""
+    source = re.sub(r'(?m)^ {0,1}(\*\*)?\\- +', lambda m: '- ' + (m[1] or ''), source)
+    source = re.sub(r'(?m)^ {0,1}\\\+ +', '    - ', source)
+    source = re.sub(r'(?m)^(\d+)\\\. ', r'\1. ', source)
+    source = re.sub(r'(?m)^\*\*(?:\((\d+)\)|(\d+)\\?\.) +',
+                    lambda m: (m[1] or m[2]) + '. **', source)
     return source
 
 
-def prefer_pdf_images(docx, body):
-    """Use body image streams whose pixels match the Word originals."""
-    word_media = {pixel_key(docx.read(name)): name for name in docx.namelist()
-                  if name.startswith('word/media/')}
-    identifiers = re.findall(r'!\[\]\[(image\d+)\]', body)
+def apply_approved_edits(source):
+    # Human-readable text and embedded raster streams are different inputs.
+    # Some short terms can also occur by chance inside base64 data.
+    prose, marker, images = source.partition('\n[image1]:')
+    edits = json.loads(APPROVED_EDITS.read_text(encoding='utf-8'))
+    for edit in edits:
+        before, after, count = edit['before'], edit['after'], edit['count']
+        if prose.count(before) != count:
+            raise ValueError(f"Recheck {edit['id']} at {edit['location']}")
+        prose = prose.replace(before, after)
+    return prose + marker + images
+
+
+def body_image_ids(body):
+    return re.findall(r'!\[[^\]\n]*\]\[(image\d+)\]', body)
+
+
+def import_body_images(docx, body):
+    """Recover Word originals in document order and cross-check the PDF."""
+    word = ElementTree.fromstring(docx.read('word/document.xml')).find('{*}body')
+    rels = ElementTree.fromstring(docx.read('word/_rels/document.xml.rels'))
+    targets = {r.attrib['Id']: r.attrib['Target'] for r in rels}
+    word_media = []
+    in_body = False
+    for node in word:
+        heading = word_text(node).strip()
+        if heading.startswith('PHẦN I. MỞ ĐẦU'):
+            in_body = True
+        elif in_body and heading.startswith('PHẦN III. KẾT LUẬN'):
+            break
+        if in_body:
+            for blip in node.iterfind('.//{*}blip'):
+                rel_id = next(v for k, v in blip.attrib.items() if k.endswith('}embed'))
+                word_media.append('word/' + targets[rel_id])
+    identifiers = body_image_ids(body)
     with fitz.open(PDF) as pdf:
-        images = [(page.number + 1, item) for page in pdf[17:100]
+        toc = pdf.get_toc()
+        start = next(page for _, title, page in toc if title.startswith('PHẦN I. MỞ ĐẦU'))
+        end = next(page for _, title, page in toc if title.startswith('PHẦN III. KẾT LUẬN'))
+        images = [(page.number + 1, item) for page in pdf[start-1:end-1]
                   for item in page.get_image_info(xrefs=True)]
-        if len(images) != len(identifiers):
-            raise ValueError('Recheck image count and order against Report V4.')
-        for ident, (page_no, item) in zip(identifiers, images):
-            source = pdf.extract_image(item['xref'])
-            data = source['image']
-            word_path = word_media[pixel_key(data)]
+        for ident, word_path, (page_no, item) in zip(identifiers, word_media, images, strict=True):
+            word_data = docx.read(word_path)
+            word_size, word_digest = pixel_key(word_data)
+            pdf_data = pdf.extract_image(item['xref'])['image']
+            exact = pixel_key(pdf_data) == (word_size, word_digest)
+            if not exact and not (
+                ident in {'image10', 'image22', 'image25'}
+                and item['width'] < word_size[0] and item['height'] < word_size[1]
+                and abs(item['width'] / item['height'] - word_size[0] / word_size[1]) < .01
+            ):
+                raise ValueError(f'Unexpected Word/PDF image difference at {ident}, page {page_no}')
+            data = pdf_data if exact else word_data
             info = IMAGE_DATA[ident]
-            info['markdown_sha256'] = info['sha256']
-            info['markdown_dimensions'] = [info['width_px'], info['height_px']]
-            info.update(source=PDF.name, pdf_page=page_no, pdf_xref=item['xref'], docx_media=word_path,
-                        sha256=hashlib.sha256(data).hexdigest(), width_px=item['width'], height_px=item['height'])
-            (ROOT / info['path']).write_bytes(data)
+            info.update(source=PDF.name if exact else DOCX.name, pdf_page=page_no, pdf_xref=item['xref'],
+                        pdf_pixel_match=exact, docx_media=word_path, sha256=hashlib.sha256(data).hexdigest(),
+                        width_px=word_size[0], height_px=word_size[1])
+            path = ROOT / info['path']
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
 
 
 def walk_inlines(value):
@@ -168,12 +215,15 @@ def walk_inlines(value):
         result = []
         for node in value:
             if isinstance(node, dict) and node['t'] == 'Str':
-                pieces = re.split(r'(\[(?:[1-9]|1\d|2[0-5])\])', node['c'])
+                pieces = re.split(r'(\[\d+\])', node['c'])
                 for part in pieces:
                     if not part:
                         continue
                     if re.fullmatch(r'\[\d+\]', part):
-                        result.append({'t': 'RawInline', 'c': ['latex', '\\cite{v4-%02d}' % int(part[1:-1])]})
+                        number = int(part[1:-1])
+                        if not 1 <= number <= REFERENCE_COUNT:
+                            raise ValueError(f'Reference outside source bibliography: {part}')
+                        result.append({'t': 'RawInline', 'c': ['latex', '\\cite{v4-%02d}' % number]})
                     else:
                         result.append({'t': 'Str', 'c': part})
             else:
@@ -182,6 +232,15 @@ def walk_inlines(value):
     if isinstance(value, dict):
         if value['t'] == 'RawInline' and value['c'] == ['html', '<br>']:
             return {'t': 'RawInline', 'c': ['latex', r'\newline{}']}
+        if value['t'] in ('Para', 'Plain'):
+            inlines = value['c']
+            # Word exports some list-item endings as forced line breaks.
+            while inlines and inlines[-1]['t'] == 'LineBreak':
+                inlines = inlines[:-1]
+            return {'t': value['t'], 'c': walk_inlines(inlines)}
+        if value['t'] == 'OrderedList':
+            (start, style, _), items = value['c']
+            return {'t': 'OrderedList', 'c': [[start, style, {'t': 'Period'}], walk_inlines(items)]}
         return {key: walk_inlines(val) if key == 'c' and value['t'] not in ('RawBlock', 'RawInline', 'Code', 'CodeBlock', 'Math') else val
                 for key, val in value.items()}
     return value
@@ -220,12 +279,16 @@ def row_cells(row):
     return [cell[-1] for cell in row[1]]
 
 
-def render_table(table, caption=None, lead=''):
+def landscape_table(table, number):
+    return len(table['c'][2]) >= 4 and number != 'B.2'
+
+
+def render_table(table, caption=None, lead='', following=''):
     heads, rows = table_rows(table)
-    number = re.match(r'Bảng\s+(\d+\.\d+):\s*', plain(caption['c']))[1] if caption else None
-    title = strip_prefix(unstyled(caption['c']), r'Bảng\s+\d+\.\d+:\s*') if caption else None
+    number = re.match(rf'Bảng\s+({TABLE_ID}):\s*', plain(caption['c']))[1] if caption else None
+    title = strip_prefix(unstyled(caption['c']), rf'Bảng\s+{TABLE_ID}:\s*') if caption else None
     n = len(table['c'][2])
-    landscape = n >= 4
+    landscape = landscape_table(table, number)
     weights = ([.10, .30, .60] if n == 3 else [1/n]*n)
     if n == 3 and caption is None:
         weights = [.20, .30, .50]
@@ -237,18 +300,36 @@ def render_table(table, caption=None, lead=''):
         weights = [.1875, .1875, .25, .1875, .1875]
     elif number == '4.2':
         weights = [.07, .12, .29, .52]
+    elif number == '4.3':
+        weights = [.23, .17, .30, .30]
+    elif number == 'A.1':
+        weights = [.14, .17, .28, .15, .26]
+    elif number == 'B.2':
+        weights = [.245, .195, .28, .28]
+    elif number == 'D.1':
+        weights = [.08, .10, .20, .18, .20, .24]
+    elif number == 'D.3b':
+        weights = [.24, .22, .22, .32]
     # widths sum to the available line width after column padding.
     spec = '@{}' + ''.join('P{\\dimexpr %.5f\\linewidth-%.3fbp\\relax}' % (w, 10*(n-1)*w) for w in weights) + '@{}'
     def render_row(row):
-        return ' & '.join(latex(walk_inlines(cell)) for cell in row_cells(row)) + r' \\'
+        cells = [latex(walk_inlines(cell)) for cell in row_cells(row)]
+        cells = [cell.replace('http://127.0.0.1:8080/api', r'\nolinkurl{http://127.0.0.1:8080/api}')
+                 .replace(r'\newline{}• ', r'\newline{}\VfourSubitemLabel{}~')
+                 for cell in cells]
+        if number == 'B.2':
+            cells = [re.sub(r'(?<=\w)/(?=\w)', r'/\\allowbreak{}', cell)
+                     .replace(r'Array\textless ', r'Array\textless{}\allowbreak{}')
+                     for cell in cells]
+        return ' & '.join(cells) + r' \\'
     header = '\n'.join(render_row(row) for row in heads)
-    parts = [r'\FloatBarrier']
+    parts = []
     if landscape:
         parts.append(r'\begin{landscape}')
         if lead:
             parts.append(lead)
     environment = 'longtable' if caption else 'longtable*'
-    parts += [r'\begingroup\let\autodot\relax\setlength{\tabcolsep}{5bp}\renewcommand{\arraystretch}{1.12}']
+    parts += [r'\begingroup\VfourTableSetup']
     if number:
         # longtable* still advances the internal counter. Preserve V4's visible
         # number while leaving hyperref's internal destination counter unique.
@@ -261,6 +342,8 @@ def render_table(table, caption=None, lead=''):
     parts += [render_row(row) for row in rows]
     parts += ['\\end{' + environment + '}', r'\endgroup']
     if landscape:
+        if following:
+            parts.append(following)
         parts.append(r'\end{landscape}')
     MANIFEST['tables'].append({'number': number, 'caption': title, 'columns': n,
                                'header_rows': len(heads), 'body_rows': len(rows), 'landscape': landscape})
@@ -271,56 +354,47 @@ def render_code(table):
     heads, _ = table_rows(table)
     title = plain(row_cells(heads[0])[0][0])
     key = LISTING_ID.match(title)[1]
-    heading = r'\par\noindent\textbf{' + literal(title) + r'}\par'
-    if key.startswith('D.'):
-        method = {
-            'D.1': ('KB-1 đánh giá khả năng từ chối định danh không hợp lệ và duy trì ngữ cảnh thuê bao '
-                    'khi tái sử dụng luồng. KB-2 kiểm tra cô lập dữ liệu bằng dữ liệu giả lập trong môi '
-                    'trường kiểm thử có kiểm soát. Mục 5.1 nêu tập mẫu và Mục 5.2 báo cáo kết quả.'),
-            'D.2': ('KB-3 đối chiếu cấu hình Baseline và Proposed trên tải nghiệp vụ 80 người dùng ảo '
-                    'trong cửa sổ đo 60 giây. Thu thập thông lượng, độ trễ theo phân vị và mã phản hồi '
-                    'theo nhóm thuê bao. Thiết lập và kết quả được trình bày tại Mục 5.1 và Mục 5.3.1.'),
-        }[key]
-        MANIFEST['code'].append({'id': key, 'title': title, 'representation': 'method-summary'})
-        return raw(heading + '\n' + literal(method))
-
-    original = CODE[key]
-    recovered = re.sub(
-        r'(?m)^(\s*(?:POSTGRES_PASSWORD|SPRING_DATASOURCE_PASSWORD|APP_JWT_SECRET):).*?$',
-        r'\1 <GIÁ TRỊ CẤU HÌNH RIÊNG>', original) if key == 'C.1' else original
+    heading = r'\par\Needspace{65bp}\noindent\textbf{' + literal(title) + r'}\par'
+    recovered = CODE[key]
     path = 'assets/code/v4/' + key.replace('.', '-') + '.txt'
     write(path, recovered)
     MANIFEST['code'].append({'id': key, 'title': title, 'path': path, 'source': DOCX.name,
                              'sha256': hashlib.sha256(recovered.encode('utf-8')).hexdigest(),
-                             'representation': 'redacted-listing' if recovered != original else 'listing'})
+                             'representation': 'listing'})
     return raw(heading + '\n'
                '\\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\\clubpenalty10000\\widowpenalty10000},'
                'fontsize=\\fontsize{9bp}{11bp}\\selectfont]{' + path + '}')
 
 
 def render_figure(images, caption, lead=''):
-    number = re.match(r'Hình\s+(\d+\.\d+[ab]?):\s*', plain(caption['c']))[1]
-    title = strip_prefix(unstyled(caption['c']), r'Hình\s+\d+\.\d+[ab]?:\s*')
+    number = re.match(rf'Hình\s+({FIGURE_ID}):\s*', plain(caption['c']))[1]
+    title = strip_prefix(unstyled(caption['c']), rf'Hình\s+{FIGURE_ID}:\s*')
     assets = [IMAGE_DATA[Path(image['c'][2][0]).stem] for image in images]
     landscape = number in LANDSCAPE_FIGURES
     label = 'fig:v4-' + number.replace('.', '-')
-    MANIFEST['figures'].append(dict(number=number, caption=title, landscape=landscape, images=assets))
+    entry = dict(number=number, caption=title, landscape=landscape, images=assets)
+    if number in FIGURE_NOTES:
+        entry['rendered_correction'] = FIGURE_NOTES[number]
+    MANIFEST['figures'].append(entry)
     command = '\\VfourFigure' if len(assets) == 1 else '\\VfourFigureGroup'
     figure = command + '{' + number + '}{' + ','.join(a['path'] for a in assets) + '}{' + literal(title) + '}{' + label + '}'
-    if landscape:
-        limit = '.62' if number == '4.9' else '.72'
-        figure = '\\begin{landscape}\n\\renewcommand{\\VfourImageMaxHeight}{' + limit + '\\textheight}\n' + lead + '\n' + figure + '\n\\end{landscape}'
+    limit = FIGURE_HEIGHT_LIMIT.get(number)
+    if limit or landscape:
+        height = '\\renewcommand{\\VfourImageMaxHeight}{' + (limit or '.72') + '\\textheight}'
+        if landscape:
+            figure = '\n'.join([r'\begin{landscape}', height, lead, figure, r'\end{landscape}'])
+        else:
+            figure = '\n'.join([r'\begingroup', height, figure, r'\endgroup'])
     return raw(figure)
 
 
-def landscape_lead(result, extra_paragraph=False):
-    """Keep the complete introducing paragraph (and adjacent heading) with its object."""
+def landscape_lead(result, paragraphs=1):
+    """Keep complete introducing paragraphs with the object they describe."""
     lead = []
-    if result and result[-1]['t'] in ('Para', 'Plain'):
+    while len(lead) < paragraphs and result and result[-1]['t'] in ('Para', 'Plain', 'OrderedList', 'BulletList'):
         lead.insert(0, result.pop())
+    if lead:
         if result and result[-1]['t'] == 'RawBlock' and re.match(r'\\(?:section|subsection|subsubsection)\{', result[-1]['c'][1]):
-            lead.insert(0, result.pop())
-        if extra_paragraph and result and result[-1]['t'] in ('Para', 'Plain'):
             lead.insert(0, result.pop())
     return latex(lead) if lead else ''
 
@@ -339,8 +413,8 @@ def heading(block, mode):
         label = 'conclusion-' + attr[0]
     elif level == 2:
         if mode == 'appendix':
-            number = re.match(r'PHỤ LỤC ([A-D]):', title)[1]
-            title = re.sub(r'^PHỤ LỤC [A-D]:\s*', '', title)
+            number = re.match(r'PHỤ LỤC ([A-D])[.:]', title)[1]
+            title = re.sub(r'^PHỤ LỤC [A-D][.:]\s*', '', title)
             label = 'appendix-' + number
         else:
             number = re.match(r'CHƯƠNG (\d+)[.:]', title)[1]
@@ -348,12 +422,15 @@ def heading(block, mode):
             label = 'chapter-' + number
         command = 'chapter'
     else:
-        number = re.match(r'([\d.]+)\s*', title)[1].rstrip('.')
-        title = re.sub(r'^\d+(?:\.\d+)*\.?(?:\s+)', '', title)
+        number = re.match(r'([\dA-D]+(?:\.\d+)*)\.?\s+', title)[1]
+        title = re.sub(r'^[\dA-D]+(?:\.\d+)*\.?\s+', '', title)
         label = 'sec-' + number.replace('.', '-')
         command = {3: 'section', 4: 'subsection', 5: 'subsubsection'}[level]
     MANIFEST['headings'].append({'source': plain(c), 'rendered_title': title, 'command': command, 'label': 'v4-' + label})
-    return raw('\\' + command + '{' + literal(title) + '}\\label{v4-' + label + '}')
+    heading_tex = '\\' + command + '{' + literal(title) + '}\\label{v4-' + label + '}'
+    if label == 'sec-2-2-4':
+        heading_tex = '\\Needspace{.55\\textheight}\n' + heading_tex
+    return raw(heading_tex)
 
 
 def process(blocks, mode):
@@ -372,70 +449,85 @@ def process(blocks, mode):
                 images.append(image_node(next_block))
                 i += 1
                 next_block = blocks[i+1] if i+1 < len(blocks) else None
-            caption = re.match(r'Hình\s+(\d+\.\d+[ab]?):', plain(next_block))
+            caption = re.match(rf'Hình\s+({FIGURE_ID}):', plain(next_block))
             if caption is None:
                 raise ValueError(f'Missing caption after {images[-1]["c"][2][0]}')
             number = caption[1]
-            lead = landscape_lead(result) if number in LANDSCAPE_FIGURES else ''
+            lead = landscape_lead(result, paragraphs=LANDSCAPE_LEAD_COUNT.get(number, 1)) if number in LANDSCAPE_FIGURES else ''
             result.append(render_figure(images, next_block, lead))
             i += 1
-        elif block['t'] == 'Para' and re.match(r'^Bảng \d+\.\d+:', plain(block)):
+        elif block['t'] == 'Para' and re.match(rf'^Bảng {TABLE_ID}:', plain(block)):
             assert next_block and next_block['t'] == 'Table'
-            number = re.match(r'Bảng\s+(\d+\.\d+):', plain(block))[1]
-            lead = landscape_lead(result, extra_paragraph=number == '4.2') if len(next_block['c'][2]) >= 4 else ''
-            result.append(render_table(next_block, block, lead))
+            number = re.match(rf'Bảng\s+({TABLE_ID}):', plain(block))[1]
+            # Keep the extended discussion of Table 1.1 with Figure 1.5,
+            # so the full table uses a single wide page.
+            landscape = landscape_table(next_block, number)
+            lead = landscape_lead(result, paragraphs=2 if number == '4.2' else 1) if landscape and number != '1.1' else ''
+            # A landscape table at the start of an appendix can carry its
+            # chapter title and introduction without a title-only page.
+            if (mode == 'appendix' and lead and len(result) == 1 and result[0]['t'] == 'RawBlock'
+                    and result[0]['c'][1].startswith(r'\chapter{')):
+                lead = latex([result.pop()]) + '\n' + lead
+            following = ''
+            if number == '1.2' and i + 2 < len(blocks) and blocks[i + 2]['t'] == 'Para':
+                following = latex([walk_inlines(blocks[i + 2])])
+                i += 1
+            result.append(render_table(next_block, block, lead, following))
             i += 1
         elif block['t'] == 'Table':
             result.append(render_code(block) if mode == 'appendix' else render_table(block))
-        elif mode == 'appendix' and block['t'] == 'Para' and re.match(r'^[A-D]\.\d+\. ', plain(block)):
-            title = re.sub(r'^[A-D]\.\d+\. ', '', plain(block))
-            key = re.match(r'^([A-D]\.\d+)', plain(block))[1].replace('.', '-')
-            result.append(raw('\\Needspace{90bp}\n\\section{' + literal(title) + '}\\label{v4-sec-' + key + '}'))
         else:
             result.append(walk_inlines(block))
         i += 1
     tex = latex(result)
-    for kind, prefix, available in [('Hình', 'fig:v4-', {x['number'] for x in MANIFEST['figures']}),
-                                    ('Bảng', 'tab:v4-', {x['number'] for x in MANIFEST['tables'] if x['number']}),
+    # Adjacent landscape objects can share the same page-building flow.
+    tex = re.sub(r'\\end\{landscape\}\s*\\begin\{landscape\}', '\n', tex)
+    for kind, prefix, available in [('Hình', 'fig:v4-', FIGURE_NUMBERS),
+                                    ('Bảng', 'tab:v4-', TABLE_NUMBERS),
                                     ('Mục', 'v4-sec-', SECTION_NUMBERS),
                                     ('Chương', 'v4-chapter-', set('12345'))]:
         def ref(match):
             number = match[1]
-            return kind + '~\\ref{' + prefix + number.replace('.', '-') + '}' if number in available else match[0]
-        tex = re.sub(kind + r'\s+(\d+(?:\.\d+)*[ab]?)(?![\d.])', ref, tex)
+            if number in available:
+                return kind + '~\\ref{' + prefix + number.replace('.', '-') + '}'
+            if kind == 'Hình' and number[-1].isalpha() and number[:-1] in available:
+                return kind + '~\\ref{' + prefix + number[:-1].replace('.', '-') + '}' + number[-1]
+            return match[0]
+        tex = re.sub(kind + r'\s+([\dA-D]+(?:\.\d+)*[a-z]?)(?!\w|\.\d)', ref, tex)
     tex = re.sub(r'\n{3,}', '\n\n', tex)
     # Identifiers keep every character, with legal line breaks after underscores.
     # Verbatim listings are external files and are not changed by this operation.
     tex = tex.replace('\\_', '\\_\\allowbreak{}')
-    return '% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.\n' + tex
+    return '% Content imported from Report_newest.docx.md with approved edits.\n' + tex
 
 
 def main():
-    global API, CODE, SECTION_NUMBERS
+    global API, CODE, FIGURE_NUMBERS, TABLE_NUMBERS, SECTION_NUMBERS
     source = SOURCE.read_text(encoding='utf-8')
     for path in (SOURCE, PDF, DOCX):
         MANIFEST['sources'][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
-    MANIFEST['approved_edits_sha256'] = hashlib.sha256(
-        (ROOT / 'assets/v4-approved-edits.json').read_bytes()).hexdigest()
+    MANIFEST['approved_edits_sha256'] = hashlib.sha256(APPROVED_EDITS.read_bytes()).hexdigest()
     body = source[source.index('# **PHẦN I.'):source.index('# **TÀI LIỆU THAM KHẢO')]
-    cleaned = extract_images(clean_markdown(apply_approved_edits(source)))
+    cleaned = image_definitions(normalize_list_markers(clean_markdown(apply_approved_edits(source))))
     with ZipFile(DOCX) as docx:
         CODE = docx_listings(docx)
-        prefer_pdf_images(docx, body)
-    doc = json.loads(pypandoc.convert_text(cleaned, 'json', format='markdown-smart-citations'))
+        import_body_images(docx, body)
+    doc = json.loads(pypandoc.convert_text(cleaned, 'json', format=MARKDOWN_FORMAT))
     API = doc['pandoc-api-version']
     blocks = doc['blocks']
     headers = [(i, plain(b['c'][2])) for i, b in enumerate(blocks) if b['t'] == 'Header']
     locate = lambda prefix: next(i for i, title in headers if title.startswith(prefix))
-    SECTION_NUMBERS = {re.match(r'^([\d.]+)', title)[1].rstrip('.') for _, title in headers if re.match(r'^\d+\.\d+', title)}
+    SECTION_NUMBERS = {m[1] for _, title in headers if (m := re.match(r'^([\dA-D]+(?:\.\d+)+)', title))}
     intro, body, end, refs, appendix = [locate(s) for s in ['PHẦN I.', 'PHẦN II.', 'PHẦN III.', 'TÀI LIỆU THAM KHẢO', 'PHỤ LỤC']]
+    FIGURE_NUMBERS = {m[1] for b in blocks[intro:refs] if (m := re.match(rf'^Hình ({FIGURE_ID}):', plain(b)))}
+    TABLE_NUMBERS = {m[1] for b in blocks[intro:] if (m := re.match(rf'^Bảng ({TABLE_ID}):', plain(b)))}
     write('chapters/introduction.tex', '\\addchap{PHẦN I. MỞ ĐẦU}\\label{chap:v4-introduction}\n' + process(blocks[intro+1:body], 'introduction'))
     chapter_starts = [locate('CHƯƠNG ' + str(i)) for i in range(1, 6)] + [end]
     folders = ['01-foundations', '02-architecture', '03-system', '04-implementation', '04-evaluation']
     for start, stop, folder in zip(chapter_starts, chapter_starts[1:], folders):
         write('chapters/' + folder + '/chapter.tex', process(blocks[start:stop], 'body'))
     write('chapters/conclusion.tex', '\\addchap{PHẦN III. KẾT LUẬN VÀ KIẾN NGHỊ}\\label{chap:v4-conclusion}\n' + process(blocks[end+1:refs], 'conclusion'))
-    starts = [locate('PHỤ LỤC ' + letter + ':') for letter in 'ABCD']
+    starts = [locate('PHỤ LỤC ' + letter + '.') for letter in 'ABCD']
     # The next two-column table is the logo at the start of the bulletin forms.
     stop = next(i for i in range(starts[-1], len(blocks)) if blocks[i]['t'] == 'Table' and len(blocks[i]['c'][2]) == 2)
     starts.append(stop)
@@ -443,7 +535,12 @@ def main():
         write('appendices/v4-' + letter.lower() + '.tex', process(blocks[start:end], 'appendix'))
     if {entry['id'] for entry in MANIFEST['code']} != set(CODE):
         raise ValueError('Markdown and Word appendix listing identifiers differ.')
-    MANIFEST['template_logos_retained'] = [IMAGE_DATA['image1'], IMAGE_DATA['image44']]
+    rendered_images = [asset['image_id'] for figure in MANIFEST['figures'] for asset in figure['images']]
+    if rendered_images != body_image_ids(source[source.index('# **PHẦN I.'):source.index('# **PHẦN III.')]):
+        raise ValueError('Missing or reordered body image during conversion.')
+    if len(MANIFEST['figures']) != len(FIGURE_NUMBERS) or sum(t['number'] is not None for t in MANIFEST['tables']) != len(TABLE_NUMBERS):
+        raise ValueError('Missing figure or table caption during conversion.')
+    MANIFEST['template_logos_retained'] = ['assets/cover-frame.pdf', 'assets/template-headers.pdf']
     write('assets/v4-import-manifest.json', json.dumps(MANIFEST, ensure_ascii=False, indent=2))
     print('Imported', len(MANIFEST['headings']), 'headings,', len(MANIFEST['figures']), 'figures,', len(MANIFEST['tables']), 'tables,', len(MANIFEST['code']), 'code listings')
 

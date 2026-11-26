@@ -2,13 +2,28 @@
 \usepackage{fvextra}
 \usepackage{ltcaption}
 \usepackage{needspace}
+\usepackage{enumitem}
 \IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{\setmonofont{Latin Modern Mono}}
-\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlist{topsep=4bp,partopsep=0pt,itemsep=2bp,parsep=0pt,leftmargin=*}
+\newcommand{\VfourSubitemLabel}{+}
+\setlist[itemize,1]{label=\textendash}
+\setlist[itemize,2]{label=\VfourSubitemLabel}
+\setlist[itemize,3]{label=\textbullet}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[enumerate,2]{label=\alph*)}
+\providecommand{\tightlist}{\setlength{\parskip}{0pt}}
+\newcommand{\VfourTableSetup}{%
+  \let\autodot\relax\setlength{\tabcolsep}{5bp}%
+  \setstretch{1.10}%
+  \setlength{\LTpre}{6bp}\setlength{\LTpost}{6bp}%
+  \setlength{\LTcapwidth}{\linewidth}%
+  \renewcommand{\arraystretch}{1.04}}
 \providecommand{\addsubsec}[1]{\subsection*{#1}\addcontentsline{toc}{subsection}{#1}}
 \pdfstringdefDisableCommands{\def\allowbreak{}}
 \newcommand{\VfourImageMaxHeight}{.64\textheight}
 \newsavebox{\VfourImageBox}
 \newsavebox{\VfourCaptionBox}
+\newsavebox{\VfourPlotBox}
 \newlength{\VfourFigureWidth}
 \newlength{\VfourFigureAvailable}
 \newlength{\VfourFigureNaturalHeight}
@@ -22,10 +37,44 @@
   \nobreak\vspace{12bp}\nobreak}
 \newcommand{\VfourDivisionBeforeChapter}[1]{%
   \AddtoOneTimeDoHook{heading/postinit/chapter}{\VfourDivisionDisplay{#1}}}
+% Preserve the source plots and correct the result labels in the rendered PDF.
+% Positions are fractions of the original image width/height, from bottom left.
+\definecolor{vfourplotblue}{RGB}{219,234,254}
+\definecolor{vfourplotgreen}{RGB}{209,250,229}
+\definecolor{vfourplotyellow}{RGB}{254,243,199}
+\definecolor{vfourplotred}{RGB}{254,226,226}
+\definecolor{vfourplotpanel}{RGB}{248,250,252}
+\newcommand{\VfourPlotNote}[6]{%
+  \rlap{\kern#1\wd\VfourPlotBox
+    \raisebox{#2\ht\VfourPlotBox}[0pt][0pt]{%
+      \begingroup\setlength{\fboxsep}{0pt}%
+      \raisebox{\depth}{\colorbox{#5}{\parbox[c][#4\ht\VfourPlotBox][c]{#3\wd\VfourPlotBox}{%
+        \centering\sffamily\fontsize{6bp}{7bp}\selectfont #6\par}}}%
+      \endgroup}}}
+\newcommand{\VfourPlotCorrections}[1]{%
+  \ifstrequal{#1}{5.2}{%
+    \VfourPlotNote{.036}{.158}{.281}{.104}{vfourplotblue}{Kết quả tổng hợp KB-1. Cần nhật ký gốc để xác nhận cỡ mẫu.}%
+    \VfourPlotNote{.352}{.107}{.280}{.102}{vfourplotgreen}{Kết quả tổng hợp KB-2. Cần nhật ký gốc để xác nhận 0/600.}%
+    \VfourPlotNote{.669}{.107}{.294}{.102}{vfourplotyellow}{\textbf{NFR-03 vượt ngưỡng 5\%:} phụ trội 36,0\% (0,45 ms). Khoảng 1,8\% khi so với độ trễ API.}%
+  }{}%
+  \ifstrequal{#1}{5.3b}{%
+    \VfourPlotNote{.16}{.822}{.68}{.113}{white}{%
+      {\fontsize{9bp}{11bp}\selectfont\textbf{TỐC ĐỘ HTTP, GIỚI HẠN LƯU LƯỢNG VÀ TRUY XUẤT CẤU HÌNH (KB-3)}}\\
+      80 VU nghiệp vụ, tối đa 82 VU gồm kiểm thử. Môi trường AWS EC2 m7i-flex.large.}%
+    \VfourPlotNote{.346}{.727}{.276}{.043}{vfourplotpanel}{%
+      \fontsize{7.5bp}{8.5bp}\selectfont\textbf{(b) Phản hồi HTTP 429 của nhóm gây nhiễu}}%
+    \VfourPlotNote{.090}{.262}{.093}{.035}{white}{63 yêu cầu thất bại}%
+    \VfourPlotNote{.037}{.115}{.274}{.098}{vfourplotgreen}{Tốc độ HTTP tổng có tính 429. Nhóm thường đạt 2.613/2.613 lượt kiểm tra.}%
+    \VfourPlotNote{.350}{.115}{.271}{.098}{vfourplotred}{16.423/17.723 yêu cầu nhận 429 từ bộ lọc ứng dụng.}%
+    \VfourPlotNote{.659}{.109}{.302}{.098}{vfourplotblue}{p50 và p95 của hai cấu hình. Đồng bộ Pub/Sub cần phép đo giữa các tiến trình.}%
+  }{}}
+\newcommand{\VfourGraphic}[3]{%
+  \sbox{\VfourPlotBox}{\includegraphics[width=\VfourFigureWidth,height=#2,keepaspectratio]{#3}}%
+  \leavevmode\rlap{\usebox{\VfourPlotBox}}\VfourPlotCorrections{#1}\kern\wd\VfourPlotBox}
 % Preserve V4's lettered figure identifiers (1.6a/b and 5.3a/b) in captions,
 % lists and hyperlinks. Each image stays after its source paragraph.
 \newcommand{\VfourFigure}[4]{%
-  \par\addvspace{8bp}\penalty0%
+  \par\addvspace{6bp}\penalty0%
   \begingroup
   \let\autodot\relax
   \renewcommand{\thefigure}{#1}%
@@ -36,7 +85,7 @@
   \ifx\VfourNumber\VfourSmallNumber\setlength{\VfourFigureWidth}{.80\linewidth}\fi
   \def\VfourTallNumber{1.5}%
   \ifx\VfourNumber\VfourTallNumber\renewcommand{\VfourImageMaxHeight}{.59\textheight}\fi
-  \sbox{\VfourImageBox}{\includegraphics[width=\VfourFigureWidth,height=\VfourImageMaxHeight,keepaspectratio]{#2}}%
+  \sbox{\VfourImageBox}{\VfourGraphic{#1}{\VfourImageMaxHeight}{#2}}%
   \sbox{\VfourCaptionBox}{\begin{minipage}{\linewidth}%
     \usekomafont{caption}\textbf{\figurename~#1: }#3\par\end{minipage}}%
   \setlength{\VfourFigureNaturalHeight}{\dimexpr\ht\VfourImageBox+\dp\VfourImageBox\relax}%
@@ -47,16 +96,16 @@
     \centering
     \ifdim\VfourFigureAvailable<\VfourFigureNaturalHeight
       \ifdim\VfourFigureAvailable>\VfourFigureMinimumHeight
-        \includegraphics[width=\VfourFigureWidth,height=\VfourFigureAvailable,keepaspectratio]{#2}%
+        \VfourGraphic{#1}{\VfourFigureAvailable}{#2}%
       \else\usebox{\VfourImageBox}\fi
     \else\usebox{\VfourImageBox}\fi
     \captionof{figure}{#3}\label{#4}%
   \end{minipage}\par
-  \endgroup\addvspace{8bp}}
+  \endgroup\addvspace{6bp}}
 \ExplSyntaxOn
 \NewDocumentCommand \VfourFigureGroup { m m m m }
   {
-    \par\addvspace{8bp}\penalty0
+    \par\addvspace{6bp}\penalty0
     \group_begin:
     \let\autodot\relax
     \renewcommand{\thefigure}{#1}
@@ -64,13 +113,13 @@
       \centering
       \clist_map_inline:nn {#2}
         {
-          \includegraphics[width=.92\linewidth,height=.289\textheight,keepaspectratio]{##1}
+          \includegraphics[width=.92\linewidth,height=.248\textheight,keepaspectratio]{##1}
           \par\smallskip
         }
       \captionof{figure}{#3}\label{#4}
     \end{minipage}\par
     \group_end:
-    \addvspace{8bp}
+    \addvspace{6bp}
   }
 \ExplSyntaxOff
 \newcommand{\VfourFigureLandscape}[4]{%

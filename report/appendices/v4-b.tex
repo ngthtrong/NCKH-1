@@ -1,32 +1,62 @@
-% Content imported from Report_V4.md; figures/code cross-checked against Report_V4.pdf.
-\chapter{MÃ NGUỒN CÀI ĐẶT CÁC CƠ CHẾ KIỂM SOÁT ĐA THUÊ BAO CỐT LÕI (K1--K4) (Đối ứng Mục~\ref{v4-sec-3-2}, 3.3, 3.4 \& Mục~\ref{v4-sec-4-3-3})}\label{v4-appendix-B}
+% Content imported from Report_newest.docx.md with approved edits.
+\begin{landscape}
+\chapter{CÁC CƠ CHẾ KIỂM SOÁT CỐT LÕI VÀ CẤU HÌNH SIÊU DỮ LIỆU}\label{v4-appendix-B}
+\section{Danh mục thành phần thực thi K1-K4}\label{v4-sec-B-1}
 
-\Needspace{90bp}
-\section{Bộ lọc xác thực JWT và Quản lý ngữ cảnh luồng (JwtTenantFilter \& TenantContext)}\label{v4-sec-B-1}
+Bảng~\ref{tab:v4-B-1} ánh xạ bốn khía cạnh kiểm soát đa thuê bao K1-K4 sang các thành phần cài đặt tương ứng trong kho mã nguồn Ứng dụng TenantFlow nhằm hỗ trợ tra cứu và đối chiếu kiến trúc.
+\begingroup\VfourTableSetup
+\renewcommand{\thetable}{B.1}
+\begin{longtable}{@{}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}P{\dimexpr 0.25000\linewidth-7.500bp\relax}@{}}
+\caption{Danh mục thành phần mã nguồn thực thi các cơ chế kiểm soát K1-K4.}\label{tab:v4-B-1}\\
+\toprule
+Khía cạnh & Thành phần / Tệp mã nguồn & Tầng thực thi & Cơ chế bảo vệ và nguyên lý hoạt động \\
+\midrule\endfirsthead
+\toprule
+Khía cạnh & Thành phần / Tệp mã nguồn & Tầng thực thi & Cơ chế bảo vệ và nguyên lý hoạt động \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{K1 - Định danh \& Ngữ cảnh} & JwtTenantFilter.java TenantContext.java & Tầng 7-8 (Spring Security Filter \& ThreadLocal) & Xác minh chữ ký JWT HMAC-SHA256, đối soát tiêu đề Host với JWT.slug (HTTP 403), gắn TenantContext và SLF4J MDC trong khối try ... finally bắt buộc clear(). \\
+\textbf{K2 - Cô lập dữ liệu} & RlsConnectionInterceptor.java Chính sách FORCE RLS & Tầng 4-6 \& 8 (AOP / JDBC + PostgreSQL 16) & Thiết lập biến ngữ cảnh phạm vi giao dịch set\_\allowbreak{}config(..., true) ngay sau khi mở giao dịch; mệnh đề USING/WITH CHECK tự động lọc và chặn ghi chéo thuê bao. \\
+\textbf{K3 - Hiệu năng \& Bộ đệm} & RateLimitFilter.java TwoTierCacheConfig.java token\_\allowbreak{}bucket.lua & Tầng 7-8 (Redis 7.2 + Caffeine L1) & Token Bucket nguyên tử theo khóa ratelimit:tenant:\{id\} (trả HTTP 429 ở lớp lọc ứng dụng); đệm L1 Caffeine (W-TinyLFU) cho tenant:\{id\}:config và L2 Redis cho bảng. \\
+\textbf{K4 - Tùy biến \& Đồng bộ} & KanbanService.java tenants.settings cards.custom\_\allowbreak{}fields & Tầng 6-9 (JSONB/GIN + Rule Engine + Pub/Sub) & Diễn giải động 3 lớp (chủ đề CSS Vars, luật WIP STRICT/WARN/OFF kèm SELECT ... FOR UPDATE + version, trường động JSONB); phát Pub/Sub xóa L1 đa nút. \\
+\end{longtable}
+\endgroup
+\end{landscape}
 
-\par\noindent\textbf{B.1. Java / Spring Boot -- TenantContext \& JwtTenantFilter (K1)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-1.txt}
+\section{Trích đoạn thiết lập ngữ cảnh giao dịch và Token Bucket}\label{v4-sec-B-2}
 
-\Needspace{90bp}
-\section{Bộ đánh chặn giao dịch tiêm biến phiên CSDL (RlsConnectionInterceptor -- SET LOCAL)}\label{v4-sec-B-2}
+Hai trích đoạn ngắn dưới đây giữ nguyên trạng mã nguồn minh họa hai chốt chặn K2 và K3 trong Ứng dụng. Đối với bộ đánh chặn RlsConnectionInterceptor (Trích đoạn B.2.1), thiết kế kỳ vọng khía cạnh AOP gắn @Order(Ordered.LOWEST\_\allowbreak{}PRECEDENCE) chạy sau TransactionInterceptor của Spring (khi giao dịch JDBC đã mở và kết nối HikariCP đã gắn vào luồng), giúp tham số is\_\allowbreak{}local = true (tương đương SET LOCAL) gắn chặt với đúng phạm vi giao dịch hiện hành và tự hủy ngay khi COMMIT hoặc ROLLBACK. Tuy nhiên, cần lưu ý một điểm kỹ thuật quan trọng: trong Spring Framework, @EnableTransactionManagement (tạo ra TransactionInterceptor) cũng có thứ tự ưu tiên mặc định là Ordered.LOWEST\_\allowbreak{}PRECEDENCE. Khi hai cơ chế cùng chia sẻ mức ưu tiên này, thứ tự thực thi phụ thuộc vào thứ tự đăng ký bean và không được bảo đảm chắc chắn trong mọi kịch bản triển khai. Do đó, khi đưa vào vận hành thực tế, cần cấu hình tường minh @EnableTransactionManagement(order = Ordered.LOWEST\_\allowbreak{}PRECEDENCE - 1) để khía cạnh RLS chạy hẳn bên trong giao dịch, hoặc chuyển bước thiết lập ngữ cảnh xuống tầng DataSource, JpaTransactionManager.doBegin() hay Hibernate CurrentTenantIdentifierResolver nhằm bao phủ cả lời gọi JpaRepository trực tiếp và giao dịch REQUIRES\_\allowbreak{}NEW.
 
-\par\noindent\textbf{B.2. Java / Hibernate -- RlsConnectionInterceptor với SET LOCAL (K2)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-2.txt}
+\par\Needspace{65bp}\noindent\textbf{Trích đoạn B.2.1 - Bộ đánh chặn thiết lập biến ngữ cảnh giao dịch SET LOCAL (Java / Spring Boot)}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-2-1.txt}
 
-\Needspace{90bp}
-\section{Bộ giới hạn tốc độ theo thuê bao và Bộ nhớ đệm hai tầng (RateLimitFilter \& TwoTierCacheConfig)}\label{v4-sec-B-3}
+\par\Needspace{65bp}\noindent\textbf{Trích đoạn B.2.2 - Thuật toán Token Bucket nguyên tử theo thuê bao (Redis 7.2 Lua)}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-2-2.txt}
 
-\par\noindent\textbf{B.3.1. Thuật toán Token Bucket nguyên tử bằng Redis Lua}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3-1.txt}
+Về Trích đoạn B.2.2, kịch bản Lua chạy nguyên tử trên Redis 7.2 giúp kiểm soát lưu lượng theo thuê bao nhưng cần lưu ý ba điểm tinh chỉnh khi triển khai ở môi trường sản xuất nhiều nút (Cấp độ 4): thứ nhất, thay lệnh HMSET (đã đánh dấu lỗi thời từ Redis 4.0) bằng HSET; thứ hai, dùng redis.call(\textquotesingle TIME\textquotesingle) ngay trong Lua thay cho mốc thời gian now\_\allowbreak{}ms truyền từ ứng dụng (ARGV\cite{v4-03}) nhằm tránh sai lệch đồng hồ giữa các nút API; thứ ba, lệnh EXPIRE key 120 đóng vai trò TTL dọn khóa nhàn rỗi và chỉ phù hợp khi thời gian làm đầy xô ngắn hơn 120 giây (nếu đặt hạn mức có cửa sổ hồi phục dài hơn, khóa hết hạn sớm sẽ làm xô token bị đặt lại đầy trước hạn).
 
-\par\noindent\textbf{B.3.2. Bộ nhớ đệm hai tầng Caffeine/Redis và cơ chế Pub/Sub}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3-2.txt}
+\section{Đối chiếu cấu hình siêu dữ liệu JSONB}\label{v4-sec-B-3}
 
-\Needspace{90bp}
-\section{Cấu trúc dữ liệu JSONB mẫu của Bộ xử lý tùy biến 3 lớp (tenants.settings \& cards.custom\_\allowbreak{}fields)}\label{v4-sec-B-4}
+Bảng~\ref{tab:v4-B-2} đối chiếu cấu trúc siêu dữ liệu lưu trong cột tenants.settings (JSONB) của hai tổ chức thuê bao điển hình t-acme và t-lotus, tương ứng trực tiếp với giao diện đối chứng tại Hình~\ref{fig:v4-4-6} và phân tích chân dung tại Mục~\ref{v4-sec-4-1-1}.
 
-\par\noindent\textbf{B.4.1. Cấu trúc JSONB mẫu trong tenants.settings}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4-1.txt}
-
-\par\noindent\textbf{B.4.2. Quy trình kiểm soát WIP và khóa lạc quan}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4-2.txt}
+\begingroup\VfourTableSetup
+\renewcommand{\thetable}{B.2}
+\begin{longtable}{@{}P{\dimexpr 0.24500\linewidth-7.350bp\relax}P{\dimexpr 0.19500\linewidth-5.850bp\relax}P{\dimexpr 0.28000\linewidth-8.400bp\relax}P{\dimexpr 0.28000\linewidth-8.400bp\relax}@{}}
+\caption{Đối chiếu cấu hình siêu dữ liệu JSONB ba lớp giữa t-acme và t-lotus.}\label{tab:v4-B-2}\\
+\toprule
+Lớp \& Khóa JSONB & Kiểu dữ liệu & t-acme (Gói ENTERPRISE) & t-lotus (Gói PRO) \\
+\midrule\endfirsthead
+\toprule
+Lớp \& Khóa JSONB & Kiểu dữ liệu & t-acme (Gói ENTERPRISE) & t-lotus (Gói PRO) \\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\textbf{Lớp 1 - theme.primary / accent} & String (Hex) & \#0d6efd / \#0ea5e9 (Xanh công nghệ) & \#fd7e14 / \#be185d (Cam - Hồng) \\
+\textbf{Lớp 1 - theme.logoText / tagline} & String & Acme Software / "Phát triển phần mềm chuẩn mực" & Lotus Media / "Sáng tạo nội dung đa nền tảng" \\
+\textbf{Lớp 1 - cardDensity} & Enum (FULL \textbar{} COMPACT) & FULL (hiển thị đầy đủ cả phần mô tả thẻ) & COMPACT (ẩn mô tả, chỉ hiện tiêu đề và huy hiệu) \\
+\textbf{Lớp 2 - wipMode \& defaultWipLimit} & Enum (STRICT \textbar{} WARN \textbar{} OFF) \& Int & STRICT, ngưỡng 2 (chặn cứng HTTP 422 khi cột đầy) & WARN, ngưỡng 2 (cảnh báo mềm màu vàng, vẫn lưu) \\
+\textbf{Lớp 2 - defaultColumns} & Array\textless{}\allowbreak{}String\textgreater{} & {[}"Backlog", "In Progress", "Code Review", "Done"{]} & {[}"Ý tưởng", "Sản xuất", "Duyệt nội dung", "Xuất bản"{]} \\
+\textbf{Lớp 3 - customFields} & Array\textless{}\allowbreak{}FieldSchema\textgreater{} (TEXT, NUMBER, SELECT, DATE) & story\_\allowbreak{}points (NUMBER, bắt buộc); bug\_\allowbreak{}severity (SELECT: Low/\allowbreak{}Medium/\allowbreak{}Critical); pull\_\allowbreak{}request\_\allowbreak{}url (TEXT) & channel (SELECT: Facebook/\allowbreak{}TikTok/\allowbreak{}YouTube, bắt buộc - nhãn "Kênh phát hành"); budget\_\allowbreak{}vnd (NUMBER, bắt buộc); publish\_\allowbreak{}date (DATE) \\
+\end{longtable}
+\endgroup

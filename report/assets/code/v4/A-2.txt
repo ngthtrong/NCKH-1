@@ -1,52 +1,15 @@
--- Bảng Kanban
-CREATE TABLE boards (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id  UUID NOT NULL
-               REFERENCES tenants(id) ON DELETE CASCADE,
-    name       VARCHAR(150) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- 1. Vai trò ứng dụng quyền tối thiểu (không được bỏ qua RLS)
+CREATE ROLE kanban_app_user WITH LOGIN PASSWORD '********'
+    NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+GRANT SELECT, INSERT, UPDATE, DELETE
+    ON tenants, tenant_users, boards, board_columns, cards TO kanban_app_user;
 
-CREATE INDEX idx_boards_tenant_created
-    ON boards (tenant_id, created_at DESC);
+-- 2. Kích hoạt và cưỡng chế RLS trên 3 bảng Mặt phẳng Dữ liệu
+ALTER TABLE boards        ENABLE ROW LEVEL SECURITY; ALTER TABLE boards        FORCE ROW LEVEL SECURITY;
+ALTER TABLE board_columns ENABLE ROW LEVEL SECURITY; ALTER TABLE board_columns FORCE ROW LEVEL SECURITY;
+ALTER TABLE cards         ENABLE ROW LEVEL SECURITY; ALTER TABLE cards         FORCE ROW LEVEL SECURITY;
 
-
--- Bảng cột trạng thái
-CREATE TABLE board_columns (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id  UUID NOT NULL
-               REFERENCES tenants(id) ON DELETE CASCADE,
-    board_id   UUID NOT NULL
-               REFERENCES boards(id) ON DELETE CASCADE,
-    name       VARCHAR(80) NOT NULL,
-    position   INT NOT NULL,
-    wip_limit  INT NULL
-               CHECK (wip_limit IS NULL OR wip_limit > 0)
-);
-
-CREATE INDEX idx_columns_tenant_board_pos
-    ON board_columns (tenant_id, board_id, position);
-
-
--- Bảng thẻ công việc
-CREATE TABLE cards (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    tenant_id     UUID NOT NULL
-                  REFERENCES tenants(id) ON DELETE CASCADE,
-    column_id     UUID NOT NULL
-                  REFERENCES board_columns(id) ON DELETE CASCADE,
-    assignee_id   UUID NULL
-                  REFERENCES tenant_users(id) ON DELETE SET NULL,
-    title         VARCHAR(200) NOT NULL,
-    description   TEXT,
-    position      INT NOT NULL DEFAULT 0,
-    version       INT NOT NULL DEFAULT 1,
-    custom_fields JSONB NOT NULL DEFAULT '{}'::jsonb,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_cards_tenant_col_pos
-    ON cards (tenant_id, column_id, position);
-
-CREATE INDEX idx_cards_custom_fields_gin
-    ON cards USING GIN (custom_fields jsonb_path_ops);
+-- 3. Chính sách đại diện Fail-Closed (áp dụng tương tự cho boards và board_columns)
+CREATE POLICY p_cards_isolation ON cards FOR ALL TO kanban_app_user
+    USING      (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid)
+    WITH CHECK (tenant_id = NULLIF(current_setting('app.current_tenant_id', true), '')::uuid);

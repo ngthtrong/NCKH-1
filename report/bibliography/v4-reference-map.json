@@ -1,191 +1,198 @@
 {
-  "source": "Report_V4.md",
-  "verification": "Source transcription only; no external bibliographic verification performed.",
+  "source": "Report_newest.docx.md",
+  "approved_corrections": "R10",
   "entries": [
     {
-      "old_number": 1,
+      "source_number": 1,
       "key": "v4-01",
-      "source_text": "\"Tìm hiểu kiến trúc multi-tenant trong hệ thống phần mềm hỗ trợ chẩn đoán bệnh dựa trên ảnh y khoa,\" Báo cáo đồ án tốt nghiệp, Trường Đại học Bách Khoa - ĐHQG TP. Hồ Chí Minh, 2023-2024.",
+      "source_text": "N. V. Dũng, B. T. Lộc, và L. T. P. Lộc, \"Tìm hiểu kiến trúc multi-tenant trong hệ thống phần mềm hỗ trợ chẩn đoán bệnh dựa trên ảnh y khoa,\" Báo cáo đồ án tốt nghiệp, Trường Đại học Bách Khoa \\- ĐHQG TP. Hồ Chí Minh, 2023-2024.",
       "database": "books.bib",
-      "bibtex_type": "mastersthesis"
+      "bibtex_type": "mastersthesis",
+      "previous_v4_number": 1
     },
     {
-      "old_number": 2,
+      "source_number": 2,
       "key": "v4-02",
-      "source_text": "Đ. T. Quý, \"Xây dựng website quản lý nội dung đa người dùng với kiến trúc multi-tenancy,\" Khóa luận tốt nghiệp, Trường Đại học Kinh tế Quốc dân, Hà Nội, 2024.",
+      "source_text": "Đ. T. Quý, \"Xây dựng website quản lý nội dung đa người dùng với kiến trúc multi-tenancy,\" Khóa luận tốt nghiệp, Trường Đại học Kinh tế Quốc dân, Hà Nội, 2024\\.",
       "database": "books.bib",
-      "bibtex_type": "mastersthesis"
+      "bibtex_type": "mastersthesis",
+      "previous_v4_number": 2
     },
     {
-      "old_number": 3,
+      "source_number": 3,
       "key": "v4-03",
-      "source_text": "N. X. Phi, \"Nâng cao hiệu năng cân bằng tải trên điện toán đám mây,\" Luận án Tiến sĩ, Học viện Công nghệ Bưu chính Viễn thông, Hà Nội, 2022.",
+      "source_text": "N. X. Phi, \"Nâng cao hiệu năng cân bằng tải trên điện toán đám mây,\" Luận án Tiến sĩ, Học viện Công nghệ Bưu chính Viễn thông, Hà Nội, 2022\\.",
       "database": "books.bib",
-      "bibtex_type": "phdthesis"
+      "bibtex_type": "phdthesis",
+      "previous_v4_number": 3
     },
     {
-      "old_number": 4,
+      "source_number": 4,
       "key": "v4-04",
-      "source_text": "N. K. Chiến, \"Nghiên cứu giải pháp tự động điều chỉnh tài nguyên hiệu quả trong điện toán đám mây,\" Luận án Tiến sĩ, Học viện Công nghệ Bưu chính Viễn thông, Hà Nội, 2019.",
+      "source_text": "N. K. Chiến, \"Nghiên cứu giải pháp tự động điều chỉnh tài nguyên hiệu quả trong điện toán đám mây,\" Luận án Tiến sĩ, Học viện Công nghệ Bưu chính Viễn thông, Hà Nội, 2019\\.",
       "database": "books.bib",
-      "bibtex_type": "phdthesis"
+      "bibtex_type": "phdthesis",
+      "previous_v4_number": 4
     },
     {
-      "old_number": 5,
+      "source_number": 5,
       "key": "v4-05",
       "source_text": "J. Kabbedijk, C.-P. Bezemer, S. Jansen, và A. Zaidman, \"Defining multi-tenancy: A systematic mapping study on the academic and the industrial perspective,\" Journal of Systems and Software, vol. 100, pp. 139-148, 2015, DOI: 10.1016/j.jss.2014.10.034.",
       "database": "books.bib",
-      "bibtex_type": "article"
+      "bibtex_type": "article",
+      "previous_v4_number": 5
     },
     {
-      "old_number": 6,
+      "source_number": 6,
       "key": "v4-06",
       "source_text": "D. Olabanji, T. Fitch, và O. Matthew, \"Multi-tenancy in Cloud-native Architecture: A Systematic Mapping Study,\" WSEAS Transactions on Computers, vol. 22, pp. 25-43, 2023, DOI: 10.37394/23205.2023.22.4.",
       "database": "books.bib",
-      "bibtex_type": "article"
+      "bibtex_type": "article",
+      "previous_v4_number": 6
     },
     {
-      "old_number": 7,
+      "source_number": 7,
       "key": "v4-07",
-      "source_text": "S. Pushpan, \"Multi-Tenant Architecture: A Comprehensive Framework for Building Scalable SaaS Applications,\" International Journal of Scientific Research in Computer Science, Engineering and Information Technology, vol. 10, no. 6, pp. 860-867, Nov. 2024, DOI: 10.32628/CSEIT241061151.",
+      "source_text": "S. Pushpan, \"Multi-Tenant Architecture: A Comprehensive Framework for Building Scalable SaaS Applications,\" International Journal of Scientific Research in Computer Science, Engineering and Information Technology, vol. 10, no. 6, pp. 1117-1126, Nov. 2024, DOI: 10.32628/CSEIT241061151.",
       "database": "books.bib",
-      "bibtex_type": "article"
+      "bibtex_type": "article",
+      "previous_v4_number": 7
     },
     {
-      "old_number": 8,
+      "source_number": 8,
       "key": "v4-08",
       "source_text": "V. R. Narasayya và S. Chaudhuri, \"Multi-Tenant Cloud Data Services: State-of-the-Art, Challenges and Opportunities,\" trong Proceedings of the ACM SIGMOD International Conference on Management of Data, 2022, pp. 1-26, DOI: 10.1145/3514221.3522566.",
       "database": "books.bib",
-      "bibtex_type": "inproceedings"
+      "bibtex_type": "inproceedings",
+      "previous_v4_number": 8
     },
     {
-      "old_number": 9,
+      "source_number": 9,
       "key": "v4-09",
-      "source_text": "R. Kumar, \"Multi-Tenant SaaS Architectures: Design Principles and Security Considerations,\" overview paper, 2025.",
-      "database": "articles.bib",
-      "bibtex_type": "misc"
+      "source_text": "R. Kumar, \"Multi-Tenant SaaS Architectures: Design Principles and Security Considerations,\" Journal of Software Engineering and Simulation, vol. 6, no. 5, pp. 28-41, May 2020, DOI: 10.35629/3795-06052841.",
+      "database": "books.bib",
+      "bibtex_type": "article",
+      "previous_v4_number": 9
     },
     {
-      "old_number": 10,
+      "source_number": 10,
       "key": "v4-10",
-      "source_text": "Microsoft Azure Architecture Center, \"Architecting multitenant solutions on Azure: Tenancy models, data isolation approaches, and noisy neighbor mitigation,\" 2024. [Trực tuyến]. Available: https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview",
+      "source_text": "Microsoft Azure Architecture Center, \"Architecting multitenant solutions on Azure: Tenancy models, data isolation approaches, and noisy neighbor mitigation,\" 2024\\. \\[Trực tuyến\\]. Available: https\\://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 10
     },
     {
-      "old_number": 11,
+      "source_number": 11,
       "key": "v4-11",
-      "source_text": "T. Golding, \"SaaS Architecture Fundamentals,\" Amazon Web Services (AWS) Whitepaper, 2022. [Trực tuyến]. Available: https://docs.aws.amazon.com/whitepapers/latest/saas-architecture-fundamentals",
+      "source_text": "T. Golding, \"SaaS Architecture Fundamentals,\" Amazon Web Services (AWS) Whitepaper, 2022\\. \\[Trực tuyến\\]. Available: https\\://docs.aws.amazon.com/whitepapers/latest/saas-architecture-fundamentals",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 11
     },
     {
-      "old_number": 12,
+      "source_number": 12,
       "key": "v4-12",
-      "source_text": "Google Cloud Architecture Center, \"Best practices for enterprise multi-tenancy,\" [Trực tuyến]. Available: https://cloud.google.com/kubernetes-engine/docs/concepts/multitenancy-overview",
+      "source_text": "Google Cloud Architecture Center, \"Best practices for enterprise multi-tenancy,\" \\[Trực tuyến\\]. Available: https\\://cloud.google.com/kubernetes-engine/docs/concepts/multitenancy-overview",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 12
     },
     {
-      "old_number": 13,
+      "source_number": 13,
       "key": "v4-13",
-      "source_text": "Amazon Web Services (aws-samples), \"SaaS Reference Architecture on Amazon ECS,\" GitHub repository. [Trực tuyến]. Available: https://github.com/aws-samples/saas-reference-architecture-ecs",
+      "source_text": "Amazon Web Services (aws-samples), \"SaaS Reference Architecture on Amazon ECS,\" GitHub repository. \\[Trực tuyến\\]. Available: https\\://github.com/aws-samples/saas-reference-architecture-ecs",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 13
     },
     {
-      "old_number": 14,
+      "source_number": 14,
       "key": "v4-14",
-      "source_text": "P. Mell và T. Grance, \"The NIST Definition of Cloud Computing,\" National Institute of Standards and Technology (NIST), Special Publication 800-145, 2011.",
+      "source_text": "P. Mell và T. Grance, \"The NIST Definition of Cloud Computing,\" National Institute of Standards and Technology (NIST), Special Publication 800-145, 2011\\.",
       "database": "articles.bib",
-      "bibtex_type": "techreport"
+      "bibtex_type": "techreport",
+      "previous_v4_number": 14
     },
     {
-      "old_number": 15,
+      "source_number": 15,
       "key": "v4-15",
-      "source_text": "F. Chong và G. Carraro, \"Architecture strategies for catching the long tail,\" Microsoft Corporation, MSDN Library, pp. 1-14, 2006.",
+      "source_text": "F. Chong và G. Carraro, \"Architecture strategies for catching the long tail,\" Microsoft Corporation, MSDN Library, pp. 1-14, 2006\\.",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 15
     },
     {
-      "old_number": 16,
+      "source_number": 16,
       "key": "v4-16",
-      "source_text": "F. Chong, G. Carraro, và R. Wolter, \"Multi-tenant data architecture,\" Microsoft Corporation, MSDN Library, 2006.",
+      "source_text": "F. Chong, G. Carraro, và R. Wolter, \"Multi-tenant data architecture,\" Microsoft Corporation, MSDN Library, 2006\\.",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 16
     },
     {
-      "old_number": 17,
+      "source_number": 17,
       "key": "v4-17",
-      "source_text": "I. M. Copi, C. Cohen, và D. E. Flage, Introduction to Logic. Macmillan / Pearson, 1972/2007.",
-      "database": "books.bib",
-      "bibtex_type": "book"
-    },
-    {
-      "old_number": 18,
-      "key": "v4-18",
-      "source_text": "T. Golding, Building Multi-Tenant SaaS Architectures: Principles, Practices, and Patterns. O'Reilly Media, 2024.",
-      "database": "books.bib",
-      "bibtex_type": "book"
-    },
-    {
-      "old_number": 19,
-      "key": "v4-19",
-      "source_text": "Amazon Web Services (AWS), \"AWS Well-Architected Framework: SaaS Lens – General Design Principles, Tenant Isolation Models & Data Partitioning Patterns,\" AWS Whitepapers & Guides, 2024.",
-      "database": "articles.bib",
-      "bibtex_type": "misc"
-    },
-    {
-      "old_number": 20,
-      "key": "v4-20",
-      "source_text": "S. Aulbach, T. Grust, D. Jacobs, A. Kemper, và J. Rittinger, \"Multi-tenant databases for software as a service: Schema-mapping techniques,\" trong Proceedings of the 2008 ACM SIGMOD International Conference on Management of Data, ACM, 2008, pp. 1195–1206.",
-      "database": "books.bib",
-      "bibtex_type": "inproceedings"
-    },
-    {
-      "old_number": 21,
-      "key": "v4-21",
       "source_text": "C.-P. Bezemer và A. Zaidman, \"Multi-tenant SaaS applications: maintenance dream or nightmare?,\" trong Proceedings of the Joint ERCIM Workshop on Software Evolution (EVOL) and IWPSE, ACM, 2010, pp. 88-92.",
       "database": "books.bib",
-      "bibtex_type": "inproceedings"
+      "bibtex_type": "inproceedings",
+      "previous_v4_number": 21
     },
     {
-      "old_number": 22,
+      "source_number": 18,
+      "key": "v4-18",
+      "source_text": "T. Golding, Building Multi-Tenant SaaS Architectures: Principles, Practices, and Patterns. O'Reilly Media, 2024\\.",
+      "database": "books.bib",
+      "bibtex_type": "book",
+      "previous_v4_number": 18
+    },
+    {
+      "source_number": 19,
+      "key": "v4-19",
+      "source_text": "Amazon Web Services (AWS), \"AWS Well-Architected Framework: SaaS Lens \\- General Design Principles, Tenant Isolation Models & Data Partitioning Patterns,\" AWS Whitepapers & Guides, 2024\\.",
+      "database": "articles.bib",
+      "bibtex_type": "misc",
+      "previous_v4_number": 19
+    },
+    {
+      "source_number": 20,
+      "key": "v4-20",
+      "source_text": "G. Einziger, R. Friedman, và B. Manes, \"TinyLFU: A highly efficient cache admission policy,\" ACM Transactions on Storage (TOS), vol. 13, no. 4, Article 35, pp. 1-31, 2017, DOI: 10.1145/3149371.",
+      "database": "books.bib",
+      "bibtex_type": "article",
+      "previous_v4_number": 23
+    },
+    {
+      "source_number": 21,
+      "key": "v4-21",
+      "source_text": "S. Aulbach, T. Grust, D. Jacobs, A. Kemper, và J. Rittinger, \"Multi-tenant databases for software as a service: Schema-mapping techniques,\" trong Proceedings of the 2008 ACM SIGMOD International Conference on Management of Data, ACM, 2008, pp. 1195-1206.",
+      "database": "books.bib",
+      "bibtex_type": "inproceedings",
+      "previous_v4_number": 20
+    },
+    {
+      "source_number": 22,
       "key": "v4-22",
-      "source_text": "Cloud Native Computing Foundation (CNCF), \"OpenFeature Specification (v0.8.0): Vendor-agnostic, community-driven API for feature flagging,\" 2024. [Trực tuyến]. Available: https://openfeature.dev/specification/",
+      "source_text": "PostgreSQL Global Development Group, \"PostgreSQL 16 Documentation \\- Section 5.8: Row Security Policies & Section 20.1: Setting Parameters (SET LOCAL),\" 2024\\. \\[Trực tuyến\\]. Available: https\\://www\\.postgresql.org/docs/current/ddl-rowsecurity.html",
       "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "misc",
+      "previous_v4_number": 25
     },
     {
-      "old_number": 23,
+      "source_number": 23,
       "key": "v4-23",
-      "source_text": "G. Einziger, R. Friedman, và B. Manes, \"TinyLFU: A highly efficient cache admission policy,\" ACM Transactions on Storage (TOS), vol. 13, no. 4, Article 35, pp. 1–31, 2017, DOI: 10.1145/3149371.",
+      "source_text": "M. Kleppmann, Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems. O'Reilly Media, 2017\\.",
       "database": "books.bib",
-      "bibtex_type": "article"
+      "bibtex_type": "book",
+      "previous_v4_number": 24
     },
     {
-      "old_number": 24,
+      "source_number": 24,
       "key": "v4-24",
-      "source_text": "M. Kleppmann, Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems. O'Reilly Media, 2017.",
+      "source_text": "R. Krebs, C. Momm, và S. Kounev, \"Metrics and techniques for quantifying performance isolation in cloud environments,\" Science of Computer Programming, vol. 90, part B, pp. 116-134, 2014, DOI: 10.1016/j.scico.2013.08.003.",
       "database": "books.bib",
-      "bibtex_type": "book"
-    },
-    {
-      "old_number": 25,
-      "key": "v4-25",
-      "source_text": "PostgreSQL Global Development Group, \"PostgreSQL 16 Documentation – Section 5.8: Row Security Policies & Section 20.1: Setting Parameters (SET LOCAL),\" 2024. [Trực tuyến]. Available: https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
-      "database": "articles.bib",
-      "bibtex_type": "misc"
+      "bibtex_type": "article",
+      "previous_v4_number": null
     }
-  ],
-  "source_sha256": "1793c771900f4c4f32566a6883ce6a30d5e0d9d32e42d35a9d3115a6e6db5c45",
-  "notes": {
-    "v4-01": "Author not supplied. Source publication range 2023-2024 retained in note. Standard mastersthesis storage type uses explicit source type Bao cao do an tot nghiep.",
-    "v4-02": "Only source initials retained. Standard mastersthesis storage type uses explicit source type Khoa luan tot nghiep.",
-    "v4-09": "Publisher, venue and identifier not supplied; overview paper retained without invented metadata.",
-    "v4-12": "Publication year not supplied.",
-    "v4-13": "Publication year not supplied.",
-    "v4-17": "Ambiguous source year 1972/2007 retained verbatim in note; no single publication year selected.",
-    "v4-25": "Source title names PostgreSQL 16, while source URL uses /current/; retained as supplied."
-  }
+  ]
 }
