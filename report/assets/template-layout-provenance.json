@@ -17,7 +17,8 @@
       "source_page": 2,
       "source_sha256": "664bc5002c8759774120652e4f86b4f4df9b81225f0b42c73603d0687e41ef01",
       "top": 70,
-      "bottom": 149
+      "bottom": 149,
+      "title_override": "Page 2 title text removed. LaTeX renders the approved English bulletin title."
     },
     {
       "profile": "VI",
@@ -84,7 +85,7 @@
     }
   ],
   "assets": {
-    "template-headers.pdf": "e218d933d583701bc5c812458530fe21c9134abbea238d74832da946af6f7542",
+    "template-headers.pdf": "cc6cbd1ba545d7a6e46c059b8f9ec7b971bc1f6a9a4dab4848d505911e8b1853",
     "cover-frame.pdf": "7256087d929365d27e8b7891d1e73bc6093397293d87664c2fa77d11bd6c138f"
   }
 }

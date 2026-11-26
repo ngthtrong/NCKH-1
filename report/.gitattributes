@@ -1,6 +1,6 @@
 # Uncompressed vector PDFs can look like text to Git. Preserve their byte
 # offsets and stream lengths on Windows checkouts with core.autocrlf=true.
-*.pdf -text
+*.pdf binary
 *.png -text
 *.jpg -text
 *.jpeg -text

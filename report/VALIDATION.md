@@ -1,4 +1,47 @@
-# Kiểm tra báo cáo V4 — cập nhật bố cục 20/11/2026
+# Kiểm tra báo cáo V4
+
+## Bản ngày 26/11/2026
+
+Nguồn gồm `Report_V4.md`, `Report_V4.pdf` và `Report_V4.docx`. Hash nguồn,
+ánh xạ từng ảnh và phiên bản các mục phụ lục nằm trong
+[manifest](assets/v4-import-manifest.json). Nội dung đã duyệt, các mục
+tạm hoãn và dữ liệu biểu mẫu được ghi ở [V4-REVIEW.md](V4-REVIEW.md).
+
+| Đầu ra | Số trang |
+| --- | ---: |
+| [Bản một mặt](build/content/content.pdf) | 139 |
+| [Bản hai mặt](build/content-twoside/content.pdf) | 139 |
+| [Bản tin Việt](build/bulletin-vi/bulletin-vi.pdf) | 1 |
+| [Bản tin Anh](build/bulletin-en/bulletin-en.pdf) | 1 |
+| [Tóm tắt Việt](build/summary-vi/summary-vi.pdf) | 2 |
+| [Tóm tắt Anh](build/summary-en/summary-en.pdf) | 2 |
+| [Minh họa template](build/smoke/smoke.pdf) | 6 |
+
+- Thân bài từ Mở đầu đến hết Kết luận và kiến nghị là 97 trang
+  ở cả hai quyển, từ trang PDF 21 đến 117.
+- Mỗi quyển có 40 số hình, 42 ảnh nội dung đúng thứ tự, 9 bảng
+  (7 bảng có chú thích) và 25 tài liệu tham khảo. Ba ảnh ở Hình 4.6
+  nằm cùng trang với chú thích. Các ảnh thân bài khớp từng pixel
+  với ảnh DOCX và giữ luồng ảnh PDF nguồn.
+- Sau khi áp dụng nội dung đã duyệt, `verify_v4.py` đối chiếu
+  26.887/26.887 cụm năm từ của 304 đoạn ở mỗi quyển. Phụ lục có
+  13 mục đối chiếu, gồm 11 khối mã/cấu hình và hai mục mô tả phép thử.
+- Kiểm tra PDF gồm A4, phông nhúng, nhãn và liên kết, hai bìa, danh
+  sách thành viên, biểu mẫu chủ nhiệm, trang ngang và bốn biểu mẫu cuối
+  quyển. Văn bản biểu mẫu ghép và bốn PDF riêng khớp nhau.
+
+```bash
+make -C report doctor
+make -C report all smoke
+make -C report check
+python report/scripts/verify_v4.py
+git diff --check -- report
+```
+
+Các kiểm tra trên đánh giá nội dung chuyển đổi và cách trình bày.
+Hồ sơ nghiệm thu và dữ liệu đo gốc được theo dõi tại V4-REVIEW.
+
+## Lịch sử — bố cục ngày 20/11/2026
 
 Nội dung nghiên cứu chỉ lấy từ `../Report_V4.md` và `../Report_V4.pdf`;
 hai nguồn không bị sửa. Hash nguồn và bảng ánh xạ tài nguyên nằm trong
@@ -7,7 +50,7 @@ Hình thức theo `RULES.md`, `HinhThucBC.pdf` và template hiện tại.
 
 Bố cục ngày 20/11 theo yêu cầu mới: ưu tiên hình nhỏ trên trang dọc,
 đặt trực tiếp sau đoạn hoàn chỉnh, giảm trang gần trống và sửa Phần II.
-Hai bản một/hai mặt hiện đều 129 trang, so với 164 trang trước điều chỉnh.
+Hai bản một/hai mặt khi đó đều 129 trang, so với 164 trang trước điều chỉnh.
 Phần II cùng trang đầu Chương 1, cỡ chữ theo tiêu đề hiện tại, không còn
 trang riêng chỉ có tiêu đề. Nhóm Phụ lục cũng không tạo trang tiêu đề trống.
 Có 35 hình dọc; chỉ năm sơ đồ dày thông tin dùng ngang: 2.7, 3.10, 4.4,
@@ -15,7 +58,7 @@ Có 35 hình dọc; chỉ năm sơ đồ dày thông tin dùng ngang: 2.7, 3.10,
 không thể trôi vào giữa một đoạn văn. Đoạn giới thiệu bảng/hình ngang đi
 cùng đối tượng; cột bảng được cân lại và vẫn dùng chữ 13 bp.
 
-| PDF hiện hành | Số trang |
+| PDF ngày 20/11/2026 | Số trang |
 | --- | ---: |
 | [Bản một mặt](build/content/content.pdf) | 129 |
 | [Bản hai mặt](build/content-twoside/content.pdf) | 129 |

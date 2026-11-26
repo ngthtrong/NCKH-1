@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  26 NOV 2026 22:10
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  26 NOV 2026 22:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -17,7 +17,7 @@ Package: scrkbase 2023/07/07 v3.41 KOMA-Script package (KOMA-Script-dependent b
 asics and keyval usage)
 
 (/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrbase.sty
-Package: scrbase 2023/07/07 v3.41 KOMA-Script package (KOMA-Script-independent 
+Package: scrbase 2023/07/07 v3.41 KOMA-Script package (KOMA-Script-independent
 basics and keyval usage)
 
 (/usr/share/texlive/texmf-dist/tex/latex/koma-script/scrlfile.sty
@@ -169,7 +169,7 @@ Package scrlayer-scrpage Info: Makeing stand-alone element `pagehead' from
 (/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec.sty
 (/usr/share/texlive/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
 (/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3.sty
-Package: expl3 2024-01-22 L3 programming layer (loader) 
+Package: expl3 2024-01-22 L3 programming layer (loader)
 
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-xetex.def
 File: l3backend-xetex.def 2024-01-04 L3 backend support: XeTeX
@@ -208,10 +208,10 @@ Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 
 Package fontspec Info: Font family 'TimesNewRoman(0)' created for font 'Times
 (fontspec)             New Roman' with options [Ligatures=TeX].
-(fontspec)              
+(fontspec)
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
-(fontspec)              
+(fontspec)
 (fontspec)             - 'normal' (m/n) with NFSS spec.: <->"Times New
 (fontspec)             Roman/OT:script=latn;language=dflt;mapping=tex-text;"
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.: <->"Times New
@@ -336,14 +336,14 @@ Package fontspec Info: Font family 'latinmodern-math.otf(0)' created for font
 (fontspec)             'latinmodern-math.otf' with options
 (fontspec)             [BoldItalicFont={},ItalicFont={},SmallCapsFont={},Script
 =Math].
-(fontspec)              
+(fontspec)
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
-(fontspec)              
+(fontspec)
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <->"[latinmodern-math.otf]/OT:script=math;language=dflt;
 "
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
 
 
 Package fontspec Info: Font family 'latinmodern-math.otf(1)' created for font
@@ -352,16 +352,16 @@ Package fontspec Info: Font family 'latinmodern-math.otf(1)' created for font
 =Math,SizeFeatures={{Size=11.091429-},{Size=7.829244-11.091429,Font=latinmodern
 -math.otf,Style=MathScript},{Size=-7.829244,Font=latinmodern-math.otf,Style=Mat
 hScriptScript}}].
-(fontspec)              
+(fontspec)
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
-(fontspec)              
+(fontspec)
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <11.091429->"[latinmodern-math.otf]/OT:script=math;langu
 age=dflt;"<7.829244-11.091429>"[latinmodern-math.otf]/OT:script=math;language=d
 flt;+ssty=0;"<-7.829244>"[latinmodern-math.otf]/OT:script=math;language=dflt;+s
 sty=1;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
 
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
 (Font)              `operators' in the math version `normal' on input line 10.
@@ -402,16 +402,16 @@ hScriptScript}},ScaleAgain=1.0001,FontAdjustment={\fontdimen
 (fontspec)             \fontdimen 19\font =2.60974pt\relax \fontdimen 22\font
 (fontspec)             =3.26219pt\relax \fontdimen 20\font =0pt\relax
 (fontspec)             \fontdimen 21\font =0pt\relax }].
-(fontspec)              
+(fontspec)
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
-(fontspec)              
+(fontspec)
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <11.091429->s*[1.0001]"[latinmodern-math.otf]/OT:script=
 math;language=dflt;"<7.829244-11.091429>s*[1.0001]"[latinmodern-math.otf]/OT:sc
 ript=math;language=dflt;+ssty=0;"<-7.829244>s*[1.0001]"[latinmodern-math.otf]/O
 T:script=math;language=dflt;+ssty=1;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
 (fontspec)             and font adjustment code:
 (fontspec)             \fontdimen 8\font =8.834pt\relax \fontdimen 9\font
 (fontspec)             =5.1412pt\relax \fontdimen 10\font =5.79364pt\relax
@@ -422,7 +422,7 @@ T:script=math;language=dflt;+ssty=1;"
 (fontspec)             \fontdimen 17\font =3.22304pt\relax \fontdimen 18\font
 (fontspec)             =3.26219pt\relax \fontdimen 19\font =2.60974pt\relax
 (fontspec)             \fontdimen 22\font =3.26219pt\relax \fontdimen 20\font
-(fontspec)             =0pt\relax \fontdimen 21\font =0pt\relax 
+(fontspec)             =0pt\relax \fontdimen 21\font =0pt\relax
 
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
 (Font)              `symbols' in the math version `normal' on input line 10.
@@ -457,21 +457,21 @@ hScriptScript}},ScaleAgain=0.9999,FontAdjustment={\fontdimen
 (fontspec)             =2.60974pt\relax \fontdimen 10\font =2.17914pt\relax
 (fontspec)             \fontdimen 11\font =1.44841pt\relax \fontdimen 12\font
 (fontspec)             =7.82924pt\relax \fontdimen 13\font =0pt\relax }].
-(fontspec)              
+(fontspec)
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
-(fontspec)              
+(fontspec)
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <11.091429->s*[0.9999]"[latinmodern-math.otf]/OT:script=
 math;language=dflt;"<7.829244-11.091429>s*[0.9999]"[latinmodern-math.otf]/OT:sc
 ript=math;language=dflt;+ssty=0;"<-7.829244>s*[0.9999]"[latinmodern-math.otf]/O
 T:script=math;language=dflt;+ssty=1;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
 (fontspec)             and font adjustment code:
 (fontspec)             \fontdimen 8\font =0.52194pt\relax \fontdimen 9\font
 (fontspec)             =2.60974pt\relax \fontdimen 10\font =2.17914pt\relax
 (fontspec)             \fontdimen 11\font =1.44841pt\relax \fontdimen 12\font
-(fontspec)             =7.82924pt\relax \fontdimen 13\font =0pt\relax 
+(fontspec)             =7.82924pt\relax \fontdimen 13\font =0pt\relax
 
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
 (Font)              `largesymbols' in the math version `normal' on input line 1
@@ -1375,13 +1375,13 @@ Package biblatex Info: Trying to load configuration file...
 Package biblatex Info: ... file 'biblatex.cfg' found.
 
 (/usr/share/texlive/texmf-dist/tex/latex/biblatex/biblatex.cfg
-File: biblatex.cfg 
+File: biblatex.cfg
 )
 Package biblatex Info: XeTeX detected.
 (biblatex)             Assuming input encoding 'utf8'.
 Package biblatex Info: Document encoding is UTF8 ....
 Package biblatex Info: ... and expl3
-(biblatex)             2024-01-22 L3 programming layer (loader) 
+(biblatex)             2024-01-22 L3 programming layer (loader)
 (biblatex)             is new enough (at least 2020/04/06),
 (biblatex)             setting 'casechanger=expl3'.
 
@@ -1433,7 +1433,7 @@ Package scrbase Info: activating vietnamese \indexname on input line 10.
 * paper: a4paper
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
-* modes: 
+* modes:
 * h-part:(L,W,R)=(85.35826pt, 455.24411pt, 56.9055pt)
 * v-part:(T,H,B)=(56.9055pt, 731.23584pt, 56.9055pt)
 * \paperwidth=597.50787pt
@@ -1467,7 +1467,7 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
 (Font)                  OT1/cmr/m/it --> TU/TimesNewRoman(0)/m/it on input line
  10.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/b/n on input line 
+(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/b/n on input line
 10.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
 (Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 10.
@@ -1594,12 +1594,12 @@ L3 programming layer <2024-01-22>
 Package logreq Info: Writing requests to 'smoke.run.xml'.
 \openout1 = `smoke.run.xml'.
 
- ) 
+ )
 Here is how much of TeX's memory you used:
- 41697 strings out of 476846
- 880413 string characters out of 5803824
- 1967091 words of memory out of 5000000
- 63025 multiletter control sequences out of 15000+600000
+ 41696 strings out of 476846
+ 880393 string characters out of 5803824
+ 1967057 words of memory out of 5000000
+ 63024 multiletter control sequences out of 15000+600000
  560464 words of font info for 75 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  126i,19n,124p,11062b,6708s stack positions out of 10000i,1000n,20000p,200000b,200000s

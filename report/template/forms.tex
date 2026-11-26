@@ -10,10 +10,10 @@
 % Compensate cropped-PDF placement in XeTeX against the source page coordinates.
 \newcommand{\FormHeaderCorrection}[1]{%
   \ifcase#1 0\or .5129\or .5165\or .6287\or .6548\or .5279\or .4344\or .3895\or .7250\or .7623\fi}
-\newcommand{\FormReferenceHeader}[3][]{%
+\newcommand{\FormReferenceHeader}[2]{%
   \AddToShipoutPictureFG*{\AtPageUpperLeft{%
-    \put(0,\LenToUnit{\dimexpr-#3bp-\FormHeaderCorrection{#2}bp\relax}){%
-      \raisebox{-\height}{\includegraphics[page=#2,#1]{assets/template-headers.pdf}}}}}}
+    \put(0,\LenToUnit{\dimexpr-#2bp-\FormHeaderCorrection{#1}bp\relax}){%
+      \raisebox{-\height}{\includegraphics[page=#1]{assets/template-headers.pdf}}}}}}
 \newcommand{\FormBulletinEnglishTitle}{RESEARCH PROJECT NEWS BRIEF}
 \newif\ifFormSummary
 \newcommand{\FormResultText}[2]{\ifFormSummary#2\else#1\fi\par}
@@ -45,7 +45,7 @@
 \newcommand{\FormSetupBulletinEN}{%
   \FormGeometry{68.54}{41.26}{152.03}{12}%
   \setlength{\parskip}{6.84bp}%
-  \def\FormHeading{\FormReferenceHeader[trim=0 30bp 0 0,clip]{2}{70}%
+  \def\FormHeading{\FormReferenceHeader{2}{70}%
     \FormCenteredAt{134.5}{14.04}{\FormBulletinEnglishTitle}}%
   \renewcommand{\FormLine}[1]{\par\noindent\hangindent=14.16bp\hangafter=1
     \makebox[14.16bp][l]{\textminus}##1\par}}
