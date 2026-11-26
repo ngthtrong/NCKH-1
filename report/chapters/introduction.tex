@@ -4,7 +4,7 @@
 
 \addsubsec{1.1. Tình hình trong nước}\label{v4-intro-1-1}
 
-Tại Việt Nam, các hệ thống phần mềm cung cấp dưới dạng dịch vụ (Software as a Service - SaaS) theo mô hình đa thuê bao (Multi-tenant) đang ngày càng phổ biến trong tiến trình chuyển đổi số của doanh nghiệp, đặc biệt trong các lĩnh vực quản lý nội bộ, quản lý công việc và phối hợp nhóm, trong số. Hiện nay, các nghiên cứu trong nước chưa đi sâu về kiến trúc đa thuê bao mà tập trung chủ yếu vào hai hướng liên quan: triển khai ứng dụng sử dụng mô hình đa thuê bao cho nghiệp vụ cụ thể và tối ưu hóa hạ tầng, nền tảng đám mây hỗ trợ triển khai SaaS đa thuê bao.\\
+Tại Việt Nam, các hệ thống phần mềm cung cấp dưới dạng dịch vụ (Software as a Service - SaaS) theo mô hình đa thuê bao (Multi-tenant) đang ngày càng phổ biến trong tiến trình chuyển đổi số của doanh nghiệp, đặc biệt trong các lĩnh vực quản lý nội bộ, quản lý công việc và phối hợp nhóm. Hiện nay, các nghiên cứu trong nước chưa đi sâu về kiến trúc đa thuê bao mà tập trung chủ yếu vào hai hướng liên quan: triển khai ứng dụng sử dụng mô hình đa thuê bao cho nghiệp vụ cụ thể và tối ưu hóa hạ tầng, nền tảng đám mây hỗ trợ triển khai SaaS đa thuê bao.\\
 Thứ nhất, nhóm nghiên cứu tập trung triển khai ứng dụng đa thuê bao theo hướng nghiệp vụ cụ thể. Nhiều khóa luận và công trình tại các trường đại học trong nước đã xây dựng thành công các hệ thống đa người dùng theo hướng đa thuê bao. Các công trình này mặc dù đảm bảo đặc điểm của ứng dụng đa thuê bao nhưng thường xây dựng tính năng đa thuê bao mang tính đặc thù cho bài toán cụ thể \cite{v4-01}\cite{v4-02}.\\
 Thứ hai, nhóm các nghiên cứu chuyên sâu về tối ưu hóa hạ tầng và nền tảng điện toán đám mây hỗ trợ triển khai SaaS đa thuê bao. Song song với việc triển khai ứng dụng, các nhà nghiên cứu trong nước đã tập trung giải quyết các bài toán cốt lõi của vận hành đám mây như cân bằng tải, phân bổ tài nguyên và đảm bảo chất lượng dịch vụ (Quality of Service -- QoS) \cite{v4-03}\cite{v4-04}.\\
 Ngoài ra, các doanh nghiệp trong nước (VNG, Base.vn, KiotViet,...) cũng đã triển khai thành công SaaS dạng đa thuê bao trong sản phẩm của họ, tuy nhiên, các kỹ thuật của họ được giữ kín như bí mật thương mại và tài sản trí tuệ độc quyền.
@@ -46,9 +46,9 @@ Bước đầu tiên áp dụng phương pháp tổng hợp và phân tích tài
 
 Từ hệ quy chiếu đó, nghiên cứu phân tích từ vĩ mô xuống vi mô theo từng tầng nhằm tránh gia tăng nhanh tổ hợp các phương án thiết kế. Ở vĩ mô, hệ thống được xét qua sự đánh đổi giữa tách riêng và gộp chung tài nguyên, đối sánh các mô hình triển khai chuẩn mực theo bộ tiêu chí cố định để định vị kiến trúc mục tiêu. Từ định vị này, phân tích đi xuống vi mô tại từng tầng để xác định các cơ chế phần mềm bắt buộc về định danh, cô lập dữ liệu, điều tiết hiệu năng và tùy biến động.
 
-Khi thiết kế ứng dụng quản lý công việc Kanban, đề tài áp dụng phương pháp Tiếp cận Ngoài--Vào định hướng thị trường (Market-Driven Outside-In Approach) kết hợp với thiết kế suy dẫn từ yêu cầu. Nghiên cứu xuất phát từ việc tham khảo nhu cầu vận hành đa dạng của các nhóm và tổ chức. Từ các nhu cầu thị trường đó, đề tài quy hoạch thành các gói năng lực Dịch vụ biểu hiện trực tiếp thành các nhóm chức năng phần mềm trên hai mặt phẳng kiến trúc (Mặt phẳng điều khiển và Mặt phẳng dữ liệu) cùng ba lớp tùy biến động (nhận diện thương hiệu, quy tắc nghiệp vụ và trường dữ liệu mở rộng). Tiếp đó, từ yêu cầu phải cung ứng các dịch vụ này đồng thời cho nhiều tổ chức với chi phí thấp, nghiên cứu suy dẫn ngược vào trong để lựa chọn mô hình kiến trúc Pool Cấp độ 3 và thiết kế các cơ chế kiểm soát kỹ thuật K1--K4.
+Khi thiết kế ứng dụng quản lý công việc Kanban, đề tài áp dụng phương pháp Tiếp cận Ngoài--Vào định hướng thị trường (Market-Driven Outside-In Approach) kết hợp với thiết kế suy dẫn từ yêu cầu. Nghiên cứu sử dụng các chân dung thuê bao giả lập để biểu diễn nhu cầu vận hành khác nhau. Từ các nhu cầu được mô hình hóa, đề tài quy hoạch thành các gói năng lực Dịch vụ biểu hiện trực tiếp thành các nhóm chức năng phần mềm trên hai mặt phẳng kiến trúc (Mặt phẳng điều khiển và Mặt phẳng dữ liệu) cùng ba lớp tùy biến động (nhận diện thương hiệu, quy tắc nghiệp vụ và trường dữ liệu mở rộng). Tiếp đó, từ yêu cầu phải cung ứng các dịch vụ này đồng thời cho nhiều tổ chức với chi phí thấp, nghiên cứu suy dẫn ngược vào trong để lựa chọn mô hình kiến trúc Pool Cấp độ 3 và thiết kế các cơ chế kiểm soát kỹ thuật K1--K4.
 
-Để kiểm chứng thiết kế, nghiên cứu áp dụng phương pháp thực nghiệm có đối chứng trên nguyên mẫu ứng dụng. Môi trường thực nghiệm được thiết lập với ngưỡng tài nguyên cố định nhằm phản ánh sự tranh chấp giữa các thuê bao, đo lường chính xác các chỉ số an toàn cô lập dữ liệu và hiệu năng vận hành trong điều kiện tải thực tế.
+Để kiểm chứng thiết kế, nghiên cứu áp dụng phương pháp thực nghiệm có đối chứng trên nguyên mẫu ứng dụng. Môi trường thực nghiệm được thiết lập với ngưỡng tài nguyên cố định nhằm phản ánh sự tranh chấp giữa các thuê bao, đo các chỉ số cô lập dữ liệu và hiệu năng vận hành dưới tải giả lập.
 
 \addsec{5. Đối tượng nghiên cứu}\label{v4-intro-5}
 
@@ -58,11 +58,11 @@ Các cơ chế kỹ thuật cốt lõi trong kiến trúc đa thuê bao để đ
 
 - Cơ chế cô lập dữ liệu: Các mô hình và kỹ thuật để phân tách dữ liệu an toàn giữa các đơn vị thuê bao trên cùng một hệ thống cơ sở dữ liệu.
 
-- Định danh và Điều hướng Tenant: Các giải pháp kỹ thuật để nhận diện chính xác nguồn gốc yêu cầu của người dùng và điều hướng vào đúng không gian làm việc.
+- Định danh và điều hướng thuê bao: Các giải pháp kỹ thuật để nhận diện chính xác nguồn gốc yêu cầu của người dùng và điều hướng vào đúng không gian làm việc.
 
-- Bảo mật và Phân quyền: Hệ thống kiểm soát quyền truy cập đa cấp độ, đảm bảo tính riêng tư và ngăn chặn truy cập trái phép giữa các tenant.
+- Bảo mật và Phân quyền: Hệ thống kiểm soát quyền truy cập đa cấp độ, đảm bảo tính riêng tư và ngăn chặn truy cập trái phép giữa các thuê bao.
 
-- Tối ưu hóa tài nguyên: Các chiến lược quản lý kết nối và truy vấn để duy trì hiệu năng hệ thống khi quy mô mở rộng.
+- Người dùng được mời chỉ có thể truy cập bảng công việc trong phạm vi được cấp quyền. Quản trị viên thuê bao (TENANT\_\allowbreak{}ADMIN) có quyền xóa bảng công việc của thuê bao mình.
 
 Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ quản lý không gian làm việc:
 
@@ -70,7 +70,7 @@ Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ 
 
 - Các thành phần chính của hệ thống: quản lý người dùng và phân quyền, quản lý dự án và công việc theo thứ bậc, quản lý và chia sẻ tài nguyên phục vụ cho công việc.
 
-- Cơ chế theo dõi tiến độ và nhắc nhở thời hạn thực hiện công việc đa kênh.
+- Cơ chế theo dõi tiến độ qua bảng, cột trạng thái và thẻ công việc. Nhắc nhở thời hạn qua nhiều kênh nằm ngoài phạm vi nguyên mẫu được đánh giá.
 
 \addsec{6. Phạm vi nghiên cứu}\label{v4-intro-6}
 
@@ -80,7 +80,7 @@ Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ 
 
 + Xây dựng module Quản trị hệ thống để khởi tạo thuê bao.
 
-+ Xây dựng module Quản trị Tenant để quản lý công việc và thành viên.
++ Xây dựng mô-đun quản trị thuê bao để quản lý công việc và thành viên.
 
 + Xây dựng module Thành viên để xem và tương tác cơ bản với công việc được giao.
 
@@ -90,7 +90,7 @@ Quy trình quản lý công việc theo phương pháp Kanban và nghiệp vụ 
 
 + Hiện thực hóa cơ chế định danh và điều hướng đa tầng kết hợp tên miền phụ (Subdomain / tiêu đề Host) với thẻ bài JWT chữ ký mật mã thông qua cổng biên Reverse Proxy.
 
-Đề tài không tập trung vào các cơ chế đồng bộ thời gian thực phức tạp hay xử lý xung đột nâng cao giữa nhiều người dùng. Không đi sâu vào các bài toán tối ưu hạ tầng quy mô lớn, cân bằng tải phức tạp, tự động mở rộng, bảo mật hạ tầng mạng chuyên sâu. Không phát triển ứng dụng cho di động.
+Đề tài không tập trung vào các cơ chế đồng bộ thời gian thực phức tạp hay xử lý xung đột nâng cao giữa nhiều người dùng. Không đi sâu vào các bài toán tối ưu hạ tầng quy mô lớn, cân bằng tải phức tạp, tự động mở rộng, bảo mật hạ tầng mạng chuyên sâu. Không phát triển ứng dụng cho di động. Tính nhất quán của trạng thái công việc được xem xét trong phạm vi giao dịch di chuyển thẻ, kiểm soát phiên bản và áp dụng giới hạn WIP ở nguyên mẫu.
 
 Quy mô triển khai thực nghiệm:
 
@@ -110,4 +110,4 @@ Lý giải sự chọn mẫu:
 
 \addsec{7. Bố cục của báo cáo}\label{v4-intro-7}
 
-Ngoài phần Mở đầu, Kết luận và Phụ lục, nội dung chính của báo cáo được tổ chức thành 5 chương: Chương~\ref{v4-chapter-1} trình bày tổng quan về SaaS và động lực kinh tế chia sẻ tài nguyên, chuẩn hóa bộ ba khái niệm Thuê bao -- Dịch vụ -- Thể hiện cùng định nghĩa Đa thuê bao, phân biệt bốn mô hình hệ thống với bốn cấp độ trưởng thành kiến trúc SaaS, xác lập năm đặc trưng kiến trúc cốt lõi từ Cấp độ 3, và mô hình hóa kiến trúc 9 tầng Cloud-Native cùng bảy thách thức thiết kế trọng tâm; Chương~\ref{v4-chapter-2} hệ thống hóa các mô hình kiến trúc đa thuê bao (Silo, Pool, Bridge, Hybrid và hướng mở rộng phân vùng theo ô) từ cấp độ Thể hiện Thành phần đến Thể hiện Hệ thống, đồng thời thiết lập khung đánh giá đa yếu tố tổng quát để luận giải lựa chọn mô hình Pool Cấp độ 3 cho đề tài; Chương~\ref{v4-chapter-3} phân tích chuyên sâu kỹ thuật tổ chức Pool xuyên suốt theo luồng xử lý qua bốn cụm tầng (Hạ tầng nền, Phần mềm trung gian Tầng 7, Ứng dụng -- Thực thi Tầng 8--9 và Cơ sở dữ liệu Tầng 4--6) và hệ thống hóa các nguyên lý kiểm soát tổng quát K1--K4; Chương~\ref{v4-chapter-4} phân tích bài toán nghiệp vụ theo hướng tiếp cận thị trường, đặc tả vai trò, ca sử dụng, luồng tương tác, giao diện ứng dụng Kanban, thiết kế cơ sở dữ liệu, ánh xạ kỹ thuật K1--K4 và đóng gói triển khai dịch vụ qua Internet bằng Docker Compose cùng định tuyến tên miền phụ; Chương~\ref{v4-chapter-5} trình bày thiết lập môi trường thực nghiệm, kết quả đo kiểm định lượng trên bốn kịch bản (KB-1 đến KB-4) và bàn luận tổng hợp.
+Ngoài phần Mở đầu, Kết luận và Phụ lục, nội dung chính của báo cáo được tổ chức thành 5 chương: Chương~\ref{v4-chapter-1} trình bày tổng quan về SaaS và động lực kinh tế chia sẻ tài nguyên, chuẩn hóa bộ ba khái niệm Thuê bao -- Dịch vụ -- Thể hiện cùng định nghĩa Đa thuê bao, phân biệt bốn mô hình hệ thống với bốn cấp độ trưởng thành kiến trúc SaaS, xác lập năm đặc trưng kiến trúc cốt lõi từ Cấp độ 3, và mô hình hóa kiến trúc 9 tầng Cloud-Native cùng bảy thách thức thiết kế trọng tâm; Chương~\ref{v4-chapter-2} hệ thống hóa các mô hình kiến trúc đa thuê bao (Silo, Pool, Bridge, Hybrid và hướng mở rộng phân vùng theo ô) từ cấp độ Thể hiện Thành phần đến Thể hiện Hệ thống, đồng thời thiết lập khung đánh giá đa yếu tố tổng quát để luận giải lựa chọn mô hình Pool Cấp độ 3 cho đề tài; Chương~\ref{v4-chapter-3} phân tích chuyên sâu kỹ thuật tổ chức Pool xuyên suốt theo luồng xử lý qua bốn cụm tầng (Hạ tầng nền, Phần mềm trung gian Tầng 7, Ứng dụng -- Thực thi Tầng 8--9 và Cơ sở dữ liệu Tầng 4--6) và hệ thống hóa các nguyên lý kiểm soát tổng quát K1--K4; Chương~\ref{v4-chapter-4} phân tích bài toán nghiệp vụ qua các chân dung thuê bao giả lập, đặc tả vai trò, ca sử dụng, luồng tương tác, giao diện ứng dụng Kanban, thiết kế cơ sở dữ liệu, ánh xạ kỹ thuật K1--K4 và đóng gói triển khai dịch vụ qua Internet bằng Docker Compose cùng định tuyến tên miền phụ; Chương~\ref{v4-chapter-5} trình bày thiết lập môi trường thực nghiệm, kết quả đo kiểm định lượng trên bốn kịch bản (KB-1 đến KB-4) và bàn luận tổng hợp.

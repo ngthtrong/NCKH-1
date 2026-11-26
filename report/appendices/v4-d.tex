@@ -5,10 +5,10 @@
 \section{Kịch bản kiểm thử xâm nhập và tiêm lỗi cô lập dữ liệu (Đối ứng KB-1 \& KB-2)}\label{v4-sec-D-1}
 
 \par\noindent\textbf{D.1. Quy trình Kiểm thử Xâm nhập Biên (KB-1) \& Tiêm lỗi CSDL (KB-2)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/D-1.txt}
+KB-1 đánh giá khả năng từ chối định danh không hợp lệ và duy trì ngữ cảnh thuê bao khi tái sử dụng luồng. KB-2 kiểm tra cô lập dữ liệu bằng dữ liệu giả lập trong môi trường kiểm thử có kiểm soát. Mục~\ref{v4-sec-5-1} nêu tập mẫu và Mục~\ref{v4-sec-5-2} báo cáo kết quả.
 
 \Needspace{90bp}
-\section{Kịch bản mô phỏng hiện tượng hàng xóm ồn ào và tải đồng thời cao bằng k6 (Đối ứng KB-3)}\label{v4-sec-D-2}
+\section{Kịch bản mô phỏng hiện tượng láng giềng ồn ào và tải đồng thời cao bằng k6 (Đối ứng KB-3)}\label{v4-sec-D-2}
 
-\par\noindent\textbf{D.2. Kịch bản Đo tải Đa thuê bao Hàng xóm Ồn ào k6 (KB-3)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/D-2.txt}
+\par\noindent\textbf{D.2. Kịch bản Đo tải Đa thuê bao Láng giềng ồn ào k6 (KB-3)}\par
+KB-3 đối chiếu cấu hình Baseline và Proposed trên tải nghiệp vụ 80 người dùng ảo trong cửa sổ đo 60 giây. Thu thập thông lượng, độ trễ theo phân vị và mã phản hồi theo nhóm thuê bao. Thiết lập và kết quả được trình bày tại Mục~\ref{v4-sec-5-1} và Mục 5.3.1.

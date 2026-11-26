@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import the supplied V4 Markdown/PDF without rewriting research prose.
+"""Import Report V4 and apply the approved copy edits.
 
 Requires pypandoc_binary, PyMuPDF and Pillow only when re-importing; ordinary
 report builds need none of these. The two source files are never modified.
@@ -13,19 +13,21 @@ import io
 import json
 from pathlib import Path
 import re
-import unicodedata
+from xml.etree import ElementTree
+from zipfile import ZipFile
 
-import fitz
+import pymupdf as fitz
 from PIL import Image
 import pypandoc
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT.parent / 'Report_V4.md'
 PDF = ROOT.parent / 'Report_V4.pdf'
-WORK = ROOT / 'build/v4'
+DOCX = ROOT.parent / 'Report_V4.docx'
 API = []
 MANIFEST = {'sources': {}, 'headings': [], 'figures': [], 'tables': [], 'code': []}
 LANDSCAPE_FIGURES = {'2.7', '3.10', '4.4', '4.8', '4.9'}
+LISTING_ID = re.compile(r'^([A-D](?:\.\d+)+)\. ')
 
 
 def plain(value):
@@ -92,60 +94,73 @@ def extract_images(source):
     return re.sub(r'^\[(image\d+)\]:\s*<data:([^;]+);base64,([^>]+)>\s*$', replace, source, flags=re.M)
 
 
-def pdf_code():
-    """Recover physical code lines from V4 PDF's code-font spans (pages 101–106)."""
-    result, current = {}, None
-    for page_no, page in enumerate(fitz.open(PDF), 1):
-        if not 101 <= page_no <= 106:
+def word_text(node):
+    return ''.join(t.text or '' for t in node.iterfind('.//{*}t'))
+
+
+def docx_listings(docx):
+    """Read listing lines and indentation from the Word table paragraphs."""
+    body = ElementTree.fromstring(docx.read('word/document.xml')).find('{*}body')
+    listings = {}
+    for table in body.findall('{*}tbl'):
+        rows = table.findall('{*}tr')
+        if len(rows) != 2:
             continue
-        for block in page.get_text('dict')['blocks']:
-            if block['type'] != 0:
-                continue
-            spans = [s for line in block['lines'] for s in line['spans']]
-            fonts = {s['font'] for s in spans}
-            text = '\n'.join(''.join(s['text'] for s in line['spans']).rstrip() for line in block['lines']).strip()
-            if 'Consolas-Bold' in fonts:
-                match = re.match(r'([A-D]\.\d+)\.', text)
-                if match:
-                    current = match[1]
-                    result[current] = {'lines': [], 'pages': [], 'title': text}
-            elif 'Consolas' in fonts and current:
-                lines = []
-                for line in block['lines']:
-                    # Ignore Cambria spacer spans, but retain Arial Vietnamese fallback glyphs.
-                    code = ''.join(s['text'] for s in line['spans'] if s['size'] < 10).rstrip()
-                    if code:
-                        lines.append(code)
-                result[current]['lines'].extend(lines + [''])
-                result[current]['pages'].append(page_no)
-    return result
+        title = word_text(rows[0]).strip()
+        number = LISTING_ID.match(title)
+        if number:
+            # Word's export surrounds styled code with private-use delimiters.
+            listings[number[1]] = '\n'.join(
+                word_text(p).replace('\uec03', '').replace('\uec02', '').rstrip()
+                for p in rows[1].iterfind('.//{*}p')
+            ).strip('\n') + '\n'
+    return listings
 
 
-def prefer_pdf_images():
-    """Use the original PDF streams, after visual correspondence was audited.
-
-    Markdown exports downsampled all diagrams to ~565 px and distorted the
-    aspect ratios of two figures. No drawing is regenerated or resampled.
-    """
-    pdf = fitz.open(PDF)
-    images = [(page_no, item) for page_no, page in enumerate(pdf, 1)
-              if 21 <= page_no <= 100 for item in page.get_images(full=True)]
-    assert len(images) == 40, 'Re-audit figure correspondence if the source PDF changes.'
-    for index, (page_no, item) in enumerate(images, 2):
-        ident = 'image' + str(index)
-        source = pdf.extract_image(item[0])
-        assert source['ext'] == 'png'
-        data = source['image']
-        info = IMAGE_DATA[ident]
-        info['markdown_sha256'] = info['sha256']
-        info['markdown_dimensions'] = [info['width_px'], info['height_px']]
-        info.update(source='Report_V4.pdf', pdf_page=page_no, pdf_xref=item[0],
-                    sha256=hashlib.sha256(data).hexdigest(), width_px=item[2], height_px=item[3])
-        (ROOT / info['path']).write_bytes(data)
+def pixel_key(data):
+    with Image.open(io.BytesIO(data)) as img:
+        return img.size, hashlib.sha256(img.convert('RGB').tobytes()).hexdigest()
 
 
-def normalize_code(s):
-    return re.sub(r'\s+', '', unicodedata.normalize('NFC', s)).replace('–', '-').replace('—', '-')
+def clean_markdown(source):
+    """Remove export-only navigation and normalize inline image/line breaks."""
+    source = '\n'.join(line.split(' {#', 1)[0] if line.startswith('#') else line
+                       for line in source.split('\n'))
+    source = source.replace('\v', '<br>')
+    return re.sub(r'(\S)(!\[\]\[image31\])', r'\1\n\n\2', source)
+
+
+def apply_approved_edits(source):
+    path = ROOT / 'assets/v4-approved-edits.json'
+    edits = json.loads(path.read_text(encoding='utf-8'))
+    for edit in edits:
+        before, after, count = edit['before'], edit['after'], edit['count']
+        if source.count(before) != count:
+            raise ValueError(f"Recheck {edit['id']} at {edit['location']}")
+        source = source.replace(before, after)
+    return source
+
+
+def prefer_pdf_images(docx, body):
+    """Use body image streams whose pixels match the Word originals."""
+    word_media = {pixel_key(docx.read(name)): name for name in docx.namelist()
+                  if name.startswith('word/media/')}
+    identifiers = re.findall(r'!\[\]\[(image\d+)\]', body)
+    with fitz.open(PDF) as pdf:
+        images = [(page.number + 1, item) for page in pdf[17:100]
+                  for item in page.get_image_info(xrefs=True)]
+        if len(images) != len(identifiers):
+            raise ValueError('Recheck image count and order against Report V4.')
+        for ident, (page_no, item) in zip(identifiers, images):
+            source = pdf.extract_image(item['xref'])
+            data = source['image']
+            word_path = word_media[pixel_key(data)]
+            info = IMAGE_DATA[ident]
+            info['markdown_sha256'] = info['sha256']
+            info['markdown_dimensions'] = [info['width_px'], info['height_px']]
+            info.update(source=PDF.name, pdf_page=page_no, pdf_xref=item['xref'], docx_media=word_path,
+                        sha256=hashlib.sha256(data).hexdigest(), width_px=item['width'], height_px=item['height'])
+            (ROOT / info['path']).write_bytes(data)
 
 
 def walk_inlines(value):
@@ -165,6 +180,8 @@ def walk_inlines(value):
                 result.append(walk_inlines(node))
         return result
     if isinstance(value, dict):
+        if value['t'] == 'RawInline' and value['c'] == ['html', '<br>']:
+            return {'t': 'RawInline', 'c': ['latex', r'\newline{}']}
         return {key: walk_inlines(val) if key == 'c' and value['t'] not in ('RawBlock', 'RawInline', 'Code', 'CodeBlock', 'Math') else val
                 for key, val in value.items()}
     return value
@@ -251,36 +268,45 @@ def render_table(table, caption=None, lead=''):
 
 
 def render_code(table):
-    heads, rows = table_rows(table)
+    heads, _ = table_rows(table)
     title = plain(row_cells(heads[0])[0][0])
-    key = re.match(r'([A-D]\.\d+)\.', title)[1]
-    original = ' '.join(plain(b) for cell in row_cells(rows[0]) for b in cell)
-    recovered = '\n'.join(CODE[key]['lines']).strip() + '\n'
-    # No alteration other than whitespace is allowed in the recovered listing.
-    if normalize_code(original) != normalize_code(recovered):
-        import difflib
-        a, b = normalize_code(original), normalize_code(recovered)
-        diffs = [(tag, a[i:j], b[k:l]) for tag, i, j, k, l in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes() if tag != 'equal']
-        raise ValueError(f'PDF/Markdown code mismatch {key}: {diffs[:6]}')
+    key = LISTING_ID.match(title)[1]
+    heading = r'\par\noindent\textbf{' + literal(title) + r'}\par'
+    if key.startswith('D.'):
+        method = {
+            'D.1': ('KB-1 đánh giá khả năng từ chối định danh không hợp lệ và duy trì ngữ cảnh thuê bao '
+                    'khi tái sử dụng luồng. KB-2 kiểm tra cô lập dữ liệu bằng dữ liệu giả lập trong môi '
+                    'trường kiểm thử có kiểm soát. Mục 5.1 nêu tập mẫu và Mục 5.2 báo cáo kết quả.'),
+            'D.2': ('KB-3 đối chiếu cấu hình Baseline và Proposed trên tải nghiệp vụ 80 người dùng ảo '
+                    'trong cửa sổ đo 60 giây. Thu thập thông lượng, độ trễ theo phân vị và mã phản hồi '
+                    'theo nhóm thuê bao. Thiết lập và kết quả được trình bày tại Mục 5.1 và Mục 5.3.1.'),
+        }[key]
+        MANIFEST['code'].append({'id': key, 'title': title, 'representation': 'method-summary'})
+        return raw(heading + '\n' + literal(method))
+
+    original = CODE[key]
+    recovered = re.sub(
+        r'(?m)^(\s*(?:POSTGRES_PASSWORD|SPRING_DATASOURCE_PASSWORD|APP_JWT_SECRET):).*?$',
+        r'\1 <GIÁ TRỊ CẤU HÌNH RIÊNG>', original) if key == 'C.1' else original
     path = 'assets/code/v4/' + key.replace('.', '-') + '.txt'
     write(path, recovered)
-    MANIFEST['code'].append({'id': key, 'title': title, 'path': path, 'pdf_pages': CODE[key]['pages'],
+    MANIFEST['code'].append({'id': key, 'title': title, 'path': path, 'source': DOCX.name,
                              'sha256': hashlib.sha256(recovered.encode('utf-8')).hexdigest(),
-                             'non_whitespace_content_matches_markdown': True})
-    return raw('\\par\\noindent\\textbf{' + literal(title) + '}\\par\n'
+                             'representation': 'redacted-listing' if recovered != original else 'listing'})
+    return raw(heading + '\n'
                '\\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\\clubpenalty10000\\widowpenalty10000},'
                'fontsize=\\fontsize{9bp}{11bp}\\selectfont]{' + path + '}')
 
 
-def render_figure(image, caption, lead=''):
+def render_figure(images, caption, lead=''):
     number = re.match(r'Hình\s+(\d+\.\d+[ab]?):\s*', plain(caption['c']))[1]
     title = strip_prefix(unstyled(caption['c']), r'Hình\s+\d+\.\d+[ab]?:\s*')
-    ident = Path(image['c'][2][0]).stem
-    data = dict(IMAGE_DATA[ident])
+    assets = [IMAGE_DATA[Path(image['c'][2][0]).stem] for image in images]
     landscape = number in LANDSCAPE_FIGURES
-    data.update(number=number, caption=title, landscape=landscape)
-    MANIFEST['figures'].append(data)
-    figure = '\\VfourFigure{' + number + '}{' + data['path'] + '}{' + literal(title) + '}{fig:v4-' + number.replace('.', '-') + '}'
+    label = 'fig:v4-' + number.replace('.', '-')
+    MANIFEST['figures'].append(dict(number=number, caption=title, landscape=landscape, images=assets))
+    command = '\\VfourFigure' if len(assets) == 1 else '\\VfourFigureGroup'
+    figure = command + '{' + number + '}{' + ','.join(a['path'] for a in assets) + '}{' + literal(title) + '}{' + label + '}'
     if landscape:
         limit = '.62' if number == '4.9' else '.72'
         figure = '\\begin{landscape}\n\\renewcommand{\\VfourImageMaxHeight}{' + limit + '\\textheight}\n' + lead + '\n' + figure + '\n\\end{landscape}'
@@ -341,10 +367,17 @@ def process(blocks, mode):
             if converted:
                 result.append(converted)
         elif image_node(block):
-            assert next_block and re.match('Hình ', plain(next_block)), plain(block)
-            number = re.match(r'Hình\s+(\d+\.\d+[ab]?):', plain(next_block))[1]
+            images = [image_node(block)]
+            while next_block and image_node(next_block):
+                images.append(image_node(next_block))
+                i += 1
+                next_block = blocks[i+1] if i+1 < len(blocks) else None
+            caption = re.match(r'Hình\s+(\d+\.\d+[ab]?):', plain(next_block))
+            if caption is None:
+                raise ValueError(f'Missing caption after {images[-1]["c"][2][0]}')
+            number = caption[1]
             lead = landscape_lead(result) if number in LANDSCAPE_FIGURES else ''
-            result.append(render_figure(image_node(block), next_block, lead))
+            result.append(render_figure(images, next_block, lead))
             i += 1
         elif block['t'] == 'Para' and re.match(r'^Bảng \d+\.\d+:', plain(block)):
             assert next_block and next_block['t'] == 'Table'
@@ -379,33 +412,19 @@ def process(blocks, mode):
 
 def main():
     global API, CODE, SECTION_NUMBERS
-    WORK.mkdir(parents=True, exist_ok=True)
     source = SOURCE.read_text(encoding='utf-8')
-    for path in (SOURCE, PDF):
+    for path in (SOURCE, PDF, DOCX):
         MANIFEST['sources'][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
-    cleaned = extract_images(source)
-    # Exported anchor strings can contain characters invalid in Pandoc attributes.
-    # They are navigation metadata, never printed heading text.
-    cleaned = '\n'.join(line.split(' {#', 1)[0] if line.startswith('#') else line for line in cleaned.splitlines())
-    # V4's second journey table has a physical newline inside its last cell.
-    # Rejoin that one exported row through its closing pipe, as in the PDF.
-    lines, repaired = [], 0
-    for line in cleaned.splitlines():
-        if lines and lines[-1].startswith('|') and not lines[-1].rstrip().endswith('|'):
-            lines[-1] += ' ' + line.strip()
-            if line.rstrip().endswith('|'):
-                repaired += 1
-        else:
-            lines.append(line)
-    assert repaired == 1, 'Re-audit multiline table rows if the source changes.'
-    cleaned = '\n'.join(lines)
-    MANIFEST['markdown_table_rows_repaired_from_pdf'] = repaired
-    (WORK / 'source-clean.md').write_text(cleaned, encoding='utf-8')
+    MANIFEST['approved_edits_sha256'] = hashlib.sha256(
+        (ROOT / 'assets/v4-approved-edits.json').read_bytes()).hexdigest()
+    body = source[source.index('# **PHẦN I.'):source.index('# **TÀI LIỆU THAM KHẢO')]
+    cleaned = extract_images(clean_markdown(apply_approved_edits(source)))
+    with ZipFile(DOCX) as docx:
+        CODE = docx_listings(docx)
+        prefer_pdf_images(docx, body)
     doc = json.loads(pypandoc.convert_text(cleaned, 'json', format='markdown-smart-citations'))
     API = doc['pandoc-api-version']
     blocks = doc['blocks']
-    CODE = pdf_code()
-    prefer_pdf_images()
     headers = [(i, plain(b['c'][2])) for i, b in enumerate(blocks) if b['t'] == 'Header']
     locate = lambda prefix: next(i for i, title in headers if title.startswith(prefix))
     SECTION_NUMBERS = {re.match(r'^([\d.]+)', title)[1].rstrip('.') for _, title in headers if re.match(r'^\d+\.\d+', title)}
@@ -417,12 +436,14 @@ def main():
         write('chapters/' + folder + '/chapter.tex', process(blocks[start:stop], 'body'))
     write('chapters/conclusion.tex', '\\addchap{PHẦN III. KẾT LUẬN VÀ KIẾN NGHỊ}\\label{chap:v4-conclusion}\n' + process(blocks[end+1:refs], 'conclusion'))
     starts = [locate('PHỤ LỤC ' + letter + ':') for letter in 'ABCD']
-    # The next table is the logo at the start of the blank bulletin forms.
+    # The next two-column table is the logo at the start of the bulletin forms.
     stop = next(i for i in range(starts[-1], len(blocks)) if blocks[i]['t'] == 'Table' and len(blocks[i]['c'][2]) == 2)
     starts.append(stop)
     for letter, start, end in zip('ABCD', starts, starts[1:]):
         write('appendices/v4-' + letter.lower() + '.tex', process(blocks[start:end], 'appendix'))
-    MANIFEST['template_logos_retained'] = [IMAGE_DATA['image1'], IMAGE_DATA['image42']]
+    if {entry['id'] for entry in MANIFEST['code']} != set(CODE):
+        raise ValueError('Markdown and Word appendix listing identifiers differ.')
+    MANIFEST['template_logos_retained'] = [IMAGE_DATA['image1'], IMAGE_DATA['image44']]
     write('assets/v4-import-manifest.json', json.dumps(MANIFEST, ensure_ascii=False, indent=2))
     print('Imported', len(MANIFEST['headings']), 'headings,', len(MANIFEST['figures']), 'figures,', len(MANIFEST['tables']), 'tables,', len(MANIFEST['code']), 'code listings')
 

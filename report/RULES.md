@@ -57,11 +57,11 @@ bắt buộc trích dẫn theo IEEE; đó là các lựa chọn của template.
 | Build | Build quyển một/hai mặt tự dựng lại cả bốn PDF riêng; không xuất số liệu hoặc chạy mô hình | `scripts/build.py` |
 
 Số chương và tên chương là mặc định có thể chỉnh theo đề tài, không phải
-yêu cầu bắt buộc của hướng dẫn hình thức. Bản V4 cập nhật ngày 19/11/2026
+yêu cầu bắt buộc của hướng dẫn hình thức. Bản V4 cập nhật ngày 26/11/2026
 dùng năm chương: cơ sở lý thuyết/mô hình hóa → kiến trúc đa thuê bao → kỹ
 thuật/nguyên lý Pool 9 tầng → nghiệp vụ/thiết kế/hiện thực Kanban → thực
-nghiệm/kết quả kiểm định. Nội dung lấy từ `Report_V4.md` và `Report_V4.pdf`;
-biểu mẫu và thông tin hành chính kế thừa khung hiện tại.
+nghiệm/kết quả kiểm định. Nội dung lấy từ ba bản V4 Markdown, PDF và
+DOCX. Biểu mẫu dùng khung CTU, nội dung V4 và thông tin xác nhận của nhóm.
 
 Quy ước vị trí hình/bảng, cỡ tiêu đề, đánh số và cách dùng nhãn là lựa
 chọn trình bày được kế thừa từ báo cáo. Không diễn giải mọi lựa chọn kỹ
@@ -96,11 +96,10 @@ thuật này thành quy định của trường.
 
 ## Phạm vi thông tin được điền
 
-Các trường hành chính được điền theo `resource/infoGroup.md` và thuyết
-minh. Thành tích học tập, ảnh, nhận xét, chữ ký, công bố và kết quả khoa
-học chưa có căn cứ tiếp tục giữ trống. Chữ ký dành cho người có thẩm
-quyền; không lấy dữ liệu của đề tài khác để điền. Tài liệu minh họa của
-template chỉ nằm trong `examples/`, không nhập vào báo cáo chính.
+Các trường hành chính lấy theo V4 và xác nhận được ghi ở
+[V4-REVIEW.md](V4-REVIEW.md). Biểu mẫu chủ nhiệm ghi điểm hệ 4 của năm
+1–3. Thành tích, ảnh, nhận xét và ngày ký/chữ ký chưa có dữ liệu được giữ
+chỗ trong mẫu. Tài liệu định dạng minh họa nằm trong `examples/`.
 
 Không áp số trang tối thiểu hay kiểm tra hồ sơ nghiệm thu vào template
 trống. Nếu cần báo cáo hoàn chỉnh, bổ sung thuyết minh và minh chứng thật

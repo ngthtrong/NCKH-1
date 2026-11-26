@@ -4,18 +4,16 @@
 \FormIndented{Coordinator: \PrincipalName}
 \FormIndented{Implementing institution: \PrincipalUnitEnglish}
 \FormIndented{Duration: \ProjectPeriodEnglish.}
-\FormSection{2. Objective(s):}
-% V4 leaves this field empty; no new translation/summary is generated.
-\PendingField{Objectives}
-\FormSection{3. Creativeness and innovativeness:}
-% Explain the original contribution.
-\PendingField{Original contribution}
+\FormSection{2. Objectives:}
+\FormResultText{To study, design, and develop a multi-tenant architecture for a Kanban task management application in a university context. The project focuses on tenant identification, data isolation, shared-resource management, and task-state consistency. The application is deployed as an Internet-accessible service and evaluated through experiments.}{To study, design, and develop a multi-tenant architecture for a Kanban task management application; implement it as an Internet-accessible software service; and evaluate its identity management, data isolation, performance, and runtime customization.}
+\FormSection{3. Novelty and innovation:}
+\FormResultText{The project integrates key multi-tenancy mechanisms into a practical Kanban application and evaluates them together in a deployed prototype. The Level 3 Pool architecture allows multiple tenants to share the application and database while maintaining tenant-specific identity context and data protection. Each tenant can also customize branding, work-in-progress (WIP) rules, and extended data fields at runtime without changing the database table structure.}{The project integrates key multi-tenancy mechanisms into a practical Kanban application and evaluates them together in a deployed prototype. The Level 3 Pool architecture allows multiple tenants to share the application and database while enforcing tenant-specific identity context and row-level data security. The application also supports runtime customization of branding, workflow rules, and extended data fields.}
 \FormSection{4. Research results:}
-% Summarize supported findings.
-\PendingField{Results}
+\FormResultText{The project designed, developed, and deployed the TenantFlow web application as a software service. It supports multiple organizations sharing infrastructure while maintaining separate workspaces and configurable Kanban workflows. In testing, all 1,500 alternating tenant requests retained the correct context, and 600 database fault-injection cases recorded no cross-tenant data leaks. Under an 80-virtual-user workload, p95 latency for four regular tenant groups was approximately 242--277 ms, below the 500 ms target. The system also demonstrated rate limiting, WIP rule enforcement, and support for extended data fields. The p99 latency remained approximately 1.99--2.45 seconds in the single-server test environment and requires further optimization.}{The project developed and deployed the TenantFlow prototype using React, Spring Boot, PostgreSQL, Redis, and Caddy on AWS EC2. Tests recorded consistent tenant context in all 1,500 alternating requests and no cross-tenant data leaks across 600 database fault-injection cases. Under an 80-virtual-user workload, p95 latency for four regular tenant groups ranged from 242 to 277 ms, below the 500 ms target. Rate limiting rejected 92.66\% of the aggressor tenant's over-limit requests. Runtime customization and extended-field tests also succeeded. The p99 latency remained approximately 1.99--2.45 seconds in the single-node test environment and requires further optimization.}
 \FormSection{5. Products:}
-% List completed research products.
-\PendingField{Products}
-\FormSection{6. Effects, technology transfer means and applicability:}
-% Describe demonstrated effects and transfer arrangements.
-\PendingField{Effects and transfer}
+\FormLine{A web-based multi-tenant Kanban task management application deployed as an Internet-accessible service.}
+\FormLine{Project completion report.}
+\FormLine{Project news brief and summary report.}
+\FormLine{A project video clip of up to two minutes.}
+\FormSection{6. Impact, technology transfer and applicability:}
+\FormResultText{The research provides a practical reference for designing and evaluating multi-tenant SaaS applications. The application may support task and project collaboration among university lecturers, students, and research teams, and may inform similar services for businesses and startup teams. The research materials and application will be compiled and transferred to the College of Information and Communication Technology, Can Tho University, for reference, teaching, and further research.}{The results provide a practical reference for designing and evaluating multi-tenant SaaS applications. The application may support task and project collaboration in universities, small and medium-sized businesses, and startup teams. The research results and application will be compiled and transferred to the College of Information and Communication Technology, Can Tho University, for reference, teaching, and further research.}

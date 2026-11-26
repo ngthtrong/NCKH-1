@@ -16,11 +16,17 @@
 \Needspace{90bp}
 \section{Bộ giới hạn tốc độ theo thuê bao và Bộ nhớ đệm hai tầng (RateLimitFilter \& TwoTierCacheConfig)}\label{v4-sec-B-3}
 
-\par\noindent\textbf{B.3. Redis Lua Token Bucket \& Bộ nhớ đệm Hai tầng Caffeine/Redis Pub/Sub (K3 \& K4)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3.txt}
+\par\noindent\textbf{B.3.1. Thuật toán Token Bucket nguyên tử bằng Redis Lua}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3-1.txt}
+
+\par\noindent\textbf{B.3.2. Bộ nhớ đệm hai tầng Caffeine/Redis và cơ chế Pub/Sub}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-3-2.txt}
 
 \Needspace{90bp}
-\section{Cấu trúc dữ liệu JSONB mẫu của Động cơ tùy biến 3 lớp (tenants.settings \& cards.custom\_\allowbreak{}fields)}\label{v4-sec-B-4}
+\section{Cấu trúc dữ liệu JSONB mẫu của Bộ xử lý tùy biến 3 lớp (tenants.settings \& cards.custom\_\allowbreak{}fields)}\label{v4-sec-B-4}
 
-\par\noindent\textbf{B.4. JSONB Mẫu Cấu hình 3 Lớp \& Quy tắc Xử lý Luật WIP (K4)}\par
-\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4.txt}
+\par\noindent\textbf{B.4.1. Cấu trúc JSONB mẫu trong tenants.settings}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4-1.txt}
+
+\par\noindent\textbf{B.4.2. Quy trình kiểm soát WIP và khóa lạc quan}\par
+\VerbatimInput[breaklines,breakanywhere,breaksymbolleft={},baselinestretch=1,samepage=false,formatcom={\clubpenalty10000\widowpenalty10000},fontsize=\fontsize{9bp}{11bp}\selectfont]{assets/code/v4/B-4-2.txt}

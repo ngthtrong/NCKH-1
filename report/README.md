@@ -2,12 +2,9 @@
 
 `report/` là nơi lưu nguồn LaTeX và PDF của báo cáo **Xây dựng ứng dụng
 quản lý công việc theo kiến trúc đa thuê bao**. Thông tin chung được
-điền theo [`infoGroup.md`](../resource/infoGroup.md) và thuyết minh trong
-`resource/`; `archive/` chỉ lưu tài liệu lịch sử. Nguồn thông tin hành
-chính dùng chung nằm ở `config/metadata.tex` và `config/members.tex`.
-Mục tiêu, thời gian và kinh phí là thông tin đề tài; các phần kết quả
-chỉ được điền khi có bằng chứng. Thành tích, ảnh, nhận xét và chữ ký
-chưa được cung cấp vẫn giữ trống.
+điền theo V4 và các xác nhận của nhóm. Nguồn thông tin hành chính dùng
+chung nằm ở `config/metadata.tex` và `config/members.tex`. Biểu mẫu chủ
+nhiệm có điểm hệ 4 của ba năm đầu theo ảnh được cung cấp.
 
 Căn cứ ưu tiên là [HinhThucBC.pdf](HinhThucBC.pdf), không phải mọi thay
 đổi trong báo cáo gốc. Bảng đối chiếu mục 2 và 3.1–3.17 nằm trong
@@ -23,20 +20,20 @@ nội dung header, số trang ở giữa footer. Hai bìa không in số trang,
 phần đầu dùng số La Mã, Mở đầu bắt đầu số Ả Rập từ 1. Trang biểu mẫu
 không in số trang nhưng vẫn được tính trong phần đầu.
 
-Bố cục cập nhật 20/11/2026: 35 hình được đặt trên trang dọc trong nội
+Bố cục thân bài: 35 hình được đặt trên trang dọc trong nội
 dung, sau đoạn văn hoàn chỉnh; chỉ năm sơ đồ nhiều chi tiết dùng trang
 ngang (2.7, 3.10, 4.4, 4.8, 4.9). Tiêu đề Phần II nằm cùng trang
 đầu Chương 1. Hình/chú thích không nổi giữa đoạn; cột bảng và vị trí các
 đoạn giới thiệu được điều chỉnh để giảm trang gần trống, giữ đủ nội dung.
 
-Nội dung hiện hành được chuyển từ `../Report_V4.md`, đối chiếu
-`../Report_V4.pdf` ngày 19/11/2026: Mở đầu, năm chương, kết luận, 25 tài
-liệu tham khảo và phụ lục A–D. Ô nghiên cứu để trống trong V4 tiếp tục
-để trống; thông tin hành chính và biểu mẫu kế thừa bản hiện tại.
-Bốn bản tin/tóm tắt được ghép sau
-phụ lục và đồng thời có đầu ra PDF riêng. Kiểm tra kỹ thuật cho khung
-trống không áp số trang tối thiểu hoặc kiểm tra hồ sơ nghiệm thu; khi
-hoàn thiện vẫn phải đáp ứng mục 2.2 và 3.15–3.17 của PDF quy định.
+Nội dung ngày 26/11/2026 được chuyển từ `Report_V4.md`, `Report_V4.pdf`
+và `Report_V4.docx`: Mở đầu, năm chương, kết luận, 25 tài liệu tham khảo
+và phụ lục A–D. Có 40 số hình với 42 ảnh nội dung. Ba ảnh của Hình 4.6
+dùng chung một chú thích. Biểu mẫu kết quả và bản tin/tóm tắt Việt–Anh
+lấy nội dung tương ứng trong V4. Bốn bản tin/tóm tắt được ghép sau phụ
+lục và đồng thời có đầu ra PDF riêng.
+Các mục đã duyệt, tạm hoãn và dữ liệu biểu mẫu còn thiếu được ghi ở
+[V4-REVIEW.md](V4-REVIEW.md).
 
 ## Cài đặt
 
@@ -127,16 +124,18 @@ LaTeX, tràn khung, thiếu ký tự, nhãn lặp hoặc tham chiếu chưa gi�
 Log nằm cạnh từng PDF. Xem trực quan PDF sau khi thay nội dung, vì log
 không phát hiện được mọi vấn đề như chữ đè lên logo.
 
-`assets/v4-import-manifest.json` ghi hash hai nguồn, đề mục, thứ tự/chú
-thích hình, trang/xref ảnh gốc PDF, số hàng/cột bảng và mã phụ lục.
+`assets/v4-import-manifest.json` ghi hash ba nguồn, đề mục, thứ tự/chú
+thích hình, vị trí ảnh gốc trong PDF/DOCX, số hàng/cột bảng và mục phụ lục.
 `bibliography/v4-reference-map.json` ánh xạ số nguồn V4 sang khóa trích
 dẫn; số hiển thị do template sắp xếp theo nhóm/tác giả. Giữ các số hình
 1.6a/b và 5.3a/b. Hai bảng hành trình không có caption trong V4 vẫn không
-đánh số; một hàng bị ngắt trong Markdown được nối lại đúng ô theo PDF.
+đánh số. Ngắt dòng bên trong ô được giữ theo nguồn.
 
-Nhập lại từ hai nguồn bằng `python report/scripts/import_v4.py` (ghi lại
+Nhập lại thân bài và phụ lục bằng `python report/scripts/import_v4.py` (ghi lại
 các tệp nội dung đã sinh); bước này cần `pypandoc_binary`, `PyMuPDF`,
-`Pillow`. Kiểm tra nội dung PDF bằng `python report/scripts/verify_v4.py`.
+`Pillow` và ba tệp V4 ở thư mục gốc. Các chỉnh sửa đã duyệt cho thân bài
+nằm ở `assets/v4-approved-edits.json`. Kiểm tra nội dung PDF bằng
+`python report/scripts/verify_v4.py`.
 Các thư viện này không cần cho build LaTeX thông thường. Kết quả và những
 điểm thiếu thông tin trong nguồn được ghi tại [VALIDATION.md](VALIDATION.md).
 

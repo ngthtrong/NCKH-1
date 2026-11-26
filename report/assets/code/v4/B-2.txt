@@ -1,22 +1,16 @@
-// RlsConnectionInterceptor.java (K2: Tiêm biến phiên SET LOCAL bên trong ranh giới giao
-dịch CSDL)
-@Aspect @Component
+@Aspect @Component @Order(Ordered.LOWEST_PRECEDENCE)
 public class RlsConnectionInterceptor {
-    @PersistenceContext private EntityManager em;
-    @Before("@annotation(org.springframework.transaction.annotation.Transactional)")
-    public void bindTenantToTransaction() {
-        TenantInfo info = TenantContext.get();
-        if (info == null) return; // Fail-Closed: không đặt SET LOCAL -> RLS chặn tự
-động trả về rỗng
-        Session session = em.unwrap(Session.class);
-        session.doWork(conn -> {
-
-            try (PreparedStatement ps = conn.prepareStatement("SELECT
-set_config('app.current_tenant_id', ?, true)")) {
-                ps.setString(1, info.tenantId().toString()); // is_local = true (tương
-đương SET LOCAL)
-                ps.execute();
-            }
-        });
-    }
+   @PersistenceContext private EntityManager entityManager;
+   @Before("@annotation(org.springframework.transaction.annotation.Transactional) || " +
+           "@within(org.springframework.transaction.annotation.Transactional)")
+   public void applyTenantRlsContext() {
+       TenantInfo info = TenantContext.get();
+       // Nguyên lý Fail-Closed: Nếu info == null -> Không đặt biến -> RLS chặn 100% truy vấn
+       if (info != null && info.tenantId() != null) {
+           // is_local = true (tương đương SET LOCAL): Biến tự hủy khi kết thúc giao dịch
+           entityManager.createNativeQuery("SELECT set_config('app.current_tenant_id', :tenantId, true)")
+                   .setParameter("tenantId", info.tenantId().toString())
+                   .getSingleResult();
+       }
+   }
 }

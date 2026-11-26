@@ -85,7 +85,7 @@ Trong thực tiễn kỹ thuật phần mềm, thuật ngữ Đa thuê bao thư�
 
 \textbf{- Sự nhầm lẫn giữa Đa thể hiện và Đa thuê bao:} Cả Đa thể hiện và Đa thuê bao đều phục vụ nhiều khách hàng tổ chức dưới cùng một thương hiệu Dịch vụ và cho phép cấu hình riêng theo từng tổ chức. Tuy nhiên, mô hình Đa thể hiện cấp phát cho mỗi Thuê bao một thể hiện hệ thống riêng biệt, không thực hiện ghép kênh nhiều thuê bao vào cùng một thể hiện hệ thống nên hiệu quả khai thác tài nguyên bị giới hạn.
 
-\textbf{- Sự nhầm lẫn giữa Đơn thuê bao và Đa thuê bao:} Đơn thuê bao thể hiện qua việc triển khai một phần mềm truyền thống dưới dạng dịch vụ và từ đó thu phí định kỳ, điêu này chỉ thay đổi vị trí đặt hạ tầng và hình thức thanh toán; toàn bộ thể hiện hệ thống đó vẫn chỉ phục vụ độc quyền cho một tổ chức khách hàng duy nhất.
+\textbf{- Sự nhầm lẫn giữa Đơn thuê bao và Đa thuê bao:} Đơn thuê bao thể hiện qua việc triển khai một phần mềm truyền thống dưới dạng dịch vụ và từ đó thu phí định kỳ, điều này chỉ thay đổi vị trí đặt hạ tầng và hình thức thanh toán; toàn bộ thể hiện hệ thống đó vẫn chỉ phục vụ độc quyền cho một tổ chức khách hàng duy nhất.
 
 Từ đó, nghiên cứu xác lập Ba Tiêu chí Phân định Bản chất giữa bốn mô hình:
 
@@ -151,7 +151,7 @@ Khi dỡ bỏ các vách ngăn máy chủ và cơ sở dữ liệu vật lý ri�
 
 \textbf{- Cô lập Dữ liệu và Quyền truy cập:} Kiểm soát chặt chẽ mọi thao tác đọc, ghi, cập nhật và xóa dữ liệu theo đúng ngữ cảnh mã định danh thuê bao (có thể là tenant\_\allowbreak{}id), nhằm ngăn chặn việc một thuê bao truy cập hoặc làm biến đổi dữ liệu của thuê bao khác ngay cả khi các bản ghi cùng nằm trong một Thể hiện Cơ sở Dữ liệu dùng chung.
 
-\textbf{- Cô lập Hiệu năng và Tài nguyên:} Kiểm soát mức độ chiếm dụng CPU, bộ nhớ RAM, bộ nhớ đệm và hồ kết nối (Connection Pool) CSDL của từng thuê bao nhằm hạn chế ảnh hưởng từ hiện tượng ``Hàng xóm ồn ào'' (Noisy Neighbor), là một tình huống khi có thuê bao phát sinh lưu lượng đột biến làm cạn kiệt tài nguyên chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận.
+\textbf{- Cô lập Hiệu năng và Tài nguyên:} Kiểm soát mức độ chiếm dụng CPU, bộ nhớ RAM, bộ nhớ đệm và bể kết nối (Connection Pool) CSDL của từng thuê bao nhằm hạn chế ảnh hưởng từ hiện tượng ``láng giềng ồn ào'' (Noisy Neighbor), là một tình huống khi có thuê bao phát sinh lưu lượng đột biến làm cạn kiệt tài nguyên chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận.
 
 \textbf{- Cô lập Sự cố và Kiểm soát Bán kính Ảnh hưởng:} Thiết kế các vách ngăn kỹ thuật để khi xảy ra lỗi phần mềm hay bảo mật tại một thuê bao, phạm vi ảnh hưởng được giới hạn, hạn chế rủi ro lan truyền sự cố sang toàn bộ thể hiện hệ thống làm ảnh hưởng đến những thuê bao đang dùng chung khác.
 
@@ -230,7 +230,7 @@ Khi áp dụng mô hình hợp nhất Cấp độ 3 xuyên qua bốn cụm tần
 
 \textbf{2. Thách thức 2 -- Lộ lọt dữ liệu chéo trên lược đồ và bộ đệm dùng chung:} Do dữ liệu của mọi tổ chức nằm chung trên cùng tập bảng vật lý tại Tầng 6 và cùng không gian đệm tại Tầng 7, chỉ một sơ suất bỏ quên điều kiện lọc ở mã nguồn ứng dụng cũng đủ làm rò rỉ dữ liệu liên thuê bao. Do đó, cần có rào chắn kiểm soát truy cập nội tại ở tầng lưu trữ và vách ngăn khoanh vùng sự cố (Mục~\ref{v4-sec-1-4-3}).
 
-\textbf{3. Thách thức 3 -- Tranh chấp tài nguyên hiệu năng và hàng xóm ồn ào:} Một thuê bao tạo đột biến lưu lượng ở Tầng 7, cấp phát vùng nhớ Heap quá lớn ở Tầng 8 hoặc thực thi truy vấn quét bảng rộng ở Tầng 6 sẽ trực tiếp chiếm cạn tài nguyên dùng chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận. Cần phối hợp đồng bộ cơ chế giới hạn tải tại biên, bộ đệm chống ô nhiễm và chỉ mục dẫn đầu theo thuê bao.
+\textbf{3. Thách thức 3 -- Tranh chấp tài nguyên hiệu năng và láng giềng ồn ào:} Một thuê bao tạo đột biến lưu lượng ở Tầng 7, cấp phát vùng nhớ Heap quá lớn ở Tầng 8 hoặc thực thi truy vấn quét bảng rộng ở Tầng 6 sẽ trực tiếp chiếm cạn tài nguyên dùng chung và kéo giảm tốc độ phản hồi của các thuê bao lân cận. Cần phối hợp đồng bộ cơ chế giới hạn tải tại biên, bộ đệm chống ô nhiễm và chỉ mục dẫn đầu theo thuê bao.
 
 \textbf{4. Thách thức 4 -- Xung đột giữa cấu trúc cố định và nhu cầu tùy biến lúc chạy:} Yêu cầu giữ một bộ mã nguồn chuẩn tại Tầng 9 và một lược đồ bảng chung tại Tầng 6 mâu thuẫn trực tiếp với nhu cầu biến thiên giao diện, quy tắc và trường dữ liệu mở rộng của từng khách hàng. Không thể phân nhánh mã nguồn hay thay đổi cấu trúc bảng vật lý trực tiếp lúc chạy vì sẽ chiếm khóa toàn bảng và phá vỡ khả năng bảo trì tập trung.
 

@@ -1,0 +1,85 @@
+@Transactional
+public Map<String, Object> moveCard(
+        UUID cardId,
+        UUID targetColumnId,
+        int targetPosition,
+        int expectedVersion) {
+
+    TenantInfo info = TenantContext.get();
+
+    // Khóa cột đích để kiểm soát truy cập đồng thời
+    BoardColumn targetCol = columnRepository
+            .findByIdForUpdate(targetColumnId)
+            .orElseThrow(() -> new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "COLUMN_NOT_FOUND",
+                    "Không tìm thấy cột đích"));
+
+    Card card = cardRepository.findById(cardId)
+            .orElseThrow(() -> new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "CARD_NOT_FOUND",
+                    "Không tìm thấy thẻ"));
+
+    // Kiểm tra phiên bản thẻ
+    if (card.getVersion() != expectedVersion) {
+        throw new ApiException(
+                HttpStatus.CONFLICT,
+                "VERSION_CONFLICT",
+                "Thẻ đã được cập nhật bởi phiên khác (kỳ vọng v"
+                + expectedVersion + ", thực tế v"
+                + card.getVersion() + ")");
+    }
+
+    UUID sourceColumnId = card.getColumnId();
+    boolean movingAcrossColumns =
+            !sourceColumnId.equals(targetColumnId);
+
+    boolean wipWarning = false;
+
+    // Kiểm tra chính sách WIP
+    if (movingAcrossColumns && targetCol.getWipLimit() != null) {
+
+        TenantSettings settings =
+                cacheService.getTenantSettings(info.tenantId());
+
+        if (!"OFF".equalsIgnoreCase(settings.wipMode())) {
+
+            long countInTarget =
+                    cardRepository.countByColumnId(targetColumnId);
+
+            if (countInTarget >= targetCol.getWipLimit()) {
+
+                if ("STRICT".equalsIgnoreCase(settings.wipMode())) {
+                    throw new ApiException(
+                            HttpStatus.UNPROCESSABLE_ENTITY,
+                            "WIP_LIMIT_EXCEEDED",
+                            "Cột '" + targetCol.getName()
+                            + "' đã đạt giới hạn WIP ("
+                            + countInTarget + "/"
+                            + targetCol.getWipLimit()
+                            + ") ở chế độ STRICT");
+                } else if ("WARN".equalsIgnoreCase(settings.wipMode())) {
+                    wipWarning = true;
+                }
+            }
+        }
+    }
+
+    // Cập nhật vị trí và phiên bản thẻ
+    card.setColumnId(targetColumnId);
+    card.setPosition(targetPosition);
+    card.setVersion(card.getVersion() + 1);
+
+    card = cardRepository.save(card);
+
+    // Vô hiệu hóa bộ đệm danh sách thẻ
+    cacheService.evictBoardCache(
+            info.tenantId(),
+            targetCol.getBoardId());
+
+    return Map.of(
+            "card", card,
+            "wipWarning", wipWarning,
+            "targetColumnId", targetColumnId);
+}

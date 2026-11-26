@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  6 NOV 2026 12:36
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  26 NOV 2026 22:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -205,38 +205,36 @@ Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 )
 (/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec.cfg)))
 
-Package fontspec Info: Font family 'times.ttf(0)' created for font 'times.ttf'
-(fontspec)             with options
-(fontspec)             [Ligatures=TeX,Path=/mnt/c/Windows/Fonts/,BoldFont=times
-bd.ttf,ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf].
+Package fontspec Info: Font family 'TimesNewRoman(0)' created for font 'Times
+(fontspec)             New Roman' with options [Ligatures=TeX].
 (fontspec)              
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
 (fontspec)              
-(fontspec)             - 'normal' (m/n) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/times.ttf]/OT:script=latn;lang
-uage=dflt;mapping=tex-text;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/times.ttf]/OT:script=latn;lang
-uage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold' (b/n) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbd.ttf]/OT:script=latn;la
-nguage=dflt;mapping=tex-text;"
-(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbd.ttf]/OT:script=latn;la
-nguage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'italic' (m/it) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesi.ttf]/OT:script=latn;lan
-guage=dflt;mapping=tex-text;"
+(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;+smcp;mapping=tex-tex
+t;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: <->"Times
+(fontspec)             New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;mapping=tex-text;"
 (fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesi.ttf]/OT:script=latn;lan
-guage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbi.ttf]/OT:script=latn;la
-nguage=dflt;mapping=tex-text;"
+(fontspec)             <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;mapping=tex-text;"
+
 (fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbi.ttf]/OT:script=latn;la
-nguage=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;+smcp;mapping=tex-
+text;"
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/unicode-math/unicode-math.sty
@@ -1201,12 +1199,14 @@ Package scrbase Info: activating vietnamese \indexname on input line 7.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  TU/latinmodern-math.otf(1)/m/n --> TU/times.ttf(0)/m/n 
-on input line 7.
+(Font)                  TU/latinmodern-math.otf(1)/m/n --> TU/TimesNewRoman(0)/
+m/n on input line 7.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/times.ttf(0)/m/it on input line 7.
+(Font)                  OT1/cmr/m/it --> TU/TimesNewRoman(0)/m/it on input line
+ 7.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/times.ttf(0)/b/n on input line 7.
+(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/b/n on input line 
+7.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
 (Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 7.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
@@ -1271,11 +1271,11 @@ L3 programming layer <2024-01-22>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 33946 strings out of 476846
- 715701 string characters out of 5803824
- 1927627 words of memory out of 5000000
- 55369 multiletter control sequences out of 15000+600000
- 558769 words of font info for 51 fonts, out of 8000000 for 9000
+ 33954 strings out of 476846
+ 715715 string characters out of 5803824
+ 1935627 words of memory out of 5000000
+ 55372 multiletter control sequences out of 15000+600000
+ 558809 words of font info for 56 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  126i,12n,124p,11036b,535s stack positions out of 10000i,1000n,20000p,200000b,200000s
 

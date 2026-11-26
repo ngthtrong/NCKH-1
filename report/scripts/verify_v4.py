@@ -6,7 +6,6 @@ Requires PyMuPDF and pypandoc_binary (ordinary report builds do not).
 """
 from __future__ import annotations
 
-from collections import Counter
 import argparse
 import hashlib
 import json
@@ -16,9 +15,12 @@ import re
 import shutil
 import subprocess
 import unicodedata
+from zipfile import ZipFile
 
-import fitz
+import pymupdf as fitz
 import pypandoc
+
+from import_v4 import apply_approved_edits, clean_markdown, docx_listings, pixel_key
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -71,20 +73,10 @@ def pdf_text(path):
                           encoding='utf-8', errors='strict', check=True).stdout
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--variant', action='append', choices=['content', 'content-twoside'])
-    args = parser.parse_args()
-    manifest = json.loads((ROOT / 'assets/v4-import-manifest.json').read_text(encoding='utf-8'))
-    errors, findings = [], []
-    for filename, expected in manifest['sources'].items():
-        actual = hashlib.sha256((ROOT.parent / filename).read_bytes()).hexdigest()
-        if actual != expected:
-            errors.append(f'Source changed: {filename}')
-    source = (ROOT.parent / 'Report_V4.md').read_text(encoding='utf-8')
+def research_prose(source):
+    source = clean_markdown(source)
     source = re.sub(r'^\[image\d+\]:[^\n]*$', '', source, flags=re.M)
-    source = '\n'.join(line.split(' {#', 1)[0] if line.startswith('#') else line for line in source.splitlines())
-    source = source[source.index('# **PHẦN I.'):source.index('# **TÀI LIỆU THAM KHẢO')]
+    source = re.sub(r'!\[\]\[image\d+\]', '', source)
     doc = json.loads(pypandoc.convert_text(source, 'json', format='markdown-smart-citations'))
     # Paragraphs/lists are checked independently from headings, captions and tables.
     paragraphs = []
@@ -100,27 +92,55 @@ def main():
             elif block['t'] in ('BulletList', 'OrderedList'):
                 visit(block['c'])
     visit(doc['blocks'])
+    return paragraphs
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--variant', action='append', choices=['content', 'content-twoside'])
+    args = parser.parse_args()
+    manifest = json.loads((ROOT / 'assets/v4-import-manifest.json').read_text(encoding='utf-8'))
+    errors, findings = [], []
+    for filename, expected in manifest['sources'].items():
+        actual = hashlib.sha256((ROOT.parent / filename).read_bytes()).hexdigest()
+        if actual != expected:
+            errors.append(f'Source changed: {filename}')
+    edit_hash = hashlib.sha256((ROOT / 'assets/v4-approved-edits.json').read_bytes()).hexdigest()
+    if edit_hash != manifest['approved_edits_sha256']:
+        errors.append('Approved edits changed since import')
+    source = (ROOT.parent / 'Report_V4.md').read_text(encoding='utf-8')
+    body = source[source.index('# **PHẦN I.'):source.index('# **TÀI LIỆU THAM KHẢO')]
+    paragraphs = research_prose(apply_approved_edits(source).split('# **PHẦN I.', 1)[1].split('# **TÀI LIỆU THAM KHẢO', 1)[0])
     original_pdf = fitz.open(ROOT.parent / 'Report_V4.pdf')
     original_grams = set(ngrams(tokens(pdf_text(ROOT.parent / 'Report_V4.pdf'))))
-    source_total = sum(len(ngrams(tokens(p))) for p in paragraphs)
-    source_matched = sum(sum(g in original_grams for g in ngrams(tokens(p))) for p in paragraphs)
+    original_paragraphs = research_prose(body)
+    source_total = sum(len(ngrams(tokens(p))) for p in original_paragraphs)
+    source_matched = sum(sum(g in original_grams for g in ngrams(tokens(p))) for p in original_paragraphs)
     if source_total != source_matched:
         findings.append('Markdown/PDF source prose differs; inspect source comparison')
     image_digest_ids = {}
-    for figure in manifest['figures']:
-        data = (ROOT / figure['path']).read_bytes()
-        if hashlib.sha256(data).hexdigest() != figure['sha256']:
-            errors.append('Changed image ' + figure['number'])
-        original = original_pdf.extract_image(figure['pdf_xref'])['image']
-        if data != original:
-            errors.append('Image differs from PDF stream ' + figure['number'])
-        image_digest_ids[fitz.Pixmap(str(ROOT / figure['path'])).digest] = figure['image_id']
-    for listing in manifest['code']:
-        actual_hash = hashlib.sha256((ROOT / listing['path']).read_bytes()).hexdigest()
-        if actual_hash != listing['sha256']:
-            errors.append('Changed code listing ' + listing['id'])
-    expected = re.findall(r'!\[\]\[(image\d+)\]', source)
-    actual = [f['image_id'] for f in manifest['figures']]
+    images = [asset for figure in manifest['figures'] for asset in figure['images']]
+    with ZipFile(ROOT.parent / 'Report_V4.docx') as docx:
+        for asset in images:
+            data = (ROOT / asset['path']).read_bytes()
+            if hashlib.sha256(data).hexdigest() != asset['sha256']:
+                errors.append('Changed image ' + asset['image_id'])
+            original = original_pdf.extract_image(asset['pdf_xref'])['image']
+            if data != original or pixel_key(data) != pixel_key(docx.read(asset['docx_media'])):
+                errors.append('Image differs from PDF or Word original ' + asset['image_id'])
+            image_digest_ids[fitz.Pixmap(str(ROOT / asset['path'])).digest] = asset['image_id']
+        listings = docx_listings(docx)
+        for listing in manifest['code']:
+            key = listing['id']
+            if listing['representation'] == 'method-summary':
+                continue
+            data = (ROOT / listing['path']).read_bytes()
+            if hashlib.sha256(data).hexdigest() != listing['sha256']:
+                errors.append('Changed code listing ' + key)
+            if listing['representation'] == 'listing' and data.decode('utf-8') != listings[key]:
+                errors.append('Listing differs from Word ' + key)
+    expected = re.findall(r'!\[\]\[(image\d+)\]', body)
+    actual = [asset['image_id'] for asset in images]
     if expected != actual:
         errors.append('Figure ordering differs from Markdown')
     bib = '\n'.join(p.read_text(encoding='utf-8') for p in (ROOT / 'bibliography').glob('*.bib'))
@@ -140,7 +160,13 @@ def main():
         embedded = [image_digest_ids[item['digest']] for page in pdf
                     for item in page.get_image_info(hashes=True) if item['digest'] in image_digest_ids]
         if embedded != actual:
-            errors.append(folder + ': embedded PDF images/order differ from the 40 source originals')
+            errors.append(folder + ': embedded PDF images/order differ from the V4 originals')
+        normalized = ' '.join(extracted.split())
+        markers = ['Phòng Quản lý Khoa học', '3.32/4.0', '3.48/4.0', '3.79/4.0',
+                   'vượt ngưỡng 5%', 'RESEARCH PROJECT NEWS BRIEF']
+        for marker in markers:
+            if marker not in normalized:
+                errors.append(folder + ': missing PDF text ' + marker)
         available = set(ngrams(tokens(extracted)))
         missing = []
         matched, total = 0, 0
@@ -160,10 +186,11 @@ def main():
         # A missing five-word sequence is a review finding, never silently a PASS.
         if missing:
             findings.append(folder + ': extracted-text gaps require review')
-    result = {'source_hashes_verified': not errors, 'figures': len(actual),
+    result = {'source_hashes_verified': not errors, 'figures': len(manifest['figures']), 'images': len(actual),
               'markdown_pdf_source_prose': {'matched_5grams': source_matched, 'total_5grams': source_total},
               'tables': len(manifest['tables']), 'captioned_tables': sum(bool(t['number']) for t in manifest['tables']),
-              'code_listings': len(manifest['code']), 'references': len(keys),
+              'appendix_items': len(manifest['code']),
+              'code_listings': sum('path' in item for item in manifest['code']), 'references': len(keys),
               'errors': errors, 'findings': findings, 'pdfs': reports}
     out = ROOT / 'build/v4/content-verification.json'
     out.parent.mkdir(parents=True, exist_ok=True)

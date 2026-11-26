@@ -1,9 +1,9 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  6 NOV 2026 12:35
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.10.6)  26 NOV 2026 22:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**\def\UseBiblatex{1}\input{main.tex}
+**\def\UseBiblatex{1}\def\TemplateHasReferences{1}\input{main.tex}
 (./main.tex (./template/ctu-report.cls
 Document Class: template/ctu-report 2026/10/06 CTU student research report
 (/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
@@ -205,38 +205,36 @@ Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 )
 (/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec.cfg)))
 
-Package fontspec Info: Font family 'times.ttf(0)' created for font 'times.ttf'
-(fontspec)             with options
-(fontspec)             [Ligatures=TeX,Path=/mnt/c/Windows/Fonts/,BoldFont=times
-bd.ttf,ItalicFont=timesi.ttf,BoldItalicFont=timesbi.ttf].
+Package fontspec Info: Font family 'TimesNewRoman(0)' created for font 'Times
+(fontspec)             New Roman' with options [Ligatures=TeX].
 (fontspec)              
 (fontspec)              This font family consists of the following NFSS
 (fontspec)             series/shapes:
 (fontspec)              
-(fontspec)             - 'normal' (m/n) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/times.ttf]/OT:script=latn;lang
-uage=dflt;mapping=tex-text;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/times.ttf]/OT:script=latn;lang
-uage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold' (b/n) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbd.ttf]/OT:script=latn;la
-nguage=dflt;mapping=tex-text;"
-(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbd.ttf]/OT:script=latn;la
-nguage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'italic' (m/it) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesi.ttf]/OT:script=latn;lan
-guage=dflt;mapping=tex-text;"
+(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;+smcp;mapping=tex-tex
+t;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: <->"Times
+(fontspec)             New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;mapping=tex-text;"
 (fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesi.ttf]/OT:script=latn;lan
-guage=dflt;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbi.ttf]/OT:script=latn;la
-nguage=dflt;mapping=tex-text;"
+(fontspec)             <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;mapping=tex-text;"
+
 (fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
-(fontspec)             <->"[/mnt/c/Windows/Fonts/timesbi.ttf]/OT:script=latn;la
-nguage=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;+smcp;mapping=tex-
+text;"
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/unicode-math/unicode-math.sty
@@ -1389,12 +1387,161 @@ Package biblatex Info: ... and expl3
 (/usr/share/texlive/texmf-dist/tex/latex/biblatex/blx-case-expl3.sty
 Package: blx-case-expl3 2023/03/05 v3.19 expl3 case changing code for biblatex
 )))
+(./template/v4-content.tex
+(/usr/share/texlive/texmf-dist/tex/latex/fvextra/fvextra.sty
+Package: fvextra 2023/11/28 v1.6.1 fvextra - extensions and patches for fancyvr
+b
+
+(/usr/share/texlive/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Package: fancyvrb 2024/01/20 4.5c verbatim text (tvz,hv)
+\FV@CodeLineNo=\count477
+\FV@InFile=\read4
+\FV@TabBox=\box79
+\c@FancyVerbLine=\count478
+\FV@StepNumber=\count479
+\FV@OutFile=\write5
+)
+(/usr/share/texlive/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+))
+(/usr/share/texlive/texmf-dist/tex/latex/lineno/lineno.sty
+Package: lineno 2023/05/20 line numbers on paragraphs v5.3
+Invalid UTF-8 byte or sequence at line 292 replaced by U+FFFD.
+\linenopenalty=\count480
+\output=\toks44
+\linenoprevgraf=\count481
+\linenumbersep=\dimen305
+\linenumberwidth=\dimen306
+\c@linenumber=\count482
+\c@pagewiselinenumber=\count483
+\c@LN@truepage=\count484
+\c@internallinenumber=\count485
+\c@internallinenumbers=\count486
+\quotelinenumbersep=\dimen307
+\bframerule=\dimen308
+\bframesep=\dimen309
+\bframebox=\box80
+\linenoamsmath@ams@eqpen=\count487
+LaTeX Info: Redefining \\ on input line 3180.
+)
+\c@FancyVerbWriteLine=\count488
+\c@FancyVerbBufferIndex=\count489
+\c@FancyVerbBufferLength=\count490
+\c@FancyVerbBufferLine=\count491
+\c@FV@oldbufferlength=\count492
+\c@FV@TrueTabGroupLevel=\count493
+\c@FV@TrueTabCounter=\count494
+\FV@TabBox@Group=\box81
+\FV@TmpLength=\skip100
+\c@FV@HighlightLinesStart=\count495
+\c@FV@HighlightLinesStop=\count496
+\FV@LoopCount=\count497
+\FV@NCharsBox=\box82
+\FV@BreakIndent=\dimen310
+\FV@BreakIndentNChars=\count498
+\FV@BreakSymbolSepLeft=\dimen311
+\FV@BreakSymbolSepLeftNChars=\count499
+\FV@BreakSymbolSepRight=\dimen312
+\FV@BreakSymbolSepRightNChars=\count500
+\FV@BreakSymbolIndentLeft=\dimen313
+\FV@BreakSymbolIndentLeftNChars=\count501
+\FV@BreakSymbolIndentRight=\dimen314
+\FV@BreakSymbolIndentRightNChars=\count502
+\c@FancyVerbLineBreakLast=\count503
+\FV@LineBox=\box83
+\FV@LineIndentBox=\box84
+\c@FV@BreakBufferDepth=\count504
+\FV@LineWidth=\dimen315
+)
+(/usr/share/texlive/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+\LTcapskip=\skip101
+\LTcapleft=\skip102
+\LTcapright=\skip103
+)
+(/usr/share/texlive/texmf-dist/tex/latex/needspace/needspace.sty
+Package: needspace 2010/09/12 v1.3d reserve vertical space
+)
+
+Package fontspec Info: Could not resolve font "Consolas/I" (it probably
+(fontspec)             doesn't exist).
+
+
+Package fontspec Info: Font family 'Consolas(0)' created for font 'Consolas'
+(fontspec)             with options
+(fontspec)             [WordSpace={1,0,0},HyphenChar=None,PunctuationSpace=Word
+Space].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->"Consolas/OT:script=latn;language=dflt;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->"Consolas/B/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->"Consolas/BI/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+
+
+Package fontspec Info: Could not resolve font "Consolas/I" (it probably
+(fontspec)             doesn't exist).
+
+
+Package fontspec Info: Font family 'Consolas(1)' created for font 'Consolas'
+(fontspec)             with options [].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->"Consolas/OT:script=latn;language=dflt;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->"Consolas/B/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->"Consolas/BI/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
+
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> TU/Consolas(1)/m/n on input line 6.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> TU/Consolas(1)/b/n on input line 6.
+\VfourImageBox=\box85
+\VfourCaptionBox=\box86
+\VfourFigureWidth=\skip104
+\VfourFigureAvailable=\skip105
+\VfourFigureNaturalHeight=\skip106
+\VfourFigureMinimumHeight=\skip107
+)
 (/usr/share/texlive/texmf-dist/tex/generic/stringenc/se-ascii-print.def
 File: se-ascii-print.def 2019/11/29 v1.12 stringenc: Printable ASCII characters
 
 )
-\@quotelevel=\count477
-\@quotereset=\count478
+\@quotelevel=\count505
+\@quotereset=\count506
 
 (build/content/content.aux (build/content/chapters/introduction.aux)
 (build/content/chapters/01-foundations/chapter.aux)
@@ -1402,42 +1549,42 @@ File: se-ascii-print.def 2019/11/29 v1.12 stringenc: Printable ASCII characters
 (build/content/chapters/03-system/chapter.aux)
 (build/content/chapters/04-implementation/chapter.aux)
 (build/content/chapters/04-evaluation/chapter.aux)
-(build/content/chapters/conclusion.aux)
-(build/content/appendices/reproducibility.aux)
-(build/content/appendices/supplementary-results.aux))
+(build/content/chapters/conclusion.aux) (build/content/appendices/v4-a.aux)
+(build/content/appendices/v4-b.aux) (build/content/appendices/v4-c.aux)
+(build/content/appendices/v4-d.aux))
 \openout1 = `content.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-Package scrbase Info: activating vietnamese \abstractname on input line 13.
-Package scrbase Info: activating vietnamese \partname on input line 13.
-Package scrbase Info: activating vietnamese \chaptername on input line 13.
-Package scrbase Info: activating vietnamese \appendixname on input line 13.
-Package scrbase Info: activating vietnamese \figurename on input line 13.
-Package scrbase Info: activating vietnamese \tablename on input line 13.
-Package scrbase Info: activating vietnamese \contentsname on input line 13.
-Package scrbase Info: activating vietnamese \listfigurename on input line 13.
-Package scrbase Info: activating vietnamese \listtablename on input line 13.
-Package scrbase Info: activating vietnamese \bibname on input line 13.
-Package scrbase Info: activating vietnamese \indexname on input line 13.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+Package scrbase Info: activating vietnamese \abstractname on input line 14.
+Package scrbase Info: activating vietnamese \partname on input line 14.
+Package scrbase Info: activating vietnamese \chaptername on input line 14.
+Package scrbase Info: activating vietnamese \appendixname on input line 14.
+Package scrbase Info: activating vietnamese \figurename on input line 14.
+Package scrbase Info: activating vietnamese \tablename on input line 14.
+Package scrbase Info: activating vietnamese \contentsname on input line 14.
+Package scrbase Info: activating vietnamese \listfigurename on input line 14.
+Package scrbase Info: activating vietnamese \listtablename on input line 14.
+Package scrbase Info: activating vietnamese \bibname on input line 14.
+Package scrbase Info: activating vietnamese \indexname on input line 14.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1474,22 +1621,19 @@ Package scrbase Info: activating vietnamese \indexname on input line 13.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  TU/latinmodern-math.otf(1)/m/n --> TU/times.ttf(0)/m/n 
-on input line 13.
+(Font)                  TU/latinmodern-math.otf(1)/m/n --> TU/TimesNewRoman(0)/
+m/n on input line 14.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/times.ttf(0)/m/it on input line 13.
-
+(Font)                  OT1/cmr/m/it --> TU/TimesNewRoman(0)/m/it on input line
+ 14.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/times.ttf(0)/b/n on input line 13.
+(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/b/n on input line 
+14.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 13.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 14.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 13.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 13.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 13.
-Package hyperref Info: Link coloring OFF on input line 13.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 14.
+Package hyperref Info: Link coloring OFF on input line 14.
 Package biblatex Info: Trying to load language 'american'...
 Package biblatex Info: ... file 'american.lbx' found.
 (/usr/share/texlive/texmf-dist/tex/latex/biblatex/lbx/american.lbx
@@ -1522,12 +1666,12 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'content.bbl' found.
 
 (build/content/content.bbl)
-Package biblatex Info: Reference section=0 on input line 13.
-Package biblatex Info: Reference segment=0 on input line 13.
-LaTeX Info: Redefining \rmfamily on input line 13.
-LaTeX Info: Redefining \sffamily on input line 13.
-LaTeX Info: Redefining \ttfamily on input line 13.
-Package hyperref Info: Option `pageanchor' set `false' on input line 14.
+Package biblatex Info: Reference section=0 on input line 14.
+Package biblatex Info: Reference segment=0 on input line 14.
+LaTeX Info: Redefining \rmfamily on input line 14.
+LaTeX Info: Redefining \sffamily on input line 14.
+LaTeX Info: Redefining \ttfamily on input line 14.
+Package hyperref Info: Option `pageanchor' set `false' on input line 15.
  (./frontmatter/cover.tex
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: xetex
@@ -1613,26 +1757,26 @@ File: assets/cover-frame.pdf Graphic file (type pdf)
 
 
 ])
-Package hyperref Info: Option `pageanchor' set `true' on input line 19.
+Package hyperref Info: Option `pageanchor' set `true' on input line 20.
  (./frontmatter/participants.tex
 chapter without number
-LaTeX Font Info:    Font shape `TU/times.ttf(0)/bx/n' in size <13.04874> not av
-ailable
-(Font)              Font shape `TU/times.ttf(0)/b/n' tried instead on input lin
-e 1.
+LaTeX Font Info:    Font shape `TU/TimesNewRoman(0)/bx/n' in size <13.04874> no
+t available
+(Font)              Font shape `TU/TimesNewRoman(0)/b/n' tried instead on input
+ line 1.
 )
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 13.05013pt on input line 22.
+(Font)              scaled to size 13.05013pt on input line 23.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 9.13509pt on input line 22.
+(Font)              scaled to size 9.13509pt on input line 23.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.52505pt on input line 22.
+(Font)              scaled to size 6.52505pt on input line 23.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 13.04733pt on input line 22.
+(Font)              scaled to size 13.04733pt on input line 23.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.13315pt on input line 22.
+(Font)              scaled to size 9.13315pt on input line 23.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.52367pt on input line 22.
+(Font)              scaled to size 6.52367pt on input line 23.
  [1
 
 
@@ -1651,46 +1795,71 @@ LaTeX Info: Redefining \ttfamily on input line 10.
 LaTeX Info: Redefining \rmfamily on input line 11.
 LaTeX Info: Redefining \sffamily on input line 11.
 LaTeX Info: Redefining \ttfamily on input line 11.
+LaTeX Font Info:    Font shape `TU/TimesNewRoman(0)/bx/n' in size <15.65843> no
+t available
+(Font)              Font shape `TU/TimesNewRoman(0)/b/n' tried instead on input
+ line 23.
  [2
 
-] [3] [4] [5] [6] [7] [8]
-LaTeX Info: Redefining \rmfamily on input line 161.
-LaTeX Info: Redefining \sffamily on input line 161.
-LaTeX Info: Redefining \ttfamily on input line 161.
-LaTeX Info: Redefining \rmfamily on input line 162.
-LaTeX Info: Redefining \sffamily on input line 162.
-LaTeX Info: Redefining \ttfamily on input line 162.
-LaTeX Info: Redefining \rmfamily on input line 163.
-LaTeX Info: Redefining \sffamily on input line 163.
-LaTeX Info: Redefining \ttfamily on input line 163.
-LaTeX Info: Redefining \rmfamily on input line 164.
-LaTeX Info: Redefining \sffamily on input line 164.
-LaTeX Info: Redefining \ttfamily on input line 164.
-LaTeX Info: Redefining \rmfamily on input line 165.
-LaTeX Info: Redefining \sffamily on input line 165.
-LaTeX Info: Redefining \ttfamily on input line 165.
-LaTeX Info: Redefining \rmfamily on input line 166.
-LaTeX Info: Redefining \sffamily on input line 166.
-LaTeX Info: Redefining \ttfamily on input line 166.
+] [3] [4] [5]
+LaTeX Info: Redefining \rmfamily on input line 98.
+LaTeX Info: Redefining \sffamily on input line 98.
+LaTeX Info: Redefining \ttfamily on input line 98.
+LaTeX Info: Redefining \rmfamily on input line 99.
+LaTeX Info: Redefining \sffamily on input line 99.
+LaTeX Info: Redefining \ttfamily on input line 99.
+LaTeX Info: Redefining \rmfamily on input line 100.
+LaTeX Info: Redefining \sffamily on input line 100.
+LaTeX Info: Redefining \ttfamily on input line 100.
+ [6]
+LaTeX Info: Redefining \rmfamily on input line 117.
+LaTeX Info: Redefining \sffamily on input line 117.
+LaTeX Info: Redefining \ttfamily on input line 117.
+LaTeX Info: Redefining \rmfamily on input line 118.
+LaTeX Info: Redefining \sffamily on input line 118.
+LaTeX Info: Redefining \ttfamily on input line 118.
+LaTeX Info: Redefining \rmfamily on input line 119.
+LaTeX Info: Redefining \sffamily on input line 119.
+LaTeX Info: Redefining \ttfamily on input line 119.
+LaTeX Info: Redefining \rmfamily on input line 120.
+LaTeX Info: Redefining \sffamily on input line 120.
+LaTeX Info: Redefining \ttfamily on input line 120.
+LaTeX Info: Redefining \rmfamily on input line 121.
+LaTeX Info: Redefining \sffamily on input line 121.
+LaTeX Info: Redefining \ttfamily on input line 121.
+LaTeX Info: Redefining \rmfamily on input line 122.
+LaTeX Info: Redefining \sffamily on input line 122.
+LaTeX Info: Redefining \ttfamily on input line 122.
 )
-\tf@toc=\write5
-\openout5 = `content.toc'.
+\tf@toc=\write6
+\openout6 = `content.toc'.
 
- [9]
+ [7]
 (build/content/content.lot)
-\tf@lot=\write6
-\openout6 = `content.lot'.
+\tf@lot=\write7
+\openout7 = `content.lot'.
 
- [10
+ [8
 
-] (build/content/content.lof)
-\tf@lof=\write7
-\openout7 = `content.lof'.
-
-
-(./frontmatter/abbreviations.tex [11
+] (build/content/content.lof [9
 
 ]
+Underfull \hbox (badness 1264) in paragraph at lines 40--40
+ [][] [][]\TU/TimesNewRoman(0)/m/n/13.04874 Kiến trúc Thành phần (Component Arc
+hitecture) của ứng dụng 
+ []
+
+[10]
+Underfull \hbox (badness 1226) in paragraph at lines 43--43
+ \TU/TimesNewRoman(0)/m/n/13.04874 AWS EC2 với Wildcard DNS, AWS Security Group
+ và Caddy 
+ []
+
+)
+\tf@lof=\write8
+\openout8 = `content.lof'.
+
+ (./frontmatter/abbreviations.tex [11]
 chapter without number
 ) (./frontmatter/research-info-vi.tex [12
 
@@ -1727,7 +1896,14 @@ chapter without number
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
- (./frontmatter/research-body-vi.tex)
+ (./frontmatter/research-body-vi.tex
+File: assets/template-headers.pdf Graphic file (type pdf)
+<use assets/template-headers.pdf, page 3>
+
+[13
+
+
+])
 LaTeX Font Info:    Calculating math sizes for size <13.0086> on input line 5.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
 (Font)              scaled to size 13.01pt on input line 5.
@@ -1741,12 +1917,7 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 (Font)              scaled to size 9.105pt on input line 5.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 (Font)              scaled to size 6.5036pt on input line 5.
-File: assets/template-headers.pdf Graphic file (type pdf)
-<use assets/template-headers.pdf, page 3>
-[13
-
-
-]
+ [14]
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: xetex
 * paper: a4paper
@@ -1779,7 +1950,7 @@ File: assets/template-headers.pdf Graphic file (type pdf)
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
- [14
+ [15
 
 
 ]) (./frontmatter/research-info-en.tex
@@ -1819,18 +1990,19 @@ LaTeX Info: Redefining \rmfamily on input line 2.
 LaTeX Info: Redefining \sffamily on input line 2.
 LaTeX Info: Redefining \ttfamily on input line 2.
 
-(./frontmatter/research-body-en.tex)
-LaTeX Info: Redefining \rmfamily on input line 5.
-LaTeX Info: Redefining \sffamily on input line 5.
-LaTeX Info: Redefining \ttfamily on input line 5.
+(./frontmatter/research-body-en.tex
 File: assets/template-headers.pdf Graphic file (type pdf)
 <use assets/template-headers.pdf, page 4>
- [15
+ [16
 
 
 
 
 ])
+LaTeX Info: Redefining \rmfamily on input line 5.
+LaTeX Info: Redefining \sffamily on input line 5.
+LaTeX Info: Redefining \ttfamily on input line 5.
+ [17])
 (./frontmatter/principal-investigator.tex
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: xetex
@@ -1866,7 +2038,7 @@ File: assets/template-headers.pdf Graphic file (type pdf)
 
 File: assets/template-headers.pdf Graphic file (type pdf)
 <use assets/template-headers.pdf, page 5>
- [16
+ [18
 
 
 
@@ -1876,111 +2048,460 @@ File: assets/template-headers.pdf Graphic file (type pdf)
 
  (./chapters/introduction.tex
 chapter without number
-) [1
+[1
 
 
 
 
 
-]
+] [2] [3] [4] [5] [6]) [7]
 \openout2 = `chapters/01-foundations/chapter.aux'.
 
  (./chapters/01-foundations/chapter.tex
 chapter 1.
-(./chapters/01-foundations/sections/saas.tex)
-(./chapters/01-foundations/sections/definitions.tex)
-(./chapters/01-foundations/sections/concepts.tex [2
-
-
-
-
-])
-(./chapters/01-foundations/sections/concept-models.tex)
-(./chapters/01-foundations/sections/reference-model.tex [3])
-(./chapters/01-foundations/sections/challenges.tex [4])) [5]
-\openout2 = `chapters/02-architecture/chapter.aux'.
-
-
-(./chapters/02-architecture/chapter.tex
-chapter 2.
-(./chapters/02-architecture/sections/boundaries.tex)
-(./chapters/02-architecture/sections/topologies.tex [6
-
-
-
-
-])
-(./chapters/02-architecture/sections/tradeoffs.tex)
-(./chapters/02-architecture/sections/scenarios.tex [7])
-(./chapters/02-architecture/sections/mechanisms.tex [8])
-(./chapters/02-architecture/sections/decision-framework.tex)) [9]
-\openout2 = `chapters/03-system/chapter.aux'.
-
-
-(./chapters/03-system/chapter.tex
-chapter 3.
-(./chapters/03-system/sections/architecture.tex)
-(./chapters/03-system/sections/synchronization.tex)
-(./chapters/03-system/sections/implementation.tex [10
-
-
-
-
-])) [11]
-\openout2 = `chapters/04-implementation/chapter.aux'.
-
-
-(./chapters/04-implementation/chapter.tex
-chapter 4.
-) [12
+[8
 
 
 
 
 ]
+File: assets/figures/v4/image2.png Graphic file (type bmp)
+<assets/figures/v4/image2.png>
+
+V4 figure 1.1 page 9: image=221.1215pt, available=243.37582pt
+[9]
+File: assets/figures/v4/image3.png Graphic file (type bmp)
+<assets/figures/v4/image3.png>
+
+V4 figure 1.2 page 10: image=220.72824pt, available=93.5176pt
+[10] [11] [12]
+File: assets/figures/v4/image4.png Graphic file (type bmp)
+<assets/figures/v4/image4.png>
+
+V4 figure 1.3 page 13: image=313.09799pt, available=317.43362pt
+[13] [14]
+File: assets/figures/v4/image5.png Graphic file (type bmp)
+<assets/figures/v4/image5.png>
+
+V4 figure 1.4 page 15: image=376.84875pt, available=487.64786pt
+[15]
+File: assets/figures/v4/image6.png Graphic file (type bmp)
+<assets/figures/v4/image6.png>
+
+V4 figure 1.5 page 16: image=431.4165pt, available=439.56964pt
+[16] [17
+
+] [18] [19
+
+] [20]
+File: assets/figures/v4/image7.png Graphic file (type bmp)
+<assets/figures/v4/image7.png>
+
+V4 figure 1.6a page 21: image=153.15558pt, available=16.9873pt
+[21]
+File: assets/figures/v4/image8.png Graphic file (type bmp)
+<assets/figures/v4/image8.png>
+
+V4 figure 1.6b page 22: image=287.11194pt, available=132.67911pt
+[22] [23] [24
+
+] [25] [26
+
+]) [27]
+\openout2 = `chapters/02-architecture/chapter.aux'.
+
+ (./chapters/02-architecture/chapter.tex
+chapter 2.
+[28
+
+
+
+
+]
+File: assets/figures/v4/image9.png Graphic file (type bmp)
+<assets/figures/v4/image9.png>
+
+V4 figure 2.1 page 29: image=467.97893pt, available=32.44958pt
+[29] [30]
+File: assets/figures/v4/image10.png Graphic file (type bmp)
+<assets/figures/v4/image10.png>
+
+V4 figure 2.2 page 31: image=287.91234pt, available=-21.68582pt
+[31]
+File: assets/figures/v4/image11.png Graphic file (type bmp)
+<assets/figures/v4/image11.png>
+
+V4 figure 2.3 page 32: image=311.94604pt, available=202.14616pt
+[32]
+File: assets/figures/v4/image12.png Graphic file (type bmp)
+<assets/figures/v4/image12.png>
+
+V4 figure 2.4 page 33: image=344.20042pt, available=198.46846pt
+[33]
+File: assets/figures/v4/image13.png Graphic file (type bmp)
+<assets/figures/v4/image13.png>
+
+V4 figure 2.5 page 34: image=290.35982pt, available=121.05783pt
+[34]
+File: assets/figures/v4/image14.png Graphic file (type bmp)
+<assets/figures/v4/image14.png>
+
+V4 figure 2.6 page 35: image=249.1977pt, available=117.61089pt
+[35] [36] [37
+
+] [38] [39] [40
+
+]
+File: assets/figures/v4/image15.png Graphic file (type bmp)
+<assets/figures/v4/image15.png>
+
+V4 figure 2.7 page 41: image=327.77351pt, available=333.79214pt
+[41
+
+]
+File: assets/figures/v4/image16.png Graphic file (type bmp)
+<assets/figures/v4/image16.png>
+
+V4 figure 2.8 page 42: image=246.59424pt, available=254.06902pt
+) [42
+
+] [43]
+\openout2 = `chapters/03-system/chapter.aux'.
+
+ (./chapters/03-system/chapter.tex
+chapter 3.
+[44
+
+
+
+
+]
+File: assets/figures/v4/image17.png Graphic file (type bmp)
+<assets/figures/v4/image17.png>
+
+V4 figure 3.1 page 45: image=166.85507pt, available=549.35301pt
+[45] [46] [47]
+File: assets/figures/v4/image18.png Graphic file (type bmp)
+<assets/figures/v4/image18.png>
+
+V4 figure 3.2 page 48: image=202.33372pt, available=609.78387pt
+[48]
+File: assets/figures/v4/image19.png Graphic file (type bmp)
+<assets/figures/v4/image19.png>
+
+V4 figure 3.3 page 49: image=232.2823pt, available=16327.15492pt
+[49] [50]
+File: assets/figures/v4/image20.png Graphic file (type bmp)
+<assets/figures/v4/image20.png>
+
+V4 figure 3.4 page 51: image=237.1828pt, available=592.06564pt
+[51]
+File: assets/figures/v4/image21.png Graphic file (type bmp)
+<assets/figures/v4/image21.png>
+
+V4 figure 3.5 page 52: image=211.11557pt, available=297.1379pt
+[52]
+File: assets/figures/v4/image22.png Graphic file (type bmp)
+<assets/figures/v4/image22.png>
+
+V4 figure 3.6 page 53: image=229.39537pt, available=-55.59651pt
+[53] [54]
+File: assets/figures/v4/image23.png Graphic file (type bmp)
+<assets/figures/v4/image23.png>
+
+V4 figure 3.7 page 55: image=170.07617pt, available=203.30096pt
+File: assets/figures/v4/image24.png Graphic file (type bmp)
+<assets/figures/v4/image24.png>
+V4 figure 3.8 page 55: image=205.84647pt, available=-27.5172pt
+[55]
+Underfull \hbox (badness 2080) in paragraph at lines 153--155
+[]\TU/TimesNewRoman(0)/m/n/13.04874 Cưỡng chế chính sách đối với mọi chủ thể tr
+uy vấn (Mandatory Policy
+ []
+
+[56]
+File: assets/figures/v4/image25.png Graphic file (type bmp)
+<assets/figures/v4/image25.png>
+
+V4 figure 3.9 page 57: image=289.02483pt, available=-71.76631pt
+[57] [58] [59]
+File: assets/figures/v4/image26.png Graphic file (type bmp)
+<assets/figures/v4/image26.png>
+
+V4 figure 3.10 page 60: image=327.7851pt, available=354.14815pt
+[60
+
+] [61
+
+
+])
+\openout2 = `chapters/04-implementation/chapter.aux'.
+
+ (./chapters/04-implementation/chapter.tex
+chapter 4.
+
+Class scrreprt Warning: `\caption' outside float.
+(scrreprt)              Seems you are using `\caption' outside a float.
+(scrreprt)              Maybe you are using a package that uses `\@makecaption'
+
+(scrreprt)              without setting `\@captype' before.
+(scrreprt)              Because I cannot detect the caption type, I'm using
+(scrreprt)              the empty one. on input line 12.
+
+[62
+
+
+
+
+
+] [63] [64]
+File: assets/figures/v4/image27.png Graphic file (type bmp)
+<assets/figures/v4/image27.png>
+
+V4 figure 4.1 page 65: image=196.36208pt, available=569.07187pt
+File: assets/figures/v4/image28.png Graphic file (type bmp)
+<assets/figures/v4/image28.png>
+V4 figure 4.2 page 65: image=251.1608pt, available=-56.84355pt
+[65]
+File: assets/figures/v4/image29.png Graphic file (type bmp)
+<assets/figures/v4/image29.png>
+
+V4 figure 4.3 page 66: image=251.1608pt, available=200.15968pt
+[66] [67] [68] [69
+
+] [70]
+File: assets/figures/v4/image30.png Graphic file (type bmp)
+<assets/figures/v4/image30.png>
+
+V4 figure 4.4 page 71: image=327.78282pt, available=16347.51093pt
+[71
+
+
+] [72
+
+] [73]
+File: assets/figures/v4/image31.png Graphic file (type bmp)
+<assets/figures/v4/image31.png>
+
+V4 figure 4.5 page 74: image=257.60326pt, available=551.33453pt
+File: assets/figures/v4/image32.png Graphic file (type bmp)
+<assets/figures/v4/image32.png>
+File: assets/figures/v4/image33.png Graphic file (type bmp)
+<assets/figures/v4/image33.png>
+File: assets/figures/v4/image34.png Graphic file (type bmp)
+<assets/figures/v4/image34.png>
+[74] [75] [76]
+File: assets/figures/v4/image35.png Graphic file (type bmp)
+<assets/figures/v4/image35.png>
+
+V4 figure 4.7 page 77: image=287.342pt, available=193.90944pt
+[77] [78] [79
+
+] [80]
+File: assets/figures/v4/image36.png Graphic file (type bmp)
+<assets/figures/v4/image36.png>
+
+V4 figure 4.8 page 81: image=327.79036pt, available=327.67554pt
+File: assets/figures/v4/image36.png Graphic file (type bmp)
+<assets/figures/v4/image36.png>
+[81
+
+
+] [82
+
+]
+File: assets/figures/v4/image37.png Graphic file (type bmp)
+<assets/figures/v4/image37.png>
+
+V4 figure 4.9 page 83: image=282.24654pt, available=304.68176pt
+[83
+
+] [84
+
+] [85]
+File: assets/figures/v4/image38.png Graphic file (type bmp)
+<assets/figures/v4/image38.png>
+
+V4 figure 4.10 page 86: image=249.40442pt, available=630.13988pt
+) [86]
 \openout2 = `chapters/04-evaluation/chapter.aux'.
 
  (./chapters/04-evaluation/chapter.tex
 chapter 5.
-(./chapters/04-evaluation/sections/setup.tex)
-(./chapters/04-evaluation/sections/results.tex)
-(./chapters/04-evaluation/sections/limitations.tex [13
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--19
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--21
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--23
+
+ []
+
+[87
 
 
 
 
-])) [14]
+]
+File: assets/figures/v4/image39.png Graphic file (type bmp)
+<assets/figures/v4/image39.png>
+
+V4 figure 5.1 page 88: image=303.49767pt, available=535.14473pt
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--37
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--39
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--41
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--43
+
+ []
+
+[88]
+Underfull \hbox (badness 10000) in paragraph at lines 57--59
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 59--61
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 61--63
+
+ []
+
+[89]
+File: assets/figures/v4/image40.png Graphic file (type bmp)
+<assets/figures/v4/image40.png>
+
+V4 figure 5.2 page 90: image=152.45284pt, available=555.17995pt
+[90]
+File: assets/figures/v4/image41.png Graphic file (type bmp)
+<assets/figures/v4/image41.png>
+
+V4 figure 5.3a page 91: image=254.29456pt, available=398.09311pt
+[91]
+File: assets/figures/v4/image42.png Graphic file (type bmp)
+<assets/figures/v4/image42.png>
+
+V4 figure 5.3b page 92: image=152.80411pt, available=284.08783pt
+[92]
+File: assets/figures/v4/image43.png Graphic file (type bmp)
+<assets/figures/v4/image43.png>
+
+V4 figure 5.4 page 93: image=326.8057pt, available=439.59512pt
+[93] [94]) [95]
 \openout2 = `chapters/conclusion.aux'.
 
-
-(./chapters/conclusion.tex
+ (./chapters/conclusion.tex
 chapter without number
-) [15
+[96
+
+
+
+
+]) [97]
+chapter without number
+LaTeX Info: Redefining \rmfamily on input line 43.
+LaTeX Info: Redefining \sffamily on input line 43.
+LaTeX Info: Redefining \ttfamily on input line 43.
+
+Package biblatex Warning: Keyword 'legal' not found on input line 43.
+
+
+LaTeX Warning: Empty bibliography on input line 43.
+
+[98
 
 
 
 
 ]
-chapter without number
-[16
+Underfull \hbox (badness 3746) in paragraph at lines 43--43
+[]\TU/TimesNewRoman(0)/m/n/13.04874 Cloud Native Computing Foundation (CNCF), \
+TU/TimesNewRoman(0)/m/it/13.04874 OpenFeature Specification
+ []
 
+[99]
+Underfull \hbox (badness 1460) in paragraph at lines 43--43
+[]\TU/TimesNewRoman(0)/m/n/13.04874 Microsoft Azure Architecture Center, \TU/Ti
+mesNewRoman(0)/m/it/13.04874 Architecting multitenant solutions on
+ []
 
+LaTeX Info: Redefining \rmfamily on input line 43.
+LaTeX Info: Redefining \sffamily on input line 43.
+LaTeX Info: Redefining \ttfamily on input line 43.
+[100]
+\openout2 = `appendices/v4-a.aux'.
 
-
-]
-\openout2 = `appendices/reproducibility.aux'.
-
- (./appendices/reproducibility.tex
+ (./appendices/v4-a.tex
 chapter A.
-) [17
+[101
 
 
-]
-\openout2 = `appendices/supplementary-results.aux'.
+] [102] [103]) [104]
+\openout2 = `appendices/v4-b.aux'.
 
- (./appendices/supplementary-results.tex
+ (./appendices/v4-b.tex
 chapter B.
-) [18
+LaTeX Font Info:    Calculating math sizes for size <10.87407> on input line 8.
+
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 10.87523pt on input line 8.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 7.61261pt on input line 8.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 5.4376pt on input line 8.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 10.8729pt on input line 8.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 7.61098pt on input line 8.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 5.43643pt on input line 8.
+[105
+
+
+
+
+] [106] [107] [108]) [109]
+\openout2 = `appendices/v4-c.aux'.
+
+ (./appendices/v4-c.tex
+chapter C.
+[110
+
+
+
+
+] [111]) [112]
+\openout2 = `appendices/v4-d.aux'.
+
+ (./appendices/v4-d.tex
+chapter D.
+) [113
 
 
 
@@ -2020,7 +2541,7 @@ chapter B.
 
 File: assets/template-headers.pdf Graphic file (type pdf)
 <use assets/template-headers.pdf, page 1>
- [19
+ [114
 
 
 
@@ -2063,12 +2584,12 @@ File: assets/template-headers.pdf Graphic file (type pdf)
 LaTeX Info: Redefining \rmfamily on input line 2.
 LaTeX Info: Redefining \sffamily on input line 2.
 LaTeX Info: Redefining \ttfamily on input line 2.
-LaTeX Info: Redefining \rmfamily on input line 24.
-LaTeX Info: Redefining \sffamily on input line 24.
-LaTeX Info: Redefining \ttfamily on input line 24.
+LaTeX Info: Redefining \rmfamily on input line 17.
+LaTeX Info: Redefining \sffamily on input line 17.
+LaTeX Info: Redefining \ttfamily on input line 17.
 File: assets/template-headers.pdf Graphic file (type pdf)
 <use assets/template-headers.pdf, page 2>
- [20
+ [115
 
 
 
@@ -2108,17 +2629,17 @@ File: assets/template-headers.pdf Graphic file (type pdf)
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
- (./frontmatter/research-body-vi.tex)
+ (./frontmatter/research-body-vi.tex
 File: assets/template-headers.pdf Graphic file (type pdf)
 <use assets/template-headers.pdf, page 6>
 
-[21
+[116
 
 
 
 
 
-]) (./deliverables/content/summary-en.tex
+]) [117]) (./deliverables/content/summary-en.tex
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: xetex
 * paper: a4paper
@@ -2155,28 +2676,29 @@ LaTeX Info: Redefining \rmfamily on input line 2.
 LaTeX Info: Redefining \sffamily on input line 2.
 LaTeX Info: Redefining \ttfamily on input line 2.
 
-(./frontmatter/research-body-en.tex)
+(./frontmatter/research-body-en.tex
+File: assets/template-headers.pdf Graphic file (type pdf)
+<use assets/template-headers.pdf, page 7>
+ [118
+
+
+
+
+
+])
 LaTeX Info: Redefining \rmfamily on input line 4.
 LaTeX Info: Redefining \sffamily on input line 4.
 LaTeX Info: Redefining \ttfamily on input line 4.
-File: assets/template-headers.pdf Graphic file (type pdf)
-<use assets/template-headers.pdf, page 7>
- [22
-
-
-
-
-
-]) (build/content/content.aux
+ [119]) (build/content/content.aux
 (build/content/chapters/introduction.aux)
 (build/content/chapters/01-foundations/chapter.aux)
 (build/content/chapters/02-architecture/chapter.aux)
 (build/content/chapters/03-system/chapter.aux)
 (build/content/chapters/04-implementation/chapter.aux)
 (build/content/chapters/04-evaluation/chapter.aux)
-(build/content/chapters/conclusion.aux)
-(build/content/appendices/reproducibility.aux)
-(build/content/appendices/supplementary-results.aux))
+(build/content/chapters/conclusion.aux) (build/content/appendices/v4-a.aux)
+(build/content/appendices/v4-b.aux) (build/content/appendices/v4-c.aux)
+(build/content/appendices/v4-d.aux))
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -2186,12 +2708,12 @@ Package logreq Info: Writing requests to 'content.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 42440 strings out of 476846
- 907994 string characters out of 5803824
- 2017915 words of memory out of 5000000
- 63568 multiletter control sequences out of 15000+600000
- 563791 words of font info for 101 fonts, out of 8000000 for 9000
+ 44575 strings out of 476846
+ 951565 string characters out of 5803824
+ 2073509 words of memory out of 5000000
+ 65623 multiletter control sequences out of 15000+600000
+ 565624 words of font info for 135 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 126i,20n,124p,11018b,5598s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 126i,20n,124p,11047b,7277s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on build/content/content.pdf (40 pages).
+Output written on build/content/content.pdf (139 pages).

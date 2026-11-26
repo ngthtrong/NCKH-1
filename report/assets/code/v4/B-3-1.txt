@@ -1,0 +1,13 @@
+-- 1. Redis Lua Script Token Bucket nguyên tử (Chạy trên Redis 7.2)
+-- Khóa: ratelimit:tenant:{tenant_id} (Dung lượng: ARGV[1], Tốc độ nạp/s: ARGV[2], Mốc giờ: ARGV[3])
+local key, cap, rate, now, req = KEYS[1], tonumber(ARGV[1]), tonumber(ARGV[2]), tonumber(ARGV[3]), tonumber(ARGV[4])
+local data = redis.call('HMGET', key, 'tokens', 'last_refill')
+local tokens = tonumber(data[1]) or cap
+local last_refill = tonumber(data[2]) or now
+-- Hồi phục token theo thời gian trôi qua thực tế
+tokens = math.min(cap, tokens + math.max(0, (now - last_refill) / 1000.0) * rate)
+if tokens < req then return { 0, math.floor(tokens) } end -- Cạn token -> RateLimitFilter ném HTTP 429
+tokens = tokens - req
+redis.call('HMSET', key, 'tokens', tokens, 'last_refill', now)
+redis.call('EXPIRE', key, 120)
+return { 1, math.floor(tokens) } -- Cho phép request đi tiếp

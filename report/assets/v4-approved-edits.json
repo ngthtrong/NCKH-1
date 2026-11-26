@@ -1,0 +1,289 @@
+[
+  {
+    "id": "BT-01",
+    "location": "Mở đầu 1.1",
+    "before": "và phối hợp nhóm, trong số.",
+    "after": "và phối hợp nhóm.",
+    "count": 1
+  },
+  {
+    "id": "BT-01",
+    "location": "Mở đầu 3",
+    "before": "môi tr\tường đại học",
+    "after": "môi trường đại học",
+    "count": 1
+  },
+  {
+    "id": "BT-01",
+    "location": "Chương 1.3.1",
+    "before": "điêu này",
+    "after": "điều này",
+    "count": 1
+  },
+  {
+    "id": "BT-01",
+    "location": "Markdown dòng 525",
+    "before": "\\- Tối ưu hóa tài nguyên: Các chiến lược quản lý kết nối và truy vấn để duy trì hiệu năng hệ thống khi quy mô mở rộng.",
+    "after": "\\- Người dùng được mời chỉ có thể truy cập bảng công việc trong phạm vi được cấp quyền. Quản trị viên thuê bao (TENANT\\_ADMIN) có quyền xóa bảng công việc của thuê bao mình.",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 1.4.3",
+    "before": "hồ kết nối",
+    "after": "bể kết nối",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 3.2.1",
+    "before": "Nguồn chân lý duy nhất",
+    "after": "Căn cứ duy nhất",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 3.1",
+    "before": "máy chủ chủ thể",
+    "after": "máy chủ vật lý",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Bảng 4.1",
+    "before": "Rào chắn Dữ liệu Đáy",
+    "after": "Bảo vệ dữ liệu tại cơ sở dữ liệu",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 3.3.2, 3.4.2, danh mục hình",
+    "before": "Động cơ Đánh giá Quy tắc",
+    "after": "Bộ đánh giá quy tắc",
+    "count": 3
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 3.2, 4.3 và Phụ lục B",
+    "before": "Động cơ tùy biến",
+    "after": "Bộ xử lý tùy biến",
+    "count": 2
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 1–5 và phụ lục",
+    "before": "Hàng xóm ồn ào",
+    "after": "láng giềng ồn ào",
+    "count": 4
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 1–5 và phụ lục",
+    "before": "hàng xóm ồn ào",
+    "after": "láng giềng ồn ào",
+    "count": 10
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 5 và Phụ lục D",
+    "before": "Hàng xóm Ồn ào",
+    "after": "Láng giềng ồn ào",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Mở đầu 5",
+    "before": "Định danh và Điều hướng Tenant",
+    "after": "Định danh và điều hướng thuê bao",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Mở đầu 5",
+    "before": "trái phép giữa các tenant.",
+    "after": "trái phép giữa các thuê bao.",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Mở đầu 6",
+    "before": "module Quản trị Tenant",
+    "after": "mô-đun quản trị thuê bao",
+    "count": 1
+  },
+  {
+    "id": "BT-02",
+    "location": "Chương 5.1",
+    "before": "Dữ liệu hạt giống",
+    "after": "Dữ liệu khởi tạo",
+    "count": 1
+  },
+  {
+    "id": "BT-03",
+    "location": "Bảng 4.1",
+    "before": "GIN). . |",
+    "after": "GIN). |",
+    "count": 1
+  },
+  {
+    "id": "BT-03",
+    "location": "Chương 4.2.2",
+    "before": "Luồng Sử dụng 1: Luồng Sử dụng 1:",
+    "after": "Luồng sử dụng 1:",
+    "count": 1
+  },
+  {
+    "id": "BT-03",
+    "location": "UC10",
+    "before": " (Đã bỏ “mức ưu tiên”).",
+    "after": "",
+    "count": 1
+  },
+  {
+    "id": "BT-03",
+    "location": "Chương 4.1.1",
+    "before": "1.Chân dung",
+    "after": "1\\. Chân dung",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Mở đầu 4",
+    "before": "Nghiên cứu xuất phát từ việc tham khảo nhu cầu vận hành đa dạng của các nhóm và tổ chức. Từ các nhu cầu thị trường đó, đề tài quy hoạch",
+    "after": "Nghiên cứu sử dụng các chân dung thuê bao giả lập để biểu diễn nhu cầu vận hành khác nhau. Từ các nhu cầu được mô hình hóa, đề tài quy hoạch",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Mở đầu 4",
+    "before": "đo lường chính xác các chỉ số an toàn cô lập dữ liệu và hiệu năng vận hành trong điều kiện tải thực tế.",
+    "after": "đo các chỉ số cô lập dữ liệu và hiệu năng vận hành dưới tải giả lập.",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Mở đầu 5",
+    "before": "Cơ chế theo dõi tiến độ và nhắc nhở thời hạn thực hiện công việc đa kênh.",
+    "after": "Cơ chế theo dõi tiến độ qua bảng, cột trạng thái và thẻ công việc. Nhắc nhở thời hạn qua nhiều kênh nằm ngoài phạm vi nguyên mẫu được đánh giá.",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Mở đầu 6",
+    "before": "Không phát triển ứng dụng cho di động.",
+    "after": "Không phát triển ứng dụng cho di động. Tính nhất quán của trạng thái công việc được xem xét trong phạm vi giao dịch di chuyển thẻ, kiểm soát phiên bản và áp dụng giới hạn WIP ở nguyên mẫu.",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Mở đầu 7",
+    "before": "Chương 4 phân tích bài toán nghiệp vụ theo hướng tiếp cận thị trường,",
+    "after": "Chương 4 phân tích bài toán nghiệp vụ qua các chân dung thuê bao giả lập,",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Dẫn nhập Chương 4",
+    "before": "khảo sát nhu cầu thị trường để tổ chức các gói dịch vụ và chức năng phần mềm",
+    "after": "phân tích nhu cầu từ các chân dung thuê bao giả lập để tổ chức các gói dịch vụ và chức năng phần mềm",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Chương 4.1.1",
+    "before": "Qua khảo sát nhu cầu thực tế của các phòng ban chuyên môn trong doanh nghiệp và các nhóm dự án trên thị trường, bài toán quản lý công việc Kanban bộc lộ sự phân hóa rõ rệt giữa hai nhóm văn hóa vận hành đối lập. Để làm cơ sở xuyên suốt cho quá trình thiết kế chức năng, giao diện và đối chứng thực nghiệm, đề tài mô hình hóa hai chân dung tổ chức thuê bao điển hình đại diện cho hai phân khúc thị trường này:",
+    "after": "Đề tài xây dựng hai chân dung thuê bao giả lập, Acme Software và Lotus Media, để tạo hai tình huống có quy trình và nhu cầu tùy biến khác nhau. Hai chân dung được dùng để thiết kế chức năng, giao diện và kịch bản thực nghiệm trong đề tài có bối cảnh ứng dụng đại học:",
+    "count": 1
+  },
+  {
+    "id": "LG-01",
+    "location": "Chương 4.1.1",
+    "before": "nghiên cứu quy nạp nhu cầu thị trường của nền tảng SaaS Kanban thành mô hình",
+    "after": "nghiên cứu tổ chức các nhu cầu đã mô hình hóa thành",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "UC02",
+    "before": "Đăng nhập & Chuyển Không gian (Admin / Member)",
+    "after": "Đăng nhập tại cổng thuê bao (Tenant Admin / Member)",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Markdown dòng 1307",
+    "before": "| GET /api/public/tenant-branding & POST /api/auth/login  | Tất cả người dùng (Pre-tenant & Chọn tổ chức) | Login: {email, password}Switch: {tenantSlug}JWT Claims cấp phát: {sub, tenant\\_id, slug, role, tier, exp} |  200 OK \\+ {accessToken, tenant, user} (403 nếu lệch tổ chức)  |",
+    "after": "| GET /api/public/tenant-branding (Mặt phẳng Điều khiển) | Người dùng trước khi đăng nhập | Mã định danh tên miền phụ, có thể truyền `slug` nếu thiếu tên miền phụ | 200 OK + thông tin nhận diện thuê bao. |\n| POST /api/auth/login (Mặt phẳng Điều khiển) | Quản trị viên hoặc thành viên tại cổng thuê bao | `{email, password, tenantSlug?}`. JWT gắn thông tin định danh và vai trò của thuê bao. | 200 OK + `{accessToken, tenant, user}`. Từ chối nếu tài khoản lệch thuê bao. |",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Markdown dòng 1308",
+    "before": "| GET /api/tenant-settings/kanbanPUT /api/tenant-settings/kanban(Mặt phẳng Điều khiển) | GET: Member+; PUT: Tenant Admin \\+ Kiểm tra Host \\== JWT.slug | Settings JSONB: {theme: {primary, accent, logoText, tagline}, wipMode: \"STRICT\"\\|\"WARN\"\\|\"OFF\", defaultWipLimit: 2, cardDisplayMode: \"FULL\"\\|\"COMPACT\", defaultColumns: \\[...\\], customFields: \\[{key, label, type, required, options}\\]}  | 200 OK (đọc L1 Caffeine 0,12ms / L2 Redis). PUT cập nhật tenants.settings, xóa L2 và phát Pub/Sub tenant:config:invalidate. |",
+    "after": "| GET /api/tenant-settings/kanban<br>PUT /api/tenant-settings/kanban (Mặt phẳng Điều khiển) | GET: Member+; PUT: Tenant Admin \\+ Kiểm tra Host \\== JWT.slug | Settings JSONB: {theme: {primary, accent, logoText, tagline}, wipMode: \"STRICT\"\\|\"WARN\"\\|\"OFF\", defaultWipLimit: 2, cardDensity: \"FULL\"\\|\"COMPACT\" (tương thích với cardDisplayMode), defaultColumns: \\[...\\], customFields: \\[{key, label, type, required, options}\\]}  | 200 OK (đọc L1 Caffeine 0,12ms / L2 Redis). PUT cập nhật tenants.settings, xóa L2 và phát Pub/Sub tenant:config:invalidate. |",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Bảng 4.3",
+    "before": "/api/boards/{id}/cards(Mặt phẳng Dữ liệu)",
+    "after": "/api/boards/{id}/tasks (Mặt phẳng Dữ liệu)",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Bảng 4.3",
+    "before": "/api/cards/{id}/move(Mặt phẳng Dữ liệu)",
+    "after": "/api/cards/{id}/move (Mặt phẳng Dữ liệu)",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Bảng 4.3",
+    "before": "Body:{columnId, title, description, assigneeId?, customFields: {\"story\\_points\": 5, \"bug\\_severity\": \"Medium\"}",
+    "after": "Body: {columnId, title, description, assigneeId?, customFields: {\"story\\_points\": 5, \"bug\\_severity\": \"Medium\"}}",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Hình 4.5 thân bài",
+    "before": "*Hình 4.5: Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow*",
+    "after": "*Hình 4.5: Giao diện Mặt phẳng Điều khiển thực tế trên TenantFlow.*",
+    "count": 1
+  },
+  {
+    "id": "LG-04",
+    "location": "Hình 4.6 thân bài",
+    "before": "*Hình 4.6: Đối chứng giao diện bảng Kanban thực tế của hai thuê bao Acme Software (t-acme) và Lotus Media (t-lotus) vận hành đồng thời trên cùng một phiên bản mã nguồn tại cụm AWS EC2.*",
+    "after": "*Hình 4.6: Giao diện TenantFlow theo thứ tự từ trên xuống: bảng Kanban của Acme Software, bảng Kanban của Lotus Media và trang cấu hình của Lotus Media.*",
+    "count": 2
+  },
+  {
+    "id": "LG-05",
+    "location": "Bảng 4.3",
+    "before": "Caffeine 0,12ms",
+    "after": "Caffeine khoảng 0,12 ms",
+    "count": 1
+  },
+  {
+    "id": "LG-05",
+    "location": "Chương 4.3.3",
+    "before": "với độ trễ dưới 0,1ms",
+    "after": "với độ trễ ghi nhận khoảng 0,12 ms",
+    "count": 1
+  },
+  {
+    "id": "LG-05",
+    "location": "Chương 5.2",
+    "before": "Như vậy, RLS tăng cường khả năng cô lập dữ liệu với mức ảnh hưởng nhỏ đến độ trễ đầu-cuối trong điều kiện thực nghiệm, đáp ứng mục tiêu NFR-03.",
+    "after": "Theo mẫu số quy định tại NFR-03 (thời gian truy vấn khi lọc thủ công), mức tăng 36,0% vượt ngưỡng 5% trong phép đo vi mô. Tỷ lệ khoảng 1,8% mô tả mức phụ trội so với độ trễ API đầu-cuối và được báo cáo riêng.",
+    "count": 1
+  },
+  {
+    "id": "LG-05",
+    "location": "Chương 5.4",
+    "before": "Chi phí phụ trội của RLS là 0,45 ms, tương đương khoảng 1,8% thời gian phản hồi API đầu-cuối. Kết quả cho thấy có thể tăng cường an toàn dữ liệu mà không gây suy giảm hiệu năng đáng kể trong điều kiện thử nghiệm.",
+    "after": "Chi phí phụ trội của RLS là 0,45 ms, tương ứng 36,0% so với truy vấn lọc thủ công và khoảng 1,8% so với thời gian phản hồi API đầu-cuối. Kết quả đo vi mô vượt ngưỡng 5% của NFR-03.",
+    "count": 1
+  }
+]

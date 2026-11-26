@@ -89,7 +89,7 @@ for folder, job in targets.items():
             if heading.casefold() not in normalized:
                 errors.append(f'{folder}: publication-table column missing: {heading}')
     if folder in ['content', 'content-twoside']:
-        headings = ['BẢN TIN ĐỀ TÀI', 'SUMMARY REPORT RESEARCH PROJECT',
+        headings = ['BẢN TIN ĐỀ TÀI', 'RESEARCH PROJECT NEWS BRIEF',
                     'BÁO CÁO TÓM TẮT', 'INFORMATION ON RESEARCH RESULTS']
         positions = [pdf_text.rfind(heading) for heading in headings]
         if any(position < 0 for position in positions) or positions != sorted(positions):
